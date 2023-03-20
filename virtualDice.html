@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dice Roller</title>
+  <link rel="stylesheet" type="text/css" href="style/rollerStyle.css"> 
+  <script src="https://kit.fontawesome.com/a2463f3d5f.js" crossorigin="anonymous"></script>
+  <script src="script/rollerScript.js"></script>
+</head>
+<body>
+  <div class="primary-buttons">
+    <div id="add-dice-container">
+      <button type="button" class="add-button" onclick="addDice()">
+        <div class="icon">
+          <i class="fa-solid fa-plus"></i>
+        </div>
+      </button>
+    </div>
+    <div class="title-container">
+      <h1>Custom Dice</h1>
+    </div>
+    <button type="button" class="roll-button" onclick="rollDice()">
+      <div class="icon">
+        <i class="fa-solid fa-dice-six"></i>
+      </div>
+      <div class="roll-label">Roll</div>
+    </button>
+  </div>
+  <div id="dice-container"></div>
+</body>
+</html>
