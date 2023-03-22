@@ -245,36 +245,37 @@ function getRandomNumber(min, max) {
 
 function rollDice() {
         const diceToRoll = diceList.filter(dice => !dice.classList.contains("dice-held"));
-
+    
         if (diceToRoll.length === 0) {
-                alert("All dice are held!");
-                return;
+            alert("All dice are held!");
+            return;
         }
-
+    
         diceToRoll.forEach(dice => {
-                const number = dice.querySelector(".number");
-                const facesInput = dice.querySelector("input[type='hidden'].faces");
-                if (!facesInput) {
-                        console.error("Dice is missing faces input:", dice);
-                        return;
-                }
-                if (dice.customFaces.length > 1) {
-                        number.textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
-                } else {
-                        const oldValue = number.textContent;
-                        const newValue = getRandomNumber(1, facesInput.value);
-                        number.textContent = newValue;
-                        if (!dice.classList.contains("dice-held") && oldValue !== newValue) {
-                                // Add shake animation class
-                                dice.classList.add("shake");
-                                // Remove shake animation class after animation completes
-                                setTimeout(() => {
-                                        dice.classList.remove("shake");
-                                }, 500);
-                        }
-                }
+            const number = dice.querySelector(".number");
+            const facesInput = dice.querySelector("input[type='hidden'].faces");
+            if (!facesInput) {
+                console.error("Dice is missing faces input:", dice);
+                return;
+            }
+            if (dice.customFaces.length > 1) {
+                number.textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
+            } else {
+                const newValue = getRandomNumber(1, facesInput.value);
+                number.textContent = newValue;
+            }
+    
+            if (!dice.classList.contains("dice-held")) {
+                // Add shake animation class
+                dice.classList.add("shake");
+                // Remove shake animation class after animation completes
+                setTimeout(() => {
+                    dice.classList.remove("shake");
+                }, 500);
+            }
         });
-}
+    }
+    
 
 function updateFontSize(dice) {
         const number = dice.querySelector('.number');
