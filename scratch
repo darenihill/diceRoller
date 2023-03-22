@@ -1,5 +1,10 @@
 Crow, Basket, Red, Yellow, Green, Blue
 
+daren.hill@ATHWNHWT2M0 diceRoller % git rm --cached .DS_Store
+
+daren.hill@ATHWNHWT2M0 diceRoller % find . -name .DS_Store -print0 | xargs -0 git rm --ignore-unmatch
+
+
 /* Responsive styles for dice */
 @media only screen and (min-width: 1200px) {
   .dice {
