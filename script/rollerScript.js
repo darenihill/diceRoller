@@ -57,12 +57,11 @@ function createDice() {
         const dice = document.createElement('div');
         dice.className = 'dice';
 
+        //#region Action Container
         // Action Container
         const actionContainer = document.createElement('div');
         actionContainer.className = 'dice-action-container';
         dice.appendChild(actionContainer);
-
-
 
         // Hold Button
         const holdButton = document.createElement('button');
@@ -97,7 +96,10 @@ function createDice() {
         configureIcon.innerHTML = '<i class="fas fa-cog"></i>';
         settingsButton.appendChild(configureIcon);
         actionContainer.appendChild(settingsButton);
+        //#endregion
 
+
+        //#region SettingsContainer
         // Remove Button
         const removeButton = document.createElement('button');
         removeButton.className = 'button dice-button remove';
@@ -130,15 +132,15 @@ function createDice() {
         customFacesButton.addEventListener('click', () => {
                 const input = prompt('Enter custom faces, separated by commas:');
                 if (input !== null) {
-                    dice.customFaces = input.split(',').map(face => face.trim());
-                    // Roll the dice with the new custom faces
-                    dice.querySelector('.number').textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
-            
-                    // Update the font size
-                    updateFontSize(dice);
+                        dice.customFaces = input.split(',').map(face => face.trim());
+                        // Roll the dice with the new custom faces
+                        dice.querySelector('.number').textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
+
+                        // Update the font size
+                        updateFontSize(dice);
                 }
-            });
-            
+        });
+
 
 
         // Number Faces Button
@@ -228,6 +230,7 @@ function createDice() {
         confirmIcon.className = 'icon';
         confirmIcon.innerHTML = '<i class="fa-regular fa-square-check"></i>';
         confirmButton.appendChild(confirmIcon);
+//#endregion
 
 
         const number = document.createElement('div');
@@ -245,54 +248,54 @@ function getRandomNumber(min, max) {
 
 function rollDice() {
         const diceToRoll = diceList.filter(dice => !dice.classList.contains("dice-held"));
-    
+
         if (diceToRoll.length === 0) {
-            alert("All dice are held!");
-            return;
-        }
-    
-        diceToRoll.forEach(dice => {
-            const number = dice.querySelector(".number");
-            const facesInput = dice.querySelector("input[type='hidden'].faces");
-            if (!facesInput) {
-                console.error("Dice is missing faces input:", dice);
+                alert("All dice are held!");
                 return;
-            }
-            if (dice.customFaces.length > 1) {
-                number.textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
-            } else {
-                const newValue = getRandomNumber(1, facesInput.value);
-                number.textContent = newValue;
-            }
-    
-            if (!dice.classList.contains("dice-held")) {
-                // Add shake animation class
-                dice.classList.add("shake");
-                // Remove shake animation class after animation completes
-                setTimeout(() => {
-                    dice.classList.remove("shake");
-                }, 500);
-            }
+        }
+
+        diceToRoll.forEach(dice => {
+                const number = dice.querySelector(".number");
+                const facesInput = dice.querySelector("input[type='hidden'].faces");
+                if (!facesInput) {
+                        console.error("Dice is missing faces input:", dice);
+                        return;
+                }
+                if (dice.customFaces.length > 1) {
+                        number.textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
+                } else {
+                        const newValue = getRandomNumber(1, facesInput.value);
+                        number.textContent = newValue;
+                }
+
+                if (!dice.classList.contains("dice-held")) {
+                        // Add shake animation class
+                        dice.classList.add("shake");
+                        // Remove shake animation class after animation completes
+                        setTimeout(() => {
+                                dice.classList.remove("shake");
+                        }, 500);
+                }
         });
-    }
-    
+}
+
 
 function updateFontSize(dice) {
         const number = dice.querySelector('.number');
         const longestFace = Math.max(...dice.customFaces.map(face => face.length));
-    
+
         // Calculate the font size based on the width of the dice and the length of the longest custom face string
         const fontSizePx = Math.floor(dice.clientWidth / longestFace);
-    
+
         // Convert the font size to vmin by dividing it by the minimum of the viewport width and height, and then multiplying by 100
         const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
         const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
         const minViewportDimension = Math.min(viewportWidth, viewportHeight);
         const fontSizeVmin = (fontSizePx / minViewportDimension) * 180;
-    
+
         number.style.fontSize = `${fontSizeVmin}vmin`;
-    }
-    
+}
+
 
 
 window.addEventListener('beforeunload', () => {
