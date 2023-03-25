@@ -5,8 +5,7 @@
         <title>Dice Roller</title>
         <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="style/rollerStyle.css">
-        <script src="https://kit.fontawesome.com/a2463f3d5f.js" crossorigin="anonymous"></script>
-        <script src="script/rollerScript.js"></script>
+       
 </head>
 
 <body>
@@ -15,22 +14,31 @@
         </div>
         <footer>
                 <div class="title-container">
-                        <h1>Custom Dice</h1>
+                        <h1>Custom <br>Dice</h1>
                 </div>
                 <div class="primary-buttons-container">
+                        <button type="button" class="update-hold-status-button" onclick="updateHoldStatus()">
+                          <div class="icon">
+                            <i class="fa-solid fa-lock"></i>
+                          </div>
+                        </button>
                         <button type="button" class="add-button" onclick="addDice()">
-                                <div class="icon">
-                                        <i class="fa-solid fa-plus"></i>
-                                </div>
+                          <div class="icon">
+                            <i class="fa-solid fa-plus"></i>
+                          </div>
                         </button>
                         <button type="button" class="roll-button" onclick="rollDice()">
-                                <div class="icon">
-                                        <i class="fa-solid fa-dice-six"></i>
-                                </div>
-                                <div class="roll-label">Roll</div>
+                          <div class="icon">
+                            <i class="fa-solid fa-dice-six"></i>
+                          </div>
+                          <div class="roll-label">Roll</div>
                         </button>
-                </div>
+                      </div>
+                      
         </footer>
+
+        <script src="https://kit.fontawesome.com/a2463f3d5f.js" crossorigin="anonymous"></script>
+        <script src="script/rollerScript.js"></script>
 </body>
 
 </html>
