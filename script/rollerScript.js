@@ -259,6 +259,8 @@ function rollDice() {
                 return;
         }
 
+        let rollTotal = 0; // Add a variable to keep track of the roll total
+
         diceToRoll.forEach(dice => {
                 const number = dice.querySelector(".number");
                 const facesInput = dice.querySelector("input[type='hidden'].faces");
@@ -281,10 +283,21 @@ function rollDice() {
                                 dice.classList.remove("shake");
                         }, 500);
                 }
+
+                rollTotal += parseInt(number.textContent); // Add the value of the rolled dice to the roll total
         });
+
+        // Display the roll total
+        const rollTotalContainer = document.querySelector(".roll-total-container");
+        const rollTotalElement = rollTotalContainer.querySelector("h1");
+        rollTotalElement.textContent = `Total: ${rollTotal}`;
+        rollTotalContainer.style.display = "flex";
 }
 
+
+
 function updateHoldStatus() {
+        console.log("Updating hold status...");
         const diceList = document.querySelectorAll('.dice');
         for (let i = 0; i < diceList.length; i++) {
           const dice = diceList[i];
