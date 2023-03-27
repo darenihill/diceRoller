@@ -41,29 +41,63 @@ daren.hill@ATHWNHWT2M0 diceRoller % find . -name .DS_Store -print0 | xargs -0 gi
    ]
 
 
-function updateHoldStatus() {
-        const diceList = document.querySelectorAll('.dice');
-        let allDiceHeld = true;
-        for (let i = 0; i < diceList.length; i++) {
-          const dice = diceList[i];
-          if (!dice.classList.contains('dice-held')) {
-            allDiceHeld = false;
-            break;
-          }
-        }
-        if (allDiceHeld) {
-          diceList.forEach(dice => dice.classList.remove('dice-held'));
-          const updateHoldButton = document.querySelector('.update-hold-status-button');
-          updateHoldButton.textContent = 'Hold All';
-          const updateHoldIcon = updateHoldButton.querySelector('.icon i');
-          updateHoldIcon.classList.remove('fa-lock');
-          updateHoldIcon.classList.add('fa-unlock');
-        } else {
-          diceList.forEach(dice => dice.classList.add('dice-held'));
-          const updateHoldButton = document.querySelector('.update-hold-status-button');
-          updateHoldButton.textContent = 'Release All';
-          const updateHoldIcon = updateHoldButton.querySelector('.icon i');
-          updateHoldIcon.classList.remove('fa-unlock');
-          updateHoldIcon.classList.add('fa-lock');
-        }
-      }
+function toggleHoldIcon(holdButton, isHeld) {
+    const holdIconElement = holdButton.querySelector('.icon i');
+    if (isHeld) {
+        holdIconElement.classList.remove('fa-unlock');
+        holdIconElement.classList.add('fa-lock');
+    } else {
+        holdIconElement.classList.remove('fa-lock');
+        holdIconElement.classList.add('fa-unlock');
+    }
+}
+
+function createHoldButton(dice) {
+    const holdButton = document.createElement('button');
+    holdButton.className = 'button dice-button hold';
+    holdButton.addEventListener('click', () => {
+        const isHeld = dice.classList.contains('dice-held');
+        dice.classList.toggle('dice-held');
+        toggleHoldIcon(holdButton, !isHeld);
+        updateHoldStatus();
+    });
+
+    const holdIcon = document.createElement('div');
+    holdIcon.className = 'icon';
+    holdIcon.innerHTML = '<i class="fa-solid fa-unlock"></i>';
+    holdButton.appendChild(holdIcon);
+
+    return holdButton;
+}
+
+function createSettingsButton(actionContainer, removeButton, settingsContainer) {
+    const settingsButton = document.createElement('button');
+    settingsButton.className = 'button dice-button settings';
+    settingsButton.addEventListener('click', () => {
+        // Toggle display of the settings container
+        actionContainer.style.display = 'none'; //hide the action container
+        removeButton.style.display = 'flex'; // show the remove button
+        settingsContainer.style.display = 'grid'; // Show the settings container
+    });
+    const configureIcon = document.createElement('div');
+    configureIcon.className = 'icon';
+    configureIcon.innerHTML = '<i class="fas fa-cog"></i>';
+    settingsButton.appendChild(configureIcon);
+
+    return settingsButton;
+}
+
+function createRemoveButton(dice) {
+    const removeButton = document.createElement('button');
+    removeButton.className = 'button dice-button remove';
+    removeButton.style.display = 'none'; // Hide the remove button by default
+    removeButton.addEventListener('click', () => {
+        removeDice(dice);
+    });
+    const removeIcon = document.createElement('div');
+    removeIcon.className = 'icon';
+    removeIcon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+    removeButton.appendChild(removeIcon);
+
+    return removeButton;
+}
