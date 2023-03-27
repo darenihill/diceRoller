@@ -1,5 +1,5 @@
 :root {
-        --dice-size: 45vmin;
+        --dice-size: 33vmin;
         --dice-button-size: calc(var(--dice-size) / 4);
         --color-swatch-size: calc(var(--dice-size) / 8);
         /* Calculate the swatch size based on the dice size */
@@ -188,7 +188,7 @@ footer {
         grid-template-columns: repeat(auto-fill, minmax(var(--dice-size), 1fr));
         justify-content: center;
         align-items: center;
-        gap: .5vmin;
+        gap: 2vmin;
         place-items: center;
         align-self: end;
     }
