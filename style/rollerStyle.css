@@ -241,6 +241,7 @@ footer {
 
 .dice-held .dice-button.hold {
         background-color: #E9EAEC;
+        border: 3px solid black;
 }
 
 .dice-held .dice-button.hold .icon {
