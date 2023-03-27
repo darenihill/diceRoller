@@ -42,6 +42,37 @@ button {
         align-items: center;
 }
 
+.hold-icon-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 25px;
+        border: none;
+        cursor: pointer;
+        background-color: #E9EAEC;
+        border: 3px solid black;
+        width: calc(100px + .1vmin);
+        height: calc(100px + .1vmin);
+        box-sizing: border-box;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
+        position: absolute;
+        top: 0px;
+        right: 0px;
+      }
+      
+      .hold-icon-container .icon {
+        font-family: "Font Awesome 6 Free";
+        font-size: calc(1em + 3vmin);
+        font-weight: normal;
+        color: #000000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+      }
+      
+
 .add-button,
 .update-hold-status-button,
 .roll-button {
@@ -85,16 +116,17 @@ button {
         font-weight: 100;
         margin: 0;
         text-align: right;
-        display: none; /* hidden by default */
-      }
+        display: none;
+        /* hidden by default */
+}
 
 .release-all-button {
         width: calc(100px + .1vmin);
-    }
-    
-    .release-all-label {
+}
+
+.release-all-label {
         margin-left: 3px;
-    }
+}
 
 .dice-button {
         width: var(--dice-button-size);
@@ -141,17 +173,17 @@ footer {
         grid-column: 1/3;
         display: grid;
         grid-template-columns: auto 1fr;
-      }
-      
-      .roll-total-container {
+}
+
+.roll-total-container {
         padding: 20px;
         align-self: flex-end;
         display: flex;
         text-align: right;
         display: none;
-      }
-      
-      .left-footer-container {
+}
+
+.left-footer-container {
         display: flex;
         grid-template-columns: 2fr 1fr;
         align-items: center;
@@ -161,9 +193,9 @@ footer {
         bottom: 0;
         left: 0;
         width: calc(80% - 200px);
-      }
-      
-      
+}
+
+
 .primary-buttons-container {
         display: flex;
         align-items: center;
@@ -180,10 +212,12 @@ footer {
 .dice-container-wrapper {
         display: grid;
         max-height: 90vh;
-        overflow: hidden;
-    }
-    
-    #dice-container {
+        /* set a maximum height for the wrapper */
+        overflow: auto;
+        /* enable scrolling when the content overflows */
+}
+
+#dice-container {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(var(--dice-size), 1fr));
         justify-content: center;
@@ -191,7 +225,7 @@ footer {
         gap: 2vmin;
         place-items: center;
         align-self: end;
-    }
+}
 
 /* Dice */
 .dice {
@@ -206,9 +240,11 @@ footer {
         cursor: pointer;
         position: relative;
         box-sizing: border-box;
-        margin: 2vmin; /* add some margin */
-      }
-      
+        margin: 2.2vmin;
+        /* add some margin */
+        z-index: 1;
+}
+
 
 .dice .number {
         font-size: 15vmin;
@@ -224,7 +260,7 @@ footer {
 .dice .remove {
         position: absolute;
         top: 0px;
-        left: 0px;
+        right: 0px;
 }
 
 .dice .settings {
@@ -233,20 +269,7 @@ footer {
         right: 0px;
 }
 
-.dice .hold {
-        position: absolute;
-        top: 0px;
-        right: 0px;
-}
 
-.dice-held .dice-button.hold {
-        background-color: #E9EAEC;
-        border: 3px solid black;
-}
-
-.dice-held .dice-button.hold .icon {
-        color: black;
-}
 
 /* Color Picker */
 .color-picker {
@@ -321,14 +344,15 @@ footer {
         justify-content: space-around;
         align-items: center;
         padding: 50px;
-      }
-      
+}
+
 
 .settings-container {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         justify-content: space-between;
-        grid-gap: 0; /* Add this line */
+        grid-gap: 0;
+        /* Add this line */
         border-radius: 1%;
         background-color: transparent;
         position: absolute;

@@ -8,8 +8,24 @@ function addDice() {
         }
         const dice = createDice();
         diceList.push(dice);
-        document.getElementById('dice-container').appendChild(dice);
+        dice.addEventListener('click', () => {
+                const holdIconContainer = dice.querySelector('.hold-icon-container');
+                const holdIconElement = holdIconContainer.querySelector('.icon i');
 
+                if (dice && !dice.classList.contains('dice-held')) {
+                        dice.classList.add('dice-held');
+                        holdIconElement.classList.remove('fa-unlock');
+                        holdIconElement.classList.add('fa-lock');
+                        holdIconContainer.style.display = 'block'; // Show the hold icon
+                } else {
+                        dice.classList.remove('dice-held');
+                        holdIconElement.classList.remove('fa-lock');
+                        holdIconElement.classList.add('fa-unlock');
+                        holdIconContainer.style.display = 'none'; // Hide the hold icon
+                }
+                updateHoldStatus();
+        });
+        document.getElementById('dice-container').appendChild(dice);
 }
 
 function removeDice(dice) {
@@ -64,29 +80,16 @@ function createDice() {
         actionContainer.className = 'dice-action-container';
         dice.appendChild(actionContainer);
 
-        // Hold Button
-        const holdButton = document.createElement('button');
-        holdButton.className = 'button dice-button hold';
-        holdButton.addEventListener('click', () => {
-                const holdIconElement = holdButton.querySelector('.icon i');
-                if (dice && !dice.classList.contains('dice-held')) {
-                        dice.classList.add('dice-held');
-                        holdIconElement.classList.remove('fa-unlock');
-                        holdIconElement.classList.add('fa-lock');
-                } else {
-                        dice.classList.remove('dice-held');
-                        holdIconElement.classList.remove('fa-lock');
-                        holdIconElement.classList.add('fa-unlock');
-                }
-                updateHoldStatus()
-
-        });
+        // Hold Icon Container
+        const holdIconContainer = document.createElement('div');
+        holdIconContainer.className = 'hold-icon-container';
+        holdIconContainer.style.display = 'none'; // Hide the hold icon container initially
 
         const holdIcon = document.createElement('div');
         holdIcon.className = 'icon';
         holdIcon.innerHTML = '<i class="fa-solid fa-unlock"></i>';
-        holdButton.appendChild(holdIcon);
-        actionContainer.appendChild(holdButton);
+        holdIconContainer.appendChild(holdIcon);
+        actionContainer.appendChild(holdIconContainer);
 
         // Settings Button
         const settingsButton = document.createElement('button');
@@ -249,6 +252,43 @@ function createDice() {
         return dice;
 }
 
+function updateHoldStatus() {
+        const allDice = document.querySelectorAll('.dice');
+        const allDiceStatusButton = document.getElementById('all-dice-status');
+        const anyHeld = Array.from(allDice).some(die => die.classList.contains('dice-held'));
+
+        if (anyHeld) {
+                allDiceStatusButton.innerHTML = '<div class="icon"><i class="fa-solid fa-unlock"></i></div>';
+        } else {
+                allDiceStatusButton.innerHTML = '<div class="icon"><i class="fa-solid fa-lock"></i></div>';
+        }
+}
+
+function toggleHoldAllDice() {
+        const allDice = document.querySelectorAll('.dice');
+        const anyHeld = Array.from(allDice).some(die => die.classList.contains('dice-held'));
+
+        allDice.forEach((die) => {
+                const holdIconContainer = die.querySelector('.hold-icon-container');
+                const holdIconElement = holdIconContainer.querySelector('.icon i');
+
+                if (anyHeld && die.classList.contains('dice-held')) {
+                        die.classList.remove('dice-held');
+                        holdIconElement.classList.remove('fa-lock');
+                        holdIconElement.classList.add('fa-unlock');
+                        holdIconContainer.style.display = 'none';
+                } else if (!anyHeld) {
+                        die.classList.add('dice-held');
+                        holdIconElement.classList.remove('fa-unlock');
+                        holdIconElement.classList.add('fa-lock');
+                        holdIconContainer.style.display = 'block';
+                }
+        });
+
+        updateHoldStatus();
+}
+
+
 function getRandomNumber(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -330,40 +370,6 @@ function updateFontSize(dice) {
         const fontSizeVmin = (fontSizePx / minViewportDimension) * 180;
 
         number.style.fontSize = `${fontSizeVmin}vmin`;
-}
-
-function updateHoldStatus() {
-        const allDice = document.querySelectorAll('.dice');
-        const allDiceStatusButton = document.getElementById('all-dice-status');
-        const anyHeld = Array.from(allDice).some(die => die.classList.contains('dice-held'));
-
-        if (anyHeld) {
-                allDiceStatusButton.innerHTML = '<div class="icon"><i class="fa-solid fa-unlock"></i></div>';
-        } else {
-                allDiceStatusButton.innerHTML = '<div class="icon"><i class="fa-solid fa-lock"></i></div>';
-        }
-}
-
-function toggleHoldAllDice() {
-        const allDice = document.querySelectorAll('.dice');
-        const allDiceStatusButton = document.getElementById('all-dice-status');
-        const anyHeld = Array.from(allDice).some(die => die.classList.contains('dice-held'));
-
-        allDice.forEach((die, index) => {
-                const holdButton = die.querySelector('.dice-button.hold');
-      
-                if (anyHeld && die.classList.contains('dice-held')) {
-                        holdButton.click();
-                } else if (!anyHeld) {
-                        holdButton.click();
-                }
-        });
-
-        if (anyHeld) {
-                allDiceStatusButton.innerHTML = '<div class="icon"><i class="fa-solid fa-lock"></i></div>';
-        } else {
-                allDiceStatusButton.innerHTML = '<div class="icon"><i class="fa-solid fa-unlock"></i></div>';
-        }
 }
 
 window.addEventListener('beforeunload', () => {
