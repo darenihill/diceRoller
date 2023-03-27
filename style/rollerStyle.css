@@ -1,5 +1,5 @@
 :root {
-        --dice-size: 33vmin;
+        --dice-size: 45vmin;
         --dice-button-size: calc(var(--dice-size) / 4);
         --color-swatch-size: calc(var(--dice-size) / 8);
         /* Calculate the swatch size based on the dice size */
