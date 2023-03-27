@@ -41,3 +41,29 @@ daren.hill@ATHWNHWT2M0 diceRoller % find . -name .DS_Store -print0 | xargs -0 gi
    ]
 
 
+function updateHoldStatus() {
+        const diceList = document.querySelectorAll('.dice');
+        let allDiceHeld = true;
+        for (let i = 0; i < diceList.length; i++) {
+          const dice = diceList[i];
+          if (!dice.classList.contains('dice-held')) {
+            allDiceHeld = false;
+            break;
+          }
+        }
+        if (allDiceHeld) {
+          diceList.forEach(dice => dice.classList.remove('dice-held'));
+          const updateHoldButton = document.querySelector('.update-hold-status-button');
+          updateHoldButton.textContent = 'Hold All';
+          const updateHoldIcon = updateHoldButton.querySelector('.icon i');
+          updateHoldIcon.classList.remove('fa-lock');
+          updateHoldIcon.classList.add('fa-unlock');
+        } else {
+          diceList.forEach(dice => dice.classList.add('dice-held'));
+          const updateHoldButton = document.querySelector('.update-hold-status-button');
+          updateHoldButton.textContent = 'Release All';
+          const updateHoldIcon = updateHoldButton.querySelector('.icon i');
+          updateHoldIcon.classList.remove('fa-unlock');
+          updateHoldIcon.classList.add('fa-lock');
+        }
+      }
