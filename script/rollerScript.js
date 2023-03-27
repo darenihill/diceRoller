@@ -3,14 +3,33 @@ let diceList = [];
 
 function addDice() {
         if (diceList.length >= maxDice) {
-                alert("You've reached the maximum number of dice!");
-                return;
+            alert("You've reached the maximum number of dice!");
+            return;
         }
         const dice = createDice();
         diceList.push(dice);
+        dice.addEventListener('click', (e) => {
+            // Ignore the event if the hold button was clicked
+            if (e.target.closest('.hold')) {
+                return;
+            }
+    
+            const holdButton = dice.querySelector('.hold');
+            const holdIconElement = holdButton.querySelector('.icon i');
+    
+            if (dice && !dice.classList.contains('dice-held')) {
+                dice.classList.add('dice-held');
+                holdIconElement.classList.remove('fa-unlock');
+                holdIconElement.classList.add('fa-lock');
+            } else {
+                dice.classList.remove('dice-held');
+                holdIconElement.classList.remove('fa-lock');
+                holdIconElement.classList.add('fa-unlock');
+            }
+            updateHoldStatus();
+        });
         document.getElementById('dice-container').appendChild(dice);
-
-}
+    }
 
 function removeDice(dice) {
         const index = diceList.indexOf(dice);
@@ -64,23 +83,24 @@ function createDice() {
         actionContainer.className = 'dice-action-container';
         dice.appendChild(actionContainer);
 
-        // Hold Button
-        const holdButton = document.createElement('button');
-        holdButton.className = 'button dice-button hold';
-        holdButton.addEventListener('click', () => {
-                const holdIconElement = holdButton.querySelector('.icon i');
-                if (dice && !dice.classList.contains('dice-held')) {
-                        dice.classList.add('dice-held');
-                        holdIconElement.classList.remove('fa-unlock');
-                        holdIconElement.classList.add('fa-lock');
-                } else {
-                        dice.classList.remove('dice-held');
-                        holdIconElement.classList.remove('fa-lock');
-                        holdIconElement.classList.add('fa-unlock');
-                }
-                updateHoldStatus()
+// Hold Button
+const holdButton = document.createElement('button');
+holdButton.className = 'button dice-button hold';
+holdButton.addEventListener('click', () => {
 
-        });
+    const holdIconElement = holdButton.querySelector('.icon i');
+    if (dice && !dice.classList.contains('dice-held')) {
+        dice.classList.add('dice-held');
+        holdIconElement.classList.remove('fa-unlock');
+        holdIconElement.classList.add('fa-lock');
+    } else {
+        dice.classList.remove('dice-held');
+        holdIconElement.classList.remove('fa-lock');
+        holdIconElement.classList.add('fa-unlock');
+    }
+    updateHoldStatus()
+});
+
 
         const holdIcon = document.createElement('div');
         holdIcon.className = 'icon';

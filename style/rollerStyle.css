@@ -179,19 +179,19 @@ footer {
 
 .dice-container-wrapper {
         display: grid;
-        max-height: 90vh;
-        overflow: hidden;
-    }
-    
-    #dice-container {
+        max-height: 90vh; /* set a maximum height for the wrapper */
+        overflow: auto; /* enable scrolling when the content overflows */
+     }
+     
+     #dice-container {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(var(--dice-size), 1fr));
         justify-content: center;
         align-items: center;
-        gap: .5vmin;
+        gap: 2vmin;
         place-items: center;
         align-self: end;
-    }
+     }
 
 /* Dice */
 .dice {
@@ -206,7 +206,8 @@ footer {
         cursor: pointer;
         position: relative;
         box-sizing: border-box;
-        margin: 2vmin; /* add some margin */
+        margin: 2.2vmin; /* add some margin */
+        z-index: 1;
       }
       
 
@@ -235,6 +236,7 @@ footer {
 
 .dice .hold {
         position: absolute;
+        z-index: 2;
         top: 0px;
         right: 0px;
 }
@@ -242,10 +244,12 @@ footer {
 .dice-held .dice-button.hold {
         background-color: #E9EAEC;
         border: 3px solid black;
+        z-index: 2;
 }
 
 .dice-held .dice-button.hold .icon {
         color: black;
+        z-index: 2;
 }
 
 /* Color Picker */
