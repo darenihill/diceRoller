@@ -9,6 +9,7 @@ function addDice() {
         const dice = createDice();
         diceList.push(dice);
         document.getElementById('dice-container').appendChild(dice);
+        updateHoldStatus(); 
 }
 
 function removeDice(dice) {
@@ -57,28 +58,31 @@ function createDice() {
         const dice = document.createElement('div');
         dice.className = 'dice';
 
+        //#region Action Container
         // Action Container
         const actionContainer = document.createElement('div');
         actionContainer.className = 'dice-action-container';
         dice.appendChild(actionContainer);
 
-
-
-        // Hold Button
-        const holdButton = document.createElement('button');
-        holdButton.className = 'button dice-button hold';
-        holdButton.addEventListener('click', () => {
-                if (!dice.classList.contains('dice-held')) {
-                        dice.classList.add('dice-held');
-                        holdButton.querySelector('.icon').innerHTML = '<i class="fas fa-hand-rock"></i>';
-                } else {
-                        dice.classList.remove('dice-held');
-                        holdButton.querySelector('.icon').innerHTML = '<i class="fas fa-hand-paper"></i>';
-                }
-        });
+// Hold Button
+const holdButton = document.createElement('button');
+holdButton.className = 'button dice-button hold';
+holdButton.addEventListener('click', () => {
+    const holdIconElement = holdButton.querySelector('.icon i');
+    if (dice && !dice.classList.contains('dice-held')) {
+        dice.classList.add('dice-held');
+        holdIconElement.classList.remove('fa-unlock');
+        holdIconElement.classList.add('fa-lock');
+    } else {
+        dice.classList.remove('dice-held');
+        holdIconElement.classList.remove('fa-lock');
+        holdIconElement.classList.add('fa-unlock');
+    }
+});            
+     
         const holdIcon = document.createElement('div');
         holdIcon.className = 'icon';
-        holdIcon.innerHTML = '<i class="fas fa-hand-paper"></i>';
+        holdIcon.innerHTML = '<i class="fa-solid fa-unlock"></i>';
         holdButton.appendChild(holdIcon);
         actionContainer.appendChild(holdButton);
 
@@ -97,7 +101,10 @@ function createDice() {
         configureIcon.innerHTML = '<i class="fas fa-cog"></i>';
         settingsButton.appendChild(configureIcon);
         actionContainer.appendChild(settingsButton);
+        //#endregion
 
+
+        //#region SettingsContainer
         // Remove Button
         const removeButton = document.createElement('button');
         removeButton.className = 'button dice-button remove';
@@ -130,15 +137,15 @@ function createDice() {
         customFacesButton.addEventListener('click', () => {
                 const input = prompt('Enter custom faces, separated by commas:');
                 if (input !== null) {
-                    dice.customFaces = input.split(',').map(face => face.trim());
-                    // Roll the dice with the new custom faces
-                    dice.querySelector('.number').textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
-            
-                    // Update the font size
-                    updateFontSize(dice);
+                        dice.customFaces = input.split(',').map(face => face.trim());
+                        // Roll the dice with the new custom faces
+                        dice.querySelector('.number').textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
+
+                        // Update the font size
+                        updateFontSize(dice);
                 }
-            });
-            
+        });
+
 
 
         // Number Faces Button
@@ -228,6 +235,7 @@ function createDice() {
         confirmIcon.className = 'icon';
         confirmIcon.innerHTML = '<i class="fa-regular fa-square-check"></i>';
         confirmButton.appendChild(confirmIcon);
+//#endregion
 
 
         const number = document.createElement('div');
@@ -245,54 +253,84 @@ function getRandomNumber(min, max) {
 
 function rollDice() {
         const diceToRoll = diceList.filter(dice => !dice.classList.contains("dice-held"));
-    
+
         if (diceToRoll.length === 0) {
-            alert("All dice are held!");
-            return;
-        }
-    
-        diceToRoll.forEach(dice => {
-            const number = dice.querySelector(".number");
-            const facesInput = dice.querySelector("input[type='hidden'].faces");
-            if (!facesInput) {
-                console.error("Dice is missing faces input:", dice);
+                alert("All dice are held!");
                 return;
-            }
-            if (dice.customFaces.length > 1) {
-                number.textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
-            } else {
-                const newValue = getRandomNumber(1, facesInput.value);
-                number.textContent = newValue;
-            }
-    
-            if (!dice.classList.contains("dice-held")) {
-                // Add shake animation class
-                dice.classList.add("shake");
-                // Remove shake animation class after animation completes
-                setTimeout(() => {
-                    dice.classList.remove("shake");
-                }, 500);
-            }
+        }
+
+        let rollTotal = 0; // Add a variable to keep track of the roll total
+
+        diceToRoll.forEach(dice => {
+                const number = dice.querySelector(".number");
+                const facesInput = dice.querySelector("input[type='hidden'].faces");
+                if (!facesInput) {
+                        console.error("Dice is missing faces input:", dice);
+                        return;
+                }
+                if (dice.customFaces.length > 1) {
+                        number.textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
+                } else {
+                        const newValue = getRandomNumber(1, facesInput.value);
+                        number.textContent = newValue;
+                }
+
+                if (!dice.classList.contains("dice-held")) {
+                        // Add shake animation class
+                        dice.classList.add("shake");
+                        // Remove shake animation class after animation completes
+                        setTimeout(() => {
+                                dice.classList.remove("shake");
+                        }, 500);
+                }
+
+                rollTotal += parseInt(number.textContent); // Add the value of the rolled dice to the roll total
         });
-    }
-    
+
+        // Display the roll total
+        const rollTotalContainer = document.querySelector(".roll-total-container");
+        const rollTotalElement = rollTotalContainer.querySelector("h1");
+        rollTotalElement.textContent = `Total: ${rollTotal}`;
+        rollTotalContainer.style.display = "flex";
+}
+
+
+
+function updateHoldStatus() {
+        console.log("Updating hold status...");
+        const diceList = document.querySelectorAll('.dice');
+        for (let i = 0; i < diceList.length; i++) {
+          const dice = diceList[i];
+          const holdButton = dice.querySelector('.hold');
+          const holdIconElement = holdButton.querySelector('.icon i');
+          if (dice.classList.contains('dice-held')) {
+            holdIconElement.classList.remove('fa-unlock');
+            holdIconElement.classList.add('fa-lock');
+          } else {
+            holdIconElement.classList.remove('fa-lock');
+            holdIconElement.classList.add('fa-unlock');
+          }
+        }
+      }
+
+
 
 function updateFontSize(dice) {
         const number = dice.querySelector('.number');
         const longestFace = Math.max(...dice.customFaces.map(face => face.length));
-    
+
         // Calculate the font size based on the width of the dice and the length of the longest custom face string
         const fontSizePx = Math.floor(dice.clientWidth / longestFace);
-    
+
         // Convert the font size to vmin by dividing it by the minimum of the viewport width and height, and then multiplying by 100
         const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
         const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
         const minViewportDimension = Math.min(viewportWidth, viewportHeight);
         const fontSizeVmin = (fontSizePx / minViewportDimension) * 180;
-    
+
         number.style.fontSize = `${fontSizeVmin}vmin`;
-    }
-    
+}
+
 
 
 window.addEventListener('beforeunload', () => {
