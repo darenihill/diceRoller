@@ -21,7 +21,6 @@ function removeDice(dice) {
         updateHoldStatus()
 }
 
-
 function createColorPicker(colors) {
         const colorPicker = document.createElement('div');
         colorPicker.className = 'color-picker';
@@ -255,27 +254,26 @@ function getRandomNumber(min, max) {
 }
 
 function rollDice() {
+        const animationDuration = 500; // Define the animation duration in milliseconds
         const diceToRoll = diceList.filter(dice => !dice.classList.contains("dice-held"));
+
 
         if (diceToRoll.length === 0) {
                 alert("All dice are held!");
                 return;
+                alert("All dice are held!");
+                return;
         }
+
 
         let rollTotal = 0; // Add a variable to keep track of the roll total
 
-        diceToRoll.forEach(dice => {
+        diceToRoll.forEach((dice, index) => {
                 const number = dice.querySelector(".number");
                 const facesInput = dice.querySelector("input[type='hidden'].faces");
                 if (!facesInput) {
                         console.error("Dice is missing faces input:", dice);
                         return;
-                }
-                if (dice.customFaces.length > 1) {
-                        number.textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
-                } else {
-                        const newValue = getRandomNumber(1, facesInput.value);
-                        number.textContent = newValue;
                 }
 
                 if (!dice.classList.contains("dice-held")) {
@@ -284,25 +282,39 @@ function rollDice() {
                         // Remove shake animation class after animation completes
                         setTimeout(() => {
                                 dice.classList.remove("shake");
-                        }, 500);
+                        }, animationDuration);
+
+                        // Update the dice value after the shake animation has completed
+                        setTimeout(() => {
+                                let newValue;
+                                if (dice.customFaces.length > 1) {
+                                        newValue = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
+                                } else {
+                                        newValue = getRandomNumber(1, facesInput.value);
+                                }
+                                number.textContent = newValue;
+                                console.log(`Dice ${index + 1} roll: ${newValue}`); // Log each dice roll
+                        }, animationDuration);
                 }
-
-
         });
 
-        // Calculate roll total for all dice, including held ones
-        diceList.forEach(dice => {
-                const number = dice.querySelector(".number");
-                rollTotal += parseInt(number.textContent);
-        });
+        // Calculate roll total and display it after the shake animation has completed
+        setTimeout(() => {
+                // Calculate roll total for all dice, including held ones
+                diceList.forEach(dice => {
+                        const number = dice.querySelector(".number");
+                        rollTotal += parseInt(number.textContent);
+                });
 
-        // Display the roll total
-        const rollTotalContainer = document.querySelector(".roll-total-container");
-        const rollTotalElement = rollTotalContainer.querySelector("h1");
-        rollTotalElement.textContent = `Total: ${rollTotal}`;
-        rollTotalContainer.style.display = "flex";
+                // Display the roll total
+                const rollTotalContainer = document.querySelector(".roll-total-container");
+                const rollTotalElement = rollTotalContainer.querySelector("h1");
+                rollTotalElement.textContent = `Total: ${rollTotal}`;
+                rollTotalContainer.style.display = "flex";
+
+                console.log(`Total roll: ${rollTotal}`); // Log the total roll
+        }, animationDuration);
 }
-
 
 function updateFontSize(dice) {
         const number = dice.querySelector('.number');
@@ -332,7 +344,6 @@ function updateHoldStatus() {
         }
 }
 
-
 function toggleHoldAllDice() {
         const allDice = document.querySelectorAll('.dice');
         const allDiceStatusButton = document.getElementById('all-dice-status');
@@ -354,10 +365,6 @@ function toggleHoldAllDice() {
                 allDiceStatusButton.innerHTML = '<div class="icon"><i class="fa-solid fa-unlock"></i></div>';
         }
 }
-
-
-
-
 
 window.addEventListener('beforeunload', () => {
         const savedDice = diceList.map(dice => {
