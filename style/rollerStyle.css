@@ -1,7 +1,7 @@
 :root {
         --dice-size: 33vmin;
         --dice-button-size: calc(var(--dice-size) / 4);
-        --color-swatch-size: calc(var(--dice-size) / 8);
+        --color-swatch-size: calc(var(--dice-size) / 5.5);
         --primary-button-size: calc(10vmin);
         --main-font-family: 'Roboto', sans-serif;
         --main-color: #E9EAEC;
@@ -78,7 +78,7 @@ button,
 .dice-button {
         display: flex;
         justify-content: center;
-        border-radius: 1.5vmin;
+        border-radius: calc(5px + 1vmin);
         align-items: center;
         border: none;
         cursor: pointer;
@@ -215,15 +215,19 @@ footer {
         position: absolute;
         background-color: #333652;
         border: 1px solid black;
-        border-radius: 25px;
+        border-radius: calc(5px + 1vmin);
         bottom: 0px;
         padding: 4px;
+        /* height if full height of dice container minus the button size 
+        shifted up the hight of button size with bottom*/        
+        height: calc(100% - var(--dice-button-size));
+        bottom: var(--dice-button-size);
         width: 100%;
         z-index: 3;
         box-sizing: border-box;
         display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        grid-template-rows: repeat(2, 1fr);
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(3, 1fr);
         grid-gap: 2px;
 }
 
