@@ -2,69 +2,81 @@
         --dice-size: 33vmin;
         --dice-button-size: calc(var(--dice-size) / 4);
         --color-swatch-size: calc(var(--dice-size) / 8);
-        /* Calculate the swatch size based on the dice size */
+        --primary-button-size: calc(5vmin + 1vmax);
+        --main-font-family: 'Roboto', sans-serif;
+        --main-color: #E9EAEC;
+        --main-bg-color: #2B3841;
+        --btn-bg-color: #333652;
+        --btn-color: #fff;
+        --btn-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
+        font-size: 50px;
 }
-
-
 
 body {
         margin: 0;
         padding: 0;
-        font-family: 'Roboto', sans-serif;
-        font-weight: 100;
-        background-color: #2B3841;
-        position: relative;
+        font-family: var(--main-font-family);
+        background-color: var(--main-bg-color);
         min-height: 85vh;
 }
 
 h1 {
         margin: 0;
-        font-size: calc(45px);
-        font-weight: 100;
-        color: #E9EAEC;
+        font-size: 45px;
+        color: var(--main-color);
 }
 
-
-/* Buttons */
-button {
+button,
+.roll-button {
         display: inline-flex;
         border-radius: 25px;
         border: none;
-        font-size: 3vim;
+        font-size: 3vmin;
         cursor: pointer;
-        background-color: #333652;
-        color: #fff;
-        width: calc(125px + .1vmin);
-        height: calc(125px + .1vmin);
+        background-color: var(--btn-bg-color);
+        width: var(--primary-button-size);
+        height: var(--primary-button-size);
+        color: var(--btn-color);
         box-sizing: border-box;
-        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
+        box-shadow: var(--btn-shadow);
         justify-content: center;
         align-items: center;
 }
 
-.hold-icon-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 30%;
-        border: none;
-        cursor: pointer;
-        background-color: #E9EAEC;
-        border: 3px solid black;
-        width: var(--dice-button-size);
-        height: var(--dice-button-size);
-        box-sizing: border-box;
-        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-        position: absolute;
-        top: 0px;
-        right: 0px;
+.roll-button {
+        padding: 0 10px;
+        width: calc(var(--dice-button-size) * 2);
 }
 
-.hold-icon-container .icon {
+.roll-button .icon {
+        flex: 1;
+}
+
+.roll-button:hover .icon {
+        animation: shake 0.5s ease-in-out;
+}
+
+.roll-button .roll-label,
+.roll-total {
+        font-size: calc(.6em + 3vmin);
+        text-align: center;
+}
+
+.roll-total {
+        color: #E9EAEC;
+        font-weight: 100;
+        margin: 0;
+        display: none;
+}
+
+.release-all-button {
+        width: calc(100px + .1vmin);
+}
+
+.icon {
         font-family: "Font Awesome 6 Free";
-        font-size: calc(1em + 3vmin);
-        font-weight: normal;
-        color: #000000;
+        font-size: calc(3vmin + 0.5vmax);
+        color: var(--btn-color);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -72,97 +84,46 @@ button {
         width: 100%;
 }
 
-
-.add-button,
-.update-hold-status-button,
-.roll-button {
-        display: inline-flex;
-        border-radius: 25px;
-        border: 1px solid white;
-        font-size: 3vim;
-        cursor: pointer;
-        background-color: #333652;
-        color: #fff;
-        box-sizing: border-box;
-        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-        justify-content: center;
-        align-items: center;
-        height: calc(125px + .1vmin);
-        padding: 0 10px;
-}
-
-.roll-button {
-        width: calc((125px + .1vmin) * 2);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 10px;
-}
-
-.roll-button .icon {
-        flex: 1;
-        justify-content: center;
-}
-
-.roll-button:hover .icon {
-        animation: shake 0.5s ease-in-out;
-    }
-
-.roll-button .roll-label {
-        flex: 1;
-        font-size: calc(.6em + 3vmin);
-        text-align: center;
-}
-
-.roll-total {
-        color: #E9EAEC;
-        font-size: 5vmin;
-        font-weight: 100;
-        margin: 0;
-        text-align: right;
-        display: none;
-        /* hidden by default */
-}
-
-.release-all-button {
-        width: calc(100px + .1vmin);
-}
-
-.release-all-label {
-        margin-left: 3px;
-}
-
+.hold-icon-container,
 .dice-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 25%;
+        border: none;
+        cursor: pointer;
         width: var(--dice-button-size);
         height: var(--dice-button-size);
-        border-radius: 30%;
+        box-sizing: border-box;
+        box-shadow: var(--btn-shadow);
 }
+
+.hold-icon-container
+{
+        position: absolute;
+        border: 2px solid #000;
+        top: 0;
+        right: 0;
+        z-index: 1;
+}
+
+.hold-icon-container .icon {
+color: #000;
+}
+
 
 .dice-button .icon {
-        font-size: calc(1em + 3vmin);
-}
-
-/* Icons */
-.icon {
         font-family: "Font Awesome 6 Free";
-        font-size: calc(4em + .1vmin);
+        font-size: calc(0.5em + 3vmin);
         font-weight: normal;
-        color: #fff;
-        display: flex;
         justify-content: center;
         align-items: center;
-        height: 80%;
-        width: 80%;
 }
 
-/* Layout */
-/* New footer selector */
 footer {
         position: fixed;
         bottom: 0;
         left: 0;
-        width: 100%;
-        height: 10vh;
         display: grid;
         grid-template-columns: 1fr auto;
 }
@@ -199,7 +160,6 @@ footer {
         width: calc(80% - 200px);
 }
 
-
 .primary-buttons-container {
         display: flex;
         align-items: center;
@@ -216,9 +176,7 @@ footer {
 .dice-container-wrapper {
         display: grid;
         max-height: 90vh;
-        /* set a maximum height for the wrapper */
         overflow: auto;
-        /* enable scrolling when the content overflows */
 }
 
 #dice-container {
@@ -231,7 +189,6 @@ footer {
         align-self: end;
 }
 
-/* Dice */
 .dice {
         display: flex;
         flex-direction: column;
@@ -245,10 +202,8 @@ footer {
         position: relative;
         box-sizing: border-box;
         margin: 2.2vmin;
-        /* add some margin */
         z-index: 1;
 }
-
 
 .dice .number {
         font-size: 15vmin;
@@ -260,27 +215,27 @@ footer {
         left: 50%;
         transform: translate(-50%, -50%);
         text-shadow:
-        -1.5px -1.5px 0 #000,
-        1.5px -1.5px 0 #000,
-        -1.5px 1.5px 0 #000,
-        1.5px 1.5px 0 #000;
+                -1.5px -1.5px 0 #000,
+                1.5px -1.5px 0 #000,
+                -1.5px 1.5px 0 #000,
+                1.5px 1.5px 0 #000;
+}
+
+.dice .remove,
+.dice .settings {
+        position: absolute;
 }
 
 .dice .remove {
-        position: absolute;
         top: 0px;
         right: 0px;
 }
 
 .dice .settings {
-        position: absolute;
         bottom: 0px;
         right: 0px;
 }
 
-
-
-/* Color Picker */
 .color-picker {
         position: absolute;
         background-color: #333652;
@@ -288,16 +243,12 @@ footer {
         border-radius: 20px;
         bottom: 0px;
         padding: 4px;
-        flex-wrap: wrap;
         width: 100%;
-        /* Make the color picker the width of the dice */
         z-index: 3;
         box-sizing: border-box;
         display: grid;
         grid-template-columns: repeat(6, 1fr);
-        /* Change to 6 columns */
         grid-template-rows: repeat(2, 1fr);
-        /* Add 2 rows */
         grid-gap: 2px;
 }
 
@@ -314,12 +265,6 @@ footer {
         box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.3);
 }
 
-
-.color-swatch:hover {
-        box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.3);
-}
-
-/* Shake Animation */
 .shake {
         animation: shake 0.5s ease-in-out;
 }
@@ -346,7 +291,6 @@ footer {
         }
 }
 
-/* Dice Actions */
 .dice-action-container {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -355,13 +299,11 @@ footer {
         padding: 50px;
 }
 
-
 .settings-container {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         justify-content: space-between;
         grid-gap: 0;
-        /* Add this line */
         border-radius: 1%;
         background-color: transparent;
         position: absolute;
@@ -370,14 +312,4 @@ footer {
         right: 0;
         margin: auto;
         z-index: 1;
-}
-
-
-#add-dice-btn {
-        margin-bottom: 10px;
-        padding: 5px;
-        font-size: 16px;
-        color: white;
-        border: none;
-        cursor: pointer;
 }

@@ -177,7 +177,7 @@ function createDice() {
 
         // Number Faces Button
         const facesButton = document.createElement('button');
-        facesButton.className = 'button dice-button faces'; // Add class to style the button
+        facesButton.className = 'button dice-button'; // Add class to style the button
         settingsContainer.appendChild(facesButton);
         const facesIcon = document.createElement('div');
         facesIcon.className = 'icon';
