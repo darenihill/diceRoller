@@ -3,30 +3,48 @@ let diceList = [];
 
 function addDice() {
         if (diceList.length >= maxDice) {
-                alert("You've reached the maximum number of dice!");
-                return;
+            alert("You've reached the maximum number of dice!");
+            return;
         }
         const dice = createDice();
         diceList.push(dice);
-        dice.addEventListener('click', () => {
-                const holdIconContainer = dice.querySelector('.hold-icon-container');
-                const holdIconElement = holdIconContainer.querySelector('.icon i');
-
-                if (dice && !dice.classList.contains('dice-held')) {
-                        dice.classList.add('dice-held');
-                        holdIconElement.classList.remove('fa-unlock');
-                        holdIconElement.classList.add('fa-lock');
-                        holdIconContainer.style.display = 'block'; // Show the hold icon
-                } else {
-                        dice.classList.remove('dice-held');
-                        holdIconElement.classList.remove('fa-lock');
-                        holdIconElement.classList.add('fa-unlock');
-                        holdIconContainer.style.display = 'none'; // Hide the hold icon
-                }
-                updateHoldStatus();
+        dice.addEventListener('click', (e) => {
+            // Check if the event target is the settings button or its children
+            const isSettingsButton = e.target.classList.contains('dice-button') || e.target.closest('.dice-button');
+            if (isSettingsButton) {
+                return;
+            }
+    
+            // Check if any settings menu or color picker is open
+            const settingsOpen = Array.from(document.querySelectorAll('.settings-container')).some(container => container.style.display === 'grid');
+            const colorPickerOpen = Array.from(document.querySelectorAll('.color-picker')).some(picker => picker.style.display === 'grid');
+    
+            // Close the settings menu and color picker if either is open
+            if (settingsOpen || colorPickerOpen) {
+                closeSettings();
+                return; // Don't toggle dice held
+            }
+    
+            const holdIconContainer = dice.querySelector('.hold-icon-container');
+            const holdIconElement = holdIconContainer.querySelector('.icon i');
+    
+            if (dice && !dice.classList.contains('dice-held')) {
+                dice.classList.add('dice-held');
+                holdIconElement.classList.remove('fa-unlock');
+                holdIconElement.classList.add('fa-lock');
+                holdIconContainer.style.display = 'block'; // Show the hold icon
+            } else {
+                dice.classList.remove('dice-held');
+                holdIconElement.classList.remove('fa-lock');
+                holdIconElement.classList.add('fa-unlock');
+                holdIconContainer.style.display = 'none'; // Hide the hold icon
+            }
+            updateHoldStatus();
         });
         document.getElementById('dice-container').appendChild(dice);
-}
+    }
+    
+    
 
 function removeDice(dice) {
         const index = diceList.indexOf(dice);
@@ -92,15 +110,12 @@ function createDice() {
         actionContainer.appendChild(holdIconContainer);
 
         // Settings Button
-        const settingsButton = document.createElement('button');
-        settingsButton.className = 'button dice-button settings';
-        settingsButton.addEventListener('click', () => {
-                // Toggle display of the settings container
-                actionContainer.style.display = 'none'; //hide the action container
-                removeButton.style.display = 'flex'; // show the remove button
-                settingsContainer.style.display = 'grid'; // Show the settings container
+const settingsButton = document.createElement('button');
+settingsButton.className = 'button dice-button settings';
+settingsButton.addEventListener('click', () => {
+    toggleContainers(actionContainer, removeButton, settingsContainer);
+});
 
-        });
         const configureIcon = document.createElement('div');
         configureIcon.className = 'icon';
         configureIcon.innerHTML = '<i class="fas fa-cog"></i>';
@@ -229,9 +244,7 @@ function createDice() {
         const confirmButton = document.createElement('button');
         confirmButton.className = 'button dice-button confirm';
         confirmButton.addEventListener('click', () => {
-                removeButton.style.display = 'none'; // hide the remove button
-                settingsContainer.style.display = 'none'; // hide the settings container
-                actionContainer.style.display = 'grid'; //show the action container
+            toggleContainers(actionContainer, removeButton, settingsContainer);
         });
         settingsContainer.appendChild(confirmButton);
 
@@ -288,6 +301,40 @@ function toggleHoldAllDice() {
         updateHoldStatus();
 }
 
+function closeSettings() {
+        const settingsContainers = document.querySelectorAll('.settings-container');
+        settingsContainers.forEach(settingsContainer => {
+            settingsContainer.style.display = 'none';
+        });
+    
+        const removeButtons = document.querySelectorAll('.dice-button.remove');
+        removeButtons.forEach(removeButton => {
+            removeButton.style.display = 'none';
+        });
+    
+        const actionContainers = document.querySelectorAll('.dice-action-container');
+        actionContainers.forEach(actionContainer => {
+            actionContainer.style.display = 'grid';
+        });
+    }
+
+    function toggleContainers(actionContainer, removeButton, settingsContainer) {
+        if (settingsContainer.style.display === 'grid') {
+            // Hide the settings container and remove button
+            settingsContainer.style.display = 'none';
+            removeButton.style.display = 'none';
+    
+            // Show the action container
+            actionContainer.style.display = 'grid';
+        } else {
+            // Show the settings container and remove button
+            settingsContainer.style.display = 'grid';
+            removeButton.style.display = 'flex';
+    
+            // Hide the action container
+            actionContainer.style.display = 'none';
+        }
+    }
 
 function getRandomNumber(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;

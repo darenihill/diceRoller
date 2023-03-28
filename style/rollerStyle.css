@@ -58,9 +58,9 @@ button {
         position: absolute;
         top: 0px;
         right: 0px;
-      }
-      
-      .hold-icon-container .icon {
+}
+
+.hold-icon-container .icon {
         font-family: "Font Awesome 6 Free";
         font-size: calc(1em + 3vmin);
         font-weight: normal;
@@ -70,8 +70,8 @@ button {
         align-items: center;
         height: 100%;
         width: 100%;
-      }
-      
+}
+
 
 .add-button,
 .update-hold-status-button,
@@ -249,12 +249,17 @@ footer {
 .dice .number {
         font-size: 15vmin;
         margin: 0;
-        font-weight: normal;
+        font-weight: thin;
         position: absolute;
         color: white;
         top: 45%;
         left: 50%;
         transform: translate(-50%, -50%);
+        text-shadow:
+        -1.5px -1.5px 0 #000,
+        1.5px -1.5px 0 #000,
+        -1.5px 1.5px 0 #000,
+        1.5px 1.5px 0 #000;
 }
 
 .dice .remove {
