@@ -46,13 +46,13 @@ button {
         display: flex;
         justify-content: center;
         align-items: center;
-        border-radius: 25px;
+        border-radius: 30%;
         border: none;
         cursor: pointer;
         background-color: #E9EAEC;
         border: 3px solid black;
-        width: calc(100px + .1vmin);
-        height: calc(100px + .1vmin);
+        width: var(--dice-button-size);
+        height: var(--dice-button-size);
         box-sizing: border-box;
         box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
         position: absolute;
@@ -103,6 +103,10 @@ button {
         flex: 1;
         justify-content: center;
 }
+
+.roll-button:hover .icon {
+        animation: shake 0.5s ease-in-out;
+    }
 
 .roll-button .roll-label {
         flex: 1;
@@ -287,7 +291,7 @@ footer {
         flex-wrap: wrap;
         width: 100%;
         /* Make the color picker the width of the dice */
-        z-index: 2;
+        z-index: 3;
         box-sizing: border-box;
         display: grid;
         grid-template-columns: repeat(6, 1fr);

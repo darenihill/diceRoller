@@ -3,48 +3,48 @@ let diceList = [];
 
 function addDice() {
         if (diceList.length >= maxDice) {
-            alert("You've reached the maximum number of dice!");
-            return;
+                alert("You've reached the maximum number of dice!");
+                return;
         }
         const dice = createDice();
         diceList.push(dice);
         dice.addEventListener('click', (e) => {
-            // Check if the event target is the settings button or its children
-            const isSettingsButton = e.target.classList.contains('dice-button') || e.target.closest('.dice-button');
-            if (isSettingsButton) {
-                return;
-            }
-    
-            // Check if any settings menu or color picker is open
-            const settingsOpen = Array.from(document.querySelectorAll('.settings-container')).some(container => container.style.display === 'grid');
-            const colorPickerOpen = Array.from(document.querySelectorAll('.color-picker')).some(picker => picker.style.display === 'grid');
-    
-            // Close the settings menu and color picker if either is open
-            if (settingsOpen || colorPickerOpen) {
-                closeSettings();
-                return; // Don't toggle dice held
-            }
-    
-            const holdIconContainer = dice.querySelector('.hold-icon-container');
-            const holdIconElement = holdIconContainer.querySelector('.icon i');
-    
-            if (dice && !dice.classList.contains('dice-held')) {
-                dice.classList.add('dice-held');
-                holdIconElement.classList.remove('fa-unlock');
-                holdIconElement.classList.add('fa-lock');
-                holdIconContainer.style.display = 'block'; // Show the hold icon
-            } else {
-                dice.classList.remove('dice-held');
-                holdIconElement.classList.remove('fa-lock');
-                holdIconElement.classList.add('fa-unlock');
-                holdIconContainer.style.display = 'none'; // Hide the hold icon
-            }
-            updateHoldStatus();
+                // Check if the event target is the settings button or its children
+                const isSettingsButton = e.target.classList.contains('dice-button') || e.target.closest('.dice-button');
+                if (isSettingsButton) {
+                        return;
+                }
+
+                // Check if any settings menu or color picker is open
+                const settingsOpen = Array.from(document.querySelectorAll('.settings-container')).some(container => container.style.display === 'grid');
+                const colorPickerOpen = Array.from(document.querySelectorAll('.color-picker')).some(picker => picker.style.display === 'grid');
+
+                // Close the settings menu and color picker if either is open
+                if (settingsOpen || colorPickerOpen) {
+                        closeSettings();
+                        return; // Don't toggle dice held
+                }
+
+                const holdIconContainer = dice.querySelector('.hold-icon-container');
+                const holdIconElement = holdIconContainer.querySelector('.icon i');
+
+                if (dice && !dice.classList.contains('dice-held')) {
+                        dice.classList.add('dice-held');
+                        holdIconElement.classList.remove('fa-unlock');
+                        holdIconElement.classList.add('fa-lock');
+                        holdIconContainer.style.display = 'block'; // Show the hold icon
+                } else {
+                        dice.classList.remove('dice-held');
+                        holdIconElement.classList.remove('fa-lock');
+                        holdIconElement.classList.add('fa-unlock');
+                        holdIconContainer.style.display = 'none'; // Hide the hold icon
+                }
+                updateHoldStatus();
         });
         document.getElementById('dice-container').appendChild(dice);
-    }
-    
-    
+}
+
+
 
 function removeDice(dice) {
         const index = diceList.indexOf(dice);
@@ -110,11 +110,11 @@ function createDice() {
         actionContainer.appendChild(holdIconContainer);
 
         // Settings Button
-const settingsButton = document.createElement('button');
-settingsButton.className = 'button dice-button settings';
-settingsButton.addEventListener('click', () => {
-    toggleContainers(actionContainer, removeButton, settingsContainer);
-});
+        const settingsButton = document.createElement('button');
+        settingsButton.className = 'button dice-button settings';
+        settingsButton.addEventListener('click', () => {
+                toggleContainers(actionContainer, removeButton, settingsContainer);
+        });
 
         const configureIcon = document.createElement('div');
         configureIcon.className = 'icon';
@@ -157,21 +157,21 @@ settingsButton.addEventListener('click', () => {
         customFacesButton.addEventListener('click', () => {
                 // Prepare the current custom faces message
                 const currentFacesMessage = dice.customFaces.length > 0
-                    ? `Current custom faces: ${dice.customFaces.join(', ')}\n\n`
-                    : '';
-            
+                        ? `${dice.customFaces.join(', ')}\n\n`
+                        : '';
+
                 // Prompt the user to enter custom faces
-                const input = prompt(`${currentFacesMessage}Enter new custom faces, separated by commas:`);
+                const input = prompt(`Enter new custom faces, separated by commas:`,currentFacesMessage);
                 if (input !== null) {
-                    dice.customFaces = input.split(',').map(face => face.trim());
-                    // Roll the dice with the new custom faces
-                    dice.querySelector('.number').textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
-            
-                    // Update the font size
-                    updateFontSize(dice);
+                        dice.customFaces = input.split(',').map(face => face.trim());
+                        // Roll the dice with the new custom faces
+                        dice.querySelector('.number').textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
+
+                        // Update the font size
+                        updateFontSize(dice);
                 }
-            });
-            
+        });
+
 
 
 
@@ -251,7 +251,7 @@ settingsButton.addEventListener('click', () => {
         const confirmButton = document.createElement('button');
         confirmButton.className = 'button dice-button confirm';
         confirmButton.addEventListener('click', () => {
-            toggleContainers(actionContainer, removeButton, settingsContainer);
+                toggleContainers(actionContainer, removeButton, settingsContainer);
         });
         settingsContainer.appendChild(confirmButton);
 
@@ -311,37 +311,37 @@ function toggleHoldAllDice() {
 function closeSettings() {
         const settingsContainers = document.querySelectorAll('.settings-container');
         settingsContainers.forEach(settingsContainer => {
-            settingsContainer.style.display = 'none';
+                settingsContainer.style.display = 'none';
         });
-    
+
         const removeButtons = document.querySelectorAll('.dice-button.remove');
         removeButtons.forEach(removeButton => {
-            removeButton.style.display = 'none';
+                removeButton.style.display = 'none';
         });
-    
+
         const actionContainers = document.querySelectorAll('.dice-action-container');
         actionContainers.forEach(actionContainer => {
-            actionContainer.style.display = 'grid';
+                actionContainer.style.display = 'grid';
         });
-    }
+}
 
-    function toggleContainers(actionContainer, removeButton, settingsContainer) {
+function toggleContainers(actionContainer, removeButton, settingsContainer) {
         if (settingsContainer.style.display === 'grid') {
-            // Hide the settings container and remove button
-            settingsContainer.style.display = 'none';
-            removeButton.style.display = 'none';
-    
-            // Show the action container
-            actionContainer.style.display = 'grid';
+                // Hide the settings container and remove button
+                settingsContainer.style.display = 'none';
+                removeButton.style.display = 'none';
+
+                // Show the action container
+                actionContainer.style.display = 'grid';
         } else {
-            // Show the settings container and remove button
-            settingsContainer.style.display = 'grid';
-            removeButton.style.display = 'flex';
-    
-            // Hide the action container
-            actionContainer.style.display = 'none';
+                // Show the settings container and remove button
+                settingsContainer.style.display = 'grid';
+                removeButton.style.display = 'flex';
+
+                // Hide the action container
+                actionContainer.style.display = 'none';
         }
-    }
+}
 
 function getRandomNumber(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -350,66 +350,66 @@ function getRandomNumber(min, max) {
 function rollDice() {
         const animationDuration = 500; // Define the animation duration in milliseconds
         const diceToRoll = diceList.filter(dice => !dice.classList.contains("dice-held"));
-    
+
         if (diceToRoll.length === 0) {
-            alert("All dice are held!");
-            return;
-        }
-    
-        let rollTotal = 0; // Add a variable to keep track of the roll total
-    
-        diceToRoll.forEach((dice, index) => {
-            const number = dice.querySelector(".number");
-            const facesInput = dice.querySelector("input[type='hidden'].faces");
-            if (!facesInput) {
-                console.error("Dice is missing faces input:", dice);
+                alert("All dice are held!");
                 return;
-            }
-    
-            if (!dice.classList.contains("dice-held")) {
-                // Add shake animation class
-                dice.classList.add("shake");
-                // Remove shake animation class after animation completes
-                setTimeout(() => {
-                    dice.classList.remove("shake");
-                }, animationDuration);
-    
-                // Update the dice value after the shake animation has completed
-                setTimeout(() => {
-                    let newValue;
-                    if (dice.customFaces.length > 1) {
-                        newValue = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
-                    } else {
-                        newValue = getRandomNumber(1, facesInput.value);
-                    }
-                    number.textContent = newValue;
-                    console.log(`Dice ${index + 1} roll: ${newValue}`); // Log each dice roll
-                }, animationDuration);
-            }
+        }
+
+        let rollTotal = 0; // Add a variable to keep track of the roll total
+
+        diceToRoll.forEach((dice, index) => {
+                const number = dice.querySelector(".number");
+                const facesInput = dice.querySelector("input[type='hidden'].faces");
+                if (!facesInput) {
+                        console.error("Dice is missing faces input:", dice);
+                        return;
+                }
+
+                if (!dice.classList.contains("dice-held")) {
+                        // Add shake animation class
+                        dice.classList.add("shake");
+                        // Remove shake animation class after animation completes
+                        setTimeout(() => {
+                                dice.classList.remove("shake");
+                        }, animationDuration);
+
+                        // Update the dice value after the shake animation has completed
+                        setTimeout(() => {
+                                let newValue;
+                                if (dice.customFaces.length > 1) {
+                                        newValue = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
+                                } else {
+                                        newValue = getRandomNumber(1, facesInput.value);
+                                }
+                                number.textContent = newValue;
+                                console.log(`Dice ${index + 1} roll: ${newValue}`); // Log each dice roll
+                        }, animationDuration);
+                }
         });
-    
+
         // Calculate roll total and display it after the shake animation has completed
         setTimeout(() => {
-            // Calculate roll total for all dice, including held ones
-            diceList.forEach(dice => {
-                const number = dice.querySelector(".number");
-                const rollValue = parseInt(number.textContent);
-                // Check if the roll value is a number before adding it to the roll total
-                if (!isNaN(rollValue)) {
-                    rollTotal += rollValue;
-                }
-            });
-    
-            // Display the roll total
-            const rollTotalContainer = document.querySelector(".roll-total-container");
-            const rollTotalElement = rollTotalContainer.querySelector("h1");
-            rollTotalElement.textContent = `Total: ${rollTotal}`;
-            rollTotalContainer.style.display = "flex";
-    
-            console.log(`Total roll: ${rollTotal}`); // Log the total roll
+                // Calculate roll total for all dice, including held ones
+                diceList.forEach(dice => {
+                        const number = dice.querySelector(".number");
+                        const rollValue = parseInt(number.textContent);
+                        // Check if the roll value is a number before adding it to the roll total
+                        if (!isNaN(rollValue)) {
+                                rollTotal += rollValue;
+                        }
+                });
+
+                // Display the roll total
+                const rollTotalContainer = document.querySelector(".roll-total-container");
+                const rollTotalElement = rollTotalContainer.querySelector("h1");
+                rollTotalElement.textContent = `Total: ${rollTotal}`;
+                rollTotalContainer.style.display = "flex";
+
+                console.log(`Total roll: ${rollTotal}`); // Log the total roll
         }, animationDuration);
-    }
-    
+}
+
 
 function updateFontSize(dice) {
         const number = dice.querySelector('.number');
