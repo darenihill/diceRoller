@@ -2,7 +2,7 @@
         --dice-size: 33vmin;
         --dice-button-size: calc(var(--dice-size) / 4);
         --color-swatch-size: calc(var(--dice-size) / 8);
-        --primary-button-size: calc(5vmin + 1vmax);
+        --primary-button-size: calc(10vmin);
         --main-font-family: 'Roboto', sans-serif;
         --main-color: #E9EAEC;
         --main-bg-color: #2B3841;
@@ -10,26 +10,19 @@
         --btn-color: #fff;
         --btn-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
         font-size: 50px;
+        font-weight: 100;
 }
 
 body {
-        margin: 0;
-        padding: 0;
         font-family: var(--main-font-family);
         background-color: var(--main-bg-color);
         min-height: 85vh;
 }
 
-h1 {
-        margin: 0;
-        font-size: 45px;
-        color: var(--main-color);
-}
-
 button,
 .roll-button {
         display: inline-flex;
-        border-radius: 25px;
+        border-radius: 1.5vmin;
         border: none;
         font-size: 3vmin;
         cursor: pointer;
@@ -41,6 +34,11 @@ button,
         box-shadow: var(--btn-shadow);
         justify-content: center;
         align-items: center;
+}
+
+.primary-buttons-container>button {
+        /* Add styles specific to buttons within the primary-buttons-container */
+        border: 1px solid white;
 }
 
 .roll-button {
@@ -56,17 +54,9 @@ button,
         animation: shake 0.5s ease-in-out;
 }
 
-.roll-button .roll-label,
-.roll-total {
-        font-size: calc(.6em + 3vmin);
+.roll-button .roll-label {
+        font-size: calc(.6em + 2vmin);
         text-align: center;
-}
-
-.roll-total {
-        color: #E9EAEC;
-        font-weight: 100;
-        margin: 0;
-        display: none;
 }
 
 .release-all-button {
@@ -89,7 +79,7 @@ button,
         display: flex;
         justify-content: center;
         align-items: center;
-        border-radius: 25%;
+        border-radius: 20px;
         border: none;
         cursor: pointer;
         width: var(--dice-button-size);
@@ -98,17 +88,17 @@ button,
         box-shadow: var(--btn-shadow);
 }
 
-.hold-icon-container
-{
+.hold-icon-container {
         position: absolute;
         border: 2px solid #000;
+        background-color: #E9EAEC;
         top: 0;
         right: 0;
         z-index: 1;
 }
 
 .hold-icon-container .icon {
-color: #000;
+        color: #000;
 }
 
 
@@ -122,42 +112,11 @@ color: #000;
 
 footer {
         position: fixed;
+        padding: 20px;
         bottom: 0;
         left: 0;
         display: grid;
         grid-template-columns: 1fr auto;
-}
-
-.title-container {
-        display: flex;
-        align-items: center;
-        align-self: flex-end;
-        justify-content: end;
-        gap: 10px;
-        padding: 20px;
-        grid-column: 1/3;
-        display: grid;
-        grid-template-columns: auto 1fr;
-}
-
-.roll-total-container {
-        padding: 20px;
-        align-self: flex-end;
-        display: flex;
-        text-align: right;
-        display: none;
-}
-
-.left-footer-container {
-        display: flex;
-        grid-template-columns: 2fr 1fr;
-        align-items: center;
-        gap: 10px;
-        padding: 20px;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: calc(80% - 200px);
 }
 
 .primary-buttons-container {
@@ -172,6 +131,22 @@ footer {
         right: 0;
 }
 
+
+.left-footer-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 20px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        color: #E9EAEC;
+        font-size: calc(5vmin + 1vmax);
+    }
+
+    .title-container, .roll-total-container {
+        margin: 1vmin;
+    }
 
 .dice-container-wrapper {
         display: grid;
@@ -196,7 +171,7 @@ footer {
         justify-content: center;
         width: var(--dice-size);
         height: var(--dice-size);
-        border-radius: 10%;
+        border-radius: 25px;
         background-color: #E9EAEC;
         cursor: pointer;
         position: relative;
@@ -240,7 +215,7 @@ footer {
         position: absolute;
         background-color: #333652;
         border: 1px solid black;
-        border-radius: 20px;
+        border-radius: 25px;
         bottom: 0px;
         padding: 4px;
         width: 100%;
@@ -304,7 +279,6 @@ footer {
         grid-template-columns: repeat(4, 1fr);
         justify-content: space-between;
         grid-gap: 0;
-        border-radius: 1%;
         background-color: transparent;
         position: absolute;
         bottom: 0;

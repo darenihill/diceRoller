@@ -402,7 +402,7 @@ function rollDice() {
 
                 // Display the roll total
                 const rollTotalContainer = document.querySelector(".roll-total-container");
-                const rollTotalElement = rollTotalContainer.querySelector("h1");
+                const rollTotalElement = rollTotalContainer.querySelector(".roll-total-text"); // Change the selector to ".roll-total-text"
                 rollTotalElement.textContent = `Total: ${rollTotal}`;
                 rollTotalContainer.style.display = "flex";
 
