@@ -155,16 +155,23 @@ settingsButton.addEventListener('click', () => {
         settingsContainer.appendChild(customFacesButton);
         dice.customFaces = [];
         customFacesButton.addEventListener('click', () => {
-                const input = prompt('Enter custom faces, separated by commas:');
+                // Prepare the current custom faces message
+                const currentFacesMessage = dice.customFaces.length > 0
+                    ? `Current custom faces: ${dice.customFaces.join(', ')}\n\n`
+                    : '';
+            
+                // Prompt the user to enter custom faces
+                const input = prompt(`${currentFacesMessage}Enter new custom faces, separated by commas:`);
                 if (input !== null) {
-                        dice.customFaces = input.split(',').map(face => face.trim());
-                        // Roll the dice with the new custom faces
-                        dice.querySelector('.number').textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
-
-                        // Update the font size
-                        updateFontSize(dice);
+                    dice.customFaces = input.split(',').map(face => face.trim());
+                    // Roll the dice with the new custom faces
+                    dice.querySelector('.number').textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
+            
+                    // Update the font size
+                    updateFontSize(dice);
                 }
-        });
+            });
+            
 
 
 
@@ -343,65 +350,66 @@ function getRandomNumber(min, max) {
 function rollDice() {
         const animationDuration = 500; // Define the animation duration in milliseconds
         const diceToRoll = diceList.filter(dice => !dice.classList.contains("dice-held"));
-
-
+    
         if (diceToRoll.length === 0) {
-                alert("All dice are held!");
-                return;
-                alert("All dice are held!");
-                return;
+            alert("All dice are held!");
+            return;
         }
-
-
+    
         let rollTotal = 0; // Add a variable to keep track of the roll total
-
+    
         diceToRoll.forEach((dice, index) => {
-                const number = dice.querySelector(".number");
-                const facesInput = dice.querySelector("input[type='hidden'].faces");
-                if (!facesInput) {
-                        console.error("Dice is missing faces input:", dice);
-                        return;
-                }
-
-                if (!dice.classList.contains("dice-held")) {
-                        // Add shake animation class
-                        dice.classList.add("shake");
-                        // Remove shake animation class after animation completes
-                        setTimeout(() => {
-                                dice.classList.remove("shake");
-                        }, animationDuration);
-
-                        // Update the dice value after the shake animation has completed
-                        setTimeout(() => {
-                                let newValue;
-                                if (dice.customFaces.length > 1) {
-                                        newValue = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
-                                } else {
-                                        newValue = getRandomNumber(1, facesInput.value);
-                                }
-                                number.textContent = newValue;
-                                console.log(`Dice ${index + 1} roll: ${newValue}`); // Log each dice roll
-                        }, animationDuration);
-                }
+            const number = dice.querySelector(".number");
+            const facesInput = dice.querySelector("input[type='hidden'].faces");
+            if (!facesInput) {
+                console.error("Dice is missing faces input:", dice);
+                return;
+            }
+    
+            if (!dice.classList.contains("dice-held")) {
+                // Add shake animation class
+                dice.classList.add("shake");
+                // Remove shake animation class after animation completes
+                setTimeout(() => {
+                    dice.classList.remove("shake");
+                }, animationDuration);
+    
+                // Update the dice value after the shake animation has completed
+                setTimeout(() => {
+                    let newValue;
+                    if (dice.customFaces.length > 1) {
+                        newValue = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
+                    } else {
+                        newValue = getRandomNumber(1, facesInput.value);
+                    }
+                    number.textContent = newValue;
+                    console.log(`Dice ${index + 1} roll: ${newValue}`); // Log each dice roll
+                }, animationDuration);
+            }
         });
-
+    
         // Calculate roll total and display it after the shake animation has completed
         setTimeout(() => {
-                // Calculate roll total for all dice, including held ones
-                diceList.forEach(dice => {
-                        const number = dice.querySelector(".number");
-                        rollTotal += parseInt(number.textContent);
-                });
-
-                // Display the roll total
-                const rollTotalContainer = document.querySelector(".roll-total-container");
-                const rollTotalElement = rollTotalContainer.querySelector("h1");
-                rollTotalElement.textContent = `Total: ${rollTotal}`;
-                rollTotalContainer.style.display = "flex";
-
-                console.log(`Total roll: ${rollTotal}`); // Log the total roll
+            // Calculate roll total for all dice, including held ones
+            diceList.forEach(dice => {
+                const number = dice.querySelector(".number");
+                const rollValue = parseInt(number.textContent);
+                // Check if the roll value is a number before adding it to the roll total
+                if (!isNaN(rollValue)) {
+                    rollTotal += rollValue;
+                }
+            });
+    
+            // Display the roll total
+            const rollTotalContainer = document.querySelector(".roll-total-container");
+            const rollTotalElement = rollTotalContainer.querySelector("h1");
+            rollTotalElement.textContent = `Total: ${rollTotal}`;
+            rollTotalContainer.style.display = "flex";
+    
+            console.log(`Total roll: ${rollTotal}`); // Log the total roll
         }, animationDuration);
-}
+    }
+    
 
 function updateFontSize(dice) {
         const number = dice.querySelector('.number');

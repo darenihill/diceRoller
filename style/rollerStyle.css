@@ -34,8 +34,8 @@ button {
         cursor: pointer;
         background-color: #333652;
         color: #fff;
-        width: calc(100px + .1vmin);
-        height: calc(100px + .1vmin);
+        width: calc(125px + .1vmin);
+        height: calc(125px + .1vmin);
         box-sizing: border-box;
         box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
         justify-content: center;
@@ -87,12 +87,12 @@ button {
         box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
         justify-content: center;
         align-items: center;
-        height: calc(100px + .1vmin);
+        height: calc(125px + .1vmin);
         padding: 0 10px;
 }
 
 .roll-button {
-        width: calc((100px + .1vmin) * 2);
+        width: calc((125px + .1vmin) * 2);
         display: flex;
         align-items: center;
         justify-content: space-between;
