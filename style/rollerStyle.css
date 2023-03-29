@@ -21,7 +21,7 @@ body {
 
 button,
 .roll-button {
-        display: inline-flex;
+        display: flex;
         border-radius: 1.5vmin;
         border: none;
         font-size: 3vmin;
@@ -32,7 +32,7 @@ button,
         color: var(--btn-color);
         box-sizing: border-box;
         box-shadow: var(--btn-shadow);
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
 }
 
@@ -42,7 +42,7 @@ button,
 }
 
 .roll-button {
-        padding: 0 10px;
+ 
         width: calc(var(--primary-button-size) * 2);
 }
 
@@ -51,7 +51,7 @@ button,
 }
 
 .roll-button .roll-label {
-        font-size: calc(.6em + 2vmin);
+        font-size: calc( var(--primary-button-size)/2);
         text-align: center;
 }
 
@@ -61,7 +61,7 @@ button,
 
 .icon {
         font-family: "Font Awesome 6 Free";
-        font-size: calc(3vmin + 0.5vmax);
+        font-size: calc(5px + var(--primary-button-size)/2);
         color: var(--btn-color);
         display: flex;
         justify-content: center;
@@ -100,7 +100,7 @@ button,
 
 .dice-button .icon {
         font-family: "Font Awesome 6 Free";
-        font-size: calc(0.5em + 3vmin);
+        font-size: calc(var(--dice-button-size)/2);
         font-weight: normal;
         justify-content: center;
         align-items: center;

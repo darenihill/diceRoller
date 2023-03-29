@@ -74,7 +74,7 @@ function createColorPicker(colors) {
                         const removeButton = dice.querySelector('.dice-button.remove');
 
                         dice.style.backgroundColor = color;
-                        number.style.color = color === '#E9EAEC' ? 'black' : 'white';
+                        number.style.color = (color === '#E9EAEC' || color === '#FBFB3C') ? 'black' : 'white';
                         colorPicker.style.display = 'none';
 
                         // Hide the settings container and remove button
@@ -437,7 +437,7 @@ function updateDiceSize() {
         if (numberOfDice <= 2) {
                 newSize = "55vmin";
         } else if (numberOfDice <= 6) {
-                newSize = "40vmin";
+                newSize = "38vmin";
         } else {
                 newSize = "28vmin";
         }
