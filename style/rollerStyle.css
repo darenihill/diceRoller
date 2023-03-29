@@ -97,7 +97,7 @@ button,
         color: #000;
 }
 
-
+.hold-icon-container .icon,
 .dice-button .icon {
         font-family: "Font Awesome 6 Free";
         font-size: calc(var(--dice-button-size)/2);
