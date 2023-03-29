@@ -1,4 +1,4 @@
-const maxDice = 10;
+const maxDice = 12;
 let diceList = [];
 
 function addDice() {
@@ -42,6 +42,7 @@ function addDice() {
                 updateHoldStatus();
         });
         document.getElementById('dice-container').appendChild(dice);
+        updateDiceSize();
 }
 
 
@@ -53,6 +54,7 @@ function removeDice(dice) {
         }
         dice.parentNode.removeChild(dice);
         updateHoldStatus()
+        updateDiceSize();
 }
 
 function createColorPicker(colors) {
@@ -161,7 +163,7 @@ function createDice() {
                         : '';
 
                 // Prompt the user to enter custom faces
-                const input = prompt(`Enter new custom faces, separated by commas:`,currentFacesMessage);
+                const input = prompt(`Enter new custom faces, separated by commas:`, currentFacesMessage);
                 if (input !== null) {
                         dice.customFaces = input.split(',').map(face => face.trim());
                         // Roll the dice with the new custom faces
@@ -426,6 +428,23 @@ function updateFontSize(dice) {
 
         number.style.fontSize = `${fontSizeVmin}vmin`;
 }
+
+function updateDiceSize() {
+        const diceElements = document.querySelectorAll(".dice");
+        const numberOfDice = diceElements.length;
+        let newSize;
+
+        if (numberOfDice <= 2) {
+                newSize = "55vmin";
+        } else if (numberOfDice <= 6) {
+                newSize = "40vmin";
+        } else {
+                newSize = "28vmin";
+        }
+
+        document.documentElement.style.setProperty("--dice-size", newSize);
+}
+
 
 window.addEventListener('beforeunload', () => {
         const savedDice = diceList.map(dice => {

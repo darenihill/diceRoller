@@ -2,7 +2,7 @@
         --dice-size: 33vmin;
         --dice-button-size: calc(var(--dice-size) / 4);
         --color-swatch-size: calc(var(--dice-size) / 5.5);
-        --primary-button-size: calc(10vmin);
+        --primary-button-size: calc(25px + 7vmin);
         --main-font-family: 'Roboto', sans-serif;
         --main-color: #E9EAEC;
         --main-bg-color: #2B3841;
@@ -16,7 +16,7 @@
 body {
         font-family: var(--main-font-family);
         background-color: var(--main-bg-color);
-        min-height: 85vh;
+        min-height: 87vh;
 }
 
 button,
@@ -43,11 +43,7 @@ button,
 
 .roll-button {
         padding: 0 10px;
-        width: calc(var(--dice-button-size) * 2);
-}
-
-.roll-button .icon {
-        flex: 1;
+        width: calc(var(--primary-button-size) * 2);
 }
 
 .roll-button:hover .icon {
@@ -150,7 +146,7 @@ footer {
 
 .dice-container-wrapper {
         display: grid;
-        max-height: 90vh;
+        max-height: 87vh;
         overflow: auto;
 }
 
@@ -181,7 +177,7 @@ footer {
 }
 
 .dice .number {
-        font-size: 15vmin;
+        font-size: calc(var(--dice-button-size)*2);
         margin: 0;
         font-weight: thin;
         position: absolute;
@@ -189,11 +185,13 @@ footer {
         top: 45%;
         left: 50%;
         transform: translate(-50%, -50%);
+        /*
         text-shadow:
         -1px -1px 0 #000,
         1px -1px 0 #000,
         -1px 1px 0 #000,
         1px 1px 0 #000;
+        */
 }
 
 .dice .remove,
