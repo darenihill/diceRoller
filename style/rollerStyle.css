@@ -22,7 +22,7 @@ body {
 button,
 .roll-button {
         display: flex;
-        border-radius: 1.5vmin;
+        border-radius: calc(10px + 1vmin);
         border: none;
         font-size: 3vmin;
         cursor: pointer;
@@ -42,7 +42,9 @@ button,
 }
 
 .roll-button {
- 
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr;
         width: calc(var(--primary-button-size) * 2);
 }
 
@@ -74,7 +76,7 @@ button,
 .dice-button {
         display: flex;
         justify-content: center;
-        border-radius: calc(5px + 1vmin);
+        border-radius: calc(7px + (var(--dice-button-size)/10));
         align-items: center;
         border: none;
         cursor: pointer;
@@ -126,6 +128,20 @@ footer {
         bottom: 0;
         right: 0;
 }
+
+
+.logo-button {
+        display: inline-block;
+        border: none;
+        padding: 8px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    .logo-button img {
+        width: 100px; /* Adjust the size of your logo as needed */
+        height: auto;
+    }
 
 
 .left-footer-container {
