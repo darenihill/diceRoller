@@ -9,12 +9,12 @@ function addDice() {
         const dice = createDice();
         diceList.push(dice);
         dice.addEventListener('click', (e) => {
-               // Check if the event target is the settings button, its children, or within the color picker
-               const isSettingsButton = e.target.classList.contains('dice-button') || e.target.closest('.dice-button');
-               const isColorPicker = e.target.closest('.color-picker');
-               if (isSettingsButton || isColorPicker) {
-                       return;
-               }
+                // Check if the event target is the settings button, its children, or within the color picker
+                const isSettingsButton = e.target.classList.contains('dice-button') || e.target.closest('.dice-button');
+                const isColorPicker = e.target.closest('.color-picker');
+                if (isSettingsButton || isColorPicker) {
+                        return;
+                }
 
                 // Check if any settings menu or color picker is open
                 const settingsOpen = Array.from(document.querySelectorAll('.settings-container')).some(container => container.style.display === 'grid');
@@ -71,7 +71,7 @@ function createColorPicker(colors) {
                         const actionContainer = dice.querySelector('.dice-action-container');
                         const settingsContainer = dice.querySelector('.settings-container');
                         const removeButton = dice.querySelector('.dice-button.remove');
-                        
+
 
                         dice.style.backgroundColor = color;
                         number.style.color = (color === '#E9EAEC' || color === '#FBFB3C') ? 'black' : 'white';
@@ -171,7 +171,7 @@ function createDice(numberValue = 1, faces = 6, customFaces = [], color = '#E9EA
                         : '';
 
                 // Prompt the user to enter custom faces
-                const input = prompt(`Enter new custom faces, separated by commas:`, currentFacesMessage);
+                const input = prompt(`Enter custom faces, separated by commas: (Red, Yellow, Blue)`, currentFacesMessage);
                 if (input !== null) {
                         dice.customFaces = input.split(',').map(face => face.trim());
                         // Roll the dice with the new custom faces
@@ -202,24 +202,24 @@ function createDice(numberValue = 1, faces = 6, customFaces = [], color = '#E9EA
         settingsContainer.appendChild(facesInput);
 
         facesButton.addEventListener('click', () => {
-                const input = prompt('Enter the number of faces (1-100):', facesInput.value);
-                
+                const input = prompt('Enter a number (1-100):', facesInput.value);
+
                 // If the input is null (user clicked cancel), return early
                 if (input === null) {
-                    return;
+                        return;
                 }
-            
+
                 if (!isNaN(input) && input >= 1 && input <= 100) {
-                    facesInput.value = input;
-                    dice.customFaces = []; // Clear out custom faces
-                    // Roll the dice with the new number of faces
-                    dice.querySelector(".number").textContent = getRandomNumber(1, facesInput.value);
-                    toggleContainers(actionContainer, removeButton, settingsContainer);
+                        facesInput.value = input;
+                        dice.customFaces = []; // Clear out custom faces
+                        // Roll the dice with the new number of faces
+                        dice.querySelector(".number").textContent = getRandomNumber(1, facesInput.value);
+                        toggleContainers(actionContainer, removeButton, settingsContainer);
                 } else {
-                    alert('Please enter a valid whole number between 1 and 100.');
+                        alert('Please enter a valid whole number between 1 and 100.');
                 }
-            });
-            
+        });
+
 
 
         // Color Button
@@ -488,7 +488,7 @@ function updateNumberColor(dice) {
     
     // Call the loadDiceData function when the page is loaded
     document.addEventListener('DOMContentLoaded', loadDiceData); */
-    
+
 
 
 /* window.addEventListener('beforeunload', () => {
@@ -533,9 +533,27 @@ window.addEventListener('load', () => {
             updateDiceSize(); // Call updateDiceSize on page load
         }
     }); */
-    
 
 
+//#region Action Container
+document.addEventListener('DOMContentLoaded', function () {
+        initializeLeftMenuToggle();
+});
+
+function initializeLeftMenuToggle() {
+        const toggleMenuButton = document.getElementById('toggle-menu');
+        const leftMenu = document.querySelector('.left-menu');
+        const chevronIcon = toggleMenuButton.querySelector('i');
+        let menuIsOpen = false;
+
+        toggleMenuButton.addEventListener('click', function () {
+                menuIsOpen = !menuIsOpen;
+                leftMenu.style.display = menuIsOpen ? 'grid' : 'none';
+                chevronIcon.classList.toggle('fa-chevron-down', !menuIsOpen);
+                chevronIcon.classList.toggle('fa-chevron-up', menuIsOpen);
+        });
+}
+//#endregion
 
 
 document.getElementById('all-dice-status').addEventListener('click', toggleHoldAllDice);
