@@ -9,11 +9,12 @@ function addDice() {
         const dice = createDice();
         diceList.push(dice);
         dice.addEventListener('click', (e) => {
-                // Check if the event target is the settings button or its children
-                const isSettingsButton = e.target.classList.contains('dice-button') || e.target.closest('.dice-button');
-                if (isSettingsButton) {
-                        return;
-                }
+               // Check if the event target is the settings button, its children, or within the color picker
+               const isSettingsButton = e.target.classList.contains('dice-button') || e.target.closest('.dice-button');
+               const isColorPicker = e.target.closest('.color-picker');
+               if (isSettingsButton || isColorPicker) {
+                       return;
+               }
 
                 // Check if any settings menu or color picker is open
                 const settingsOpen = Array.from(document.querySelectorAll('.settings-container')).some(container => container.style.display === 'grid');
@@ -70,14 +71,13 @@ function createColorPicker(colors) {
                         const actionContainer = dice.querySelector('.dice-action-container');
                         const settingsContainer = dice.querySelector('.settings-container');
                         const removeButton = dice.querySelector('.dice-button.remove');
+                        
 
                         dice.style.backgroundColor = color;
                         number.style.color = (color === '#E9EAEC' || color === '#FBFB3C') ? 'black' : 'white';
                         colorPicker.style.display = 'none';
 
-                        // Hide the settings container and remove button
-                        settingsContainer.style.display = 'none';
-                        removeButton.style.display = 'none';
+                        toggleContainers(actionContainer, removeButton, settingsContainer);
 
                         // Show the action container
                         actionContainer.style.display = 'grid';
@@ -176,9 +176,9 @@ function createDice(numberValue = 1, faces = 6, customFaces = [], color = '#E9EA
                         dice.customFaces = input.split(',').map(face => face.trim());
                         // Roll the dice with the new custom faces
                         dice.querySelector('.number').textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
-
                         // Update the font size
                         updateFontSize(dice);
+                        toggleContainers(actionContainer, removeButton, settingsContainer);
                 }
         });
 
@@ -203,15 +203,23 @@ function createDice(numberValue = 1, faces = 6, customFaces = [], color = '#E9EA
 
         facesButton.addEventListener('click', () => {
                 const input = prompt('Enter the number of faces (1-100):', facesInput.value);
-                if (input !== null && !isNaN(input) && input >= 1 && input <= 100) {
-                        facesInput.value = input;
-                        dice.customFaces = []; // Clear out custom faces
-                        // Roll the dice with the new number of faces
-                        dice.querySelector(".number").textContent = getRandomNumber(1, facesInput.value);
-                } else {
-                        alert('Please enter a valid whole number between 1 and 100.');
+                
+                // If the input is null (user clicked cancel), return early
+                if (input === null) {
+                    return;
                 }
-        });
+            
+                if (!isNaN(input) && input >= 1 && input <= 100) {
+                    facesInput.value = input;
+                    dice.customFaces = []; // Clear out custom faces
+                    // Roll the dice with the new number of faces
+                    dice.querySelector(".number").textContent = getRandomNumber(1, facesInput.value);
+                    toggleContainers(actionContainer, removeButton, settingsContainer);
+                } else {
+                    alert('Please enter a valid whole number between 1 and 100.');
+                }
+            });
+            
 
 
         // Color Button
@@ -268,7 +276,7 @@ function createDice(numberValue = 1, faces = 6, customFaces = [], color = '#E9EA
         // Confirm Icon
         const confirmIcon = document.createElement('div');
         confirmIcon.className = 'icon';
-        confirmIcon.innerHTML = '<i class="fa-regular fa-square-check"></i>';
+        confirmIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
         confirmButton.appendChild(confirmIcon);
         //#endregion
 

@@ -111,7 +111,7 @@ button:focus {
 .hold-icon-container .icon,
 .dice-button .icon {
         font-family: "Font Awesome 6 Free";
-        font-size: calc(var(--dice-button-size)/2);
+        font-size: calc(var(--dice-button-size)*0.6);
         font-weight: normal;
         justify-content: center;
         align-items: center;
