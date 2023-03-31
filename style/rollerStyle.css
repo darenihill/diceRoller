@@ -82,14 +82,14 @@ button:focus {
 
 .icon {
         font-family: "Font Awesome 6 Free";
-        font-size: calc(5px + var(--primary-button-size)/2);
+        font-size: calc(var(--primary-button-size) * 0.65); /* Updated from 0.65 to 0.5 */
         color: var(--btn-color);
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100%;
         width: 100%;
-}
+    }
 
 .hold-icon-container,
 .dice-button {
@@ -184,6 +184,7 @@ footer {
         display: none;
         grid-template-columns: repeat(2, 1fr);
         background-color: transparent;
+        font-size: calc( var(--primary-button-size)/4);
         grid-gap: 10px;
         width: calc(var(--primary-button-size) * 4); /* Twice the width of the buttons */
         padding: 20px;

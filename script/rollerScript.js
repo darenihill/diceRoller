@@ -535,7 +535,7 @@ window.addEventListener('load', () => {
     }); */
 
 
-//#region Action Container
+//#region Left Menu Container
 document.addEventListener('DOMContentLoaded', function () {
         initializeLeftMenuToggle();
 });
@@ -549,10 +549,51 @@ function initializeLeftMenuToggle() {
         toggleMenuButton.addEventListener('click', function () {
                 menuIsOpen = !menuIsOpen;
                 leftMenu.style.display = menuIsOpen ? 'grid' : 'none';
-                chevronIcon.classList.toggle('fa-chevron-down', !menuIsOpen);
-                chevronIcon.classList.toggle('fa-chevron-up', menuIsOpen);
+                chevronIcon.classList.toggle('fa-chevron-down', menuIsOpen);
+                chevronIcon.classList.toggle('fa-chevron-up', !menuIsOpen);
         });
 }
+
+document.getElementById('donate').addEventListener('click', () => {
+        window.location.href = 'donate.html'; // Link to a dummy donate page
+    });
+    
+    document.getElementById('suggestions-btn').addEventListener('click', () => {
+        window.location.href = 'https://docs.google.com/forms/d/1MurbBtETb6e9JmkThO_Apuc9lowJcDPHpCcPNIhbPpg/prefill'; // Link to a dummy suggestions page
+    });
+    
+    document.getElementById('help-btn').addEventListener('click', () => {
+        // Create a popup menu for help
+        let helpPopup = document.createElement('div');
+        helpPopup.id = 'help-popup';
+        helpPopup.innerHTML = `
+            <h2>Help</h2>
+            <p>Here is some help text...</p>
+            <button type="button" id="close-help-popup">Close</button>
+        `;
+        helpPopup.style.position = 'fixed';
+        helpPopup.style.top = '50%';
+        helpPopup.style.left = '50%';
+        helpPopup.style.transform = 'translate(-50%, -50%)';
+        helpPopup.style.backgroundColor = 'white';
+        helpPopup.style.padding = '20px';
+        helpPopup.style.border = '1px solid black';
+        helpPopup.style.zIndex = '999';
+        document.body.appendChild(helpPopup);
+    
+        document.getElementById('close-help-popup').addEventListener('click', () => {
+            document.body.removeChild(helpPopup);
+        });
+    });
+    
+    document.getElementById('delete-all-btn').addEventListener('click', () => {
+        // Remove all dice
+        let diceElements = document.querySelectorAll('.dice');
+        diceElements.forEach((dice) => {
+            removeDice(dice);
+        });
+    });
+
 //#endregion
 
 
