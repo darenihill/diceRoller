@@ -36,6 +36,15 @@ button,
         align-items: center;
 }
 
+button:focus {
+       outline-color: transparent;
+    }
+
+    button {
+        -webkit-tap-highlight-color: transparent;
+
+    }
+
 .primary-buttons-container>button {
         /* Add styles specific to buttons within the primary-buttons-container */
         border: 1px solid white;
