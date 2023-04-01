@@ -478,40 +478,88 @@ function saveDice() {
                 };
         });
 
-        localStorage.setItem('diceConfig', JSON.stringify(diceConfig));
-        alert('Dice configuration saved!');
-}
-
-function loadDice() {
-        const diceConfigString = localStorage.getItem('diceConfig');
-
-        if (diceConfigString) {
-                const diceConfig = JSON.parse(diceConfigString);
-
-                // Remove existing dice
-                diceList.forEach(dice => {
-                        dice.parentNode.removeChild(dice);
-                });
-
-                diceList = [];
-
-                // Add loaded dice
-                diceConfig.forEach(config => {
-                        const dice = createDice(config.numberValue, config.faces, config.customFaces, config.color);
-                        diceList.push(dice);
-                        document.getElementById('dice-container').appendChild(dice);
-                });
-
-                updateDiceSize();
-                alert('Dice configuration loaded!');
-        } else {
-                alert('No saved dice configuration found.');
+        const saveName = prompt('Enter a name for this dice configuration:');
+        if (saveName === null || saveName.trim() === '') {
+          return;
         }
-}
+      
+        const savedConfigs = JSON.parse(localStorage.getItem('diceConfigs') || '{}');
+        savedConfigs[saveName] = diceConfig;
+        localStorage.setItem('diceConfigs', JSON.stringify(savedConfigs));
+        alert('Dice configuration saved!');
+      }
+
+      function loadDice() {
+        const savedConfigs = JSON.parse(localStorage.getItem('diceConfigs') || '{}');
+      
+        if (Object.keys(savedConfigs).length > 0) {
+          const configNames = Object.keys(savedConfigs).join(', ');
+          const selectedConfigName = prompt(`Select a saved configuration by entering its name:\n\n${configNames}`);
+      
+          if (selectedConfigName !== null && savedConfigs[selectedConfigName]) {
+            const diceConfig = savedConfigs[selectedConfigName];
+      
+            // Remove existing dice
+            diceList.forEach(dice => {
+              dice.parentNode.removeChild(dice);
+            });
+      
+            diceList = [];
+      
+            // Add loaded dice
+            diceConfig.forEach(config => {
+              const dice = createDice(config.numberValue, config.faces, config.customFaces, config.color);
+              diceList.push(dice);
+              document.getElementById('dice-container').appendChild(dice);
+            });
+      
+            updateDiceSize();
+            alert('Dice configuration loaded!');
+          } else {
+            alert('No saved dice configuration found with that name.');
+          }
+        } else {
+          alert('No saved dice configurations found.');
+        }
+      }
+      
 
 
 document.getElementById('save-btn').addEventListener('click', saveDice);
 document.getElementById('load-btn').addEventListener('click', loadDice);
+
+
+const dicePresets = [
+        {
+          name: "Yatzee",
+          dice: [
+            { numberValue: 1, faces: 6, customFaces: [], color: "#E9EAEC" },
+            { numberValue: 2, faces: 6, customFaces: [], color: "#E9EAEC" },
+            { numberValue: 3, faces: 6, customFaces: [], color: "#E9EAEC" },
+            { numberValue: 4, faces: 6, customFaces: [], color: "#E9EAEC" },
+            { numberValue: 5, faces: 6, customFaces: [], color: "#E9EAEC" }
+          ],
+        },
+        {
+          name: "Cities & Knights",
+          dice: [
+                { numberValue: 1, faces: 6, customFaces: [], color: "#E9EAEC" },
+                { numberValue: 2, faces: 6, customFaces: [], color: "#E32227" },
+                { numberValue: 3, faces: 6, customFaces: ["Barbarian", "Barbarian", "Barbarian", "Blue", "Yellow", "Green"], color: "#C0C0C0" }                
+          ],
+        },
+        {
+                name: "That's Pretty Clever",
+                dice: [
+                  { numberValue: 1, faces: 6, customFaces: [], color: "#E9EAEC" },
+                  { numberValue: 2, faces: 6, customFaces: [], color: "#0000FF" },
+                  { numberValue: 3, faces: 6, customFaces: [], color: "#FBFB3C" },
+                  { numberValue: 4, faces: 6, customFaces: [], color: "#228B22" },
+                  { numberValue: 5, faces: 6, customFaces: [], color: "#F28500" },
+                  { numberValue: 6, faces: 6, customFaces: [], color: "#B24BF3" }
+                ],
+              }
+      ];
 
 
 

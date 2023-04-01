@@ -189,7 +189,7 @@ footer {
         width: calc(var(--primary-button-size) * 4); /* Twice the width of the buttons */
         padding: 20px;
         position: fixed;
-        bottom: 10vh;
+        bottom: 12vh;
         z-index: 2;
         border: 1px solid white;
         border-radius: calc(5px + 1vmin);

@@ -9,3 +9,17 @@ daren.hill@ATHWNHWT2M0 diceRoller % find . -name .DS_Store -print0 | xargs -0 gi
    "#000000","#0000FF","#808080","#008000","#FFA500",
    "#FFC0CB","#800080","#FF0000","#FFFFFF","#FFFF00",
    ]
+
+
+       "#E9EAEC", // white
+                "#C0C0C0", // gray
+                "#000000", // black
+                "#E32227", // red
+                "#0000FF", // blue
+                "#FBFB3C", // yellow
+                "#228B22", // green
+                "#B24BF3", // purple
+                "#F28500", // orange
+                "#FF69B4", // pink
+                "#AA5518", // brown
+                "#EEB58B"  // tan
