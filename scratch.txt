@@ -1,25 +1,21 @@
 Crow, Basket, Red, Yellow, Green, Blue
 
-daren.hill@ATHWNHWT2M0 diceRoller % git rm --cached .DS_Store
 
-daren.hill@ATHWNHWT2M0 diceRoller % find . -name .DS_Store -print0 | xargs -0 git rm --ignore-unmatch
+                function rollDice() {
+        const animationDuration = 500; // Define the animation duration in milliseconds
+        const diceToRoll = diceList.filter(dice => !dice.classList.contains("dice-held"));
 
+        if (diceToRoll.length === 0) {
+                alert("All dice are held!");
+                return;
+        }
 
-[
-   "#000000","#0000FF","#808080","#008000","#FFA500",
-   "#FFC0CB","#800080","#FF0000","#FFFFFF","#FFFF00",
-   ]
+        let rollTotal = 0; // Add a variable to keep track of the roll total
 
-
-       "#E9EAEC", // white
-                "#C0C0C0", // gray
-                "#000000", // black
-                "#E32227", // red
-                "#0000FF", // blue
-                "#FBFB3C", // yellow
-                "#228B22", // green
-                "#B24BF3", // purple
-                "#F28500", // orange
-                "#FF69B4", // pink
-                "#AA5518", // brown
-                "#EEB58B"  // tan
+        diceToRoll.forEach((dice, index) => {
+                const number = dice.querySelector(".number");
+                const facesInput = dice.querySelector("input[type='hidden'].faces");
+                if (!facesInput) {
+                        console.error("Dice is missing faces input:", dice);
+                        return;
+                }
