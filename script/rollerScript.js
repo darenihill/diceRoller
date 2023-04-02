@@ -534,7 +534,7 @@ async function loadDice(diceConfig) {
                                                 }, 100);
                                         });
                                 },
-                                footer: '<button id="swal2-delete" class="double-wide-button">Delete</button>', // Modify this line
+                                footer: '<button id="swal2-delete" class="double-wide-button">Delete</button>',
                                 didOpen: () => {
                                         const deleteButton = document.getElementById('swal2-delete');
                                         deleteButton.addEventListener('click', () => {
@@ -552,7 +552,7 @@ async function loadDice(diceConfig) {
 
                         if (!dismiss && selectedConfigName) {
                                 diceConfig = savedConfigs[selectedConfigName];
-                        } else if (dismiss !== 'close') { // Modify this line
+                        } else if (dismiss !== 'close') {
                                 Swal.fire('No configuration selected');
                                 return;
                         }
@@ -569,27 +569,32 @@ async function loadDice(diceConfig) {
 
         diceList = [];
 
-        // Add loaded dice
-        diceConfig.forEach(config => {
-                const dice = createDice(config.numberValue, config.faces, config.customFaces, config.color);
-                const number = dice.querySelector('.number');
-                const holdIcon = dice.querySelector('.hold-icon-container');
-
-                if (config.held) {
-                        holdIcon.style.display = 'block';
-                        dice.dataset.hold = 'true';
-                }
-                number.style.color = config.numberColor;
-
-                diceList.push(dice);
-                document.getElementById('dice-container').appendChild(dice);
-        });
-
-        updateDiceSize();
-        Swal.fire({
-                title: 'Dice configuration loaded!',
-                icon: 'success',
-        });
+// Add loaded dice
+diceConfig.forEach(config => {
+        const dice = createDice(config.numberValue, config.faces, config.customFaces, config.color);
+        const number = dice.querySelector('.number');
+        const holdIcon = dice.querySelector('.hold-icon-container');
+      
+        if (config.held) {
+          holdIcon.style.display = 'block';
+          dice.dataset.hold = 'true';
+        }
+      
+        // Call updateNumberColor() for each loaded dice
+        updateNumberColor(dice);
+      
+        // Set the number color after updating it
+        number.style.color = config.numberColor;
+      
+        diceList.push(dice);
+        document.getElementById('dice-container').appendChild(dice);
+      });
+      
+      updateDiceSize();
+      Swal.fire({
+        title: 'Dice configuration loaded!',
+        icon: 'success',
+      });      
 }
 
 
