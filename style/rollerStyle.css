@@ -379,4 +379,28 @@ footer {
         border: 1px solid white;
         box-shadow: var(--btn-shadow);
     }
+
+    /* Custom CSS for smaller SweetAlert2 popups on mobile devices */
+
+        .swal2-popup {
+          width: 80%; /* Adjust the width of the popup */
+          font-size: calc( var(--primary-button-size)/2);
+        }
+      
+        .swal2-title {
+                font-size: calc( var(--primary-button-size)/2);
+        }
+      
+        .swal2-content {
+                font-size: calc( var(--primary-button-size)/2);
+        }
+      
+        .swal2-actions {
+                font-size: calc( var(--primary-button-size)/2);
+        }
+
+        .custom-close-button {
+                font-size: calc( var(--primary-button-size)*0.75);
+              }
+              
     

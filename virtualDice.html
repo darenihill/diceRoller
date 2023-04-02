@@ -10,7 +10,12 @@
                 content="dice, roll, dice roller, custom dice, dice colors, custom faces, virtual, virtual dice">
         <title>Dice Roller</title>
         <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@5/dark.css" />
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
         <link rel="stylesheet" type="text/css" href="style/rollerStyle.css">
+
+
 </head>
 
 <body>
@@ -32,7 +37,7 @@
                         <button type="button" class="double-wide-button" id="roll-history-btn">
                                 <i class="fas fa-history"></i>
                                 History
-                              </button>
+                        </button>
                         <button type="button" class="double-wide-button" id="presets-btn">
                                 <i class="fas fa-list"></i>
                                 Presets
@@ -64,7 +69,6 @@
                         </div>
                         </button>
                         </div>
-
                         <div class="primary-buttons-container">
                                 <button type="button" id="all-dice-status" class="update-hold-status-button">
                                         <div class="icon">
@@ -83,11 +87,6 @@
                                         <div class="roll-label">Roll</div>
                                 </button>
                 </footer>
-
-
-
-
-
                 <script src="https://kit.fontawesome.com/a2463f3d5f.js" crossorigin="anonymous"></script>
                 <script src="script/rollerScript.js"></script>
         </body>
