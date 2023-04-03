@@ -394,40 +394,7 @@ function addDice() {
         }
         const dice = createDice();
         diceList.push(dice);
-        dice.addEventListener('click', (e) => {
-                // Check if the event target is the settings button, its children, or within the color picker
-                const isSettingsButton = e.target.classList.contains('dice-button') || e.target.closest('.dice-button');
-                const isColorPicker = e.target.closest('.color-picker');
-                if (isSettingsButton || isColorPicker) {
-                        return;
-                }
-
-                // Check if any settings menu or color picker is open
-                const settingsOpen = Array.from(document.querySelectorAll('.settings-container')).some(container => container.style.display === 'grid');
-                const colorPickerOpen = Array.from(document.querySelectorAll('.color-picker')).some(picker => picker.style.display === 'grid');
-
-                // Close the settings menu and color picker if either is open
-                if (settingsOpen || colorPickerOpen) {
-                        closeSettings();
-                        return; // Don't toggle dice held
-                }
-
-                const holdIconContainer = dice.querySelector('.hold-icon-container');
-                const holdIconElement = holdIconContainer.querySelector('.icon i');
-
-                if (dice && !dice.classList.contains('dice-held')) {
-                        dice.classList.add('dice-held');
-                        holdIconElement.classList.remove('fa-unlock');
-                        holdIconElement.classList.add('fa-lock');
-                        holdIconContainer.style.display = 'block'; // Show the hold icon
-                } else {
-                        dice.classList.remove('dice-held');
-                        holdIconElement.classList.remove('fa-lock');
-                        holdIconElement.classList.add('fa-unlock');
-                        holdIconContainer.style.display = 'none'; // Hide the hold icon
-                }
-                updateHoldStatus();
-        });
+        dice.addEventListener('click', handleDiceClick);
         document.getElementById('dice-container').appendChild(dice);
         updateDiceSize();
 }
@@ -537,6 +504,53 @@ document.getElementById('all-dice-status').addEventListener('click', toggleHoldA
 //#endregion
 
 //#region Dice Functions
+function handleDiceClick(e) {
+        const dice = e.currentTarget;
+
+        const isSettingsButton = e.target.classList.contains('dice-button') || e.target.closest('.dice-button');
+        const isColorPicker = e.target.closest('.color-picker');
+        if (isSettingsButton || isColorPicker) {
+                return;
+        }
+
+        const settingsOpen = Array.from(document.querySelectorAll('.settings-container')).some(container => container.style.display === 'grid');
+        const colorPickerOpen = Array.from(document.querySelectorAll('.color-picker')).some(picker => picker.style.display === 'grid');
+
+        if (settingsOpen || colorPickerOpen) {
+                closeSettings();
+                return;
+        }
+
+        const holdIconContainer = dice.querySelector('.hold-icon-container');
+        const holdIconElement = holdIconContainer.querySelector('.icon i');
+
+        if (dice && !dice.classList.contains('dice-held')) {
+                dice.classList.add('dice-held');
+                holdIconElement.classList.remove('fa-unlock');
+                holdIconElement.classList.add('fa-lock');
+                holdIconContainer.style.display = 'block';
+        } else {
+                dice.classList.remove('dice-held');
+                holdIconElement.classList.remove('fa-lock');
+                holdIconElement.classList.add('fa-unlock');
+                holdIconContainer.style.display = 'none';
+        }
+        updateHoldStatus();
+}
+
+function addDice() {
+        if (diceList.length >= maxDice) {
+                alert("You've reached the maximum number of dice!");
+                return;
+        }
+        const dice = createDice();
+        diceList.push(dice);
+        dice.addEventListener('click', handleDiceClick);
+        document.getElementById('dice-container').appendChild(dice);
+        updateDiceSize();
+}
+
+
 function toggleContainers(actionContainer, removeButton, settingsContainer) {
         if (settingsContainer.style.display === 'grid') {
                 // Hide the settings container and remove button
@@ -603,14 +617,33 @@ function updateDiceColor(dice, color) {
 }
 
 function updateNumberColor(dice) {
-        const color = dice.style.backgroundColor;
+        const color = rgbToHex(dice.style.backgroundColor);
         const number = dice.querySelector('.number');
+
         number.style.color = (color === '#E9EAEC' || color === '#FBFB3C') ? 'black' : 'white';
 }
+
 
 function getRandomNumber(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+function rgbToHex(rgb) {
+        const regex = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/;
+        const match = rgb.match(regex);
+
+        if (!match) {
+                return rgb;
+        }
+
+        function componentToHex(c) {
+                const hex = parseInt(c).toString(16).toUpperCase();;
+                return hex.length === 1 ? '0' + hex : hex;
+        }
+
+        return `#${componentToHex(match[1])}${componentToHex(match[2])}${componentToHex(match[3])}`;
+}
+
 //#endregion
 
 //#region Menu functions
@@ -650,7 +683,7 @@ function saveDice(configName) {
                         numberValue: parseInt(number.textContent),
                         faces: parseInt(facesInput.value),
                         customFaces: dice.customFaces,
-                        color: diceColor.value,
+                        color: dice.style.backgroundColor,
                         held: holdIcon.style.display === 'block',
                         numberColor: number.style.color
                 };
@@ -772,7 +805,6 @@ async function loadDice(diceConfig) {
         diceConfig.config.forEach(config => {
                 const dice = createDice(config.numberValue, config.faces, config.customFaces);
                 const holdIcon = dice.querySelector('.hold-icon-container');
-                const diceColor = dice.querySelector('.dice-color');
 
                 // Set the dice color
                 updateDiceColor(dice, config.color);
@@ -780,8 +812,11 @@ async function loadDice(diceConfig) {
                 // Set the hold icon
                 if (config.held) {
                         holdIcon.style.display = 'block';
-                        dice.dataset.hold = 'true';
+                        dice.classList.add('dice-held');
                 }
+
+                // Add the click event listener
+                dice.addEventListener('click', handleDiceClick);
 
                 diceList.push(dice);
                 diceContainer.appendChild(dice);
