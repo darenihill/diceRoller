@@ -1,6 +1,7 @@
+//#region Constants
 const maxDice = 12;
 let diceList = [];
-
+let rollHistory = [];
 const dicePresets = [
         {
                 name: "Yatzee",
@@ -32,109 +33,52 @@ const dicePresets = [
                 ],
         }
 ];
+//#endregion
 
-
-function addDice() {
-        if (diceList.length >= maxDice) {
-                alert("You've reached the maximum number of dice!");
-                return;
-        }
-        const dice = createDice();
-        diceList.push(dice);
-        dice.addEventListener('click', (e) => {
-                // Check if the event target is the settings button, its children, or within the color picker
-                const isSettingsButton = e.target.classList.contains('dice-button') || e.target.closest('.dice-button');
-                const isColorPicker = e.target.closest('.color-picker');
-                if (isSettingsButton || isColorPicker) {
-                        return;
-                }
-
-                // Check if any settings menu or color picker is open
-                const settingsOpen = Array.from(document.querySelectorAll('.settings-container')).some(container => container.style.display === 'grid');
-                const colorPickerOpen = Array.from(document.querySelectorAll('.color-picker')).some(picker => picker.style.display === 'grid');
-
-                // Close the settings menu and color picker if either is open
-                if (settingsOpen || colorPickerOpen) {
-                        closeSettings();
-                        return; // Don't toggle dice held
-                }
-
-                const holdIconContainer = dice.querySelector('.hold-icon-container');
-                const holdIconElement = holdIconContainer.querySelector('.icon i');
-
-                if (dice && !dice.classList.contains('dice-held')) {
-                        dice.classList.add('dice-held');
-                        holdIconElement.classList.remove('fa-unlock');
-                        holdIconElement.classList.add('fa-lock');
-                        holdIconContainer.style.display = 'block'; // Show the hold icon
-                } else {
-                        dice.classList.remove('dice-held');
-                        holdIconElement.classList.remove('fa-lock');
-                        holdIconElement.classList.add('fa-unlock');
-                        holdIconContainer.style.display = 'none'; // Hide the hold icon
-                }
-                updateHoldStatus();
-        });
-        document.getElementById('dice-container').appendChild(dice);
-        updateDiceSize();
-}
-
-function removeDice(dice) {
-        const index = diceList.indexOf(dice);
-        if (index !== -1) {
-                diceList.splice(index, 1);
-        }
-        dice.parentNode.removeChild(dice);
-        updateHoldStatus()
-        updateDiceSize();
-}
-
-
-
-//#region Dice Creation
+//#region Create Dice
 function createDice(numberValue = 1, faces = 6, customFaces = [], color = '#E9EAEC') {
         const dice = document.createElement('div');
         dice.className = 'dice';
-    
+
         const number = document.createElement('div');
         number.className = 'number';
         number.style.color = 'black';
         number.textContent = numberValue;
         dice.appendChild(number);
-    
+
         dice.style.backgroundColor = color;
         dice.customFaces = customFaces;
-    
+
         const removeButton = createRemoveButton(dice);
         dice.appendChild(removeButton);
-    
+
         const settingsContainer = createSettingsContainer(dice, faces);
         dice.appendChild(settingsContainer);
-    
+
         const actionContainer = createActionContainer(dice, removeButton, settingsContainer);
         dice.appendChild(actionContainer);
-    
-        appendColorPicker(dice);
-    
-        updateHoldStatus();
-    
-        return dice;
-    }
-    
 
-    function createActionContainer(dice, removeButton, settingsContainer) {
+        appendColorPicker(dice);
+
+        updateHoldStatus();
+
+        return dice;
+}
+
+
+function createActionContainer(dice, removeButton, settingsContainer) {
         const actionContainer = document.createElement('div');
         actionContainer.className = 'dice-action-container';
-    
+
         const holdIconContainer = createHoldIconContainer();
         actionContainer.appendChild(holdIconContainer);
-    
+
         const settingsButton = createSettingsButton(dice, actionContainer, removeButton, settingsContainer);
         actionContainer.appendChild(settingsButton);
-    
+
         return actionContainer;
-    }
-    
+}
+
 
 function createHoldIconContainer() {
         const holdIconContainer = document.createElement('div');
@@ -153,40 +97,40 @@ function createSettingsButton(dice, actionContainer, removeButton, settingsConta
         const settingsButton = document.createElement('button');
         settingsButton.className = 'button dice-button settings';
         settingsButton.addEventListener('click', () => {
-            const number = dice.querySelector('.number');
-            const facesInput = settingsContainer.querySelector('.faces');
-            const diceColor = settingsContainer.querySelector('.dice-color');
-            console.log({
-                number: number.textContent,
-                faces: facesInput.value,
-                customFaces: dice.customFaces,
-                color: diceColor.value
-            });
-            toggleContainers(actionContainer, removeButton, settingsContainer);
+                const number = dice.querySelector('.number');
+                const facesInput = settingsContainer.querySelector('.faces');
+                const diceColor = settingsContainer.querySelector('.dice-color');
+                console.log({
+                        number: number.textContent,
+                        faces: facesInput.value,
+                        customFaces: dice.customFaces,
+                        color: diceColor.value
+                });
+                toggleContainers(actionContainer, removeButton, settingsContainer);
         });
-    
+
         const configureIcon = document.createElement('div');
         configureIcon.className = 'icon';
         configureIcon.innerHTML = '<i class="fas fa-cog"></i>';
         settingsButton.appendChild(configureIcon);
-    
+
         return settingsButton;
-    }
-    
-    
-    function createSettingsContainer(dice, faces = 6) {
+}
+
+
+function createSettingsContainer(dice, faces = 6) {
         const settingsContainer = document.createElement('div');
         settingsContainer.className = 'settings-container';
         settingsContainer.style.display = 'none';
-    
+
         const removeButton = createRemoveButton(dice);
         dice.appendChild(removeButton);
-    
+
         const customFacesButton = createCustomFacesButton(dice);
         settingsContainer.appendChild(customFacesButton);
-    
+
         settingsContainer.appendChild(createFacesButton(dice, settingsContainer, faces));
-    
+
         const colorButton = createColorButton(dice);
         settingsContainer.appendChild(colorButton);
 
@@ -195,13 +139,13 @@ function createSettingsButton(dice, actionContainer, removeButton, settingsConta
         diceColor.className = 'dice-color';
         diceColor.value = '#000000';
         settingsContainer.appendChild(diceColor);
-    
+
         const confirmButton = createConfirmButton(dice, removeButton, settingsContainer);
         settingsContainer.appendChild(confirmButton);
-    
+
         return settingsContainer;
-    }
-    
+}
+
 
 function createCustomFacesButton(dice) {
         const customFacesButton = document.createElement('button');
@@ -318,19 +262,19 @@ function createConfirmButton(dice, removeButton, settingsContainer) {
         const confirmButton = document.createElement('button');
         confirmButton.className = 'button dice-button confirm';
         confirmButton.addEventListener('click', () => {
-            const actionContainer = dice.querySelector('.dice-action-container');
-            toggleContainers(actionContainer, removeButton, settingsContainer);
+                const actionContainer = dice.querySelector('.dice-action-container');
+                toggleContainers(actionContainer, removeButton, settingsContainer);
         });
-    
+
         const confirmIcon = document.createElement('div');
         confirmIcon.className = 'icon';
         confirmIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
         confirmButton.appendChild(confirmIcon);
-    
-        return confirmButton;
-    }
 
-    function createColorPicker(colors) {
+        return confirmButton;
+}
+
+function createColorPicker(colors) {
         const colorPicker = document.createElement('div');
         colorPicker.className = 'color-picker';
         colorPicker.style.display = 'none';
@@ -362,105 +306,149 @@ function createConfirmButton(dice, removeButton, settingsContainer) {
         return colorPicker;
 }
 
-    
-    function appendColorPicker(dice) {
+
+function appendColorPicker(dice) {
         const colorPicker = createColorPicker([
-            "#E9EAEC", // white
-            "#C0C0C0", // gray
-            "#000000", // black
-            "#E32227", // red
-            "#0000FF", // blue
-            "#FBFB3C", // yellow
-            "#228B22", // green
-            "#B24BF3", // purple
-            "#F28500", // orange
-            "#FF69B4", // pink
-            "#AA5518", // brown
-            "#EEB58B"  // tan
+                "#E9EAEC", // white
+                "#C0C0C0", // gray
+                "#000000", // black
+                "#E32227", // red
+                "#0000FF", // blue
+                "#FBFB3C", // yellow
+                "#228B22", // green
+                "#B24BF3", // purple
+                "#F28500", // orange
+                "#FF69B4", // pink
+                "#AA5518", // brown
+                "#EEB58B"  // tan
         ]);
         dice.appendChild(colorPicker);
-    }
-    
-    
+}
+
+
 
 //#endregion
 
-function updateHoldStatus() {
-        const allDice = document.querySelectorAll('.dice');
-        const allDiceStatusButton = document.getElementById('all-dice-status');
-        const anyHeld = Array.from(allDice).some(die => die.classList.contains('dice-held'));
+//#region Create Menu Container
+document.addEventListener('DOMContentLoaded', function () {
+        initializeLeftMenuToggle();
+});
 
-        if (anyHeld) {
-                allDiceStatusButton.innerHTML = '<div class="icon"><i class="fa-solid fa-unlock"></i></div>';
-        } else {
-                allDiceStatusButton.innerHTML = '<div class="icon"><i class="fa-solid fa-lock"></i></div>';
-        }
+function initializeLeftMenuToggle() {
+        const toggleMenuButton = document.getElementById('toggle-menu');
+        const leftMenu = document.querySelector('.left-menu');
+        const chevronIcon = toggleMenuButton.querySelector('i');
+        let menuIsOpen = false;
+
+        toggleMenuButton.addEventListener('click', function () {
+                menuIsOpen = !menuIsOpen;
+                leftMenu.style.display = menuIsOpen ? 'grid' : 'none';
+                chevronIcon.classList.toggle('fa-chevron-down', menuIsOpen);
+                chevronIcon.classList.toggle('fa-chevron-up', !menuIsOpen);
+        });
 }
 
-function toggleHoldAllDice() {
-        const allDice = document.querySelectorAll('.dice');
-        const anyHeld = Array.from(allDice).some(die => die.classList.contains('dice-held'));
+document.getElementById('donate').addEventListener('click', () => {
+        window.location.href = 'donate.html'; // Link to a dummy donate page
+});
 
-        allDice.forEach((die) => {
-                const holdIconContainer = die.querySelector('.hold-icon-container');
-                const holdIconElement = holdIconContainer.querySelector('.icon i');
+document.getElementById('suggestions-btn').addEventListener('click', () => {
+        window.location.href = 'https://docs.google.com/forms/d/1MurbBtETb6e9JmkThO_Apuc9lowJcDPHpCcPNIhbPpg/prefill'; // Link to a dummy suggestions page
+});
 
-                if (anyHeld && die.classList.contains('dice-held')) {
-                        die.classList.remove('dice-held');
-                        holdIconElement.classList.remove('fa-lock');
-                        holdIconElement.classList.add('fa-unlock');
-                        holdIconContainer.style.display = 'none';
-                } else if (!anyHeld) {
-                        die.classList.add('dice-held');
-                        holdIconElement.classList.remove('fa-unlock');
-                        holdIconElement.classList.add('fa-lock');
-                        holdIconContainer.style.display = 'block';
+document.getElementById('help-btn').addEventListener('click', () => {
+        // Create a popup menu for help
+        let helpPopup = document.createElement('div');
+        helpPopup.id = 'help-popup';
+        helpPopup.className = 'help-popup';
+        helpPopup.innerHTML = `
+            <h2>Help</h2>
+            <ul>
+                <li><strong>Donate:</strong> Support our project by making a donation. Clicking this button will take you to a donation page.</li>
+                <li><strong>Feedback:</strong> Share your suggestions or report any issues you've encountered. Clicking this button will take you to a feedback form.</li>
+                <li><strong>Help:</strong> Opens this help popup with explanations for each button on the page.</li>
+                <li><strong>Delete All:</strong> Removes all dice from the screen. Use with caution, as this action cannot be undone.</li>
+                <li><strong>Roll History:</strong> Shows a list of your previous dice rolls.</li>
+                <li><strong>Presets:</strong> Allows you to save and load custom dice configurations for quick access.</li>
+                <li><strong>Save:</strong> Saves the current dice configuration to your local storage or a file.</li>
+                <li><strong>Load:</strong> Loads a previously saved dice configuration from your local storage or a file.</li>
+            </ul>
+            <button type="button" id="close-help-popup">Close</button>
+            `;
+        document.body.appendChild(helpPopup);
+
+        document.getElementById('close-help-popup').addEventListener('click', () => {
+                document.body.removeChild(helpPopup);
+        });
+});
+
+document.getElementById('delete-all-btn').addEventListener('click', () => {
+        Swal.fire({
+                title: 'Are you sure you want to delete all your dice?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+                reverseButtons: true
+        }).then((result) => {
+                if (result.isConfirmed) {
+                        // Remove all dice
+                        let diceElements = document.querySelectorAll('.dice');
+                        diceElements.forEach((dice) => {
+                                removeDice(dice);
+                        });
                 }
         });
+});
 
-        updateHoldStatus();
-}
 
-function closeSettings() {
-        const settingsContainers = document.querySelectorAll('.settings-container');
-        settingsContainers.forEach(settingsContainer => {
-                settingsContainer.style.display = 'none';
-        });
+//#endregion
 
-        const removeButtons = document.querySelectorAll('.dice-button.remove');
-        removeButtons.forEach(removeButton => {
-                removeButton.style.display = 'none';
-        });
-
-        const actionContainers = document.querySelectorAll('.dice-action-container');
-        actionContainers.forEach(actionContainer => {
-                actionContainer.style.display = 'grid';
-        });
-}
-
-function toggleContainers(actionContainer, removeButton, settingsContainer) {
-        if (settingsContainer.style.display === 'grid') {
-                // Hide the settings container and remove button
-                settingsContainer.style.display = 'none';
-                removeButton.style.display = 'none';
-
-                // Show the action container
-                actionContainer.style.display = 'grid';
-        } else {
-                // Show the settings container and remove button
-                settingsContainer.style.display = 'grid';
-                removeButton.style.display = 'flex';
-
-                // Hide the action container
-                actionContainer.style.display = 'none';
+//#region Primary Button Functions
+function addDice() {
+        if (diceList.length >= maxDice) {
+                alert("You've reached the maximum number of dice!");
+                return;
         }
-}
+        const dice = createDice();
+        diceList.push(dice);
+        dice.addEventListener('click', (e) => {
+                // Check if the event target is the settings button, its children, or within the color picker
+                const isSettingsButton = e.target.classList.contains('dice-button') || e.target.closest('.dice-button');
+                const isColorPicker = e.target.closest('.color-picker');
+                if (isSettingsButton || isColorPicker) {
+                        return;
+                }
 
-function getRandomNumber(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+                // Check if any settings menu or color picker is open
+                const settingsOpen = Array.from(document.querySelectorAll('.settings-container')).some(container => container.style.display === 'grid');
+                const colorPickerOpen = Array.from(document.querySelectorAll('.color-picker')).some(picker => picker.style.display === 'grid');
 
-let rollHistory = [];
+                // Close the settings menu and color picker if either is open
+                if (settingsOpen || colorPickerOpen) {
+                        closeSettings();
+                        return; // Don't toggle dice held
+                }
+
+                const holdIconContainer = dice.querySelector('.hold-icon-container');
+                const holdIconElement = holdIconContainer.querySelector('.icon i');
+
+                if (dice && !dice.classList.contains('dice-held')) {
+                        dice.classList.add('dice-held');
+                        holdIconElement.classList.remove('fa-unlock');
+                        holdIconElement.classList.add('fa-lock');
+                        holdIconContainer.style.display = 'block'; // Show the hold icon
+                } else {
+                        dice.classList.remove('dice-held');
+                        holdIconElement.classList.remove('fa-lock');
+                        holdIconElement.classList.add('fa-unlock');
+                        holdIconContainer.style.display = 'none'; // Hide the hold icon
+                }
+                updateHoldStatus();
+        });
+        document.getElementById('dice-container').appendChild(dice);
+        updateDiceSize();
+}
 
 function rollDice() {
         const animationDuration = 500;
@@ -530,17 +518,73 @@ function rollDice() {
         }, animationDuration);
 }
 
-function showRollHistory() {
-        let rollHistoryText = rollHistory.map((roll, index) => `Roll ${rollHistory.length - index}: ${roll.join(", ")}`).join("<br>");
-        Swal.fire({
-                title: 'Roll History',
-                html: rollHistoryText,
-        });
+function updateHoldStatus() {
+        const allDice = document.querySelectorAll('.dice');
+        const allDiceStatusButton = document.getElementById('all-dice-status');
+        const anyHeld = Array.from(allDice).some(die => die.classList.contains('dice-held'));
+
+        if (anyHeld) {
+                allDiceStatusButton.innerHTML = '<div class="icon"><i class="fa-solid fa-unlock"></i></div>';
+        } else {
+                allDiceStatusButton.innerHTML = '<div class="icon"><i class="fa-solid fa-lock"></i></div>';
+        }
 }
 
-document.getElementById('roll-history-btn').addEventListener('click', showRollHistory);
+function toggleHoldAllDice() {
+        const allDice = document.querySelectorAll('.dice');
+        const anyHeld = Array.from(allDice).some(die => die.classList.contains('dice-held'));
 
+        allDice.forEach((die) => {
+                const holdIconContainer = die.querySelector('.hold-icon-container');
+                const holdIconElement = holdIconContainer.querySelector('.icon i');
 
+                if (anyHeld && die.classList.contains('dice-held')) {
+                        die.classList.remove('dice-held');
+                        holdIconElement.classList.remove('fa-lock');
+                        holdIconElement.classList.add('fa-unlock');
+                        holdIconContainer.style.display = 'none';
+                } else if (!anyHeld) {
+                        die.classList.add('dice-held');
+                        holdIconElement.classList.remove('fa-unlock');
+                        holdIconElement.classList.add('fa-lock');
+                        holdIconContainer.style.display = 'block';
+                }
+        });
+
+        updateHoldStatus();
+}
+
+document.getElementById('all-dice-status').addEventListener('click', toggleHoldAllDice);
+//#endregion
+
+//#region Dice Functions
+function toggleContainers(actionContainer, removeButton, settingsContainer) {
+        if (settingsContainer.style.display === 'grid') {
+                // Hide the settings container and remove button
+                settingsContainer.style.display = 'none';
+                removeButton.style.display = 'none';
+
+                // Show the action container
+                actionContainer.style.display = 'grid';
+        } else {
+                // Show the settings container and remove button
+                settingsContainer.style.display = 'grid';
+                removeButton.style.display = 'flex';
+
+                // Hide the action container
+                actionContainer.style.display = 'none';
+        }
+}
+
+function removeDice(dice) {
+        const index = diceList.indexOf(dice);
+        if (index !== -1) {
+                diceList.splice(index, 1);
+        }
+        dice.parentNode.removeChild(dice);
+        updateHoldStatus()
+        updateDiceSize();
+}
 
 function updateFontSize(dice) {
         const number = dice.querySelector('.number');
@@ -574,11 +618,24 @@ function updateDiceSize() {
         document.documentElement.style.setProperty("--dice-size", newSize);
 }
 
-
 function updateNumberColor(dice) {
         const color = dice.style.backgroundColor;
         const number = dice.querySelector('.number');
         number.style.color = (color === '#E9EAEC' || color === '#FBFB3C') ? 'black' : 'white';
+}
+
+function getRandomNumber(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+//#endregion
+
+//#region Menu functions
+function showRollHistory() {
+        let rollHistoryText = rollHistory.map((roll, index) => `Roll ${rollHistory.length - index}: ${roll.join(", ")}`).join("<br>");
+        Swal.fire({
+                title: 'Roll History',
+                html: rollHistoryText,
+        });
 }
 
 function promptForSave() {
@@ -619,13 +676,6 @@ function saveDice(configName) {
         savedConfigs[configName] = { name: configName, config: diceConfigs };
         localStorage.setItem('diceConfigs', JSON.stringify(savedConfigs));
 }
-
-
-window.addEventListener('beforeunload', () => {
-        const diceConfigs = diceList.map(dice => {
-                saveDice('systemAutosave');
-        });
-});
 
 async function promptForLoad() {
         const savedConfigs = JSON.parse(localStorage.getItem('diceConfigs') || '{}');
@@ -770,109 +820,16 @@ async function loadDice(diceConfig) {
                 localStorage.setItem('diceConfigs', JSON.stringify(savedConfigs));
         }
 }
+//#endregion
 
-
-
-
+//#region Event Listeners
+document.getElementById('roll-history-btn').addEventListener('click', showRollHistory);
+window.addEventListener('beforeunload', () => {
+        const diceConfigs = diceList.map(dice => {
+                saveDice('systemAutosave');
+        });
+});
 document.getElementById('save-btn').addEventListener('click', promptForSave);
 document.getElementById('load-btn').addEventListener('click', promptForLoad);
 document.getElementById('presets-btn').addEventListener('click', loadPreset);
-
-
-
-
-
-document.getElementById('presets-btn').addEventListener('click', loadPreset);
-
-
-
-
-
-
-//#region Left Menu Container
-document.addEventListener('DOMContentLoaded', function () {
-        initializeLeftMenuToggle();
-});
-
-function initializeLeftMenuToggle() {
-        const toggleMenuButton = document.getElementById('toggle-menu');
-        const leftMenu = document.querySelector('.left-menu');
-        const chevronIcon = toggleMenuButton.querySelector('i');
-        let menuIsOpen = false;
-
-        toggleMenuButton.addEventListener('click', function () {
-                menuIsOpen = !menuIsOpen;
-                leftMenu.style.display = menuIsOpen ? 'grid' : 'none';
-                chevronIcon.classList.toggle('fa-chevron-down', menuIsOpen);
-                chevronIcon.classList.toggle('fa-chevron-up', !menuIsOpen);
-        });
-}
-
-document.getElementById('donate').addEventListener('click', () => {
-        window.location.href = 'donate.html'; // Link to a dummy donate page
-});
-
-document.getElementById('suggestions-btn').addEventListener('click', () => {
-        window.location.href = 'https://docs.google.com/forms/d/1MurbBtETb6e9JmkThO_Apuc9lowJcDPHpCcPNIhbPpg/prefill'; // Link to a dummy suggestions page
-});
-
-document.getElementById('help-btn').addEventListener('click', () => {
-        // Create a popup menu for help
-        let helpPopup = document.createElement('div');
-        helpPopup.id = 'help-popup';
-        helpPopup.className = 'help-popup';
-        helpPopup.innerHTML = `
-            <h2>Help</h2>
-            <ul>
-                <li><strong>Donate:</strong> Support our project by making a donation. Clicking this button will take you to a donation page.</li>
-                <li><strong>Feedback:</strong> Share your suggestions or report any issues you've encountered. Clicking this button will take you to a feedback form.</li>
-                <li><strong>Help:</strong> Opens this help popup with explanations for each button on the page.</li>
-                <li><strong>Delete All:</strong> Removes all dice from the screen. Use with caution, as this action cannot be undone.</li>
-                <li><strong>Roll History:</strong> Shows a list of your previous dice rolls.</li>
-                <li><strong>Presets:</strong> Allows you to save and load custom dice configurations for quick access.</li>
-                <li><strong>Save:</strong> Saves the current dice configuration to your local storage or a file.</li>
-                <li><strong>Load:</strong> Loads a previously saved dice configuration from your local storage or a file.</li>
-            </ul>
-            <button type="button" id="close-help-popup">Close</button>
-            `;
-        document.body.appendChild(helpPopup);
-
-        document.getElementById('close-help-popup').addEventListener('click', () => {
-                document.body.removeChild(helpPopup);
-        });
-});
-
-document.getElementById('delete-all-btn').addEventListener('click', () => {
-        Swal.fire({
-                title: 'Are you sure you want to delete all your dice?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes',
-                cancelButtonText: 'No',
-                reverseButtons: true
-        }).then((result) => {
-                if (result.isConfirmed) {
-                        // Remove all dice
-                        let diceElements = document.querySelectorAll('.dice');
-                        diceElements.forEach((dice) => {
-                                removeDice(dice);
-                        });
-                }
-        });
-});
-
-
 //#endregion
-
-
-document.getElementById('all-dice-status').addEventListener('click', toggleHoldAllDice);
-
-
-document.querySelectorAll(".button[data-tooltip]").forEach((button) => {
-        const tooltipText = button.getAttribute("data-tooltip");
-        const tooltip = document.createElement("span");
-        tooltip.classList.add("tooltip");
-        tooltip.textContent = tooltipText;
-        button.appendChild(tooltip);
-        button.style.position = "relative";
-});
