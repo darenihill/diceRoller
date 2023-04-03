@@ -56,7 +56,14 @@ function createDice(numberValue = 1, faces = 6, customFaces = [], color = '#E9EA
         dice.className = 'dice';
 
         const number = document.createElement('div');
-        number.className = 'number';
+        number.classList.add('number');
+
+        // Set the textContent of the number for custom-faced dice
+        if (customFaces && customFaces.length > 0) {
+                number.textContent = customFaces[0];
+        } else {
+                number.textContent = numberValue;
+        }
         number.textContent = numberValue;
         dice.appendChild(number);
 
@@ -801,10 +808,14 @@ async function loadDice(diceConfig) {
         diceList = [];
 
         // Add loaded dice
+
+
+        
         const diceContainer = document.getElementById('dice-container');
         diceConfig.config.forEach(config => {
                 const dice = createDice(config.numberValue, config.faces, config.customFaces);
                 const holdIcon = dice.querySelector('.hold-icon-container');
+                const number = dice.querySelector('.number');
 
                 // Set the dice color
                 updateDiceColor(dice, config.color);
@@ -820,21 +831,35 @@ async function loadDice(diceConfig) {
 
                 diceList.push(dice);
                 diceContainer.appendChild(dice);
+
+                // Update font size only for dice with custom faces
+                if (config.customFaces && config.customFaces.length > 0) {
+                        number.textContent = config.customFaces[0];
+                        updateFontSize(dice);
+                }
         });
 
         updateDiceSize();
-
-        Swal.fire({
-                title: 'Dice configuration loaded!',
-                icon: 'success',
-        });
 
         if (diceConfig.name === 'systemAutosave') {
                 const savedConfigs = JSON.parse(localStorage.getItem('diceConfigs') || '{}');
                 delete savedConfigs['systemAutosave'];
                 localStorage.setItem('diceConfigs', JSON.stringify(savedConfigs));
+        } else {
+                Swal.fire({
+                        title: 'Dice configuration loaded!',
+                        icon: 'success',
+                });
         }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+        const savedConfigs = JSON.parse(localStorage.getItem('diceConfigs') || '{}');
+        const systemAutosaveConfig = savedConfigs['systemAutosave'];
+        if (systemAutosaveConfig) {
+                loadDice(systemAutosaveConfig);
+        }
+});
 //#endregion
 
 //#region Event Listeners
