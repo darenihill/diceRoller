@@ -89,7 +89,248 @@ function removeDice(dice) {
         updateDiceSize();
 }
 
-function createColorPicker(colors) {
+
+
+//#region Dice Creation
+function createDice(numberValue = 1, faces = 6, customFaces = [], color = '#E9EAEC') {
+        const dice = document.createElement('div');
+        dice.className = 'dice';
+    
+        const number = document.createElement('div');
+        number.className = 'number';
+        number.style.color = 'black';
+        number.textContent = numberValue;
+        dice.appendChild(number);
+    
+        dice.style.backgroundColor = color;
+        dice.customFaces = customFaces;
+    
+        const removeButton = createRemoveButton(dice);
+        dice.appendChild(removeButton);
+    
+        const settingsContainer = createSettingsContainer(dice, faces);
+        dice.appendChild(settingsContainer);
+    
+        const actionContainer = createActionContainer(dice, removeButton, settingsContainer);
+        dice.appendChild(actionContainer);
+    
+        appendColorPicker(dice);
+    
+        updateHoldStatus();
+    
+        return dice;
+    }
+    
+
+    function createActionContainer(dice, removeButton, settingsContainer) {
+        const actionContainer = document.createElement('div');
+        actionContainer.className = 'dice-action-container';
+    
+        const holdIconContainer = createHoldIconContainer();
+        actionContainer.appendChild(holdIconContainer);
+    
+        const settingsButton = createSettingsButton(dice, actionContainer, removeButton, settingsContainer);
+        actionContainer.appendChild(settingsButton);
+    
+        return actionContainer;
+    }
+    
+
+function createHoldIconContainer() {
+        const holdIconContainer = document.createElement('div');
+        holdIconContainer.className = 'hold-icon-container';
+        holdIconContainer.style.display = 'none';
+
+        const holdIcon = document.createElement('div');
+        holdIcon.className = 'icon';
+        holdIcon.innerHTML = '<i class="fa-solid fa-unlock"></i>';
+        holdIconContainer.appendChild(holdIcon);
+
+        return holdIconContainer;
+}
+
+function createSettingsButton(dice, actionContainer, removeButton, settingsContainer) {
+        const settingsButton = document.createElement('button');
+        settingsButton.className = 'button dice-button settings';
+        settingsButton.addEventListener('click', () => {
+            const number = dice.querySelector('.number');
+            const facesInput = settingsContainer.querySelector('.faces');
+            const diceColor = settingsContainer.querySelector('.dice-color');
+            console.log({
+                number: number.textContent,
+                faces: facesInput.value,
+                customFaces: dice.customFaces,
+                color: diceColor.value
+            });
+            toggleContainers(actionContainer, removeButton, settingsContainer);
+        });
+    
+        const configureIcon = document.createElement('div');
+        configureIcon.className = 'icon';
+        configureIcon.innerHTML = '<i class="fas fa-cog"></i>';
+        settingsButton.appendChild(configureIcon);
+    
+        return settingsButton;
+    }
+    
+    
+    function createSettingsContainer(dice, faces = 6) {
+        const settingsContainer = document.createElement('div');
+        settingsContainer.className = 'settings-container';
+        settingsContainer.style.display = 'none';
+    
+        const removeButton = createRemoveButton(dice);
+        dice.appendChild(removeButton);
+    
+        const customFacesButton = createCustomFacesButton(dice);
+        settingsContainer.appendChild(customFacesButton);
+    
+        settingsContainer.appendChild(createFacesButton(dice, settingsContainer, faces));
+    
+        const colorButton = createColorButton(dice);
+        settingsContainer.appendChild(colorButton);
+
+        const diceColor = document.createElement('input');
+        diceColor.type = 'hidden';
+        diceColor.className = 'dice-color';
+        diceColor.value = '#000000';
+        settingsContainer.appendChild(diceColor);
+    
+        const confirmButton = createConfirmButton(dice, removeButton, settingsContainer);
+        settingsContainer.appendChild(confirmButton);
+    
+        return settingsContainer;
+    }
+    
+
+function createCustomFacesButton(dice) {
+        const customFacesButton = document.createElement('button');
+        customFacesButton.className = 'button dice-button custom-faces';
+        const customFacesIcon = document.createElement('div');
+        customFacesIcon.className = 'icon';
+        customFacesIcon.innerHTML = '<i class="fas fa-star"></i>';
+        customFacesButton.appendChild(customFacesIcon);
+
+        customFacesButton.addEventListener('click', () => {
+                const currentFacesMessage = dice.customFaces.length > 0 ? `${dice.customFaces.join(', ')}\n\n` : '';
+
+                Swal.fire({
+                        title: 'Enter custom faces, separated by commas:',
+                        input: 'text',
+                        inputValue: currentFacesMessage,
+                        showCancelButton: true,
+                        confirmButtonText: 'OK',
+                }).then(result => {
+                        if (result.isConfirmed) {
+                                dice.customFaces = result.value.split(',').map(face => face.trim());
+                                dice.querySelector('.number').textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
+                                updateFontSize(dice);
+                        }
+                });
+        });
+
+        return customFacesButton;
+}
+
+function createRemoveButton(dice) {
+        const removeButton = document.createElement('button');
+        removeButton.className = 'button dice-button remove';
+        removeButton.style.display = 'none'; // Hide the remove button by default
+        removeButton.addEventListener('click', () => {
+                removeDice(dice);
+        });
+        const removeIcon = document.createElement('div');
+        removeIcon.className = 'icon';
+        removeIcon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+        removeButton.appendChild(removeIcon);
+
+        return removeButton;
+}
+
+
+function createFacesButton(dice, settingsContainer, faces = 6) {
+        const facesButton = document.createElement('button');
+        facesButton.className = 'button dice-button';
+        const facesIcon = document.createElement('div');
+        facesIcon.className = 'icon';
+        facesIcon.innerHTML = '<i class="fas fa-hashtag"></i>';
+        facesButton.appendChild(facesIcon);
+        const facesInput = document.createElement('input');
+        facesInput.type = 'hidden';
+        facesInput.className = 'faces';
+        facesInput.min = 1;
+        facesInput.max = 100;
+        facesInput.value = faces;
+        settingsContainer.appendChild(facesInput);
+
+        facesButton.addEventListener('click', () => {
+                Swal.fire({
+                        title: 'Enter a number (1-100):',
+                        input: 'number',
+                        inputAttributes: {
+                                min: 1,
+                                max: 100,
+                        },
+                        inputValue: facesInput.value,
+                        showCancelButton: true,
+                        confirmButtonText: 'OK',
+                }).then(result => {
+                        if (result.isConfirmed) {
+                                facesInput.value = result.value;
+                                dice.customFaces = []; // Clear out custom faces
+                                dice.querySelector(".number").textContent = getRandomNumber(1, facesInput.value);
+                        }
+                }).catch(error => {
+                        if (error && error.message !== 'Swal.close()') {
+                                Swal.fire({
+                                        title: 'Error',
+                                        text: 'Please enter a valid whole number between 1 and 100.',
+                                        icon: 'error',
+                                });
+                        }
+                });
+        });
+
+        return facesButton;
+}
+
+function createColorButton(dice) {
+        const colorButton = document.createElement('button');
+        colorButton.className = 'button dice-button color';
+        const colorIcon = document.createElement('div');
+        colorIcon.className = 'icon';
+        colorIcon.innerHTML = '<i class="fas fa-paint-brush"></i>';
+        colorButton.appendChild(colorIcon);
+
+        colorButton.addEventListener('click', () => {
+                const colorPicker = dice.querySelector('.color-picker');
+                if (colorPicker.style.display === 'none') {
+                        colorPicker.style.display = 'grid';
+                } else {
+                        colorPicker.style.display = 'none';
+                }
+        });
+
+        return colorButton;
+}
+
+function createConfirmButton(dice, removeButton, settingsContainer) {
+        const confirmButton = document.createElement('button');
+        confirmButton.className = 'button dice-button confirm';
+        confirmButton.addEventListener('click', () => {
+            const actionContainer = dice.querySelector('.dice-action-container');
+            toggleContainers(actionContainer, removeButton, settingsContainer);
+        });
+    
+        const confirmIcon = document.createElement('div');
+        confirmIcon.className = 'icon';
+        confirmIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
+        confirmButton.appendChild(confirmIcon);
+    
+        return confirmButton;
+    }
+
+    function createColorPicker(colors) {
         const colorPicker = document.createElement('div');
         colorPicker.className = 'color-picker';
         colorPicker.style.display = 'none';
@@ -121,219 +362,28 @@ function createColorPicker(colors) {
         return colorPicker;
 }
 
-function createDice(numberValue = 1, faces = 6, customFaces = [], color = '#E9EAEC') {
-        const dice = document.createElement('div');
-        dice.className = 'dice';
-
-        const number = document.createElement('div');
-        number.className = 'number';
-        number.style.color = 'black';
-        number.textContent = numberValue;
-        dice.appendChild(number);
-
-        // Update dice properties with provided values
-        dice.style.backgroundColor = color;
-        dice.customFaces = customFaces;
-
-        //#region Action Container
-        // Action Container
-        const actionContainer = document.createElement('div');
-        actionContainer.className = 'dice-action-container';
-        dice.appendChild(actionContainer);
-
-        // Hold Icon Container
-        const holdIconContainer = document.createElement('div');
-        holdIconContainer.className = 'hold-icon-container';
-        holdIconContainer.style.display = 'none'; // Hide the hold icon container initially
-
-        const holdIcon = document.createElement('div');
-        holdIcon.className = 'icon';
-        holdIcon.innerHTML = '<i class="fa-solid fa-unlock"></i>';
-        holdIconContainer.appendChild(holdIcon);
-        actionContainer.appendChild(holdIconContainer);
-
-        // Settings Button
-        const settingsButton = document.createElement('button');
-        settingsButton.className = 'button dice-button settings';
-        settingsButton.addEventListener('click', () => {
-                console.log({
-                        number: number.textContent,
-                        faces: facesInput.value,
-                        customFaces: dice.customFaces,
-                        color: diceColor.value
-                });
-                toggleContainers(actionContainer, removeButton, settingsContainer);
-        });
-
-        const configureIcon = document.createElement('div');
-        configureIcon.className = 'icon';
-        configureIcon.innerHTML = '<i class="fas fa-cog"></i>';
-        settingsButton.appendChild(configureIcon);
-        actionContainer.appendChild(settingsButton);
-        //#endregion
-
-
-        //#region SettingsContainer
-        // Remove Button
-        const removeButton = document.createElement('button');
-        removeButton.className = 'button dice-button remove';
-        removeButton.style.display = 'none'; // Hide the remove button by default
-        removeButton.addEventListener('click', () => {
-                removeDice(dice);
-        });
-        const removeIcon = document.createElement('div');
-        removeIcon.className = 'icon';
-        removeIcon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-        removeButton.appendChild(removeIcon);
-        dice.appendChild(removeButton);
-
-        //Settings Menu
-        const settingsContainer = document.createElement('div');
-        settingsContainer.className = 'settings-container';
-        settingsContainer.style.display = 'none'; // Hide the settings container by default
-        dice.appendChild(settingsContainer);
-
-
-        // Custom Faces Button
-        const customFacesButton = document.createElement('button');
-        customFacesButton.className = 'button dice-button custom-faces';
-        const customFacesIcon = document.createElement('div');
-        customFacesIcon.className = 'icon';
-        customFacesIcon.innerHTML = '<i class="fas fa-star"></i>';
-        customFacesButton.appendChild(customFacesIcon);
-        settingsContainer.appendChild(customFacesButton);
-        dice.customFaces = [];
-        customFacesButton.addEventListener('click', () => {
-                // Prepare the current custom faces message
-                const currentFacesMessage = dice.customFaces.length > 0
-                        ? `${dice.customFaces.join(', ')}\n\n`
-                        : '';
-
-                Swal.fire({
-                        title: 'Enter custom faces, separated by commas:',
-                        input: 'text',
-                        inputValue: currentFacesMessage,
-                        showCancelButton: true,
-                        confirmButtonText: 'OK',
-                }).then(result => {
-                        if (result.isConfirmed) {
-                                dice.customFaces = result.value.split(',').map(face => face.trim());
-                                dice.querySelector('.number').textContent = dice.customFaces[getRandomNumber(0, dice.customFaces.length - 1)];
-                                updateFontSize(dice);
-                                toggleContainers(actionContainer, removeButton, settingsContainer);
-                        }
-                });
-        });
-
-        // Number Faces Button
-        const facesButton = document.createElement('button');
-        facesButton.className = 'button dice-button';
-        settingsContainer.appendChild(facesButton);
-        const facesIcon = document.createElement('div');
-        facesIcon.className = 'icon';
-        facesIcon.innerHTML = '<i class="fas fa-hashtag"></i>';
-        facesButton.appendChild(facesIcon);
-        const facesInput = document.createElement('input');
-        facesInput.type = 'hidden';
-        facesInput.className = 'faces';
-        facesInput.min = 1;
-        facesInput.max = 100;
-        facesInput.value = faces;
-        settingsContainer.appendChild(facesInput);
-
-        facesButton.addEventListener('click', () => {
-                Swal.fire({
-                        title: 'Enter a number (1-100):',
-                        input: 'number',
-                        inputAttributes: {
-                                min: 1,
-                                max: 100,
-                        },
-                        inputValue: facesInput.value,
-                        showCancelButton: true,
-                        confirmButtonText: 'OK',
-                }).then(result => {
-                        if (result.isConfirmed) {
-                                facesInput.value = result.value;
-                                dice.customFaces = []; // Clear out custom faces
-                                dice.querySelector(".number").textContent = getRandomNumber(1, facesInput.value);
-                                toggleContainers(actionContainer, removeButton, settingsContainer);
-                        }
-                }).catch(error => {
-                        if (error && error.message !== 'Swal.close()') {
-                                Swal.fire({
-                                        title: 'Error',
-                                        text: 'Please enter a valid whole number between 1 and 100.',
-                                        icon: 'error',
-                                });
-                        }
-                });
-        });
-
-
-
-
-        // Color Button
-        const colorButton = document.createElement('button');
-        colorButton.className = 'button dice-button color'; // Fix class name
-        const colorIcon = document.createElement('div');
-        colorIcon.className = 'icon';
-        colorIcon.innerHTML = '<i class="fas fa-paint-brush"></i>';
-        colorButton.appendChild(colorIcon);
-        settingsContainer.appendChild(colorButton);
-        colorButton.addEventListener('click', () => {
-                // Show/hide the color picker
-                const colorPicker = dice.querySelector('.color-picker');
-                if (colorPicker.style.display === 'none') {
-                        colorPicker.style.display = 'grid';
-                } else {
-                        colorPicker.style.display = 'none';
-                }
-        });
-
-        // Dice Color
-        const diceColor = document.createElement('input');
-        diceColor.type = 'hidden';
-        diceColor.className = 'dice-color';
-        diceColor.value = '#000000';
-        settingsContainer.appendChild(diceColor);
-
-        // Add the color picker
+    
+    function appendColorPicker(dice) {
         const colorPicker = createColorPicker([
-                "#E9EAEC", // white
-                "#C0C0C0", // gray
-                "#000000", // black
-                "#E32227", // red
-                "#0000FF", // blue
-                "#FBFB3C", // yellow
-                "#228B22", // green
-                "#B24BF3", // purple
-                "#F28500", // orange
-                "#FF69B4", // pink
-                "#AA5518", // brown
-                "#EEB58B"  // tan
+            "#E9EAEC", // white
+            "#C0C0C0", // gray
+            "#000000", // black
+            "#E32227", // red
+            "#0000FF", // blue
+            "#FBFB3C", // yellow
+            "#228B22", // green
+            "#B24BF3", // purple
+            "#F28500", // orange
+            "#FF69B4", // pink
+            "#AA5518", // brown
+            "#EEB58B"  // tan
         ]);
         dice.appendChild(colorPicker);
+    }
+    
+    
 
-
-        // Confirm Button
-        const confirmButton = document.createElement('button');
-        confirmButton.className = 'button dice-button confirm';
-        confirmButton.addEventListener('click', () => {
-                toggleContainers(actionContainer, removeButton, settingsContainer);
-        });
-        settingsContainer.appendChild(confirmButton);
-
-        // Confirm Icon
-        const confirmIcon = document.createElement('div');
-        confirmIcon.className = 'icon';
-        confirmIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
-        confirmButton.appendChild(confirmIcon);
-        //#endregion
-
-        updateHoldStatus();
-        return dice;
-}
+//#endregion
 
 function updateHoldStatus() {
         const allDice = document.querySelectorAll('.dice');
