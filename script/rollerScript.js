@@ -2,6 +2,20 @@
 const maxDice = 12;
 let diceList = [];
 let rollHistory = [];
+const COLORS = [
+        "#E9EAEC", // white
+        "#C0C0C0", // gray
+        "#000000", // black
+        "#E32227", // red
+        "#0000FF", // blue
+        "#FBFB3C", // yellow
+        "#228B22", // green
+        "#B24BF3", // purple
+        "#F28500", // orange
+        "#FF69B4", // pink
+        "#AA5518", // brown
+        "#EEB58B"  // tan
+];
 const dicePresets = [
         {
                 name: "Yatzee",
@@ -33,6 +47,7 @@ const dicePresets = [
                 ],
         }
 ];
+
 //#endregion
 
 //#region Create Dice
@@ -42,17 +57,16 @@ function createDice(numberValue = 1, faces = 6, customFaces = [], color = '#E9EA
 
         const number = document.createElement('div');
         number.className = 'number';
-        number.style.color = 'black';
         number.textContent = numberValue;
         dice.appendChild(number);
 
-        dice.style.backgroundColor = color;
+        updateDiceColor(dice, color);
         dice.customFaces = customFaces;
 
         const removeButton = createRemoveButton(dice);
         dice.appendChild(removeButton);
 
-        const settingsContainer = createSettingsContainer(dice, faces);
+        const settingsContainer = createSettingsContainer(dice, removeButton, faces);
         dice.appendChild(settingsContainer);
 
         const actionContainer = createActionContainer(dice, removeButton, settingsContainer);
@@ -64,7 +78,6 @@ function createDice(numberValue = 1, faces = 6, customFaces = [], color = '#E9EA
 
         return dice;
 }
-
 
 function createActionContainer(dice, removeButton, settingsContainer) {
         const actionContainer = document.createElement('div');
@@ -78,7 +91,6 @@ function createActionContainer(dice, removeButton, settingsContainer) {
 
         return actionContainer;
 }
-
 
 function createHoldIconContainer() {
         const holdIconContainer = document.createElement('div');
@@ -104,8 +116,9 @@ function createSettingsButton(dice, actionContainer, removeButton, settingsConta
                         number: number.textContent,
                         faces: facesInput.value,
                         customFaces: dice.customFaces,
-                        color: diceColor.value
+                        color: dice.style.backgroundColor
                 });
+
                 toggleContainers(actionContainer, removeButton, settingsContainer);
         });
 
@@ -117,14 +130,10 @@ function createSettingsButton(dice, actionContainer, removeButton, settingsConta
         return settingsButton;
 }
 
-
-function createSettingsContainer(dice, faces = 6) {
+function createSettingsContainer(dice, removeButton, faces = 6) {
         const settingsContainer = document.createElement('div');
         settingsContainer.className = 'settings-container';
         settingsContainer.style.display = 'none';
-
-        const removeButton = createRemoveButton(dice);
-        dice.appendChild(removeButton);
 
         const customFacesButton = createCustomFacesButton(dice);
         settingsContainer.appendChild(customFacesButton);
@@ -134,18 +143,11 @@ function createSettingsContainer(dice, faces = 6) {
         const colorButton = createColorButton(dice);
         settingsContainer.appendChild(colorButton);
 
-        const diceColor = document.createElement('input');
-        diceColor.type = 'hidden';
-        diceColor.className = 'dice-color';
-        diceColor.value = '#000000';
-        settingsContainer.appendChild(diceColor);
-
         const confirmButton = createConfirmButton(dice, removeButton, settingsContainer);
         settingsContainer.appendChild(confirmButton);
 
         return settingsContainer;
 }
-
 
 function createCustomFacesButton(dice) {
         const customFacesButton = document.createElement('button');
@@ -190,7 +192,6 @@ function createRemoveButton(dice) {
 
         return removeButton;
 }
-
 
 function createFacesButton(dice, settingsContainer, faces = 6) {
         const facesButton = document.createElement('button');
@@ -248,12 +249,9 @@ function createColorButton(dice) {
 
         colorButton.addEventListener('click', () => {
                 const colorPicker = dice.querySelector('.color-picker');
-                if (colorPicker.style.display === 'none') {
-                        colorPicker.style.display = 'grid';
-                } else {
-                        colorPicker.style.display = 'none';
-                }
+                colorPicker.style.display = colorPicker.style.display === 'none' ? 'grid' : 'none';
         });
+
 
         return colorButton;
 }
@@ -261,6 +259,7 @@ function createColorButton(dice) {
 function createConfirmButton(dice, removeButton, settingsContainer) {
         const confirmButton = document.createElement('button');
         confirmButton.className = 'button dice-button confirm';
+
         confirmButton.addEventListener('click', () => {
                 const actionContainer = dice.querySelector('.dice-action-container');
                 toggleContainers(actionContainer, removeButton, settingsContainer);
@@ -285,14 +284,13 @@ function createColorPicker(colors) {
                 swatch.style.backgroundColor = color;
                 swatch.addEventListener('click', (e) => {
                         const dice = e.target.closest('.dice');
-                        const number = dice.querySelector('.number');
                         const actionContainer = dice.querySelector('.dice-action-container');
                         const settingsContainer = dice.querySelector('.settings-container');
                         const removeButton = dice.querySelector('.dice-button.remove');
 
 
-                        dice.style.backgroundColor = color;
-                        number.style.color = (color === '#E9EAEC' || color === '#FBFB3C') ? 'black' : 'white';
+                        updateDiceColor(dice, color);
+
                         colorPicker.style.display = 'none';
 
                         toggleContainers(actionContainer, removeButton, settingsContainer);
@@ -306,26 +304,10 @@ function createColorPicker(colors) {
         return colorPicker;
 }
 
-
 function appendColorPicker(dice) {
-        const colorPicker = createColorPicker([
-                "#E9EAEC", // white
-                "#C0C0C0", // gray
-                "#000000", // black
-                "#E32227", // red
-                "#0000FF", // blue
-                "#FBFB3C", // yellow
-                "#228B22", // green
-                "#B24BF3", // purple
-                "#F28500", // orange
-                "#FF69B4", // pink
-                "#AA5518", // brown
-                "#EEB58B"  // tan
-        ]);
+        const colorPicker = createColorPicker(COLORS);
         dice.appendChild(colorPicker);
 }
-
-
 
 //#endregion
 
@@ -490,7 +472,6 @@ function rollDice() {
                                         newValue = getRandomNumber(1, facesInput.value);
                                 }
                                 number.textContent = newValue;
-                                console.log(`Dice ${index + 1} roll: ${newValue}`);
                         }, animationDuration);
                 }
                 rollDetails.push(`${number.textContent}`);
@@ -513,8 +494,6 @@ function rollDice() {
 
                 const rollLabel = document.querySelector(".roll-button .roll-label");
                 rollLabel.textContent = `${rollTotal}`;
-
-                console.log(`Total roll: ${rollTotal}`);
         }, animationDuration);
 }
 
@@ -616,6 +595,11 @@ function updateDiceSize() {
         }
 
         document.documentElement.style.setProperty("--dice-size", newSize);
+}
+
+function updateDiceColor(dice, color) {
+        dice.style.backgroundColor = color;
+        updateNumberColor(dice);
 }
 
 function updateNumberColor(dice) {
@@ -791,11 +775,7 @@ async function loadDice(diceConfig) {
                 const diceColor = dice.querySelector('.dice-color');
 
                 // Set the dice color
-                diceColor.value = config.color;
-                dice.style.backgroundColor = config.color;
-
-                // Call updateNumberColor() for each loaded dice
-                updateNumberColor(dice);
+                updateDiceColor(dice, config.color);
 
                 // Set the hold icon
                 if (config.held) {
