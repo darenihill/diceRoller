@@ -413,7 +413,7 @@ function rollDice() {
         if (diceToRoll.length === 0) {
                 Swal.fire({
                         title: 'All dice are held',
-                        toast: true,
+                        icon: 'info',
                         showConfirmButton: false,
                         timer: 1000,
                         timerProgressBar: true
@@ -587,20 +587,25 @@ function removeDice(dice) {
 }
 
 function updateFontSize(dice) {
-        const number = dice.querySelector('.number');
-        const longestFace = Math.max(...dice.customFaces.map(face => face.length));
-
-        // Calculate the font size based on the width of the dice and the length of the longest custom face string
-        const fontSizePx = Math.floor(dice.clientWidth / longestFace);
-
-        // Convert the font size to vmin by dividing it by the minimum of the viewport width and height, and then multiplying by 100
-        const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
-        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-        const minViewportDimension = Math.min(viewportWidth, viewportHeight);
-        const fontSizeVmin = (fontSizePx / minViewportDimension) * 180;
-
-        number.style.fontSize = `${fontSizeVmin}vmin`;
-}
+        console.log('Update Font Size Called');
+    
+        requestAnimationFrame(() => {
+            const number = dice.querySelector('.number');
+            const longestFace = Math.max(...dice.customFaces.map(face => face.length));
+    
+            // Calculate the font size based on the width of the dice and the length of the longest custom face string
+            const fontSizePx = Math.floor(dice.clientWidth / longestFace);
+    
+            // Convert the font size to vmin by dividing it by the minimum of the viewport width and height, and then multiplying by 100
+            const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+            const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+            const minViewportDimension = Math.min(viewportWidth, viewportHeight);
+            const fontSizeVmin = (fontSizePx / minViewportDimension) * 180;
+            console.log('Font size set to: ', fontSizeVmin);
+            number.style.fontSize = `${fontSizeVmin}vmin`;
+        });
+    }
+    
 
 function updateDiceSize() {
         const diceElements = document.querySelectorAll(".dice");
@@ -664,20 +669,32 @@ function showRollHistory() {
 
 function promptForSave() {
         Swal.fire({
-                title: 'Enter a name for this configuration:',
-                input: 'text',
-                showCancelButton: true,
-                confirmButtonText: 'Save'
+            title: 'Enter a name for this configuration:',
+            input: 'text',
+            showCancelButton: true,
+            confirmButtonText: 'Save'
         }).then(result => {
-                if (result.isConfirmed) {
-                        const configName = result.value;
-                        saveDice(configName);
-                        Swal.fire('Configuration saved!');
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                        Swal.fire('No name provided');
+            if (result.isConfirmed) {
+                const configName = result.value.trim();
+                if (configName) {
+                    saveDice(configName);
+                    Swal.fire('Configuration saved!');
+                } else {
+                    Swal.fire({
+                        title: 'Please enter a valid name',
+                        icon: 'error',
+                        timer: 1500,
+                        showConfirmButton: false,
+                        timerProgressBar: true
+                    }).then(() => {
+                        promptForSave();
+                    });
                 }
+            }
         });
-}
+    }
+    
+    
 
 function saveDice(configName) {
         const diceConfigs = diceList.map(dice => {
@@ -847,8 +864,10 @@ async function loadDice(diceConfig) {
                 localStorage.setItem('diceConfigs', JSON.stringify(savedConfigs));
         } else {
                 Swal.fire({
-                        title: 'Dice configuration loaded!',
+                        title: 'Loaded!',
                         icon: 'success',
+                        showConfirmButton: false,
+                        timer: 800,
                 });
         }
 }
