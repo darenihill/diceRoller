@@ -1,6 +1,39 @@
 const maxDice = 12;
 let diceList = [];
 
+const dicePresets = [
+        {
+                name: "Yatzee",
+                dice: [
+                        { numberValue: 1, faces: 6, customFaces: [], color: "#E9EAEC" },
+                        { numberValue: 2, faces: 6, customFaces: [], color: "#E9EAEC" },
+                        { numberValue: 3, faces: 6, customFaces: [], color: "#E9EAEC" },
+                        { numberValue: 4, faces: 6, customFaces: [], color: "#E9EAEC" },
+                        { numberValue: 5, faces: 6, customFaces: [], color: "#E9EAEC" }
+                ],
+        },
+        {
+                name: "Cities & Knights",
+                dice: [
+                        { numberValue: 1, faces: 6, customFaces: [], color: "#E9EAEC" },
+                        { numberValue: 2, faces: 6, customFaces: [], color: "#E32227" },
+                        { numberValue: 3, faces: 6, customFaces: ["Barbarian", "Barbarian", "Barbarian", "Blue", "Yellow", "Green"], color: "#C0C0C0" }
+                ],
+        },
+        {
+                name: "That's Pretty Clever",
+                dice: [
+                        { numberValue: 1, faces: 6, customFaces: [], color: "#E9EAEC" },
+                        { numberValue: 2, faces: 6, customFaces: [], color: "#0000FF" },
+                        { numberValue: 3, faces: 6, customFaces: [], color: "#FBFB3C" },
+                        { numberValue: 4, faces: 6, customFaces: [], color: "#228B22" },
+                        { numberValue: 5, faces: 6, customFaces: [], color: "#F28500" },
+                        { numberValue: 6, faces: 6, customFaces: [], color: "#B24BF3" }
+                ],
+        }
+];
+
+
 function addDice() {
         if (diceList.length >= maxDice) {
                 alert("You've reached the maximum number of dice!");
@@ -500,43 +533,43 @@ function updateNumberColor(dice) {
 
 function promptForSave() {
         Swal.fire({
-            title: 'Enter a name for this configuration:',
-            input: 'text',
-            showCancelButton: true,
-            confirmButtonText: 'Save'
+                title: 'Enter a name for this configuration:',
+                input: 'text',
+                showCancelButton: true,
+                confirmButtonText: 'Save'
         }).then(result => {
-            if (result.isConfirmed) {
-                const configName = result.value;
-                saveDice(configName);
-                Swal.fire('Configuration saved!');
-            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                Swal.fire('No name provided');
-            }
+                if (result.isConfirmed) {
+                        const configName = result.value;
+                        saveDice(configName);
+                        Swal.fire('Configuration saved!');
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        Swal.fire('No name provided');
+                }
         });
-    }
-    
-    function saveDice(configName) {
+}
+
+function saveDice(configName) {
         const diceConfigs = diceList.map(dice => {
-            const number = dice.querySelector('.number');
-            const facesInput = dice.querySelector('.faces');
-            const diceColor = dice.querySelector('.dice-color');
-            const holdIcon = dice.querySelector('.hold-icon-container');
-    
-            return {
-                numberValue: parseInt(number.textContent),
-                faces: parseInt(facesInput.value),
-                customFaces: dice.customFaces,
-                color: diceColor.value,
-                held: holdIcon.style.display === 'block',
-                numberColor: number.style.color
-            };
+                const number = dice.querySelector('.number');
+                const facesInput = dice.querySelector('.faces');
+                const diceColor = dice.querySelector('.dice-color');
+                const holdIcon = dice.querySelector('.hold-icon-container');
+
+                return {
+                        numberValue: parseInt(number.textContent),
+                        faces: parseInt(facesInput.value),
+                        customFaces: dice.customFaces,
+                        color: diceColor.value,
+                        held: holdIcon.style.display === 'block',
+                        numberColor: number.style.color
+                };
         });
-    
+
         const savedConfigs = JSON.parse(localStorage.getItem('diceConfigs') || '{}');
         savedConfigs[configName] = { name: configName, config: diceConfigs };
         localStorage.setItem('diceConfigs', JSON.stringify(savedConfigs));
-    }
-    
+}
+
 
 window.addEventListener('beforeunload', () => {
         const diceConfigs = diceList.map(dice => {
@@ -546,187 +579,163 @@ window.addEventListener('beforeunload', () => {
 
 async function promptForLoad() {
         const savedConfigs = JSON.parse(localStorage.getItem('diceConfigs') || '{}');
-    
+
         if (Object.keys(savedConfigs).length > 0) {
-            const inputOptions = Object.keys(savedConfigs).reduce((options, configName) => {
-                options[configName] = configName;
-                return options;
-            }, {});
-    
-            const { value: selectedConfigName, dismiss } = await Swal.fire({
-                input: 'select',
-                inputOptions: inputOptions,
-                inputPlaceholder: 'Select a save',
-                showCancelButton: true,
-                confirmButtonText: 'Load',
-                cancelButtonText: 'Cancel',
-                showCloseButton: true,
-                showLoaderOnConfirm: true,
-                buttonsStyling: false,
-                customClass: {
-                    confirmButton: 'double-wide-button',
-                    cancelButton: 'double-wide-button',
-                    footer: 'swal2-delete-container',
-                    closeButton: 'custom-close-button',
-                },
-                preConfirm: (selectedConfigName) => {
-                    return new Promise((resolve) => {
-                        setTimeout(() => {
-                            resolve();
-                        }, 100);
-                    });
-                },
-                footer: '<button id="swal2-delete" class="double-wide-button">Delete</button>',
-                didOpen: () => {
-                    const deleteButton = document.getElementById('swal2-delete');
-                    deleteButton.addEventListener('click', () => {
-                        const selectedConfigName = Swal.getInput().value;
-                        if (selectedConfigName && savedConfigs[selectedConfigName]) {
-                            delete savedConfigs[selectedConfigName];
-                            localStorage.setItem('diceConfigs', JSON.stringify(savedConfigs));
-                            Swal.fire('Configuration deleted!');
-                        } else {
-                            Swal.fire('No configuration selected');
-                        }
-                    });
-                },
-            });
-    
-            if (!dismiss && selectedConfigName) {
-                const diceConfig = savedConfigs[selectedConfigName];
-                loadDice(diceConfig);
-            } else if (dismiss !== 'close') {
-                Swal.fire('No configuration selected');
-            }
+                const inputOptions = Object.keys(savedConfigs).reduce((options, configName) => {
+                        options[configName] = configName;
+                        return options;
+                }, {});
+
+                const { value: selectedConfigName, dismiss } = await Swal.fire({
+                        input: 'select',
+                        inputOptions: inputOptions,
+                        inputPlaceholder: 'Select a save',
+                        showCancelButton: true,
+                        confirmButtonText: 'Load',
+                        cancelButtonText: 'Cancel',
+                        showCloseButton: true,
+                        showLoaderOnConfirm: true,
+                        buttonsStyling: false,
+                        customClass: {
+                                confirmButton: 'double-wide-button',
+                                cancelButton: 'double-wide-button',
+                                footer: 'swal2-delete-container',
+                                closeButton: 'custom-close-button',
+                        },
+                        preConfirm: (selectedConfigName) => {
+                                return new Promise((resolve) => {
+                                        setTimeout(() => {
+                                                resolve();
+                                        }, 100);
+                                });
+                        },
+                        footer: '<button id="swal2-delete" class="double-wide-button">Delete</button>',
+                        didOpen: () => {
+                                const deleteButton = document.getElementById('swal2-delete');
+                                deleteButton.addEventListener('click', () => {
+                                        const selectedConfigName = Swal.getInput().value;
+                                        if (selectedConfigName && savedConfigs[selectedConfigName]) {
+                                                delete savedConfigs[selectedConfigName];
+                                                localStorage.setItem('diceConfigs', JSON.stringify(savedConfigs));
+                                                Swal.fire('Configuration deleted!');
+                                        } else {
+                                                Swal.fire('No configuration selected');
+                                        }
+                                });
+                        },
+                });
+
+                if (!dismiss && selectedConfigName) {
+                        const diceConfig = savedConfigs[selectedConfigName];
+                        loadDice(diceConfig);
+                } else if (dismiss !== 'close') {
+                        Swal.fire('No configuration selected');
+                }
         } else {
-            Swal.fire('No saved dice configurations found.');
-        }
-    }
-    
-    async function loadDice(diceConfig) {
-        // Remove existing dice
-        diceList.forEach(dice => {
-            dice.parentNode.removeChild(dice);
-        });
-    
-        diceList = [];
-    
-        // Add loaded dice
-        diceConfig.config.forEach(config => {
-            const dice = createDice(config.numberValue, config.faces, config.customFaces);
-            const number = dice.querySelector('.number');
-            const holdIcon = dice.querySelector('.hold-icon-container');
-            const diceColor = dice.querySelector('.dice-color');
-    
-            if (config.held) {
-                holdIcon.style.display = 'block';
-                dice.dataset.hold = 'true';
-            }
-    
-            // Set the dice color
-            diceColor.value = config.color;
-            dice.style.backgroundColor = config.color;
-    
-            // Call updateNumberColor() for each loaded dice
-            updateNumberColor(dice);
-    
-            // Set the number color after updating it
-            number.style.color = config.numberColor;
-    
-            diceList.push(dice);
-            document.getElementById('dice-container').appendChild(dice);
-        });
-    
-        updateDiceSize();
-        Swal.fire({
-            title: 'Dice configuration loaded!',
-            icon: 'success',
-        });
-        
-    
-        if (diceConfig.name === 'systemAutosave') {
-            const savedConfigs = JSON.parse(localStorage.getItem('diceConfigs') || '{}');
-            delete savedConfigs['systemAutosave'];
-            localStorage.setItem('diceConfigs', JSON.stringify(savedConfigs));
+                Swal.fire('No saved dice configurations found.');
         }
 }
+
+async function loadPreset() {
+        const inputOptions = dicePresets.reduce((options, preset) => {
+                options[preset.name] = preset.name;
+                return options;
+        }, {});
+
+        const { value: selectedPresetName, dismiss } = await Swal.fire({
+                input: 'select',
+                inputOptions: inputOptions,
+                inputPlaceholder: 'Games',
+                showCancelButton: true,
+                showCloseButton: true,
+                confirmButtonText: 'Load',
+                cancelButtonText: 'Cancel',
+                buttonsStyling: false,
+                customClass: {
+                        confirmButton: 'double-wide-button',
+                        cancelButton: 'double-wide-button',
+                        closeButton: 'custom-close-button',
+                },
+        });
+
+        if (!dismiss && selectedPresetName) {
+                const selectedPreset = dicePresets.find(preset => preset.name === selectedPresetName);
+                if (selectedPreset) {
+                        const diceConfig = {
+                                config: selectedPreset.dice,
+                                name: selectedPreset.name
+                        };
+                        loadDice(diceConfig);
+                } else {
+                        Swal.fire('No preset configuration selected');
+                }
+        } else if (dismiss !== 'close') {
+                Swal.fire('No preset selected');
+        }
+
+}
+
+async function loadDice(diceConfig) {
+        // Remove existing dice
+        diceList.forEach(dice => {
+                dice.parentNode.removeChild(dice);
+        });
+
+        diceList = [];
+
+        // Add loaded dice
+        const diceContainer = document.getElementById('dice-container');
+        diceConfig.config.forEach(config => {
+                const dice = createDice(config.numberValue, config.faces, config.customFaces);
+                const holdIcon = dice.querySelector('.hold-icon-container');
+                const diceColor = dice.querySelector('.dice-color');
+
+                // Set the dice color
+                diceColor.value = config.color;
+                dice.style.backgroundColor = config.color;
+
+                // Call updateNumberColor() for each loaded dice
+                updateNumberColor(dice);
+
+                // Set the hold icon
+                if (config.held) {
+                        holdIcon.style.display = 'block';
+                        dice.dataset.hold = 'true';
+                }
+
+                diceList.push(dice);
+                diceContainer.appendChild(dice);
+        });
+
+        updateDiceSize();
+
+        Swal.fire({
+                title: 'Dice configuration loaded!',
+                icon: 'success',
+        });
+
+        if (diceConfig.name === 'systemAutosave') {
+                const savedConfigs = JSON.parse(localStorage.getItem('diceConfigs') || '{}');
+                delete savedConfigs['systemAutosave'];
+                localStorage.setItem('diceConfigs', JSON.stringify(savedConfigs));
+        }
+}
+
+
 
 
 document.getElementById('save-btn').addEventListener('click', promptForSave);
 document.getElementById('load-btn').addEventListener('click', promptForLoad);
 document.getElementById('presets-btn').addEventListener('click', loadPreset);
 
-async function loadPreset() {
-        const inputOptions = dicePresets.reduce((options, preset) => {
-            options[preset.name] = preset.name;
-            return options;
-        }, {});
-    
-        const { value: selectedPresetName, dismiss } = await Swal.fire({
-            input: 'select',
-            inputOptions: inputOptions,
-            inputPlaceholder: 'Games',
-            showCancelButton: true,
-            showCloseButton: true,
-            confirmButtonText: 'Load',
-            cancelButtonText: 'Cancel',
-            buttonsStyling: false,
-            customClass: {
-                confirmButton: 'double-wide-button',
-                cancelButton: 'double-wide-button',
-                closeButton: 'custom-close-button',
-            },
-        });
-    
-        if (!dismiss && selectedPresetName) {
-            const selectedPreset = dicePresets.find(preset => preset.name === selectedPresetName);
-            if (selectedPreset) {
-                loadDice(selectedPreset.dice);
-            } else {
-                Swal.fire('No preset configuration selected');
-            }
-        } else if (dismiss !== 'close') {
-            Swal.fire('No preset selected');
-        }
-    }
-    
+
+
 
 
 document.getElementById('presets-btn').addEventListener('click', loadPreset);
 
 
 
-const dicePresets = [
-        {
-                name: "Yatzee",
-                dice: [
-                        { numberValue: 1, faces: 6, customFaces: [], color: "#E9EAEC" },
-                        { numberValue: 2, faces: 6, customFaces: [], color: "#E9EAEC" },
-                        { numberValue: 3, faces: 6, customFaces: [], color: "#E9EAEC" },
-                        { numberValue: 4, faces: 6, customFaces: [], color: "#E9EAEC" },
-                        { numberValue: 5, faces: 6, customFaces: [], color: "#E9EAEC" }
-                ],
-        },
-        {
-                name: "Cities & Knights",
-                dice: [
-                        { numberValue: 1, faces: 6, customFaces: [], color: "#E9EAEC" },
-                        { numberValue: 2, faces: 6, customFaces: [], color: "#E32227" },
-                        { numberValue: 3, faces: 6, customFaces: ["Barbarian", "Barbarian", "Barbarian", "Blue", "Yellow", "Green"], color: "#C0C0C0" }
-                ],
-        },
-        {
-                name: "That's Pretty Clever",
-                dice: [
-                        { numberValue: 1, faces: 6, customFaces: [], color: "#E9EAEC" },
-                        { numberValue: 2, faces: 6, customFaces: [], color: "#0000FF" },
-                        { numberValue: 3, faces: 6, customFaces: [], color: "#FBFB3C" },
-                        { numberValue: 4, faces: 6, customFaces: [], color: "#228B22" },
-                        { numberValue: 5, faces: 6, customFaces: [], color: "#F28500" },
-                        { numberValue: 6, faces: 6, customFaces: [], color: "#B24BF3" }
-                ],
-        }
-];
 
 
 
@@ -783,19 +792,25 @@ document.getElementById('help-btn').addEventListener('click', () => {
         });
 });
 
-
-
 document.getElementById('delete-all-btn').addEventListener('click', () => {
-        const confirmation = confirm('Are you sure you want to delete all your dice?');
-
-        if (confirmation) {
-                // Remove all dice
-                let diceElements = document.querySelectorAll('.dice');
-                diceElements.forEach((dice) => {
-                        removeDice(dice);
-                });
-        }
+        Swal.fire({
+                title: 'Are you sure you want to delete all your dice?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+                reverseButtons: true
+        }).then((result) => {
+                if (result.isConfirmed) {
+                        // Remove all dice
+                        let diceElements = document.querySelectorAll('.dice');
+                        diceElements.forEach((dice) => {
+                                removeDice(dice);
+                        });
+                }
+        });
 });
+
 
 //#endregion
 
