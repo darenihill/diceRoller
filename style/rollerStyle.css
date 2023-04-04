@@ -108,8 +108,8 @@ button {
 
 .hold-icon-container {
         position: absolute;
-        border: 2px solid #000;
-        background-color: #E9EAEC;
+        border: calc((var(--dice-button-size)/25) + 1px) solid #000;
+        background-color: #fff;
         top: 0;
         right: 0;
         z-index: 1;
