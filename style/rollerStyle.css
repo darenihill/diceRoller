@@ -38,26 +38,34 @@ button,
 }
 
 button:focus {
-       outline-color: transparent;
-    }
+        outline-color: transparent;
+}
 
-    button {
+button {
         -webkit-tap-highlight-color: transparent;
 
+}
+
+.double-wide-button {
+        font-size: calc(var(--primary-button-size) / 4); /* Adjust the font size for the label */
+        text-align: left; /* Align the text to the left */
+       
     }
 
-    .roll-button,
+
+
+.roll-button,
 .double-wide-button {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr;
-    width: calc(var(--primary-button-size) * 2);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr;
+        width: calc(var(--primary-button-size) * 2);
 }
 
 .roll-button .roll-label,
 .double-wide-button .button-label {
-    font-size: calc( var(--primary-button-size)/2);
-    text-align: center;
+        font-size: calc(var(--primary-button-size)/2);
+        text-align: center;
 }
 
 .roll-button {
@@ -72,7 +80,7 @@ button:focus {
 }
 
 .roll-button .roll-label {
-        font-size: calc( var(--primary-button-size)/2);
+        font-size: calc(var(--primary-button-size)/2);
         text-align: center;
 }
 
@@ -80,19 +88,22 @@ button:focus {
         width: calc(100px + .1vmin);
 }
 
-.icon, .menu-icon{
+.icon,
+.menu-icon {
         font-family: "Font Awesome 6 Free";
-        font-size: calc(var(--primary-button-size) * 0.65); /* Updated from 0.65 to 0.5 */
+        font-size: calc(var(--primary-button-size) * 0.65);
+        /* Updated from 0.65 to 0.5 */
         color: var(--btn-color);
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100%;
         width: 100%;
-    }
+}
 
-    .menu-icon{ font-size: calc(var(--primary-button-size) * 0.4);
-    }
+.menu-icon {
+        font-size: calc(var(--primary-button-size) * 0.4);
+}
 
 .hold-icon-container,
 .dice-button {
@@ -158,12 +169,13 @@ footer {
         padding: 8px;
         border-radius: 4px;
         cursor: pointer;
-    }
-    
-    .logo-button img {
-        width: 100px; /* Adjust the size of your logo as needed */
+}
+
+.logo-button img {
+        width: 100px;
+        /* Adjust the size of your logo as needed */
         height: auto;
-    }
+}
 
 
 .left-footer-container {
@@ -176,28 +188,29 @@ footer {
         left: 0;
         color: #E9EAEC;
         font-size: calc(5vmin + 1vmax);
-    }
+}
 
-    .title-container, .roll-total-container {
+.title-container,
+.roll-total-container {
         margin: 1vmin;
-    }
+}
 
-
-    .left-menu {
+.left-menu {
         display: none;
         grid-template-columns: repeat(2, 1fr);
         background-color: var(--main-bg-color);
-        font-size: calc( var(--primary-button-size)/4);
-        grid-gap: 10px;
-        width: calc(var(--primary-button-size) * 4); /* Twice the width of the buttons */
-        padding: 20px;
+        font-size: calc(var(--primary-button-size)/4);
+        gap: 15px;
+        width: calc(var(--primary-button-size) * 4.5);
+        margin-left: 15px;
+        padding: 15px;
         position: fixed;
-        bottom: 12vh;
+        bottom: calc(12vh + 6px);
         z-index: 2;
         border: 1px solid white;
         border-radius: calc(5px + 1vmin);
-    }
-    
+        place-items: center;
+}
 
 .dice-container-wrapper {
         display: grid;
@@ -210,7 +223,8 @@ footer {
         grid-template-columns: repeat(auto-fill, minmax(var(--dice-size), 1fr));
         justify-content: center;
         align-items: center;
-        gap: 2vmin;
+        gap: 2.5vmin;
+        padding: 2.5vmin;
         place-items: center;
         align-self: end;
 }
@@ -227,7 +241,6 @@ footer {
         cursor: pointer;
         position: relative;
         box-sizing: border-box;
-        margin: 2.2vmin;
         z-index: 1;
 }
 
@@ -240,13 +253,6 @@ footer {
         top: 45%;
         left: 50%;
         transform: translate(-50%, -50%);
-        /*
-        text-shadow:
-        -1px -1px 0 #000,
-        1px -1px 0 #000,
-        -1px 1px 0 #000,
-        1px 1px 0 #000;
-        */
 }
 
 .dice .remove,
@@ -272,7 +278,7 @@ footer {
         bottom: 0px;
         padding: 4px;
         /* height if full height of dice container minus the button size 
-        shifted up the hight of button size with bottom*/        
+        shifted up the hight of button size with bottom*/
         height: calc(100% - var(--dice-button-size));
         bottom: var(--dice-button-size);
         width: 100%;
@@ -345,27 +351,26 @@ footer {
         z-index: 1;
 }
 
-    /* Custom CSS for smaller SweetAlert2 popups on mobile devices */
+/* Custom CSS for smaller SweetAlert2 popups on mobile devices */
 
-        .swal2-popup {
-          width: 80%; /* Adjust the width of the popup */
-          font-size: calc( var(--primary-button-size)/2);
-        }
-      
-        .swal2-title {
-                font-size: calc( var(--primary-button-size)/2);
-        }
-      
-        .swal2-content {
-                font-size: calc( var(--primary-button-size)/2);
-        }
-      
-        .swal2-actions {
-                font-size: calc( var(--primary-button-size)/2);
-        }
+.swal2-popup {
+        width: 80%;
+        /* Adjust the width of the popup */
+        font-size: calc(var(--primary-button-size)/2);
+}
 
-        .custom-close-button {
-                font-size: calc( var(--primary-button-size)*0.75);
-              }
-              
-    
+.swal2-title {
+        font-size: calc(var(--primary-button-size)/2);
+}
+
+.swal2-content {
+        font-size: calc(var(--primary-button-size)/2);
+}
+
+.swal2-actions {
+        font-size: calc(var(--primary-button-size)/2);
+}
+
+.custom-close-button {
+        font-size: calc(var(--primary-button-size)*0.75);
+}
