@@ -13,8 +13,7 @@
         --common-margin: 15px;
         --common-gap: 10px;
         --common-font-size: calc(var(--primary-button-size)/2);
-        font-size: 50px;
-        font-weight: 100;
+        --common-border-radius: calc(10px + 1vmin);
 }
 
 body {
@@ -26,7 +25,7 @@ body {
 button,
 .roll-button {
         display: flex;
-        border-radius: calc(10px + 1vmin);
+        border-radius: var(--common-border-radius);
         border: none;
         font-size: 3vmin;
         cursor: pointer;
@@ -80,8 +79,8 @@ button {
         display: flex;
         justify-content: center;
         align-items: center;
-        font-family: "Font Awesome 6 Free";
-        color: var(--btn-color);
+        height: 100%;
+        width: 100%;
     }
     
     .menu-icon {
@@ -97,7 +96,7 @@ button {
 .dice-button {
         display: flex;
         justify-content: center;
-        border-radius: calc(7px + (var(--dice-button-size)/10));
+        border-radius: calc(var(--common-border-radius) * 0.8);
         align-items: center;
         border: none;
         cursor: pointer;
@@ -180,7 +179,7 @@ footer {
         bottom: calc(12vh + 6px);
         z-index: 2;
         border: 1px solid white;
-        border-radius: calc(5px + 1vmin);
+        border-radius: var(--common-border-radius);
         place-items: center;
 }
 
@@ -208,7 +207,7 @@ footer {
         justify-content: center;
         width: var(--dice-size);
         height: var(--dice-size);
-        border-radius: 25px;
+        border-radius: var(--common-border-radius);
         background-color: #E9EAEC;
         cursor: pointer;
         position: relative;
@@ -246,7 +245,7 @@ footer {
         position: absolute;
         background-color: #333652;
         border: 1px solid black;
-        border-radius: calc(5px + 1vmin);
+        border-radius: var(--common-border-radius);
         bottom: 0px;
         padding: 4px;
         height: calc(100% - var(--dice-button-size));
@@ -275,7 +274,8 @@ footer {
 
 .shake {
         animation: shake 0.5s ease-in-out;
-}
+        transform-origin: center;
+      }
 
 @keyframes shake {
         0% {
