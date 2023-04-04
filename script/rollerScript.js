@@ -325,20 +325,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function initializeLeftMenuToggle() {
         const toggleMenuButton = document.getElementById('toggle-menu');
-        const leftMenu = document.querySelector('.left-menu');
-        const chevronIcon = toggleMenuButton.querySelector('i');
-        let menuIsOpen = false;
 
         toggleMenuButton.addEventListener('click', function () {
-                menuIsOpen = !menuIsOpen;
-                leftMenu.style.display = menuIsOpen ? 'grid' : 'none';
-                chevronIcon.classList.toggle('fa-chevron-down', menuIsOpen);
-                chevronIcon.classList.toggle('fa-chevron-up', !menuIsOpen);
+                toggleLeftMenu();
         });
 }
 
+function toggleLeftMenu() {
+        const leftMenu = document.querySelector('.left-menu');
+        const toggleMenuButton = document.getElementById('toggle-menu');
+        const chevronIcon = toggleMenuButton.querySelector('i');
+        const menuIsOpen = leftMenu.style.display === 'grid';
+
+        leftMenu.style.display = menuIsOpen ? 'none' : 'grid';
+        chevronIcon.classList.toggle('fa-chevron-down', !menuIsOpen);
+        chevronIcon.classList.toggle('fa-chevron-up', menuIsOpen);
+}
+//#endregion
+
+
 document.getElementById('donate').addEventListener('click', () => {
-        window.location.href = 'donate.html'; // Link to a dummy donate page
+        window.location.href = 'https://www.buymeacoffee.com/darenihill'; // Link to a dummy donate page
 });
 
 document.getElementById('suggestions-btn').addEventListener('click', () => {
@@ -346,30 +353,25 @@ document.getElementById('suggestions-btn').addEventListener('click', () => {
 });
 
 document.getElementById('help-btn').addEventListener('click', () => {
-        // Create a popup menu for help
-        let helpPopup = document.createElement('div');
-        helpPopup.id = 'help-popup';
-        helpPopup.className = 'help-popup';
-        helpPopup.innerHTML = `
-            <h2>Help</h2>
-            <ul>
-                <li><strong>Donate:</strong> Support our project by making a donation. Clicking this button will take you to a donation page.</li>
-                <li><strong>Feedback:</strong> Share your suggestions or report any issues you've encountered. Clicking this button will take you to a feedback form.</li>
-                <li><strong>Help:</strong> Opens this help popup with explanations for each button on the page.</li>
-                <li><strong>Delete All:</strong> Removes all dice from the screen. Use with caution, as this action cannot be undone.</li>
-                <li><strong>Roll History:</strong> Shows a list of your previous dice rolls.</li>
-                <li><strong>Presets:</strong> Allows you to save and load custom dice configurations for quick access.</li>
-                <li><strong>Save:</strong> Saves the current dice configuration to your local storage or a file.</li>
-                <li><strong>Load:</strong> Loads a previously saved dice configuration from your local storage or a file.</li>
-            </ul>
-            <button type="button" id="close-help-popup">Close</button>
-            `;
-        document.body.appendChild(helpPopup);
-
-        document.getElementById('close-help-popup').addEventListener('click', () => {
-                document.body.removeChild(helpPopup);
+        Swal.fire({
+                title: 'Help',
+                html: `
+                <ul>
+                    <li><strong>Donate:</strong> Support our project by making a donation. Clicking this button will take you to a donation page.</li>
+                    <li><strong>Feedback:</strong> Share your suggestions or report any issues you've encountered. Clicking this button will take you to a feedback form.</li>
+                    <li><strong>Help:</strong> Opens this help popup with explanations for each button on the page.</li>
+                    <li><strong>Delete All:</strong> Removes all dice from the screen. Use with caution, as this action cannot be undone.</li>
+                    <li><strong>Roll History:</strong> Shows a list of your previous dice rolls.</li>
+                    <li><strong>Presets:</strong> Allows you to save and load custom dice configurations for quick access.</li>
+                    <li><strong>Save:</strong> Saves the current dice configuration to your local storage or a file.</li>
+                    <li><strong>Load:</strong> Loads a previously saved dice configuration from your local storage or a file.</li>
+                </ul>
+            `,
+                confirmButtonText: 'Close',
+                showCloseButton: true
         });
 });
+
 
 document.getElementById('delete-all-btn').addEventListener('click', () => {
         Swal.fire({
@@ -387,6 +389,7 @@ document.getElementById('delete-all-btn').addEventListener('click', () => {
                                 removeDice(dice);
                         });
                 }
+                toggleLeftMenu();
         });
 });
 
@@ -588,24 +591,24 @@ function removeDice(dice) {
 
 function updateFontSize(dice) {
         console.log('Update Font Size Called');
-    
+
         requestAnimationFrame(() => {
-            const number = dice.querySelector('.number');
-            const longestFace = Math.max(...dice.customFaces.map(face => face.length));
-    
-            // Calculate the font size based on the width of the dice and the length of the longest custom face string
-            const fontSizePx = Math.floor(dice.clientWidth / longestFace);
-    
-            // Convert the font size to vmin by dividing it by the minimum of the viewport width and height, and then multiplying by 100
-            const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
-            const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-            const minViewportDimension = Math.min(viewportWidth, viewportHeight);
-            const fontSizeVmin = (fontSizePx / minViewportDimension) * 180;
-            console.log('Font size set to: ', fontSizeVmin);
-            number.style.fontSize = `${fontSizeVmin}vmin`;
+                const number = dice.querySelector('.number');
+                const longestFace = Math.max(...dice.customFaces.map(face => face.length));
+
+                // Calculate the font size based on the width of the dice and the length of the longest custom face string
+                const fontSizePx = Math.floor(dice.clientWidth / longestFace);
+
+                // Convert the font size to vmin by dividing it by the minimum of the viewport width and height, and then multiplying by 100
+                const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+                const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+                const minViewportDimension = Math.min(viewportWidth, viewportHeight);
+                const fontSizeVmin = (fontSizePx / minViewportDimension) * 180;
+                console.log('Font size set to: ', fontSizeVmin);
+                number.style.fontSize = `${fontSizeVmin}vmin`;
         });
-    }
-    
+}
+
 
 function updateDiceSize() {
         const diceElements = document.querySelectorAll(".dice");
@@ -664,37 +667,45 @@ function showRollHistory() {
         Swal.fire({
                 title: 'Roll History',
                 html: rollHistoryText,
+        }).then(() => {
+                toggleLeftMenu();
         });
 }
 
 function promptForSave() {
         Swal.fire({
-            title: 'Enter a name for this configuration:',
-            input: 'text',
-            showCancelButton: true,
-            confirmButtonText: 'Save'
+                title: 'Enter a name for this configuration:',
+                input: 'text',
+                showCancelButton: true,
+                confirmButtonText: 'Save'
         }).then(result => {
-            if (result.isConfirmed) {
-                const configName = result.value.trim();
-                if (configName) {
-                    saveDice(configName);
-                    Swal.fire('Configuration saved!');
-                } else {
-                    Swal.fire({
-                        title: 'Please enter a valid name',
-                        icon: 'error',
-                        timer: 1500,
-                        showConfirmButton: false,
-                        timerProgressBar: true
-                    }).then(() => {
-                        promptForSave();
-                    });
+                if (result.isConfirmed) {
+                        const configName = result.value.trim();
+                        if (configName) {
+                                saveDice(configName);
+                                Swal.fire({
+                                        title: 'Configuration saved!',
+                                        timer: 1200,
+                                        icon: 'success',
+                                        showConfirmButton: false,
+                                        timerProgressBar: true
+                                }).then(() => {
+                                        toggleLeftMenu();
+                                });
+                        } else {
+                                Swal.fire({
+                                        title: 'Please enter a valid name',
+                                        icon: 'error',
+                                        timer: 1200,
+                                        showConfirmButton: false,
+                                        timerProgressBar: true
+                                }).then(() => {
+                                        promptForSave();
+                                });
+                        }
                 }
-            }
         });
-    }
-    
-    
+}
 
 function saveDice(configName) {
         const diceConfigs = diceList.map(dice => {
@@ -827,7 +838,7 @@ async function loadDice(diceConfig) {
         // Add loaded dice
 
 
-        
+
         const diceContainer = document.getElementById('dice-container');
         diceConfig.config.forEach(config => {
                 const dice = createDice(config.numberValue, config.faces, config.customFaces);
@@ -868,6 +879,8 @@ async function loadDice(diceConfig) {
                         icon: 'success',
                         showConfirmButton: false,
                         timer: 800,
+                }).then(() => {
+                        toggleLeftMenu();
                 });
         }
 }
