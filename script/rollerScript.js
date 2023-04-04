@@ -345,12 +345,13 @@ function toggleLeftMenu() {
 
 
 document.getElementById('donate').addEventListener('click', () => {
-        window.location.href = 'https://www.buymeacoffee.com/darenihill'; // Link to a dummy donate page
-});
-
-document.getElementById('suggestions-btn').addEventListener('click', () => {
-        window.location.href = 'https://docs.google.com/forms/d/1MurbBtETb6e9JmkThO_Apuc9lowJcDPHpCcPNIhbPpg/prefill'; // Link to a dummy suggestions page
-});
+        window.open('https://www.buymeacoffee.com/darenihill', '_blank'); // Link to a dummy donate page
+    });
+    
+    document.getElementById('suggestions-btn').addEventListener('click', () => {
+        window.open('https://docs.google.com/forms/d/1MurbBtETb6e9JmkThO_Apuc9lowJcDPHpCcPNIhbPpg/prefill', '_blank'); // Link to a dummy suggestions page
+    });
+    
 
 document.getElementById('help-btn').addEventListener('click', () => {
         Swal.fire({
@@ -399,15 +400,22 @@ document.getElementById('delete-all-btn').addEventListener('click', () => {
 //#region Primary Button Functions
 function addDice() {
         if (diceList.length >= maxDice) {
-                alert("You've reached the maximum number of dice!");
-                return;
+            Swal.fire({
+                icon: 'info',
+                title: "You've reached the maximum number of dice!",
+                showConfirmButton: false,
+                timer: 1000,
+                timerProgressBar: true
+            });
+            return;
         }
         const dice = createDice();
         diceList.push(dice);
         dice.addEventListener('click', handleDiceClick);
         document.getElementById('dice-container').appendChild(dice);
         updateDiceSize();
-}
+    }
+    
 
 function rollDice() {
         const animationDuration = 500;
@@ -547,19 +555,6 @@ function handleDiceClick(e) {
         }
         updateHoldStatus();
 }
-
-function addDice() {
-        if (diceList.length >= maxDice) {
-                alert("You've reached the maximum number of dice!");
-                return;
-        }
-        const dice = createDice();
-        diceList.push(dice);
-        dice.addEventListener('click', handleDiceClick);
-        document.getElementById('dice-container').appendChild(dice);
-        updateDiceSize();
-}
-
 
 function toggleContainers(actionContainer, removeButton, settingsContainer) {
         if (settingsContainer.style.display === 'grid') {
