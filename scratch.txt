@@ -1,53 +1,18 @@
 Crow, Basket, Red, Yellow, Green, Blue
 
+.icon,
+.menu-icon {
+        font-family: "Font Awesome 6 Free";
+        font-size: calc(var(--primary-button-size) * 0.65);
+        /* Updated from 0.65 to 0.5 */
+        color: var(--btn-color);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+}
 
-                function rollDice() {
-        const animationDuration = 500; // Define the animation duration in milliseconds
-        const diceToRoll = diceList.filter(dice => !dice.classList.contains("dice-held"));
-
-        if (diceToRoll.length === 0) {
-                alert("All dice are held!");
-                return;
-        }
-
-        let rollTotal = 0; // Add a variable to keep track of the roll total
-
-        diceToRoll.forEach((dice, index) => {
-                const number = dice.querySelector(".number");
-                const facesInput = dice.querySelector("input[type='hidden'].faces");
-                if (!facesInput) {
-                        console.error("Dice is missing faces input:", dice);
-                        return;
-                }
-
-                Daren Hill is inviting you to a scheduled Workday Zoom meeting. 
-
-To join from Workday VC Room
-Meeting ID: 915 8341 4528
-Passcode: 425903
-SIP URI: sip:91583414528.425903@zoomcrc.com
-
-Use Touch10:	 Tap the Join button next to the scheduled Zoom meeting or tap the Call button and enter 91583414528.425903@zoomcrc.com
-
-To join by Zoom Desktop or Mobile App
-Use Link: 			Join Zoom Meeting 
-
-Use iPhone one-tap: 	(US Toll): +16699006833,,915 8341 4528,#,,,#,,425903# or +13462487799,,915 8341 4528,#,,,#,,425903#
-
-Use Meeting URL: 		https://workday.zoom.us/j/91583414528?pwd=cGlHUVAzeWwrSXVpTERUSkViZnZvQT09
-
-To join by Web Browser
-
-Use Link:			https://workday.zoom.us/j/91583414528?pwd=cGlHUVAzeWwrSXVpTERUSkViZnZvQT09
-To join by Telephone
-Meeting ID: 915 8341 4528
-Passcode: 425903
-Dial: 				
-
-+1 877 369 0926 (US Toll Free)
-+1 877 853 5247 (US Toll Free)
-+1 408 638 0968 (US Toll)
-+1 646 558 8656 (US Toll)
-+353 1800 817 388 (Ireland Toll Free)
-+353 (0) 1 691 7488 (Ireland Toll)
-International Numbers
+.menu-icon {
+        font-size: calc(var(--primary-button-size) * 0.4);
+}
