@@ -752,21 +752,22 @@ async function promptForLoad() {
                 cancelButtonText: 'Cancel',
                 showCancelButton: true,
                 showLoaderOnConfirm: true,
-                footer: '<button id="swal2-delete" class="swal2-styled">Delete</button>',
+                footer: '<button id="swal2-delete" class="swal-custom-button">Delete</button>',
                 didOpen: () => {
-                    const deleteButton = document.getElementById('swal2-delete');
-                    deleteButton.addEventListener('click', () => {
-                        const selectedConfigName = Swal.getInput().value;
-                        if (selectedConfigName && savedConfigs[selectedConfigName]) {
-                            delete savedConfigs[selectedConfigName];
-                            localStorage.setItem('diceConfigs', JSON.stringify(savedConfigs));
-                            Swal.fire('Set deleted!');
-                        } else {
-                            Swal.fire('No set selected');
-                        }
-                    });
+                  const deleteButton = document.getElementById('swal2-delete');
+                  deleteButton.addEventListener('click', () => {
+                    const selectedConfigName = Swal.getInput().value;
+                    if (selectedConfigName && savedConfigs[selectedConfigName]) {
+                      delete savedConfigs[selectedConfigName];
+                      localStorage.setItem('diceConfigs', JSON.stringify(savedConfigs));
+                      Swal.fire('Set deleted!');
+                    } else {
+                      Swal.fire('No set selected');
+                    }
+                  });
                 },
-            });
+              });
+              
     
             if (!dismiss && selectedConfigName) {
                 const diceConfig = savedConfigs[selectedConfigName];

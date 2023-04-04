@@ -3,16 +3,19 @@
         --dice-button-size: calc(var(--dice-size) / 4);
         --color-swatch-size: calc(var(--dice-size) / 5.5);
         --primary-button-size: calc(30px + 7vmin);
+        --swal-button-size: calc(var(--primary-button-size)*1.3);
         --main-font-family: 'Roboto', sans-serif;
         --main-color: #E9EAEC;
         --main-bg-color: #2B3841;
         --btn-bg-color: #333652;
-        --btn-color: #fff;
+        --btn-bg-cancel-color: #BF4C41;
+        --btn-txt-color: #fff;
         --btn-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
         --common-padding: 20px;
         --common-margin: 15px;
         --common-gap: 10px;
         --common-font-size: calc(var(--primary-button-size)/2);
+        --common-font-size-small: calc(var(--common-font-size)/2);
         --common-border-radius: calc(5px + 1.2vmin);
 }
 
@@ -23,7 +26,10 @@ body {
 }
 
 button,
-.roll-button {
+.roll-button,
+.swal2-styled,
+.swal2-styled.swal2-confirm,
+.swal2-styled.swal2-cancel {
         display: flex;
         border-radius: var(--common-border-radius);
         border: none;
@@ -32,13 +38,23 @@ button,
         background-color: var(--btn-bg-color);
         width: var(--primary-button-size);
         height: var(--primary-button-size);
-        color: var(--btn-color);
+        color: var(--btn-txt-color);
         box-sizing: border-box;
         box-shadow: var(--btn-shadow);
         justify-content: space-between;
         align-items: center;
         border: 1px solid white;
 }
+
+button:hover,
+.roll-button:hover,
+.swal2-styled:hover,
+.swal2-styled.swal2-confirm:hover,
+.swal2-styled.swal2-cancel:hover {
+  background-color: #4B5072; /* Hover background color */
+  border-width: 1.5px; /* Increase button border by 1.5 */
+}
+      
 
 button:focus {
         outline-color: transparent;
@@ -359,6 +375,48 @@ footer {
 .swal2-cancel {
         background-color: #fff;
       }
+
+/* Override button background color       */
+
+
+.swal2-styled{
+        font-size: var(--common-font-size-small);
+        width: var(--swal-button-size);
+        text-align: center;
+        justify-content: center;
+}
+
+.swal2-styled.swal2-confirm,
+.swal2-styled.swal2-cancel {
+        font-size: var(--common-font-size-small);
+        width: var(--swal-button-size);
+      }
+
+      .swal-custom-button {
+        text-align: center;
+        justify-content: center;
+        background-color: var(--btn-bg-cancel-color);
+        width: var(--swal-button-size);
+        font-size: var(--common-font-size-small);
+      }
+
+      .swal-custom-button:hover {
+        background-color: #E06C59;
+      }
+      
+      .swal2-styled.swal2-cancel {
+        background-color: var(--btn-bg-cancel-color);
+      }
+   
+      .swal2-styled.swal2-cancel:hover {
+        background-color: #E06C59;
+      }
+
+
+
+
+
+
 
 /* For Chrome, Edge, and Safari */
 ::-webkit-scrollbar {
