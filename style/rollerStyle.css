@@ -49,7 +49,8 @@ button {
 }
 
 .double-wide-button {
-        font-size: calc(var(--common-font-size)/2); /* If needed can be changed and add a class to menu item buttons */
+        font-size: calc(var(--common-font-size)/2);
+        /* If needed can be changed and add a class to menu item buttons */
         text-align: left;
 }
 
@@ -75,22 +76,23 @@ button {
         width: calc(100px + .1vmin);
 }
 
-.icon, .menu-icon {
+.icon,
+.menu-icon {
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100%;
         width: 100%;
-    }
-    
-    .menu-icon {
+}
+
+.menu-icon {
         font-size: calc(var(--primary-button-size) * 0.4);
-    }
-    
-    .icon {
+}
+
+.icon {
         font-size: calc(var(--primary-button-size) * 0.65);
-    }
-    
+}
+
 
 .hold-icon-container,
 .dice-button {
@@ -275,7 +277,7 @@ footer {
 .shake {
         animation: shake 0.5s ease-in-out;
         transform-origin: center;
-      }
+}
 
 @keyframes shake {
         0% {
@@ -346,24 +348,38 @@ footer {
 
 */
 
+.swal2-popup {
+        background-color: var(--main-bg-color);
+}
+
+.swal2-confirmButtonColor {
+         background-color: var(--btn-bg-color);
+}
+
+.swal2-cancel {
+        background-color: #fff;
+      }
+
 /* For Chrome, Edge, and Safari */
 ::-webkit-scrollbar {
         width: 12px;
-      }
-      
-      ::-webkit-scrollbar-track {
-        background: #222; /* Background color of the track */
-      }
-      
-      ::-webkit-scrollbar-thumb {
-        background-color: #444; /* Background color of the thumb */
+}
+
+::-webkit-scrollbar-track {
+        background: #222;
+        /* Background color of the track */
+}
+
+::-webkit-scrollbar-thumb {
+        background-color: #444;
+        /* Background color of the thumb */
         border-radius: 6px;
-        border: 3px solid #222; /* Add a border to the thumb */
-      }
-      
-      /* For Firefox */
-      * {
+        border: 3px solid #222;
+        /* Add a border to the thumb */
+}
+
+/* For Firefox */
+* {
         scrollbar-width: thin;
         scrollbar-color: #444 #222;
-      }
-      
+}

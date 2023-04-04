@@ -734,9 +734,12 @@ function saveDice(configName) {
 
 async function promptForLoad() {
         const savedConfigs = JSON.parse(localStorage.getItem('diceConfigs')) ?? {};
+        console.log(savedConfigs);
     
-        if (Object.keys(savedConfigs).length > 0) {
-            const inputOptions = Object.keys(savedConfigs).reduce((options, configName) => {
+        const nonEmptyConfigs = Object.keys(savedConfigs).filter(configName => configName.trim() !== '');
+    
+        if (nonEmptyConfigs.length > 0) {
+            const inputOptions = nonEmptyConfigs.reduce((options, configName) => {
                 options[configName] = configName;
                 return options;
             }, {});
@@ -749,78 +752,85 @@ async function promptForLoad() {
                 cancelButtonText: 'Cancel',
                 showCancelButton: true,
                 showLoaderOnConfirm: true,
+                footer: '<button id="swal2-delete" class="swal2-styled">Delete</button>',
                 didOpen: () => {
-                                const deleteButton = document.getElementById('swal2-delete');
-                                deleteButton.addEventListener('click', () => {
-                                        const selectedConfigName = Swal.getInput().value;
-                                        if (selectedConfigName && savedConfigs[selectedConfigName]) {
-                                                delete savedConfigs[selectedConfigName];
-                                                localStorage.setItem('diceConfigs', JSON.stringify(savedConfigs));
-                                                Swal.fire('Set deleted!');
-                                        } else {
-                                                Swal.fire('No set selected');
-                                        }
-                                });
-                        },
+                    const deleteButton = document.getElementById('swal2-delete');
+                    deleteButton.addEventListener('click', () => {
+                        const selectedConfigName = Swal.getInput().value;
+                        if (selectedConfigName && savedConfigs[selectedConfigName]) {
+                            delete savedConfigs[selectedConfigName];
+                            localStorage.setItem('diceConfigs', JSON.stringify(savedConfigs));
+                            Swal.fire('Set deleted!');
+                        } else {
+                            Swal.fire('No set selected');
+                        }
+                    });
+                },
+            });
+    
+            if (!dismiss && selectedConfigName) {
+                const diceConfig = savedConfigs[selectedConfigName];
+                loadDice(diceConfig);
+            } else if (!dismiss) {
+                Swal.fire({
+                    title: 'Please select a set',
+                    icon: 'error',
+                    timer: 1200,
+                    showConfirmButton: false,
+                    timerProgressBar: true
+                }).then(() => {
+                    promptForLoad();
                 });
-
-                if (!dismiss && selectedConfigName) {
-                        const diceConfig = savedConfigs[selectedConfigName];
-                        loadDice(diceConfig);
-                    } else if (!dismiss) {
-                        Swal.fire({
-                            title: 'Please select a set',
-                            icon: 'error',
-                            timer: 1200,
-                            showConfirmButton: false,
-                            timerProgressBar: true
-                        }).then(() => {
-                            promptForLoad();
-                        });
-                    }
-                } else {
-                    Swal.fire('No saved dice sets found.');
-                }
             }
+        } else {
+                Swal.fire({
+                        title: 'No Saved Sets',
+                        icon: 'info',
+                        timer: 1200,
+                        showConfirmButton: false,
+                        timerProgressBar: true
+                    });
+        }
+    }
+    
+async function loadPreset() {
+        const inputOptions = dicePresets.reduce((options, preset) => {
+                options[preset.name] = preset.name;
+                return options;
+        }, {});
 
-            async function loadPreset() {
-                const inputOptions = dicePresets.reduce((options, preset) => {
-                    options[preset.name] = preset.name;
-                    return options;
-                }, {});
-            
-                const { value: selectedPresetName, dismiss } = await Swal.fire({
-                    input: 'select',
-                    inputOptions: inputOptions,
-                    inputPlaceholder: 'Games',
-                    confirmButtonText: 'Load',
-                    cancelButtonText: 'Cancel',
-                    showCancelButton: true
-                });
-            
-                if (!dismiss && selectedPresetName) {
-                    const selectedPreset = dicePresets.find(preset => preset.name === selectedPresetName);
-                    if (selectedPreset) {
+        const { value: selectedPresetName, dismiss } = await Swal.fire({
+                input: 'select',
+                inputOptions: inputOptions,
+                inputPlaceholder: 'Games',
+                confirmButtonText: 'Load',
+                cancelButtonText: 'Cancel',
+                showCancelButton: true
+        });
+
+        if (!dismiss && selectedPresetName) {
+                const selectedPreset = dicePresets.find(preset => preset.name === selectedPresetName);
+                if (selectedPreset) {
                         const diceConfig = {
-                            config: selectedPreset.dice,
-                            name: selectedPreset.name
+                                config: selectedPreset.dice,
+                                name: selectedPreset.name
                         };
                         loadDice(diceConfig);
-                    } else {
+                } else {
                         Swal.fire('No preset configuration selected');
-                    }
-                } else if (!dismiss) {
-                    Swal.fire({
+                }
+        } else if (!dismiss) {
+                Swal.fire({
                         title: 'Please select a preset',
                         icon: 'error',
                         timer: 1200,
                         showConfirmButton: false,
                         timerProgressBar: true
-                    }).then(() => {
+                }).then(() => {
                         loadPreset();
-                    });
-                }
-            }
+                });
+        }
+}
 
 async function loadDice(diceConfig) {
         // Remove existing dice
