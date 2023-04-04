@@ -321,11 +321,10 @@ footer {
         z-index: 1;
 }
 
-/* Custom CSS for smaller SweetAlert2 popups on mobile devices */
+/* Custom CSS for smaller SweetAlert2 popups on mobile devices 
 
 .swal2-popup {
         width: 80%;
-        /* Adjust the width of the popup */
         font-size: var(--common-font-size);
 }
 
@@ -344,3 +343,27 @@ footer {
 .custom-close-button {
         font-size: calc(var(--primary-button-size)*0.75);
 }
+
+*/
+
+/* For Chrome, Edge, and Safari */
+::-webkit-scrollbar {
+        width: 12px;
+      }
+      
+      ::-webkit-scrollbar-track {
+        background: #222; /* Background color of the track */
+      }
+      
+      ::-webkit-scrollbar-thumb {
+        background-color: #444; /* Background color of the thumb */
+        border-radius: 6px;
+        border: 3px solid #222; /* Add a border to the thumb */
+      }
+      
+      /* For Firefox */
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: #444 #222;
+      }
+      
