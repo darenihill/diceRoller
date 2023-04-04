@@ -2,7 +2,7 @@
         --dice-size: 33vmin;
         --dice-button-size: calc(var(--dice-size) / 4);
         --color-swatch-size: calc(var(--dice-size) / 5.5);
-        --primary-button-size: calc(25px + 7vmin);
+        --primary-button-size: calc(30px + 7vmin);
         --main-font-family: 'Roboto', sans-serif;
         --main-color: #E9EAEC;
         --main-bg-color: #2B3841;
@@ -13,7 +13,7 @@
         --common-margin: 15px;
         --common-gap: 10px;
         --common-font-size: calc(var(--primary-button-size)/2);
-        --common-border-radius: calc(10px + 1vmin);
+        --common-border-radius: calc(5px + 1.2vmin);
 }
 
 body {
@@ -96,7 +96,7 @@ button {
 .dice-button {
         display: flex;
         justify-content: center;
-        border-radius: calc(var(--common-border-radius) * 0.8);
+        border-radius: calc((var(--common-border-radius) * 0.8));
         align-items: center;
         border: none;
         cursor: pointer;
@@ -260,8 +260,8 @@ footer {
 }
 
 .color-swatch {
-        width: calc(var(--dice-button-size)*0.85);
-        height: calc(var(--dice-button-size)*0.85);
+        width: calc(var(--dice-button-size)*0.9 - 5px);
+        height: calc(var(--dice-button-size)*0.9 - 5px);
         border-radius: 50%;
         margin: 2px;
         cursor: pointer;

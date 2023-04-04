@@ -346,28 +346,32 @@ function toggleLeftMenu() {
 
 document.getElementById('donate').addEventListener('click', () => {
         window.open('https://www.buymeacoffee.com/darenihill', '_blank'); // Link to a dummy donate page
-    });
-    
-    document.getElementById('suggestions-btn').addEventListener('click', () => {
+});
+
+document.getElementById('suggestions-btn').addEventListener('click', () => {
         window.open('https://docs.google.com/forms/d/1MurbBtETb6e9JmkThO_Apuc9lowJcDPHpCcPNIhbPpg/prefill', '_blank'); // Link to a dummy suggestions page
-    });
-    
+});
+
 
 document.getElementById('help-btn').addEventListener('click', () => {
         Swal.fire({
                 title: 'Help',
                 html: `
+                <style>
+                    .swal2-popup .swal2-html-container ul {
+                        text-align: left;
+                    }
+                </style>
                 <ul>
-                    <li><strong>Donate:</strong> Support our project by making a donation. Clicking this button will take you to a donation page.</li>
-                    <li><strong>Feedback:</strong> Share your suggestions or report any issues you've encountered. Clicking this button will take you to a feedback form.</li>
-                    <li><strong>Help:</strong> Opens this help popup with explanations for each button on the page.</li>
-                    <li><strong>Delete All:</strong> Removes all dice from the screen. Use with caution, as this action cannot be undone.</li>
-                    <li><strong>Roll History:</strong> Shows a list of your previous dice rolls.</li>
-                    <li><strong>Presets:</strong> Allows you to save and load custom dice configurations for quick access.</li>
-                    <li><strong>Save:</strong> Saves the current dice configuration to your local storage or a file.</li>
-                    <li><strong>Load:</strong> Loads a previously saved dice configuration from your local storage or a file.</li>
+                    <li><strong>Settings:</strong> On individual dice to set custom faces, numbers, and colors</li>
+                    <br>
+                    <li><strong>Sets:</strong> Quick setup of popular games</li>
+                    <br>
+                    <li><strong>Save/Load:</strong> Save your own dice setup</li>
+                    <br>
+                    <li><strong>Hold/Release:</strong> By clicking on individual dice or the lock icon at the bottom of the screen to hold or release all dice</li>
                 </ul>
-            `,
+                `,
                 confirmButtonText: 'Close',
                 showCloseButton: true
         });
@@ -400,22 +404,22 @@ document.getElementById('delete-all-btn').addEventListener('click', () => {
 //#region Primary Button Functions
 function addDice() {
         if (diceList.length >= maxDice) {
-            Swal.fire({
-                icon: 'info',
-                title: "You've reached the maximum number of dice!",
-                showConfirmButton: false,
-                timer: 1000,
-                timerProgressBar: true
-            });
-            return;
+                Swal.fire({
+                        icon: 'info',
+                        title: "You've reached the maximum number of dice!",
+                        showConfirmButton: false,
+                        timer: 1000,
+                        timerProgressBar: true
+                });
+                return;
         }
         const dice = createDice();
         diceList.push(dice);
         dice.addEventListener('click', handleDiceClick);
         document.getElementById('dice-container').appendChild(dice);
         updateDiceSize();
-    }
-    
+}
+
 
 function rollDice() {
         const animationDuration = 500;
