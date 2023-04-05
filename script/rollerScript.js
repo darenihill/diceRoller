@@ -601,17 +601,23 @@ function updateDiceSize() {
         const diceElements = document.querySelectorAll(".dice");
         const numberOfDice = diceElements.length;
         let newSize;
-
+        let newGap;
+    
         if (numberOfDice <= 2) {
-                newSize = "55vmin";
+            newSize = "55vmin";
+            newGap = "4vmin";
         } else if (numberOfDice <= 6) {
-                newSize = "38vmin";
+            newSize = "38vmin";
+            newGap = "3vmin";
         } else {
-                newSize = "28vmin";
+            newSize = "28vmin";
+            newGap = "2vmin";
         }
-
+    
         document.documentElement.style.setProperty("--dice-size", newSize);
-}
+        document.documentElement.style.setProperty("--dice-gap", newGap);
+    }
+    
 
 function updateDiceColor(dice, color) {
         dice.style.backgroundColor = color;
