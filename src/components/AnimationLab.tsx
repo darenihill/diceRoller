@@ -100,9 +100,9 @@ export const AnimationLab = () => {
                 ) : (
                   <motion.div 
                     key="unlocked"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.4 }}
-                    exit={{ opacity: 0 }}
+                    initial={{ opacity: 1 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 1 }}
                     className={`${styles.actionBtn} ${styles.unlockIcon}`}
                   >
                     <Unlock size={20} color="currentColor" />
