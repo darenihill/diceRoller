@@ -104,18 +104,18 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, onToggle
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
-            className={styles.holdIcon}
+            className={`${styles.actionBtn} ${styles.holdIcon}`}
           >
             <Lock size={20} color="#FFD700" />
           </motion.div>
         ) : (
-          <div className={styles.unlockIcon}>
+          <div className={`${styles.actionBtn} ${styles.unlockIcon}`}>
             <Unlock size={20} color="currentColor" />
           </div>
         )}
       </AnimatePresence>
 
-      <button className={styles.settingsBtn} onClick={(e) => {
+      <button className={`${styles.actionBtn} ${styles.settingsBtn}`} onClick={(e) => {
         e.stopPropagation();
         onOpenSettings(dice.id);
       }}>
@@ -123,7 +123,7 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, onToggle
       </button>
 
       <button 
-        className={styles.removeBtn} 
+        className={`${styles.actionBtn} ${styles.removeBtn}`} 
         onClick={(e) => { e.stopPropagation(); onRemove(dice.id); }}
       >
         <X size={20} color="currentColor" />

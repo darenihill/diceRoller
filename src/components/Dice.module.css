@@ -31,69 +31,50 @@
   line-height: 1;
 }
 
-.holdIcon {
+.actionBtn {
   position: absolute;
-  top: calc(var(--dice-size) * -0.04);
-  right: calc(var(--dice-size) * -0.04);
-  background-color: var(--md-sys-color-surface-variant);
   border-radius: 50%;
   padding: calc(var(--dice-size) * 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: var(--elevation-3);
-  color: var(--md-sys-color-on-surface);
   z-index: 10;
-  transition: transform 0.2s;
+  transition: opacity 0.2s, transform 0.2s, background-color 0.2s;
+  pointer-events: none;
+  opacity: 0;
 }
 
-.holdIcon:hover {
+.actionBtn:hover {
   transform: scale(1.1);
+}
+
+.holdIcon {
+  top: calc(var(--dice-size) * -0.04);
+  right: calc(var(--dice-size) * -0.04);
+  background-color: var(--md-sys-color-surface-variant);
+  color: var(--md-sys-color-on-surface);
+  opacity: 1; /* Always visible when active */
+  pointer-events: none; /* Let parent handle click */
 }
 
 .unlockIcon {
-  position: absolute;
   top: calc(var(--dice-size) * -0.04);
   right: calc(var(--dice-size) * -0.04);
   background-color: var(--md-sys-color-surface-variant);
-  border-radius: 50%;
-  padding: calc(var(--dice-size) * 0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.4;
-  pointer-events: none;
-  transition: opacity 0.2s, transform 0.2s;
-  box-shadow: var(--elevation-3);
   color: var(--md-sys-color-on-surface);
-  z-index: 10;
-}
-
-.unlockIcon:hover {
-  transform: scale(1.1);
+  opacity: 0.4;
 }
 
 .dice:hover .unlockIcon {
   opacity: 0.8;
-  pointer-events: none;
 }
 
 .settingsBtn {
-  position: absolute;
   bottom: calc(var(--dice-size) * -0.04);
   right: calc(var(--dice-size) * -0.04);
   background-color: var(--md-sys-color-surface-variant);
-  border-radius: 50%;
-  padding: calc(var(--dice-size) * 0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s, background-color 0.2s, transform 0.2s;
-  box-shadow: var(--elevation-3);
   color: var(--md-sys-color-on-surface);
-  z-index: 10;
 }
 
 .dice:hover .settingsBtn {
@@ -101,26 +82,16 @@
   pointer-events: auto;
 }
 
-.settingsBtn:hover {
-  transform: scale(1.1);
-}
-
 .removeBtn {
-  position: absolute;
   top: calc(var(--dice-size) * -0.04);
   left: calc(var(--dice-size) * -0.04);
   background-color: var(--md-sys-color-error);
   color: var(--md-sys-color-on-error);
-  border-radius: 50%;
-  padding: calc(var(--dice-size) * 0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--elevation-3);
-  z-index: 10;
-  opacity: 0;
-  transition: opacity 0.2s, transform 0.2s;
-  pointer-events: none;
+}
+
+.dice:hover .removeBtn {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .dice:hover .removeBtn {

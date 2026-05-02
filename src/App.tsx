@@ -8,6 +8,7 @@ import { ActionBar } from './components/ActionBar';
 import { SidebarMenu } from './components/SidebarMenu';
 import { Modal } from './components/Modal';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
+import { AnimationLab } from './components/AnimationLab';
 import { dicePresets } from './utils/presets';
 import { generateId } from './utils/diceUtils';
 import { Trash2 } from 'lucide-react';
@@ -123,6 +124,7 @@ function App() {
 
   return (
     <div className={styles.app}>
+      <AnimationLab />
       <div className={styles.diceContainer} style={diceStyles}>
         {diceList.map((dice) => (
           <Dice
