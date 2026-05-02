@@ -11,49 +11,33 @@ const VARIANTS = [
       opacity: 1, 
       rotate: [0, -30, 0], 
       color: ["#FFFFFF", "#FFD700"],
-      transition: { duration: 0.4, ease: "easeInOut" } as any
+      transition: { duration: 0.6, ease: "easeInOut" } as any
     },
     exit: { 
       opacity: 0, 
       rotate: [0, 30, 0], 
       color: ["#FFD700", "#FFFFFF"],
-      transition: { duration: 0.4, ease: "easeInOut" } as any
+      transition: { duration: 0.6, ease: "easeInOut" } as any
     }
   },
   {
-    name: "2. Snappy Snap",
-    initial: { opacity: 0, rotate: 0, color: "#FFFFFF" },
-    animate: { 
-      opacity: 1, 
-      rotate: [0, -45, 0], 
-      color: ["#FFFFFF", "#FFD700"],
-      transition: { type: "spring", stiffness: 400, damping: 15 } as any
-    },
-    exit: { 
-      opacity: 0, 
-      rotate: [0, 45, 0], 
-      color: ["#FFD700", "#FFFFFF"],
-      transition: { type: "spring", stiffness: 400, damping: 15 } as any
-    }
-  },
-  {
-    name: "3. Overshoot Tick",
+    name: "2. Overshoot Tick",
     initial: { opacity: 0, rotate: 0, color: "#FFFFFF" },
     animate: { 
       opacity: 1, 
       rotate: [0, -45, 10, 0], 
       color: ["#FFFFFF", "#FFD700", "#FFD700"],
-      transition: { duration: 0.5, times: [0, 0.6, 0.8, 1] } as any
+      transition: { duration: 0.6, ease: "easeInOut" } as any
     },
     exit: { 
       opacity: 0, 
       rotate: [0, 45, -10, 0], 
       color: ["#FFD700", "#FFA500", "#FFFFFF"],
-      transition: { duration: 0.5, times: [0, 0.6, 0.8, 1] } as any
+      transition: { duration: 0.6, ease: "easeInOut" } as any
     }
   },
   {
-    name: "4. The Wiggle",
+    name: "3. The Wiggle",
     initial: { opacity: 0, rotate: 0, color: "#FFFFFF" },
     animate: { 
       opacity: 1, 
@@ -69,25 +53,25 @@ const VARIANTS = [
     }
   },
   {
-    name: "5. Slow Windup",
+    name: "4. Slow Windup",
     initial: { opacity: 0, rotate: 0, color: "#FFFFFF" },
     animate: { 
       opacity: 1, 
       rotate: [0, -45, -45, 0], 
       color: ["#FFFFFF", "#FFA500", "#FFD700"],
-      transition: { duration: 0.6, times: [0, 0.3, 0.7, 1] } as any
+      transition: { duration: 0.6, ease: "easeInOut" } as any
     },
     exit: { 
       opacity: 0, 
       rotate: [0, 45, 45, 0], 
       color: ["#FFD700", "#FFA500", "#FFFFFF"],
-      transition: { duration: 0.6, times: [0, 0.3, 0.7, 1] } as any
+      transition: { duration: 0.6, ease: "easeInOut" } as any
     }
   }
 ];
 
 export const AnimationLab = () => {
-  const [heldStates, setHeldStates] = useState([false, false, false, false, false]);
+  const [heldStates, setHeldStates] = useState([false, false, false, false]);
 
   const toggleHold = (index: number) => {
     const newStates = [...heldStates];
