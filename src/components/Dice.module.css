@@ -40,7 +40,6 @@
   justify-content: center;
   box-shadow: var(--elevation-3);
   z-index: 10;
-  transition: opacity 0.2s, transform 0.2s, background-color 0.2s;
   pointer-events: none;
   opacity: 0;
 }
@@ -64,6 +63,7 @@
   background-color: var(--md-sys-color-surface-variant);
   color: var(--md-sys-color-on-surface);
   opacity: 0.4;
+  transition: opacity 0.2s, transform 0.2s;
 }
 
 .dice:hover .unlockIcon {
@@ -75,6 +75,7 @@
   right: calc(var(--dice-size) * -0.04);
   background-color: var(--md-sys-color-surface-variant);
   color: var(--md-sys-color-on-surface);
+  transition: opacity 0.2s, transform 0.2s, background-color 0.2s;
 }
 
 .dice:hover .settingsBtn {
@@ -87,6 +88,7 @@
   left: calc(var(--dice-size) * -0.04);
   background-color: var(--md-sys-color-error);
   color: var(--md-sys-color-on-error);
+  transition: opacity 0.2s, transform 0.2s;
 }
 
 .dice:hover .removeBtn {

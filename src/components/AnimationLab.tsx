@@ -110,9 +110,10 @@ export const AnimationLab = () => {
             >
               <div className={styles.number} style={{ fontSize: 48, color: '#000' }}>?</div>
               
-              <AnimatePresence>
+              <AnimatePresence mode="popLayout">
                 {heldStates[i] ? (
                   <motion.div 
+                    key="locked"
                     initial={variant.initial}
                     animate={variant.animate}
                     exit={variant.exit}
@@ -121,9 +122,15 @@ export const AnimationLab = () => {
                     <Lock size={20} color="currentColor" />
                   </motion.div>
                 ) : (
-                  <div className={`${styles.actionBtn} ${styles.unlockIcon}`}>
+                  <motion.div 
+                    key="unlocked"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.4 }}
+                    exit={{ opacity: 0 }}
+                    className={`${styles.actionBtn} ${styles.unlockIcon}`}
+                  >
                     <Unlock size={20} color="currentColor" />
-                  </div>
+                  </motion.div>
                 )}
               </AnimatePresence>
             </div>
