@@ -6,15 +6,13 @@ import styles from './Dice.module.css';
 const VARIANTS = [
   {
     name: "1. Gentle Rock",
-    initial: { opacity: 0, rotate: 0, color: "#FFFFFF" },
+    initial: { rotate: 0, color: "#FFFFFF" },
     animate: { 
-      opacity: 1, 
       rotate: [0, -30, 0], 
       color: ["#FFFFFF", "#FFD700"],
       transition: { duration: 0.6, ease: "easeInOut" } as any
     },
     exit: { 
-      opacity: 0, 
       rotate: [0, -30, 0], 
       color: ["#FFD700", "#FFFFFF"],
       transition: { duration: 0.6, ease: "easeInOut" } as any
@@ -22,15 +20,13 @@ const VARIANTS = [
   },
   {
     name: "2. Overshoot Tick",
-    initial: { opacity: 0, rotate: 0, color: "#FFFFFF" },
+    initial: { rotate: 0, color: "#FFFFFF" },
     animate: { 
-      opacity: 1, 
       rotate: [0, -45, 10, 0], 
       color: ["#FFFFFF", "#FFD700", "#FFD700"],
       transition: { duration: 0.6, ease: "easeInOut" } as any
     },
     exit: { 
-      opacity: 0, 
       rotate: [0, -45, 10, 0], 
       color: ["#FFD700", "#FFA500", "#FFFFFF"],
       transition: { duration: 0.6, ease: "easeInOut" } as any
@@ -38,15 +34,13 @@ const VARIANTS = [
   },
   {
     name: "3. The Wiggle",
-    initial: { opacity: 0, rotate: 0, color: "#FFFFFF" },
+    initial: { rotate: 0, color: "#FFFFFF" },
     animate: { 
-      opacity: 1, 
       rotate: [0, -35, 20, -10, 0], 
       color: ["#FFFFFF", "#FFD700"],
       transition: { duration: 0.6, ease: "easeInOut" } as any
     },
     exit: { 
-      opacity: 0, 
       rotate: [0, -35, 20, -10, 0], 
       color: ["#FFD700", "#FFFFFF"],
       transition: { duration: 0.6, ease: "easeInOut" } as any
@@ -54,15 +48,13 @@ const VARIANTS = [
   },
   {
     name: "4. Slow Windup",
-    initial: { opacity: 0, rotate: 0, color: "#FFFFFF" },
+    initial: { rotate: 0, color: "#FFFFFF" },
     animate: { 
-      opacity: 1, 
       rotate: [0, -45, -45, 0], 
       color: ["#FFFFFF", "#FFA500", "#FFD700"],
       transition: { duration: 0.6, ease: "easeInOut" } as any
     },
     exit: { 
-      opacity: 0, 
       rotate: [0, -45, -45, 0], 
       color: ["#FFD700", "#FFA500", "#FFFFFF"],
       transition: { duration: 0.6, ease: "easeInOut" } as any
