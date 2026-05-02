@@ -86,7 +86,7 @@ export const AnimationLab = () => {
             >
               <div className={styles.number} style={{ fontSize: 48, color: '#000' }}>?</div>
               
-              <AnimatePresence mode="popLayout">
+              <AnimatePresence mode="wait">
                 {heldStates[i] ? (
                   <motion.div 
                     key="locked"
