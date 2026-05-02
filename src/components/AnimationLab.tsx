@@ -15,6 +15,7 @@ const VARIANTS = [
     },
     exit: { 
       opacity: 0, 
+      rotate: [0, -30, 0], 
       color: ["#FFD700", "#FFFFFF"],
       transition: { duration: 0.6, ease: "easeInOut" } as any
     }
@@ -30,6 +31,7 @@ const VARIANTS = [
     },
     exit: { 
       opacity: 0, 
+      rotate: [0, -45, 10, 0], 
       color: ["#FFD700", "#FFA500", "#FFFFFF"],
       transition: { duration: 0.6, ease: "easeInOut" } as any
     }
@@ -45,6 +47,7 @@ const VARIANTS = [
     },
     exit: { 
       opacity: 0, 
+      rotate: [0, -35, 20, -10, 0], 
       color: ["#FFD700", "#FFFFFF"],
       transition: { duration: 0.6, ease: "easeInOut" } as any
     }
@@ -60,6 +63,7 @@ const VARIANTS = [
     },
     exit: { 
       opacity: 0, 
+      rotate: [0, -45, -45, 0], 
       color: ["#FFD700", "#FFA500", "#FFFFFF"],
       transition: { duration: 0.6, ease: "easeInOut" } as any
     }
