@@ -88,7 +88,9 @@ export const AnimationLab = () => {
               
               <motion.div 
                 animate={{
-                  rotate: heldStates[i] ? variant.animate.rotate : variant.exit.rotate,
+                  rotate: heldStates[i] 
+                    ? variant.animate.rotate.map((v: number, idx: number) => idx === 1 ? v + 0.01 : v)
+                    : variant.animate.rotate.map((v: number, idx: number) => idx === 1 ? v - 0.01 : v),
                   color: heldStates[i] ? ["#FFFFFF", "#FFD700"] : ["#FFD700", "#FFFFFF"]
                 }}
                 transition={{ duration: 0.6, ease: "easeInOut" } as any}
