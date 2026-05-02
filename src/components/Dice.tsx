@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import type { DiceData } from '../types';
 import styles from './Dice.module.css';
 import { Lock, Unlock, Settings, X } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ALL_ICONS } from '../utils/iconUtils';
 
 interface DiceProps {
@@ -98,22 +98,33 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, onToggle
         </div>
       )}
 
-      <AnimatePresence>
-        {dice.held ? (
+      <motion.div 
+        animate={{
+          rotate: dice.held 
+            ? [0, -45, 10, 0].map((v, idx) => idx === 1 ? v + 0.01 : v)
+            : [0, -45, 10, 0].map((v, idx) => idx === 1 ? v - 0.01 : v),
+          color: dice.held ? ["#FFFFFF", "#FFD700", "#FFD700"] : ["#FFD700", "#FFA500", "#FFFFFF"]
+        }}
+        transition={{ duration: 0.5, ease: "easeInOut" } as any}
+        className={`${styles.actionBtn} ${dice.held ? styles.holdIcon : styles.unlockIcon}`}
+      >
+        <div style={{ position: 'relative', width: 20, height: 20 }}>
           <motion.div 
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5 }}
-            className={`${styles.actionBtn} ${styles.holdIcon}`}
+            animate={{ opacity: dice.held ? 1 : 0 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            style={{ position: 'absolute', top: 0, left: 0, width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
-            <Lock size={20} color="#FFD700" />
+            <Lock size={20} color="currentColor" />
           </motion.div>
-        ) : (
-          <div className={`${styles.actionBtn} ${styles.unlockIcon}`}>
+          <motion.div 
+            animate={{ opacity: dice.held ? 0 : 1 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            style={{ position: 'absolute', top: 0, left: 0, width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
             <Unlock size={20} color="currentColor" />
-          </div>
-        )}
-      </AnimatePresence>
+          </motion.div>
+        </div>
+      </motion.div>
 
       <button className={`${styles.actionBtn} ${styles.settingsBtn}`} onClick={(e) => {
         e.stopPropagation();

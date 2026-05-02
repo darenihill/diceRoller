@@ -62,7 +62,7 @@
   right: calc(var(--dice-size) * -0.04);
   background-color: var(--md-sys-color-surface-variant);
   color: var(--md-sys-color-on-surface);
-  opacity: 1;
+  opacity: 0;
   transition: opacity 0.2s, transform 0.2s;
 }
 
