@@ -5,34 +5,59 @@ import styles from './Dice.module.css';
 
 const VARIANTS = [
   {
-    name: "1. Fade Only",
-    initial: { opacity: 0 },
-    animate: { opacity: 1 },
+    name: "1. Gentle Rock",
+    initial: { opacity: 0, rotate: 0, color: "#FFFFFF" },
+    animate: { 
+      opacity: 1, 
+      rotate: [0, -30, 0], 
+      color: ["#FFFFFF", "#FFD700"],
+      transition: { duration: 0.4, ease: "easeInOut" } as any
+    },
     exit: { opacity: 0 }
   },
   {
-    name: "2. Drop In",
-    initial: { opacity: 0, y: -20 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -20 }
+    name: "2. Snappy Snap",
+    initial: { opacity: 0, rotate: 0, color: "#FFFFFF" },
+    animate: { 
+      opacity: 1, 
+      rotate: [0, -45, 0], 
+      color: ["#FFFFFF", "#FFD700"],
+      transition: { type: "spring", stiffness: 400, damping: 15 } as any
+    },
+    exit: { opacity: 0 }
   },
   {
-    name: "3. Rotate In",
-    initial: { opacity: 0, rotate: -90, scale: 0.5 },
-    animate: { opacity: 1, rotate: 0, scale: 1 },
-    exit: { opacity: 0, rotate: 90, scale: 0.5 }
+    name: "3. Overshoot Tick",
+    initial: { opacity: 0, rotate: 0, color: "#FFFFFF" },
+    animate: { 
+      opacity: 1, 
+      rotate: [0, -45, 10, 0], 
+      color: ["#FFFFFF", "#FFD700", "#FFD700"],
+      transition: { duration: 0.5, times: [0, 0.6, 0.8, 1] } as any
+    },
+    exit: { opacity: 0 }
   },
   {
-    name: "4. Spring Bounce",
-    initial: { opacity: 0, scale: 0 },
-    animate: { opacity: 1, scale: 1, transition: { type: 'spring' as const, stiffness: 500, damping: 15 } },
-    exit: { opacity: 0, scale: 0 }
+    name: "4. The Wiggle",
+    initial: { opacity: 0, rotate: 0, color: "#FFFFFF" },
+    animate: { 
+      opacity: 1, 
+      rotate: [0, -35, 20, -10, 0], 
+      color: ["#FFFFFF", "#FFD700"],
+      transition: { duration: 0.6, ease: "easeInOut" } as any
+    },
+    exit: { opacity: 0 }
   },
   {
-    name: "5. Slide Left",
-    initial: { opacity: 0, x: 20 },
-    animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: 20 }
+    name: "5. Slow Windup",
+    initial: { opacity: 0, rotate: 0, color: "#FFFFFF" },
+    animate: { 
+      opacity: 1, 
+      rotate: [0, -45, -45, 0], 
+      color: ["#FFFFFF", "#FFA500", "#FFD700"],
+      transition: { duration: 0.6, times: [0, 0.3, 0.7, 1] } as any
+    },
+    exit: { opacity: 0 }
   }
 ];
 
@@ -68,7 +93,7 @@ export const AnimationLab = () => {
                     exit={variant.exit}
                     className={`${styles.actionBtn} ${styles.holdIcon}`}
                   >
-                    <Lock size={20} color="#FFD700" />
+                    <Lock size={20} color="currentColor" />
                   </motion.div>
                 ) : (
                   <div className={`${styles.actionBtn} ${styles.unlockIcon}`}>
