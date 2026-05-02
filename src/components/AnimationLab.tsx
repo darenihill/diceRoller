@@ -72,19 +72,19 @@ export const AnimationLab = () => {
   };
 
   return (
-    <div style={{ padding: 24, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 16, margin: 24, textAlign: 'center' }}>
-      <h2 style={{ color: '#fff', marginBottom: 24, marginTop: 0 }}>🧪 Animation Testing Lab</h2>
-      <p style={{ color: '#aaa', marginBottom: 24 }}>Click the dice below to test 5 different lock animations. Let me know which one you prefer!</p>
+    <div style={{ padding: 48, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 16, margin: 32, textAlign: 'center' }}>
+      <h2 style={{ color: '#fff', fontSize: '2.2rem', marginBottom: 24, marginTop: 0 }}>🧪 Animation Testing Lab</h2>
+      <p style={{ color: '#aaa', fontSize: '1.15rem', marginBottom: 32 }}>Click the dice below to test 4 different lock animations. Let me know which one you prefer!</p>
       
-      <div style={{ display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 32, justifyContent: 'center', flexWrap: 'wrap' }}>
         {VARIANTS.map((variant, i) => (
-          <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+          <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
             <div 
               className={styles.dice}
-              style={{ backgroundColor: '#E9EAEC', position: 'relative', width: 120, height: 120 }}
+              style={{ backgroundColor: '#E9EAEC', position: 'relative', width: 140, height: 140 }}
               onClick={() => toggleHold(i)}
             >
-              <div className={styles.number} style={{ fontSize: 48, color: '#000' }}>?</div>
+              <div className={styles.number} style={{ fontSize: 56, color: '#000' }}>?</div>
               
               <motion.div 
                 animate={{
@@ -97,25 +97,25 @@ export const AnimationLab = () => {
                 className={`${styles.actionBtn} ${styles.holdIcon}`}
                 style={{ opacity: 1 }}
               >
-                <div style={{ position: 'relative', width: 20, height: 20 }}>
+                <div style={{ position: 'relative', width: 28, height: 28 }}>
                   <motion.div 
                     animate={{ opacity: heldStates[i] ? 1 : 0 }}
                     transition={{ duration: 0.3 }}
-                    style={{ position: 'absolute', top: 0, left: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    style={{ position: 'absolute', top: 0, left: 0, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
-                    <Lock size={20} color="currentColor" />
+                    <Lock size={28} color="currentColor" />
                   </motion.div>
                   <motion.div 
                     animate={{ opacity: heldStates[i] ? 0 : 1 }}
                     transition={{ duration: 0.3 }}
-                    style={{ position: 'absolute', top: 0, left: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    style={{ position: 'absolute', top: 0, left: 0, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
-                    <Unlock size={20} color="currentColor" />
+                    <Unlock size={28} color="currentColor" />
                   </motion.div>
                 </div>
               </motion.div>
             </div>
-            <span style={{ color: '#fff', fontSize: 14, fontWeight: 500 }}>{variant.name}</span>
+            <span style={{ color: '#fff', fontSize: 16, fontWeight: 500 }}>{variant.name}</span>
           </div>
         ))}
       </div>
