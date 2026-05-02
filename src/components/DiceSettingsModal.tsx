@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { DiceData } from '../types';
 import { Modal } from './Modal';
 import { COLORS } from '../utils/diceUtils';
-import { X, Plus, Star, Check } from 'lucide-react';
+import { X, Plus, Star, Check, Copy, Trash2 } from 'lucide-react';
 import { ALL_ICONS, COMMON_ICONS } from '../utils/iconUtils';
 
 interface DiceSettingsModalProps {
@@ -200,23 +200,23 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
         <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
           <button 
             className="md-button md-button-surface" 
-            style={{ flex: 1, color: 'var(--md-sys-color-error)', border: '1px solid var(--md-sys-color-error)' }}
+            style={{ flex: 1, color: 'var(--md-sys-color-error)', border: '1px solid var(--md-sys-color-error)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
             onClick={() => {
               onRemove(dice.id);
               onClose();
             }}
           >
-            Remove
+            <Trash2 size={18} /> Remove
           </button>
           <button 
             className="md-button md-button-surface" 
-            style={{ flex: 1, color: 'var(--md-sys-color-primary)', border: '1px solid var(--md-sys-color-primary)' }}
+            style={{ flex: 1, color: 'var(--md-sys-color-primary)', border: '1px solid var(--md-sys-color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
             onClick={() => {
               onClone(dice);
               onClose();
             }}
           >
-            Clone
+            <Copy size={18} /> Clone
           </button>
           <button 
             className="md-button md-button-filled" 

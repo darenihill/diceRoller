@@ -61,7 +61,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
+  opacity: 0.4;
   pointer-events: none;
   transition: opacity 0.2s, transform 0.2s;
   box-shadow: var(--elevation-3);
@@ -74,8 +74,8 @@
 }
 
 .dice:hover .unlockIcon {
-  opacity: 1;
-  pointer-events: auto;
+  opacity: 0.8;
+  pointer-events: none;
 }
 
 .settingsBtn {

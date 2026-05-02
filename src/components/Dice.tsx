@@ -105,12 +105,11 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, onToggle
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
             className={styles.holdIcon}
-            style={{ color: '#FFD700', filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))', backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: '50%', padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
-            <Lock size={24} color="#FFD700" />
+            <Lock size={20} color="#FFD700" />
           </motion.div>
         ) : (
-          <div className={styles.unlockIcon} style={{ opacity: 0.3 }}>
+          <div className={styles.unlockIcon}>
             <Unlock size={20} color="currentColor" />
           </div>
         )}
