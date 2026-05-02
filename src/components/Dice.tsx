@@ -103,7 +103,7 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, onToggle
           rotate: dice.held 
             ? [0, -45, 10, 0].map((v, idx) => idx === 1 ? v + 0.01 : v)
             : [0, -45, 10, 0].map((v, idx) => idx === 1 ? v - 0.01 : v),
-          color: dice.held ? ["#FFFFFF", "#FFD700", "#FFD700"] : ["#FFD700", "#FFA500", "#FFFFFF"]
+          color: dice.held ? "#FFD700" : "#FFFFFF"
         }}
         transition={{ duration: 0.5, ease: "easeInOut" } as any}
         className={`${styles.actionBtn} ${dice.held ? styles.holdIcon : styles.unlockIcon}`}
