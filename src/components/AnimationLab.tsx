@@ -156,14 +156,14 @@ export const AnimationLab = () => {
                 <div style={{ position: 'relative', width: 36, height: 36 }}>
                   <motion.div 
                     animate={{ opacity: heldStates[i] ? 1 : 0 }}
-                    transition={{ duration: 0.25 }}
+                    transition={{ duration: variant.animate.transition.duration, ease: "easeInOut" }}
                     style={{ position: 'absolute', top: 0, left: 0, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
                     <Lock size={36} color="currentColor" />
                   </motion.div>
                   <motion.div 
                     animate={{ opacity: heldStates[i] ? 0 : 1 }}
-                    transition={{ duration: 0.25 }}
+                    transition={{ duration: variant.animate.transition.duration, ease: "easeInOut" }}
                     style={{ position: 'absolute', top: 0, left: 0, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
                     <Unlock size={36} color="currentColor" />
