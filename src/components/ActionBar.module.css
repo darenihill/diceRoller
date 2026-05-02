@@ -1,0 +1,21 @@
+.actionBar {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 100;
+}
+
+.actionBtn {
+  width: 72px;
+  height: 72px;
+}
+
+.rollBtn {
+  height: 72px;
+  padding: 0 40px;
+  font-size: 24px;
+  gap: 16px;
+}

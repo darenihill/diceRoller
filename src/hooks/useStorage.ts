@@ -1,0 +1,61 @@
+import { useState, useEffect, useCallback } from 'react';
+import type { DiceConfig, DiceData } from '../types';
+
+export function useStorage() {
+  const [savedConfigs, setSavedConfigs] = useState<Record<string, DiceConfig>>({});
+
+  // Load from local storage on mount
+  useEffect(() => {
+    const loadFromStorage = () => {
+      try {
+        const stored = localStorage.getItem('diceConfigs');
+        if (stored) {
+          setSavedConfigs(JSON.parse(stored));
+        }
+      } catch (e) {
+        console.error("Failed to load configs", e);
+      }
+    };
+    loadFromStorage();
+  }, []);
+
+  const saveConfig = useCallback((name: string, config: DiceData[]) => {
+    setSavedConfigs((prev) => {
+      const updated = { ...prev, [name]: { name, config } };
+      localStorage.setItem('diceConfigs', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
+  const deleteConfig = useCallback((name: string) => {
+    setSavedConfigs((prev) => {
+      const updated = { ...prev };
+      delete updated[name];
+      localStorage.setItem('diceConfigs', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
+  const getSystemAutosave = useCallback((): DiceConfig | null => {
+    const stored = localStorage.getItem('diceConfigs');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (parsed['systemAutosave']) {
+        const autosave = parsed['systemAutosave'];
+        // After loading autosave, we should delete it
+        delete parsed['systemAutosave'];
+        localStorage.setItem('diceConfigs', JSON.stringify(parsed));
+        setSavedConfigs(parsed);
+        return autosave;
+      }
+    }
+    return null;
+  }, []);
+
+  return {
+    savedConfigs,
+    saveConfig,
+    deleteConfig,
+    getSystemAutosave
+  };
+}

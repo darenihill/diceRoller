@@ -1,0 +1,104 @@
+.app {
+  min-height: 100vh;
+  padding: 24px;
+  padding-bottom: 120px; /* space for bottom bar */
+  display: flex;
+  flex-direction: column;
+}
+
+.diceContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--dice-size), 1fr));
+  gap: var(--dice-gap);
+  padding: var(--dice-gap);
+  place-items: center;
+  align-self: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.helpList {
+  padding-left: 20px;
+  line-height: 1.6;
+}
+
+.helpList li {
+  margin-bottom: 12px;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.historyItem {
+  background-color: var(--md-sys-color-surface-variant);
+  padding: 12px;
+  border-radius: var(--shape-small);
+  display: grid;
+  grid-template-columns: 80px 1fr 100px;
+  gap: 16px;
+  align-items: center;
+}
+
+.historyIndex {
+  font-weight: 500;
+  color: var(--md-sys-color-primary);
+}
+
+.historyDetails {
+  font-family: monospace;
+  font-size: 16px;
+}
+
+.historyTotal {
+  font-weight: 700;
+  text-align: right;
+}
+
+.setsContainer h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.setsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.setCard {
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  background-color: var(--md-sys-color-surface-variant);
+  border: none;
+  color: var(--md-sys-color-on-surface);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.setCard:hover {
+  background-color: #383838;
+  box-shadow: var(--elevation-2);
+}
+
+.saveCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 8px 8px 16px;
+}
+
+.saveCardBtn {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  flex-grow: 1;
+  text-align: left;
+  padding: 8px 0;
+}

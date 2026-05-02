@@ -1,0 +1,444 @@
+:root {
+        --dice-size: 33vmin;
+        --dice-button-size: calc(var(--dice-size) / 4);
+        --dice-gap: 4vmin;
+        --color-swatch-size: calc(var(--dice-size) / 5.5);
+        --primary-button-size: calc(30px + 7vmin);
+        --swal-button-size: calc(var(--primary-button-size)*1.3);
+        --main-font-family: 'Roboto', sans-serif;
+        --main-color: #E9EAEC;
+        --main-bg-color: #2B3841;
+        --btn-bg-color: #333652;
+        --btn-bg-cancel-color: #BF4C41;
+        --btn-txt-color: #fff;
+        --btn-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
+        --common-padding: 20px;
+        --common-margin: 15px;
+        --common-gap: 10px;
+        --common-font-size: calc(var(--primary-button-size)/2);
+        --common-font-size-small: calc(var(--common-font-size)/2);
+        --common-border-radius: calc(5px + 1.2vmin);
+}
+
+body {
+        font-family: var(--main-font-family);
+        background-color: var(--main-bg-color);
+        min-height: 87vh;
+}
+
+button,
+.roll-button,
+.swal2-styled,
+.swal2-styled.swal2-confirm,
+.swal2-styled.swal2-cancel {
+        display: flex;
+        border-radius: var(--common-border-radius);
+        border: none;
+        font-size: 3vmin;
+        cursor: pointer;
+        background-color: var(--btn-bg-color);
+        width: var(--primary-button-size);
+        height: var(--primary-button-size);
+        color: var(--btn-txt-color);
+        box-sizing: border-box;
+        box-shadow: var(--btn-shadow);
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid white;
+}
+
+button:hover,
+.roll-button:hover,
+.swal2-styled:hover,
+.swal2-styled.swal2-confirm:hover,
+.swal2-styled.swal2-cancel:hover {
+  background-color: #4B5072; /* Hover background color */
+  border-width: 1.5px; /* Increase button border by 1.5 */
+}
+      
+
+button:focus {
+        outline-color: transparent;
+}
+
+button {
+        -webkit-tap-highlight-color: transparent;
+}
+
+.double-wide-button {
+        font-size: calc(var(--common-font-size)/2);
+        /* If needed can be changed and add a class to menu item buttons */
+        text-align: left;
+}
+
+.roll-button,
+.double-wide-button {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr;
+        width: calc(var(--primary-button-size) * 2);
+}
+
+.roll-button .roll-label,
+.double-wide-button .button-label {
+        font-size: var(--common-font-size);
+        text-align: center;
+}
+
+.roll-button:hover .icon {
+        animation: shake 0.5s ease-in-out;
+}
+
+.release-all-button {
+        width: calc(100px + .1vmin);
+}
+
+.icon,
+.menu-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+}
+
+.menu-icon {
+        font-size: calc(var(--primary-button-size) * 0.4);
+}
+
+.icon {
+        font-size: calc(var(--primary-button-size) * 0.65);
+}
+
+
+.hold-icon-container,
+.dice-button {
+        display: flex;
+        justify-content: center;
+        border-radius: calc((var(--common-border-radius) * 0.8));
+        align-items: center;
+        border: none;
+        cursor: pointer;
+        width: var(--dice-button-size);
+        height: var(--dice-button-size);
+        box-sizing: border-box;
+        box-shadow: var(--btn-shadow);
+}
+
+.hold-icon-container {
+        position: absolute;
+        border: calc((var(--dice-button-size)/25) + 1px) solid #000;
+        background-color: #fff;
+        top: 0;
+        right: 0;
+        z-index: 1;
+}
+
+.hold-icon-container .icon {
+        color: #000;
+}
+
+.hold-icon-container .icon,
+.dice-button .icon {
+        font-family: "Font Awesome 6 Free";
+        font-size: calc(var(--dice-button-size)*0.65);
+        font-weight: normal;
+        justify-content: center;
+        align-items: center;
+}
+
+footer {
+        position: fixed;
+        padding: var(--common-padding);
+        bottom: 0;
+        left: 0;
+        display: grid;
+        grid-template-columns: 1fr auto;
+}
+
+.primary-buttons-container {
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        gap: var(--common-gap);
+        padding: var(--common-padding);
+        grid-column: 2;
+        position: fixed;
+        bottom: 0;
+        right: 0;
+}
+
+.left-footer-container {
+        display: flex;
+        align-items: center;
+        gap: var(--common-gap);
+        padding: var(--common-padding);
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        color: #E9EAEC;
+        font-size: calc(5vmin + 1vmax);
+}
+
+.title-container,
+.roll-total-container {
+        margin: 1vmin;
+}
+
+.left-menu {
+        display: none;
+        grid-template-columns: repeat(2, 1fr);
+        background-color: var(--main-bg-color);
+        font-size: calc(var(--common-font-size)/2);
+        width: calc(var(--primary-button-size) * 4.25);
+        padding: var(--common-padding);
+        gap: var(--common-gap);
+        margin-left: var(--common-margin);
+        position: fixed;
+        bottom: calc(12vh + 6px);
+        z-index: 2;
+        border: 1px solid white;
+        border-radius: var(--common-border-radius);
+        place-items: center;
+}
+
+.dice-container-wrapper {
+        display: grid;
+        max-height: 87vh;
+        overflow: auto;
+}
+
+#dice-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(var(--dice-size), 1fr));
+        justify-content: center;
+        align-items: center;
+        gap: var(--dice-gap);
+        padding: var(--dice-gap);
+        place-items: center;
+        align-self: end;
+}
+
+.dice {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: var(--dice-size);
+        height: var(--dice-size);
+        border-radius: var(--common-border-radius);
+        background-color: #E9EAEC;
+        cursor: pointer;
+        position: relative;
+        box-sizing: border-box;
+        z-index: 1;
+}
+
+.dice .number {
+        font-size: calc(var(--dice-button-size)*2);
+        margin: 0;
+        font-weight: thin;
+        position: absolute;
+        color: white;
+        top: 45%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+}
+
+.dice .remove,
+.dice .settings {
+        position: absolute;
+}
+
+.dice .remove {
+        top: 0px;
+        right: 0px;
+}
+
+.dice .settings {
+        bottom: 0px;
+        right: 0px;
+}
+
+.color-picker {
+        position: absolute;
+        background-color: #333652;
+        border: 1px solid black;
+        border-radius: var(--common-border-radius);
+        bottom: 0px;
+        padding: 4px;
+        height: calc(100% - var(--dice-button-size));
+        bottom: var(--dice-button-size);
+        width: 100%;
+        z-index: 3;
+        box-sizing: border-box;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        grid-gap: 2px;
+}
+
+.color-swatch {
+        width: calc(var(--dice-button-size)*0.9 - 5px);
+        height: calc(var(--dice-button-size)*0.9 - 5px);
+        border-radius: 50%;
+        margin: 2px;
+        cursor: pointer;
+        aspect-ratio: 1 / 1;
+}
+
+.color-swatch:hover {
+        box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+.shake {
+        animation: shake 0.5s ease-in-out;
+        transform-origin: center;
+}
+
+@keyframes shake {
+        0% {
+                transform: translateX(0) rotate(0deg);
+        }
+
+        25% {
+                transform: translateX(-8px) rotate(-8deg);
+        }
+
+        50% {
+                transform: translateX(8px) rotate(8deg);
+        }
+
+        75% {
+                transform: translateX(-8px) rotate(-8deg);
+        }
+
+        100% {
+                transform: translateX(0) rotate(0deg);
+        }
+}
+
+.dice-action-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        justify-content: space-around;
+        align-items: center;
+        padding: 50px;
+}
+
+.settings-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        justify-content: space-between;
+        grid-gap: 0;
+        background-color: transparent;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+        z-index: 1;
+}
+
+/* Custom CSS for smaller SweetAlert2 popups on mobile devices 
+
+.swal2-popup {
+        width: 80%;
+        font-size: var(--common-font-size);
+}
+
+.swal2-title {
+        font-size: var(--common-font-size);
+}
+
+.swal2-content {
+        font-size: var(--common-font-size);
+}
+
+.swal2-actions {
+        font-size: var(--common-font-size);
+}
+
+.custom-close-button {
+        font-size: calc(var(--primary-button-size)*0.75);
+}
+
+*/
+
+.swal2-popup {
+        background-color: var(--main-bg-color);
+}
+
+.swal2-confirmButtonColor {
+         background-color: var(--btn-bg-color);
+}
+
+.swal2-cancel {
+        background-color: #fff;
+      }
+
+/* Override button background color       */
+
+
+.swal2-styled{
+        font-size: var(--common-font-size-small);
+        width: var(--swal-button-size);
+        text-align: center;
+        justify-content: center;
+}
+
+.swal2-styled.swal2-confirm,
+.swal2-styled.swal2-cancel {
+        font-size: var(--common-font-size-small);
+        width: var(--swal-button-size);
+      }
+
+      .swal-custom-button {
+        text-align: center;
+        justify-content: center;
+        background-color: var(--btn-bg-cancel-color);
+        width: var(--swal-button-size);
+        font-size: var(--common-font-size-small);
+      }
+
+      .swal-custom-button:hover {
+        background-color: #E06C59;
+      }
+      
+      .swal2-styled.swal2-cancel {
+        background-color: var(--btn-bg-cancel-color);
+      }
+   
+      .swal2-styled.swal2-cancel:hover {
+        background-color: #E06C59;
+      }
+
+
+
+
+
+
+
+/* For Chrome, Edge, and Safari */
+::-webkit-scrollbar {
+        width: 12px;
+}
+
+::-webkit-scrollbar-track {
+        background: #222;
+        /* Background color of the track */
+}
+
+::-webkit-scrollbar-thumb {
+        background-color: #444;
+        /* Background color of the thumb */
+        border-radius: 6px;
+        border: 3px solid #222;
+        /* Add a border to the thumb */
+}
+
+/* For Firefox */
+* {
+        scrollbar-width: thin;
+        scrollbar-color: #444 #222;
+}
