@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Lock, Unlock } from 'lucide-react';
 import styles from './Dice.module.css';
 
@@ -86,29 +86,32 @@ export const AnimationLab = () => {
             >
               <div className={styles.number} style={{ fontSize: 48, color: '#000' }}>?</div>
               
-              <AnimatePresence mode="wait">
-                {heldStates[i] ? (
+              <motion.div 
+                animate={{
+                  rotate: heldStates[i] ? variant.animate.rotate : variant.exit.rotate,
+                  color: heldStates[i] ? ["#FFFFFF", "#FFD700"] : ["#FFD700", "#FFFFFF"]
+                }}
+                transition={{ duration: 0.6, ease: "easeInOut" } as any}
+                className={`${styles.actionBtn} ${styles.holdIcon}`}
+                style={{ opacity: 1 }}
+              >
+                <div style={{ position: 'relative', width: 20, height: 20 }}>
                   <motion.div 
-                    key="locked"
-                    initial={variant.initial}
-                    animate={variant.animate}
-                    exit={variant.exit}
-                    className={`${styles.actionBtn} ${styles.holdIcon}`}
+                    animate={{ opacity: heldStates[i] ? 1 : 0 }}
+                    transition={{ duration: 0.3 }}
+                    style={{ position: 'absolute', top: 0, left: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
                     <Lock size={20} color="currentColor" />
                   </motion.div>
-                ) : (
                   <motion.div 
-                    key="unlocked"
-                    initial={{ opacity: 1 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 1 }}
-                    className={`${styles.actionBtn} ${styles.unlockIcon}`}
+                    animate={{ opacity: heldStates[i] ? 0 : 1 }}
+                    transition={{ duration: 0.3 }}
+                    style={{ position: 'absolute', top: 0, left: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
                     <Unlock size={20} color="currentColor" />
                   </motion.div>
-                )}
-              </AnimatePresence>
+                </div>
+              </motion.div>
             </div>
             <span style={{ color: '#fff', fontSize: 14, fontWeight: 500 }}>{variant.name}</span>
           </div>
