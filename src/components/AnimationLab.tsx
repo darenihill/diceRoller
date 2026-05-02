@@ -135,6 +135,7 @@ export const AnimationLab = () => {
       <div style={{ display: 'flex', gap: 32, justifyContent: 'center', flexWrap: 'wrap' }}>
         {VARIANTS.map((variant, i) => (
           <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+            <div style={{ color: '#FFD700', fontSize: '1.8rem', fontWeight: 'bold' }}>#{i + 1}</div>
             <div 
               className={styles.dice}
               style={{ backgroundColor: '#E9EAEC', position: 'relative', width: 160, height: 160 }}
