@@ -5,121 +5,37 @@ import styles from './Dice.module.css';
 
 const VARIANTS = [
   {
-    name: "1. Gentle Rock (0.4s)",
-    initial: { rotate: 0, color: "#FFFFFF" },
-    animate: { 
-      rotate: [0, -30, 0], 
-      color: ["#FFFFFF", "#FFD700"],
-      transition: { duration: 0.4, ease: "easeInOut" } as any
-    },
-    exit: { 
-      rotate: [0, -30, 0], 
-      color: ["#FFD700", "#FFFFFF"],
-      transition: { duration: 0.4, ease: "easeInOut" } as any
-    }
-  },
-  {
-    name: "2. Gentle Rock (0.8s)",
-    initial: { rotate: 0, color: "#FFFFFF" },
-    animate: { 
-      rotate: [0, -30, 0], 
-      color: ["#FFFFFF", "#FFD700"],
-      transition: { duration: 0.8, ease: "easeInOut" } as any
-    },
-    exit: { 
-      rotate: [0, -30, 0], 
-      color: ["#FFD700", "#FFFFFF"],
-      transition: { duration: 0.8, ease: "easeInOut" } as any
-    }
-  },
-  {
-    name: "3. Overshoot Tick (0.4s)",
+    name: "1. Overshoot Tick (0.5s)",
     initial: { rotate: 0, color: "#FFFFFF" },
     animate: { 
       rotate: [0, -45, 10, 0], 
       color: ["#FFFFFF", "#FFD700", "#FFD700"],
-      transition: { duration: 0.4, ease: "easeInOut" } as any
+      transition: { duration: 0.5, ease: "easeInOut" } as any
     },
     exit: { 
       rotate: [0, -45, 10, 0], 
       color: ["#FFD700", "#FFA500", "#FFFFFF"],
-      transition: { duration: 0.4, ease: "easeInOut" } as any
+      transition: { duration: 0.5, ease: "easeInOut" } as any
     }
   },
   {
-    name: "4. Overshoot Tick (0.8s)",
-    initial: { rotate: 0, color: "#FFFFFF" },
-    animate: { 
-      rotate: [0, -45, 10, 0], 
-      color: ["#FFFFFF", "#FFD700", "#FFD700"],
-      transition: { duration: 0.8, ease: "easeInOut" } as any
-    },
-    exit: { 
-      rotate: [0, -45, 10, 0], 
-      color: ["#FFD700", "#FFA500", "#FFFFFF"],
-      transition: { duration: 0.8, ease: "easeInOut" } as any
-    }
-  },
-  {
-    name: "5. The Wiggle (0.4s)",
+    name: "2. The Wiggle (0.5s)",
     initial: { rotate: 0, color: "#FFFFFF" },
     animate: { 
       rotate: [0, -35, 20, -10, 0], 
       color: ["#FFFFFF", "#FFD700"],
-      transition: { duration: 0.4, ease: "easeInOut" } as any
+      transition: { duration: 0.5, ease: "easeInOut" } as any
     },
     exit: { 
       rotate: [0, -35, 20, -10, 0], 
       color: ["#FFD700", "#FFFFFF"],
-      transition: { duration: 0.4, ease: "easeInOut" } as any
-    }
-  },
-  {
-    name: "6. The Wiggle (0.8s)",
-    initial: { rotate: 0, color: "#FFFFFF" },
-    animate: { 
-      rotate: [0, -35, 20, -10, 0], 
-      color: ["#FFFFFF", "#FFD700"],
-      transition: { duration: 0.8, ease: "easeInOut" } as any
-    },
-    exit: { 
-      rotate: [0, -35, 20, -10, 0], 
-      color: ["#FFD700", "#FFFFFF"],
-      transition: { duration: 0.8, ease: "easeInOut" } as any
-    }
-  },
-  {
-    name: "7. Slow Windup (0.4s)",
-    initial: { rotate: 0, color: "#FFFFFF" },
-    animate: { 
-      rotate: [0, -45, -45, 0], 
-      color: ["#FFFFFF", "#FFA500", "#FFD700"],
-      transition: { duration: 0.4, ease: "easeInOut" } as any
-    },
-    exit: { 
-      rotate: [0, -45, -45, 0], 
-      color: ["#FFD700", "#FFA500", "#FFFFFF"],
-      transition: { duration: 0.4, ease: "easeInOut" } as any
-    }
-  },
-  {
-    name: "8. Slow Windup (0.8s)",
-    initial: { rotate: 0, color: "#FFFFFF" },
-    animate: { 
-      rotate: [0, -45, -45, 0], 
-      color: ["#FFFFFF", "#FFA500", "#FFD700"],
-      transition: { duration: 0.8, ease: "easeInOut" } as any
-    },
-    exit: { 
-      rotate: [0, -45, -45, 0], 
-      color: ["#FFD700", "#FFA500", "#FFFFFF"],
-      transition: { duration: 0.8, ease: "easeInOut" } as any
+      transition: { duration: 0.5, ease: "easeInOut" } as any
     }
   }
 ];
 
 export const AnimationLab = () => {
-  const [heldStates, setHeldStates] = useState(Array(8).fill(false));
+  const [heldStates, setHeldStates] = useState(Array(2).fill(false));
 
   const toggleHold = (index: number) => {
     const newStates = [...heldStates];
