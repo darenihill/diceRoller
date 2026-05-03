@@ -14,13 +14,13 @@
   transition: box-shadow 0.2s;
 }
 
-.dice:hover {
+.dice:hover, .dice.revealed {
   box-shadow: var(--elevation-2);
 }
 
 .number {
   margin: 0;
-  font-weight: 500; /* Medium weight for Material */
+  font-weight: 500;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -53,8 +53,8 @@
   right: calc(var(--dice-size) * -0.04);
   background-color: var(--md-sys-color-surface-variant);
   color: var(--md-sys-color-on-surface);
-  opacity: 1; /* Always visible when active */
-  pointer-events: none; /* Let parent handle click */
+  opacity: 1;
+  pointer-events: none;
 }
 
 .unlockIcon {
@@ -96,9 +96,13 @@
   pointer-events: auto;
 }
 
-.dice:hover .removeBtn {
-  opacity: 1;
-  pointer-events: auto;
+@media (hover: none) {
+  .dice.revealed .unlockIcon,
+  .dice.revealed .settingsBtn,
+  .dice.revealed .removeBtn {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 .removeBtn:hover {

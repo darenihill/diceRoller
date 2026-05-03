@@ -15,7 +15,25 @@
 
 .rollBtn {
   height: 72px;
-  padding: 0 40px;
+  min-width: 156px;
+  padding: 0 24px;
   font-size: 24px;
   gap: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 468px) {
+  .lockBtn {
+    position: fixed !important;
+    bottom: 24px !important;
+    left: 24px !important;
+    right: auto !important;
+    z-index: 101 !important;
+  }
+  
+  :global(.menu-open) .modifierColumn {
+    display: none !important;
+  }
 }

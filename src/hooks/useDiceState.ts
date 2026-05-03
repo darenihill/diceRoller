@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { DiceData } from '../types';
-import { generateId } from '../utils/diceUtils';
+import { generateId, parseFaceContent, FACE_ICON_PREFIX } from '../utils/diceUtils';
 
 export interface RollHistoryItem {
   id: string;
@@ -12,6 +12,7 @@ export const useDiceState = () => {
   const [diceList, setDiceList] = useState<DiceData[]>([]);
   const [rollHistory, setRollHistory] = useState<RollHistoryItem[]>([]);
   const [isRolling, setIsRolling] = useState(false);
+  const [modifier, setModifier] = useState<number>(0);
 
   const addDice = useCallback((template?: Partial<DiceData>) => {
     const newDice: DiceData = {
@@ -62,18 +63,18 @@ export const useDiceState = () => {
             let val = d.numberValue;
             let display = val.toString();
             if (d.customFaces.length > 0) {
-                const idx = d.currentFaceIndex ?? 0;
-                display = d.customFaces[idx];
-                const parts = display.split(':bg:');
-                if (!parts[0].startsWith(':icon:')) {
-                   const parsed = parseInt(parts[0]);
-                   if (!isNaN(parsed)) val = parsed;
-                } else {
-                   val = 0;
-                }
+              const idx = d.currentFaceIndex ?? 0;
+              const parsed = parseFaceContent(d.customFaces[idx]);
+              display = parsed.content;
+              if (!parsed.content.startsWith(FACE_ICON_PREFIX)) {
+                const num = parseInt(parsed.content);
+                if (!isNaN(num)) val = num;
+              } else {
+                val = 0;
+              }
             }
             rollTotal += val;
-            if (d.name) details.push(`${d.name}: ${display.split(':bg:')[0]}`);
+            if (d.name) details.push(`${d.name}: ${display}`);
             return d;
           }
 
@@ -85,18 +86,18 @@ export const useDiceState = () => {
           
           let display = val.toString();
           if (d.customFaces.length > 0) {
-              display = d.customFaces[idx];
-              const parts = display.split(':bg:');
-              if (parts[0].startsWith(':icon:')) {
-                  val = 0;
-              } else {
-                  const parsed = parseInt(parts[0]);
-                  if (!isNaN(parsed)) val = parsed;
-              }
+            const parsed = parseFaceContent(d.customFaces[idx]);
+            display = parsed.content;
+            if (parsed.content.startsWith(FACE_ICON_PREFIX)) {
+              val = 0;
+            } else {
+              const num = parseInt(parsed.content);
+              if (!isNaN(num)) val = num;
+            }
           }
           
           rollTotal += val;
-          if (d.name) details.push(`${d.name}: ${display.split(':bg:')[0]}`);
+          if (d.name) details.push(`${d.name}: ${display}`);
 
           return {
             ...d,
@@ -105,9 +106,14 @@ export const useDiceState = () => {
           };
         });
 
+        const finalTotal = rollTotal + modifier;
+        if (modifier !== 0) {
+          details.push(`Modifier: ${modifier > 0 ? '+' : ''}${modifier}`);
+        }
+
         setRollHistory(h => [{
           id: generateId(),
-          total: rollTotal,
+          total: finalTotal,
           details
         }, ...h]);
 
@@ -115,7 +121,7 @@ export const useDiceState = () => {
       });
       setIsRolling(false);
     }, 600);
-  }, []);
+  }, [modifier]);
 
   const clearHistory = useCallback(() => {
     setRollHistory([]);
@@ -126,6 +132,8 @@ export const useDiceState = () => {
     setDiceList,
     rollHistory,
     isRolling,
+    modifier,
+    setModifier,
     addDice,
     removeDice,
     updateDice,

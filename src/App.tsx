@@ -14,7 +14,7 @@ import { Trash2 } from 'lucide-react';
 
 function App() {
   const {
-    diceList, setDiceList, rollHistory, isRolling,
+    diceList, setDiceList, rollHistory, isRolling, modifier, setModifier,
     addDice, removeDice, updateDice, toggleHold, toggleHoldAll,
     clearAllDice, rollDice, clearHistory
   } = useDiceState();
@@ -23,15 +23,28 @@ function App() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [editingDiceId, setEditingDiceId] = useState<string | null>(null);
+  const [revealedDiceId, setRevealedDiceId] = useState<string | null>(null);
   const [theme, setTheme] = useState(() => localStorage.getItem('appTheme') || 'theme-dark');
   
+  const [showModifier, setShowModifier] = useState(() => localStorage.getItem('showModifier') !== 'false');
+
+  useEffect(() => {
+    localStorage.setItem('showModifier', String(showModifier));
+  }, [showModifier]);
+
   // Modals state
   const [modalOpen, setModalOpen] = useState<'help' | 'history' | 'sets' | 'themes' | null>(null);
 
   useEffect(() => {
-    document.body.className = theme;
+    // Remove old theme classes, then add the current one
+    document.body.classList.remove('theme-dark', 'theme-light', 'theme-felt', 'theme-midnight');
+    document.body.classList.add(theme);
     localStorage.setItem('appTheme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    document.body.classList.toggle('menu-open', menuOpen);
+  }, [menuOpen]);
 
   // Load shared config from URL or autosave on mount
   useEffect(() => {
@@ -54,11 +67,24 @@ function App() {
       }
     }
 
+    const defaultSet = localStorage.getItem('defaultDiceSet');
+    if (defaultSet) {
+      try {
+        const parsed = JSON.parse(defaultSet);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setDiceList(parsed.map((d: any) => ({ ...d, id: generateId() })));
+          return;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
     const autosave = getSystemAutosave();
     if (autosave && autosave.config.length > 0) {
       setDiceList(autosave.config.map(d => ({ ...d, id: generateId() })));
     }
-  }, [getSystemAutosave, setDiceList]);
+  }, []);
 
   // Save autosave on unload
   useEffect(() => {
@@ -76,9 +102,22 @@ function App() {
 
   // Dice Size Calculation based on count
   const diceCount = diceList.length;
+  const getDiceSize = () => {
+    if (diceCount <= 2) return '55vmin';
+    if (diceCount <= 4) return '42vmin';
+    if (diceCount <= 6) return '34vmin';
+    if (diceCount <= 12) return '24vmin';
+    return '18vmin';
+  };
+  const getDiceGap = () => {
+    if (diceCount <= 2) return '4vmin';
+    if (diceCount <= 6) return '3vmin';
+    return '2vmin';
+  };
+
   const diceStyles = {
-    '--dice-size': diceCount <= 2 ? '55vmin' : diceCount <= 6 ? '38vmin' : '28vmin',
-    '--dice-gap': diceCount <= 2 ? '4vmin' : diceCount <= 6 ? '3vmin' : '2vmin'
+    '--dice-size': getDiceSize(),
+    '--dice-gap': getDiceGap()
   } as React.CSSProperties;
 
   const handleSave = () => {
@@ -96,9 +135,25 @@ function App() {
     setMenuOpen(false);
   };
 
+  const handleSetDefault = () => {
+    localStorage.setItem('defaultDiceSet', JSON.stringify(diceList));
+    alert('This dice set has been saved as your default! It will automatically load whenever you open the app.');
+    setMenuOpen(false);
+  };
+
   const handleDeleteAll = () => {
     if (window.confirm('Delete All Dice?')) {
       clearAllDice();
+      try {
+        const stored = localStorage.getItem('diceConfigs');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          delete parsed['systemAutosave'];
+          localStorage.setItem('diceConfigs', JSON.stringify(parsed));
+        }
+      } catch (e) {
+        console.error(e);
+      }
       setMenuOpen(false);
     }
   };
@@ -122,13 +177,15 @@ function App() {
   };
 
   return (
-    <div className={styles.app}>
+    <div className={styles.app} style={{ paddingBottom: showModifier ? '360px' : '120px' }}>
       <div className={styles.diceContainer} style={diceStyles}>
         {diceList.map((dice) => (
           <Dice
             key={dice.id}
             dice={dice}
             isRolling={isRolling}
+            isRevealed={revealedDiceId === dice.id}
+            onReveal={() => setRevealedDiceId(dice.id)}
             onToggleHold={toggleHold}
             onRemove={removeDice}
             onOpenSettings={setEditingDiceId}
@@ -149,6 +206,9 @@ function App() {
         onSave={handleSave}
         onLoad={() => setModalOpen('sets')}
         onShare={handleShare}
+        onSetDefault={handleSetDefault}
+        showModifier={showModifier}
+        onToggleModifier={() => setShowModifier(!showModifier)}
       />
 
       <ActionBar
@@ -158,15 +218,24 @@ function App() {
         allHeld={allHeld}
         totalVisible={totalVisible}
         lastTotal={lastTotal}
+        modifier={modifier}
+        showModifier={showModifier}
+        onChangeModifier={setModifier}
       />
 
       {/* Help Modal */}
-      <Modal isOpen={modalOpen === 'help'} onClose={() => setModalOpen(null)} title="Help">
-        <ul className={styles.helpList}>
-          <li><strong>Settings:</strong> Click the gear icon on a die to set custom faces, numbers, and colors.</li>
-          <li><strong>Sets/Saves:</strong> Load presets or your own saved setups from the Sets/Load menu.</li>
-          <li><strong>Hold/Release:</strong> Click the body of a die to hold it, or use the lock button to hold all.</li>
-        </ul>
+      <Modal isOpen={modalOpen === 'help'} onClose={() => setModalOpen(null)} title="Help & Guide">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, color: 'var(--md-sys-color-on-surface-variant)', fontSize: 14, lineHeight: 1.6 }}>
+          <p>Welcome to <strong>Dice Roller</strong>! Here is how to use the available features:</p>
+          <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <li><strong>Add / Roll Dice:</strong> Use the <code>+</code> button at the bottom to add dice, and the main button to roll all unheld dice.</li>
+            <li><strong>Hold individual dice:</strong> Simply click/tap any die to hold or release it. Held dice stay locked across rolls.</li>
+            <li><strong>Lock All:</strong> Toggle the Lock icon in the action bar to instantly hold or release all dice at once.</li>
+            <li><strong>Custom Faces:</strong> Click the gear icon on a die to open settings. You can add custom text, special icons, and pick custom background colors for each face.</li>
+            <li><strong>Sets & Presets:</strong> Quickly load predefined configurations like <em>Cities & Knights</em> or <em>That's Pretty Clever</em>, or save and load your own custom sets!</li>
+            <li><strong>Colorblind Friendly:</strong> Automatic contrast coloring ensures text and icons are perfectly readable against any background color.</li>
+          </ul>
+        </div>
       </Modal>
 
       {/* History Modal */}

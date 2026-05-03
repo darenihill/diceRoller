@@ -5,32 +5,74 @@
   z-index: 100;
 }
 
+.toggleBtn {
+  width: 72px;
+  height: 72px;
+  box-shadow: var(--elevation-3);
+  background-color: var(--md-sys-color-surface-variant);
+  color: var(--md-sys-color-on-surface);
+  border-radius: 50%;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.toggleBtn:hover {
+  background-color: var(--md-sys-color-surface-hover);
+}
+
+.toggleBtn:active {
+  transform: scale(0.95);
+}
+
 .menu {
   position: fixed;
-  bottom: 96px;
+  bottom: 104px;
   left: 24px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  z-index: 90;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  z-index: 120;
   padding: 16px;
-  width: 280px;
+  width: 450px;
+  max-width: calc(100vw - 48px);
 }
 
 .menuItem {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: 8px;
+  padding: 10px 12px;
   background-color: var(--md-sys-color-surface-variant);
   color: var(--md-sys-color-on-surface);
   border-radius: var(--shape-small);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.1s;
   justify-content: flex-start;
 }
 
 .menuItem:hover {
-  background-color: #383838;
+  background-color: var(--md-sys-color-surface-hover);
+}
+
+.menuItem:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 468px) {
+  .toggleContainer {
+    bottom: 112px;
+    left: 24px;
+    right: auto;
+  }
+  
+  .menu {
+    bottom: 192px;
+    left: 16px;
+    right: 16px;
+    width: auto;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    z-index: 130;
+    max-height: 55vh;
+    overflow-y: auto;
+  }
 }

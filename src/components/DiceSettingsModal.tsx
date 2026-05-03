@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import type { DiceData } from '../types';
 import { Modal } from './Modal';
-import { COLORS } from '../utils/diceUtils';
-import { X, Plus, Star, Check, Copy, Trash2 } from 'lucide-react';
+import { COLORS, FACE_BG_DELIMITER, FACE_ICON_PREFIX, parseFaceContent, isLightColor } from '../utils/diceUtils';
+import { X, Plus, Minus, Star, Check, Copy, Trash2, Palette } from 'lucide-react';
 import { ALL_ICONS, COMMON_ICONS } from '../utils/iconUtils';
+import styles from './DiceSettingsModal.module.css';
 
 interface DiceSettingsModalProps {
   dice: DiceData;
@@ -17,12 +18,10 @@ interface DiceSettingsModalProps {
 export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOpen, onClose, onUpdate, onRemove, onClone }) => {
   const [customInput, setCustomInput] = useState('');
   const [showAllIcons, setShowAllIcons] = useState(false);
+  const [activeColorPicker, setActiveColorPicker] = useState<{ type: 'base' | 'custom'; index?: number } | null>(null);
 
-  const handleFacesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const num = parseInt(e.target.value);
-    if (!isNaN(num) && num > 0) {
-      onUpdate(dice.id, { faces: num, customFaces: [] });
-    }
+  const setFaces = (num: number) => {
+    if (num > 0) onUpdate(dice.id, { faces: num, customFaces: [] });
   };
 
   const addCustomFace = (face: string) => {
@@ -40,192 +39,197 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   const updateCustomFaceColor = (index: number, color: string) => {
     const newFaces = [...dice.customFaces];
     const faceStr = newFaces[index];
-    const parts = faceStr.split(':bg:');
-    newFaces[index] = `${parts[0]}:bg:${color}`;
+    const parsed = parseFaceContent(faceStr);
+    newFaces[index] = `${parsed.content}${FACE_BG_DELIMITER}${color}`;
     onUpdate(dice.id, { customFaces: newFaces });
+  };
+
+  const handleColorSelect = (color: string) => {
+    if (!activeColorPicker) return;
+    if (activeColorPicker.type === 'base') {
+      onUpdate(dice.id, { color });
+    } else if (activeColorPicker.index !== undefined) {
+      updateCustomFaceColor(activeColorPicker.index, color);
+    }
+    setActiveColorPicker(null);
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Dice Settings">
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        
-        <div style={{ backgroundColor: 'var(--md-sys-color-surface-variant)', padding: 16, borderRadius: 12 }}>
-          <h3 style={{ margin: '0 0 16px 0', fontSize: 16, color: 'var(--md-sys-color-primary)' }}>Base Settings</h3>
-          
+      <div className={styles.container}>
+
+        {/* General Settings */}
+        <div className={styles.sectionCard}>
+          <h3 className={styles.sectionTitle}>General Settings</h3>
           <div style={{ marginBottom: 16 }}>
-            <label style={{ fontSize: 14, color: 'var(--md-sys-color-on-surface)', display: 'block', marginBottom: 8, opacity: 0.8 }}>Name (Optional)</label>
+            <label className={styles.label}>Name (Optional)</label>
             <input 
               type="text" 
               value={dice.name || ''} 
               onChange={(e) => onUpdate(dice.id, { name: e.target.value })}
               placeholder="e.g. Player 1"
-              style={{ width: '100%', height: '40px', padding: '0 12px', borderRadius: 8, border: 'none', backgroundColor: 'rgba(0,0,0,0.2)', color: '#fff', fontSize: 14 }}
+              className={styles.inputField}
             />
           </div>
 
-          <div style={{ marginBottom: 16 }}>
-            <label style={{ fontSize: 14, color: 'var(--md-sys-color-on-surface)', display: 'block', marginBottom: 8, opacity: 0.8 }}>Base Color</label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
-              {COLORS.slice(0, 11).map(c => (
-                <button 
-                  key={c} 
-                  style={{ 
-                    backgroundColor: c, 
-                    border: c === dice.color ? '2px solid var(--md-sys-color-primary)' : 'none',
-                    borderRadius: '50%',
-                    aspectRatio: '1',
-                    width: '100%',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => onUpdate(dice.id, { color: c })}
-                />
-              ))}
-              <label 
-                style={{
-                  backgroundColor: 'rgba(0,0,0,0.2)',
-                  borderRadius: '50%',
-                  aspectRatio: '1',
-                  width: '100%',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'var(--md-sys-color-on-surface)'
-                }}
+          <div className={styles.twoColumnRow}>
+            <div>
+              <label className={styles.label}>Base Color</label>
+              <button 
+                onClick={(e) => { e.stopPropagation(); setActiveColorPicker({ type: 'base' }); }}
+                className={styles.colorSwatch}
+                style={{ backgroundColor: dice.color, color: isLightColor(dice.color) ? '#121212' : '#ffffff' }}
+                title="Pick base color"
               >
-                <input 
-                  type="color" 
-                  value={dice.color} 
-                  onChange={(e) => onUpdate(dice.id, { color: e.target.value })} 
-                  style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }} 
-                />
-                <Plus size={20} />
-              </label>
+                <Palette size={20} strokeWidth={2} />
+              </button>
             </div>
-          </div>
 
-          <div>
-            <label style={{ fontSize: 14, color: 'var(--md-sys-color-on-surface)', display: 'block', marginBottom: 8, opacity: 0.8 }}>Standard Faces</label>
-            <input 
-              type="number" 
-              value={dice.faces} 
-              onChange={handleFacesChange}
-              style={{ width: '100%', height: '40px', padding: '0 12px', borderRadius: 8, border: 'none', backgroundColor: 'rgba(0,0,0,0.2)', color: '#fff', fontSize: 14 }}
-            />
+            <div>
+              <label className={styles.label}>Standard Faces</label>
+              <div className={styles.stepperRow}>
+                <button className={styles.stepperBtn} onClick={() => setFaces(dice.faces - 1)} title="Decrease faces">
+                  <Minus size={18} strokeWidth={2.5} />
+                </button>
+                <input 
+                  type="number" 
+                  value={dice.faces} 
+                  onChange={(e) => setFaces(parseInt(e.target.value))}
+                  className={styles.stepperInput}
+                />
+                <button className={styles.stepperBtn} onClick={() => setFaces(dice.faces + 1)} title="Increase faces">
+                  <Plus size={18} strokeWidth={2.5} />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div style={{ backgroundColor: 'var(--md-sys-color-surface-variant)', padding: 16, borderRadius: 12 }}>
-          <h3 style={{ margin: '0 0 16px 0', fontSize: 16, color: 'var(--md-sys-color-primary)' }}>Custom Faces</h3>
+        {/* Custom Faces */}
+        <div className={styles.sectionCard}>
+          <h3 className={styles.sectionTitle}>Custom Faces</h3>
           
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }}>
-            {dice.customFaces.length === 0 && <span style={{ fontSize: 14, color: '#888' }}>No custom faces added</span>}
+          <div className={styles.facesGrid}>
+            {dice.customFaces.length === 0 && <span className={styles.emptyText}>No custom faces added</span>}
             {dice.customFaces.map((f, i) => {
-              const parts = f.split(':bg:');
-              const content = parts[0];
-              const bgColor = parts[1] || 'transparent';
+              const parsed = parseFaceContent(f);
+              const content = parsed.content;
+              const bgColor = parsed.bgColor;
               
               return (
-                <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 10, backgroundColor: 'rgba(0,0,0,0.15)', padding: 14, borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', fontSize: 20, fontWeight: 600, color: 'var(--md-sys-color-on-surface)' }}>
-                      {content.startsWith(':icon:') 
-                        ? React.createElement(ALL_ICONS.find(icon => icon.name === content.replace(':icon:', ''))?.icon || Star, { size: 24 }) 
+                <div key={i} className={styles.faceCard}>
+                  <div className={styles.faceCardRow}>
+                    <div className={styles.faceContent}>
+                      {content.startsWith(FACE_ICON_PREFIX) 
+                        ? React.createElement(ALL_ICONS.find(icon => icon.name === content.replace(FACE_ICON_PREFIX, ''))?.icon || Star, { size: 20, strokeWidth: 2.5 }) 
                         : content}
                     </div>
-                    <button onClick={() => removeCustomFace(i)} style={{ color: 'var(--md-sys-color-error)', backgroundColor: 'transparent', padding: 4 }}><X size={20} /></button>
-                  </div>
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    {COLORS.slice(0, 8).map(c => (
+                    <div className={styles.faceActions}>
                       <button 
-                        key={c}
-                        style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: c, border: c === bgColor ? '2px solid var(--md-sys-color-primary)' : '1px solid rgba(255,255,255,0.2)', padding: 0, cursor: 'pointer' }}
-                        onClick={() => updateCustomFaceColor(i, c)}
-                      />
-                    ))}
-                    <label 
-                      style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.2)' }}
-                      title="Custom Color"
-                    >
-                      <Plus size={16} color="#fff" />
-                      <input 
-                        type="color" 
-                        value={bgColor !== 'transparent' ? bgColor : '#ffffff'}
-                        onChange={(e) => updateCustomFaceColor(i, e.target.value)}
-                        style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }} 
-                      />
-                    </label>
+                        onClick={(e) => { e.stopPropagation(); setActiveColorPicker({ type: 'custom', index: i }); }} 
+                        className={styles.faceColorBtn}
+                        style={{ backgroundColor: bgColor !== 'transparent' ? bgColor : 'rgba(255,255,255,0.08)' }}
+                        title="Edit Color"
+                      >
+                        <Palette size={14} strokeWidth={2.5} />
+                      </button>
+                      <button onClick={() => removeCustomFace(i)} className={styles.faceRemoveBtn}>
+                        <X size={18} strokeWidth={2.5} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
             })}
           </div>
 
-          <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+          <div className={styles.addFaceRow}>
             <input 
               type="text" 
               value={customInput}
               onChange={(e) => setCustomInput(e.target.value)}
               onKeyDown={(e) => { if(e.key === 'Enter') addCustomFace(customInput); }}
               placeholder="Add custom text"
-              style={{ flex: 1, height: '40px', padding: '0 12px', borderRadius: 8, border: 'none', backgroundColor: 'rgba(0,0,0,0.2)', color: '#fff', fontSize: 14, minWidth: 0 }}
+              className={styles.inputField}
+              style={{ flex: 1, minWidth: 0 }}
             />
-            <button className="md-button md-button-filled" onClick={() => addCustomFace(customInput)} style={{ width: '40px', height: '40px', padding: '0', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Plus size={20} />
+            <button className={`md-button md-button-filled ${styles.addFaceBtn}`} onClick={() => addCustomFace(customInput)}>
+              <Plus size={20} strokeWidth={2.5} />
             </button>
           </div>
 
-          <label style={{ fontSize: 12, color: 'var(--md-sys-color-on-surface)', display: 'block', marginBottom: 8, opacity: 0.6 }}>Or add an icon:</label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8, maxHeight: showAllIcons ? '200px' : 'auto', overflowY: showAllIcons ? 'auto' : 'visible', paddingRight: showAllIcons ? '4px' : '0' }}>
+          <label className={styles.sublabel}>Or add an icon:</label>
+          <div className={styles.iconGrid} style={{ maxHeight: showAllIcons ? '150px' : 'auto', overflowY: showAllIcons ? 'auto' : 'visible' }}>
             {(showAllIcons ? ALL_ICONS : COMMON_ICONS).map(icon => (
               <button 
                 key={icon.name} 
-                onClick={() => addCustomFace(`:icon:${icon.name}`)}
-                style={{ backgroundColor: 'rgba(0,0,0,0.2)', color: '#fff', borderRadius: '50%', aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                onClick={() => addCustomFace(`${FACE_ICON_PREFIX}${icon.name}`)}
+                className={styles.iconBtn}
               >
-                <icon.icon size={20} />
+                <icon.icon size={18} strokeWidth={2.5} />
               </button>
             ))}
             {!showAllIcons && (
-              <button 
-                onClick={() => setShowAllIcons(true)}
-                style={{ backgroundColor: 'var(--md-sys-color-primary)', color: 'var(--md-sys-color-on-primary)', borderRadius: '50%', aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-              >
-                <Plus size={20} />
+              <button onClick={() => setShowAllIcons(true)} className={styles.iconBtnMore}>
+                <Plus size={18} strokeWidth={2.5} />
               </button>
             )}
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+        {/* Footer Actions */}
+        <div className={styles.footerActions}>
           <button 
-            className="md-button md-button-surface" 
-            style={{ flex: 1, color: 'var(--md-sys-color-error)', border: '1px solid var(--md-sys-color-error)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-            onClick={() => {
-              onRemove(dice.id);
-              onClose();
-            }}
+            className={`md-button md-button-surface ${styles.footerBtnRemove}`}
+            onClick={() => { onRemove(dice.id); onClose(); }}
           >
-            <Trash2 size={18} /> Remove
+            <Trash2 size={18} strokeWidth={2.5} /> Remove
           </button>
           <button 
-            className="md-button md-button-surface" 
-            style={{ flex: 1, color: 'var(--md-sys-color-primary)', border: '1px solid var(--md-sys-color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-            onClick={() => {
-              onClone(dice);
-              onClose();
-            }}
+            className={`md-button md-button-surface ${styles.footerBtnClone}`}
+            onClick={() => onClone(dice)}
           >
-            <Copy size={18} /> Clone
+            <Copy size={18} strokeWidth={2.5} /> Clone
           </button>
           <button 
-            className="md-button md-button-filled" 
-            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            className={`md-button md-button-filled ${styles.footerBtnDone}`}
             onClick={onClose}
           >
-            <Check size={20} /> Done
+            <Check size={20} strokeWidth={2.5} /> Done
           </button>
         </div>
+
+        {/* Color Picker Popover */}
+        {activeColorPicker && (
+          <>
+            <div onClick={() => setActiveColorPicker(null)} className={styles.popoverBackdrop} />
+            <div className={styles.colorPopover} style={{ top: activeColorPicker.type === 'base' ? '65px' : '230px' }}>
+              <div className={styles.popoverHeader}>
+                <span className={styles.popoverTitle}>Choose Color</span>
+                <button onClick={() => setActiveColorPicker(null)} className={styles.popoverClose}><X size={18} /></button>
+              </div>
+              <div className={styles.colorGrid}>
+                {COLORS.map(c => (
+                  <button 
+                    key={c}
+                    className={styles.colorDot}
+                    style={{ backgroundColor: c, border: c === dice.color ? '3px solid var(--md-sys-color-primary)' : 'none' }}
+                    onClick={() => handleColorSelect(c)}
+                  />
+                ))}
+                <label className={styles.colorDotCustom}>
+                  <Plus size={16} color="#fff" strokeWidth={2.5} />
+                  <input 
+                    type="color" 
+                    value={activeColorPicker.type === 'base' ? dice.color : '#ffffff'}
+                    onChange={(e) => handleColorSelect(e.target.value)}
+                    className={styles.hiddenInput}
+                  />
+                </label>
+              </div>
+            </div>
+          </>
+        )}
 
       </div>
     </Modal>

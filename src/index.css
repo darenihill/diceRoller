@@ -4,6 +4,7 @@
   --md-sys-color-background: #121212;
   --md-sys-color-surface: #1E1E1E;
   --md-sys-color-surface-variant: #2D2D2D;
+  --md-sys-color-surface-hover: #383838;
   --md-sys-color-on-background: #E3E3E3;
   --md-sys-color-on-surface: #E3E3E3;
   --md-sys-color-primary: #A8C7FA;
@@ -21,15 +22,16 @@
   --shape-medium: 12px;
   --shape-large: 16px;
 
-  /* Dice Sizing Variables */
-  --dice-size: 33vmin;
-  --dice-gap: 4vmin;
+  /* Dice sizing defaults (overridden by JS based on dice count) */
+  --dice-size: 150px;
+  --dice-gap: 24px;
 }
 
 body.theme-light {
   --md-sys-color-background: #FDFDFD;
   --md-sys-color-surface: #F0F0F0;
   --md-sys-color-surface-variant: #E0E0E0;
+  --md-sys-color-surface-hover: #D0D0D0;
   --md-sys-color-on-background: #1A1A1A;
   --md-sys-color-on-surface: #1A1A1A;
   --md-sys-color-primary: #0056D2;
@@ -42,6 +44,7 @@ body.theme-felt {
   --md-sys-color-background: #1B4D3E; /* Casino Felt Green */
   --md-sys-color-surface: #13382D;
   --md-sys-color-surface-variant: #0F2E24;
+  --md-sys-color-surface-hover: #1A5A48;
   --md-sys-color-on-background: #FFFFFF;
   --md-sys-color-on-surface: #FFFFFF;
   --md-sys-color-primary: #FFD700;
@@ -54,6 +57,7 @@ body.theme-midnight {
   --md-sys-color-background: #090B10;
   --md-sys-color-surface: #121622;
   --md-sys-color-surface-variant: #1B2134;
+  --md-sys-color-surface-hover: #252B42;
   --md-sys-color-on-background: #EAEBFF;
   --md-sys-color-on-surface: #EAEBFF;
   --md-sys-color-primary: #8E99F3;
@@ -108,7 +112,7 @@ button {
 }
 
 .md-button-filled:hover {
-  background-color: #005B92; /* slightly lighter primary container */
+  filter: brightness(1.1);
   box-shadow: var(--elevation-2);
 }
 
@@ -119,7 +123,7 @@ button {
 }
 
 .md-button-surface:hover {
-  background-color: #383838;
+  background-color: var(--md-sys-color-surface-hover);
   box-shadow: var(--elevation-2);
 }
 
@@ -136,7 +140,7 @@ button {
 }
 
 .md-icon-button:hover {
-  background-color: #383838;
+  background-color: var(--md-sys-color-surface-hover);
   box-shadow: var(--elevation-1);
 }
 
