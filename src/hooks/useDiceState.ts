@@ -13,20 +13,32 @@ export const useDiceState = () => {
   const [rollHistory, setRollHistory] = useState<RollHistoryItem[]>([]);
   const [isRolling, setIsRolling] = useState(false);
   const [modifier, setModifier] = useState<number>(0);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const showToast = useCallback((msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  }, []);
 
   const addDice = useCallback((template?: Partial<DiceData>) => {
-    const newDice: DiceData = {
-      id: generateId(),
-      numberValue: template?.numberValue ?? 1,
-      faces: template?.faces ?? 6,
-      currentFaceIndex: template?.currentFaceIndex ?? 0,
-      name: template?.name ?? '',
-      customFaces: template?.customFaces ? [...template.customFaces] : [],
-      color: template?.color ?? '#E9EAEC',
-      held: false,
-    };
-    setDiceList(prev => [...prev, newDice]);
-  }, []);
+    setDiceList(prev => {
+      if (prev.length >= 50) {
+        showToast("Maximum of 50 dice reached.");
+        return prev;
+      }
+      const newDice: DiceData = {
+        id: generateId(),
+        numberValue: template?.numberValue ?? 1,
+        faces: template?.faces ?? 6,
+        currentFaceIndex: template?.currentFaceIndex ?? 0,
+        name: template?.name ?? '',
+        customFaces: template?.customFaces ? [...template.customFaces] : [],
+        color: template?.color ?? '#E9EAEC',
+        held: false,
+      };
+      return [...prev, newDice];
+    });
+  }, [showToast]);
 
   const removeDice = useCallback((id: string) => {
     setDiceList(prev => prev.filter(d => d.id !== id));
@@ -69,6 +81,7 @@ export const useDiceState = () => {
               if (!parsed.content.startsWith(FACE_ICON_PREFIX)) {
                 const num = parseInt(parsed.content);
                 if (!isNaN(num)) val = num;
+                else val = 0;
               } else {
                 val = 0;
               }
@@ -93,6 +106,7 @@ export const useDiceState = () => {
             } else {
               const num = parseInt(parsed.content);
               if (!isNaN(num)) val = num;
+              else val = 0;
             }
           }
           
@@ -141,6 +155,7 @@ export const useDiceState = () => {
     toggleHoldAll,
     clearAllDice,
     rollDice,
-    clearHistory
+    clearHistory,
+    toast
   };
 };

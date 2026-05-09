@@ -47,16 +47,16 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
               exit={{ y: 20, opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <div style={{ fontSize: 11, fontWeight: 600, opacity: 0.6, paddingLeft: 4, color: 'var(--md-sys-color-on-surface)' }}>Saves</div>
+              <div className={styles.menuColumn}>
+                <div className={styles.menuColumnHeader}>Saves</div>
                 <button className={styles.menuItem} onClick={onSets}><Dice6 size={18} /> <span>Sets</span></button>
                 <button className={styles.menuItem} onClick={onSave}><Save size={18} /> <span>Save</span></button>
                 <button className={styles.menuItem} onClick={onLoad}><Download size={18} /> <span>Load</span></button>
                 <button className={styles.menuItem} onClick={onSetDefault} title="Pin as startup default"><Pin size={18} /> <span>Set Default</span></button>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <div style={{ fontSize: 11, fontWeight: 600, opacity: 0.6, paddingLeft: 4, color: 'var(--md-sys-color-on-surface)' }}>Tools</div>
+              <div className={styles.menuColumn}>
+                <div className={styles.menuColumnHeader}>Tools</div>
                 <button className={styles.menuItem} onClick={onHistory}><History size={18} /> <span>History</span></button>
                 <button className={styles.menuItem} onClick={onThemes}><Palette size={18} /> <span>Themes</span></button>
                 <button className={styles.menuItem} onClick={onToggleModifier}>
@@ -66,8 +66,8 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
                 <button className={styles.menuItem} style={{ color: 'var(--md-sys-color-error)' }} onClick={onDeleteAll}><Trash2 size={18} /> <span>Clear All</span></button>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <div style={{ fontSize: 11, fontWeight: 600, opacity: 0.6, paddingLeft: 4, color: 'var(--md-sys-color-on-surface)' }}>App</div>
+              <div className={styles.menuColumn}>
+                <div className={styles.menuColumnHeader}>App</div>
                 <button className={styles.menuItem} onClick={onIdeas}><Lightbulb size={18} /> <span>Feedback</span></button>
                 <button className={styles.menuItem} onClick={onDonate}><Coffee size={18} /> <span>Donate</span></button>
                 <button className={styles.menuItem} onClick={onShare}><Share2 size={18} /> <span>Share</span></button>

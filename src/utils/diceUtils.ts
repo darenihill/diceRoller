@@ -66,6 +66,5 @@ export const COLORS = [
   "#B24BF3", // purple
   "#F28500", // orange
   "#FF69B4", // pink
-  "#AA5518", // brown
-  "#EEB58B"  // tan
+  "#AA5518"  // brown
 ];

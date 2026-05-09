@@ -7,14 +7,13 @@
 
 .diceContainer {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--dice-size), 1fr));
+  grid-template-columns: repeat(var(--dice-columns), var(--dice-size));
   gap: var(--dice-gap);
-  padding: var(--dice-gap);
-  padding-bottom: 240px;
-  place-items: center;
-  align-self: center;
+  place-content: center;
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  max-width: 1200px;
+  padding: 16px;
 }
 
 .helpList {
@@ -101,4 +100,26 @@
   flex-grow: 1;
   text-align: left;
   padding: 8px 0;
+}
+
+.toast {
+  position: fixed;
+  top: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  padding: 12px 24px;
+  border-radius: var(--shape-large);
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 1000;
+  box-shadow: var(--elevation-3, 0 4px 12px rgba(0,0,0,0.3));
+  animation: slideDown 0.3s cubic-bezier(0.2, 0, 0, 1);
+  pointer-events: none;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translate(-50%, -20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
 }

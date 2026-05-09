@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import LZString from 'lz-string';
 import styles from './App.module.css';
 import { useDiceState } from './hooks/useDiceState';
@@ -16,8 +16,25 @@ function App() {
   const {
     diceList, setDiceList, rollHistory, isRolling, modifier, setModifier,
     addDice, removeDice, updateDice, toggleHold, toggleHoldAll,
-    clearAllDice, rollDice, clearHistory
+    clearAllDice, rollDice, clearHistory, toast
   } = useDiceState();
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+
+  useLayoutEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      if (entries[0]) {
+        setContainerSize({
+          width: entries[0].contentRect.width,
+          height: entries[0].contentRect.height
+        });
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   const { savedConfigs, saveConfig, deleteConfig, getSystemAutosave } = useStorage();
 
@@ -26,7 +43,7 @@ function App() {
   const [revealedDiceId, setRevealedDiceId] = useState<string | null>(null);
   const [theme, setTheme] = useState(() => localStorage.getItem('appTheme') || 'theme-dark');
   
-  const [showModifier, setShowModifier] = useState(() => localStorage.getItem('showModifier') !== 'false');
+  const [showModifier, setShowModifier] = useState(() => localStorage.getItem('showModifier') === 'true');
 
   useEffect(() => {
     localStorage.setItem('showModifier', String(showModifier));
@@ -102,22 +119,34 @@ function App() {
 
   // Dice Size Calculation based on count
   const diceCount = diceList.length;
-  const getDiceSize = () => {
-    if (diceCount <= 2) return '55vmin';
-    if (diceCount <= 4) return '42vmin';
-    if (diceCount <= 6) return '34vmin';
-    if (diceCount <= 12) return '24vmin';
-    return '18vmin';
-  };
-  const getDiceGap = () => {
-    if (diceCount <= 2) return '4vmin';
-    if (diceCount <= 6) return '3vmin';
-    return '2vmin';
-  };
+  let optimalSize = 0;
+  let optimalColumns = 1;
+  const GAP = 40; // Increased to give corner buttons breathing room
+
+  if (diceCount > 0 && containerSize.width > 0 && containerSize.height > 0) {
+    let maxDieSize = 0;
+    
+    for (let c = 1; c <= diceCount; c++) {
+      const r = Math.ceil(diceCount / c);
+      const availableW = Math.max(0, containerSize.width - (c - 1) * GAP);
+      const availableH = Math.max(0, containerSize.height - (r - 1) * GAP);
+      const sizeW = availableW / c;
+      const sizeH = availableH / r;
+      const size = Math.min(sizeW, sizeH);
+      
+      if (size > maxDieSize) {
+        maxDieSize = size;
+        optimalColumns = c;
+      }
+    }
+    
+    optimalSize = Math.floor(Math.min(maxDieSize, 480));
+  }
 
   const diceStyles = {
-    '--dice-size': getDiceSize(),
-    '--dice-gap': getDiceGap()
+    '--dice-size': `${optimalSize}px`,
+    '--dice-columns': optimalColumns,
+    '--dice-gap': `${GAP}px`
   } as React.CSSProperties;
 
   const handleSave = () => {
@@ -178,7 +207,7 @@ function App() {
 
   return (
     <div className={styles.app} style={{ paddingBottom: showModifier ? '360px' : '120px' }}>
-      <div className={styles.diceContainer} style={diceStyles}>
+      <div ref={containerRef} className={styles.diceContainer} style={diceStyles}>
         {diceList.map((dice) => (
           <Dice
             key={dice.id}
@@ -197,7 +226,7 @@ function App() {
         isOpen={menuOpen}
         onToggle={() => setMenuOpen(!menuOpen)}
         onDonate={() => window.open('https://www.buymeacoffee.com/darenihill', '_blank')}
-        onIdeas={() => window.open('https://docs.google.com/forms/d/1MurbBtETb6e9JmkThO_Apuc9lowJcDPHpCcPNIhbPpg/prefill', '_blank')}
+        onIdeas={() => window.open('https://forms.gle/wqYaKsEZ5FQwizuMA', '_blank')}
         onHelp={() => setModalOpen('help')}
         onHistory={() => setModalOpen('history')}
         onSets={() => setModalOpen('sets')}
@@ -321,6 +350,13 @@ function App() {
           </button>
         </div>
       </Modal>
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={styles.toast}>
+          {toast}
+        </div>
+      )}
 
       {/* Dice Settings Modal */}
       {editingDiceId && (
