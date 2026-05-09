@@ -156,6 +156,7 @@ export const useDiceState = () => {
     clearAllDice,
     rollDice,
     clearHistory,
-    toast
+    toast,
+    showToast
   };
 };

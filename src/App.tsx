@@ -16,10 +16,15 @@ function App() {
   const {
     diceList, setDiceList, rollHistory, isRolling, modifier, setModifier,
     addDice, removeDice, updateDice, toggleHold, toggleHoldAll,
-    clearAllDice, rollDice, clearHistory, toast
+    clearAllDice, rollDice, clearHistory, toast, showToast
   } = useDiceState();
 
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  const [savePromptOpen, setSavePromptOpen] = useState(false);
+  const [saveName, setSaveName] = useState('');
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [shareFallbackUrl, setShareFallbackUrl] = useState<string | null>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
   useLayoutEffect(() => {
@@ -121,17 +126,17 @@ function App() {
   const diceCount = diceList.length;
   let optimalSize = 0;
   let optimalColumns = 1;
-  const GAP = 40; // Increased to give corner buttons breathing room
+  let dynamicGap = 0;
+  const GAP_RATIO = 0.10; // 10% gap relative to size ensures the 4% corner buttons never collide
 
   if (diceCount > 0 && containerSize.width > 0 && containerSize.height > 0) {
     let maxDieSize = 0;
     
     for (let c = 1; c <= diceCount; c++) {
       const r = Math.ceil(diceCount / c);
-      const availableW = Math.max(0, containerSize.width - (c - 1) * GAP);
-      const availableH = Math.max(0, containerSize.height - (r - 1) * GAP);
-      const sizeW = availableW / c;
-      const sizeH = availableH / r;
+      // Math: size * columns + size * gapRatio * (columns - 1) = available container width
+      const sizeW = containerSize.width / (c + GAP_RATIO * (c - 1));
+      const sizeH = containerSize.height / (r + GAP_RATIO * (r - 1));
       const size = Math.min(sizeW, sizeH);
       
       if (size > maxDieSize) {
@@ -141,20 +146,26 @@ function App() {
     }
     
     optimalSize = Math.floor(Math.min(maxDieSize, 480));
+    dynamicGap = Math.floor(optimalSize * GAP_RATIO);
   }
 
   const diceStyles = {
     '--dice-size': `${optimalSize}px`,
     '--dice-columns': optimalColumns,
-    '--dice-gap': `${GAP}px`
+    '--dice-gap': `${dynamicGap}px`
   } as React.CSSProperties;
 
   const handleSave = () => {
-    const name = window.prompt('Enter a name for this set:');
-    if (name && name.trim()) {
-      saveConfig(name.trim(), diceList);
-      alert('Saved!');
-      setMenuOpen(false);
+    setSaveName('');
+    setSavePromptOpen(true);
+    setMenuOpen(false);
+  };
+
+  const executeSave = () => {
+    if (saveName.trim()) {
+      saveConfig(saveName.trim(), diceList);
+      showToast('Saved!');
+      setSavePromptOpen(false);
     }
   };
 
@@ -166,25 +177,28 @@ function App() {
 
   const handleSetDefault = () => {
     localStorage.setItem('defaultDiceSet', JSON.stringify(diceList));
-    alert('This dice set has been saved as your default! It will automatically load whenever you open the app.');
+    showToast('Saved as default! It will automatically load on open.');
     setMenuOpen(false);
   };
 
   const handleDeleteAll = () => {
-    if (window.confirm('Delete All Dice?')) {
-      clearAllDice();
-      try {
-        const stored = localStorage.getItem('diceConfigs');
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          delete parsed['systemAutosave'];
-          localStorage.setItem('diceConfigs', JSON.stringify(parsed));
-        }
-      } catch (e) {
-        console.error(e);
+    setConfirmDeleteOpen(true);
+    setMenuOpen(false);
+  };
+
+  const executeDeleteAll = () => {
+    clearAllDice();
+    try {
+      const stored = localStorage.getItem('diceConfigs');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        delete parsed['systemAutosave'];
+        localStorage.setItem('diceConfigs', JSON.stringify(parsed));
       }
-      setMenuOpen(false);
+    } catch (e) {
+      console.error(e);
     }
+    setConfirmDeleteOpen(false);
   };
 
   const handleShare = () => {
@@ -194,13 +208,13 @@ function App() {
     
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(url).then(() => {
-        alert("Share link copied to clipboard!");
+        showToast("Share link copied to clipboard!");
       }).catch(err => {
         console.error("Failed to copy link: ", err);
-        window.prompt("Copy this link to share:", url);
+        setShareFallbackUrl(url);
       });
     } else {
-      window.prompt("Copy this link to share:", url);
+      setShareFallbackUrl(url);
     }
     setMenuOpen(false);
   };
@@ -314,6 +328,51 @@ function App() {
               </div>
             </>
           )}
+        </div>
+      </Modal>
+
+      {/* Custom Dialogs */}
+      <Modal isOpen={savePromptOpen} onClose={() => setSavePromptOpen(false)} title="Save Set">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <label style={{ fontSize: 14, color: 'var(--md-sys-color-on-surface-variant)' }}>Enter a name for this set:</label>
+          <input 
+            autoFocus
+            type="text" 
+            value={saveName} 
+            onChange={(e) => setSaveName(e.target.value)}
+            style={{ padding: 12, borderRadius: 8, border: '1px solid var(--md-sys-color-outline)', background: 'transparent', color: 'var(--md-sys-color-on-surface)', fontSize: 16 }}
+            onKeyDown={(e) => e.key === 'Enter' && executeSave()}
+          />
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
+            <button className="md-button md-button-surface" onClick={() => setSavePromptOpen(false)}>Cancel</button>
+            <button className="md-button md-button-primary" onClick={executeSave} disabled={!saveName.trim()}>Save</button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal isOpen={confirmDeleteOpen} onClose={() => setConfirmDeleteOpen(false)} title="Confirm Delete">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <p style={{ margin: 0, color: 'var(--md-sys-color-on-surface-variant)' }}>Are you sure you want to delete all dice?</p>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
+            <button className="md-button md-button-surface" onClick={() => setConfirmDeleteOpen(false)}>Cancel</button>
+            <button className="md-button" style={{ backgroundColor: 'var(--md-sys-color-error)', color: 'var(--md-sys-color-on-error)' }} onClick={executeDeleteAll}>Delete All</button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal isOpen={!!shareFallbackUrl} onClose={() => setShareFallbackUrl(null)} title="Share Link">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <label style={{ fontSize: 14, color: 'var(--md-sys-color-on-surface-variant)' }}>Copy this link to share:</label>
+          <input 
+            type="text" 
+            readOnly
+            value={shareFallbackUrl || ''} 
+            style={{ padding: 12, borderRadius: 8, border: '1px solid var(--md-sys-color-outline)', background: 'var(--md-sys-color-surface-variant)', color: 'var(--md-sys-color-on-surface)', fontSize: 14 }}
+            onClick={(e) => (e.target as HTMLInputElement).select()}
+          />
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+            <button className="md-button md-button-primary" onClick={() => setShareFallbackUrl(null)}>Done</button>
+          </div>
         </div>
       </Modal>
 
