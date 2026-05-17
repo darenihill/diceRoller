@@ -48,6 +48,14 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
               transition={{ duration: 0.2 }}
             >
               <div className={styles.menuColumn}>
+                <div className={styles.menuColumnHeader}>App</div>
+                <button className={styles.menuItem} onClick={onIdeas}><Lightbulb size={18} /> <span>Feedback</span></button>
+                <button className={styles.menuItem} onClick={onDonate}><Coffee size={18} /> <span>Donate</span></button>
+                <button className={styles.menuItem} onClick={onShare}><Share2 size={18} /> <span>Share</span></button>
+                <button className={styles.menuItem} onClick={onHelp}><HelpCircle size={18} /> <span>Help</span></button>
+              </div>
+
+              <div className={styles.menuColumn}>
                 <div className={styles.menuColumnHeader}>Saves</div>
                 <button className={styles.menuItem} onClick={onSets}><Dice6 size={18} /> <span>Sets</span></button>
                 <button className={styles.menuItem} onClick={onSave}><Save size={18} /> <span>Save</span></button>
@@ -64,14 +72,6 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
                   <span>Modifier</span>
                 </button>
                 <button className={styles.menuItem} style={{ color: 'var(--md-sys-color-error)' }} onClick={onDeleteAll}><Trash2 size={18} /> <span>Clear All</span></button>
-              </div>
-
-              <div className={styles.menuColumn}>
-                <div className={styles.menuColumnHeader}>App</div>
-                <button className={styles.menuItem} onClick={onIdeas}><Lightbulb size={18} /> <span>Feedback</span></button>
-                <button className={styles.menuItem} onClick={onDonate}><Coffee size={18} /> <span>Donate</span></button>
-                <button className={styles.menuItem} onClick={onShare}><Share2 size={18} /> <span>Share</span></button>
-                <button className={styles.menuItem} onClick={onHelp}><HelpCircle size={18} /> <span>Help</span></button>
               </div>
             </motion.div>
           </>
