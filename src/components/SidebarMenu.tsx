@@ -57,7 +57,7 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
 
               <div className={styles.menuColumn}>
                 <div className={styles.menuColumnHeader}>Saves</div>
-                <button className={styles.menuItem} onClick={onSets}><Dice6 size={18} /> <span>Sets</span></button>
+                <button className={styles.menuItem} onClick={onSets}><Dice6 size={18} /> <span>Games</span></button>
                 <button className={styles.menuItem} onClick={onSave}><Save size={18} /> <span>Save</span></button>
                 <button className={styles.menuItem} onClick={onLoad}><Download size={18} /> <span>Load</span></button>
                 <button className={styles.menuItem} onClick={onSetDefault} title="Pin as startup default"><Pin size={18} /> <span>Set Default</span></button>

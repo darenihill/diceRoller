@@ -68,6 +68,30 @@ function App() {
     document.body.classList.toggle('menu-open', menuOpen);
   }, [menuOpen]);
 
+  // Auto-deselect active die on mobile after 5 seconds, or if any other button/area is clicked
+  useEffect(() => {
+    if (!revealedDiceId) return;
+
+    const timer = setTimeout(() => {
+      setRevealedDiceId(null);
+    }, 5000);
+
+    const handleOutsideClick = (e: PointerEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('[data-dice-id]')) {
+        return;
+      }
+      setRevealedDiceId(null);
+    };
+
+    document.addEventListener('pointerdown', handleOutsideClick);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('pointerdown', handleOutsideClick);
+    };
+  }, [revealedDiceId]);
+
   // Load shared config from URL or autosave on mount
   useEffect(() => {
     const hash = window.location.hash;
@@ -132,11 +156,15 @@ function App() {
   if (diceCount > 0 && containerSize.width > 0 && containerSize.height > 0) {
     let maxDieSize = 0;
     
+    // Add a safety margin to account for absolute-positioned corner buttons and shadows
+    const safeWidth = Math.max(0, containerSize.width - 24);
+    const safeHeight = Math.max(0, containerSize.height - 24);
+    
     for (let c = 1; c <= diceCount; c++) {
       const r = Math.ceil(diceCount / c);
       // Math: size * columns + size * gapRatio * (columns - 1) = available container width
-      const sizeW = containerSize.width / (c + GAP_RATIO * (c - 1));
-      const sizeH = containerSize.height / (r + GAP_RATIO * (r - 1));
+      const sizeW = safeWidth / (c + GAP_RATIO * (c - 1));
+      const sizeH = safeHeight / (r + GAP_RATIO * (r - 1));
       const size = Math.min(sizeW, sizeH);
       
       if (size > maxDieSize) {
@@ -275,7 +303,7 @@ function App() {
             <li><strong>Hold individual dice:</strong> Simply click/tap any die to hold or release it. Held dice stay locked across rolls.</li>
             <li><strong>Lock All:</strong> Toggle the Lock icon in the action bar to instantly hold or release all dice at once.</li>
             <li><strong>Custom Faces:</strong> Click the gear icon on a die to open settings. You can add custom text, special icons, and pick custom background colors for each face.</li>
-            <li><strong>Sets & Presets:</strong> Quickly load predefined configurations like <em>Cities & Knights</em> or <em>That's Pretty Clever</em>, or save and load your own custom sets!</li>
+            <li><strong>Games & Presets:</strong> Quickly load predefined configurations like <em>Cities & Knights</em> or <em>That's Pretty Clever</em>, or save and load your own custom games!</li>
             <li><strong>Colorblind Friendly:</strong> Automatic contrast coloring ensures text and icons are perfectly readable against any background color.</li>
           </ul>
         </div>
@@ -300,7 +328,7 @@ function App() {
       </Modal>
 
       {/* Sets Modal */}
-      <Modal isOpen={modalOpen === 'sets'} onClose={() => setModalOpen(null)} title="Sets & Saves">
+      <Modal isOpen={modalOpen === 'sets'} onClose={() => setModalOpen(null)} title="Games & Saves">
         <div className={styles.setsContainer}>
           <h3>Presets</h3>
           <div className={styles.setsGrid}>
@@ -332,9 +360,9 @@ function App() {
       </Modal>
 
       {/* Custom Dialogs */}
-      <Modal isOpen={savePromptOpen} onClose={() => setSavePromptOpen(false)} title="Save Set">
+      <Modal isOpen={savePromptOpen} onClose={() => setSavePromptOpen(false)} title="Save Game">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <label style={{ fontSize: 14, color: 'var(--md-sys-color-on-surface-variant)' }}>Enter a name for this set:</label>
+          <label style={{ fontSize: 14, color: 'var(--md-sys-color-on-surface-variant)' }}>Enter a name for this game:</label>
           <input 
             autoFocus
             type="text" 

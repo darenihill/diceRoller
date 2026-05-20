@@ -62,6 +62,7 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
       ref={diceRef}
       className={`${styles.dice} ${isRolling && !dice.held ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''}`}
       style={{ backgroundColor }}
+      data-dice-id={dice.id}
       onClick={(e) => {
         if ((e.target as HTMLElement).closest('button')) return;
         onReveal();
