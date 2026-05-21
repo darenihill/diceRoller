@@ -37,6 +37,10 @@ self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   
   const url = new URL(e.request.url);
+  
+  // Bypass caching on localhost/127.0.0.1 to prevent caching outdated code in local development
+  if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') return;
+  
   const isLocal = url.origin === self.location.origin;
   const isGoogleFont = url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
   
