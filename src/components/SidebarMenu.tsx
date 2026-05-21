@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './SidebarMenu.module.css';
-import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, ChevronUp, ChevronDown, Share2, Palette, ToggleLeft, ToggleRight, Pin, Volume2, VolumeX } from 'lucide-react';
+import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Download, ChevronUp, ChevronDown, Share2, Palette, Pin } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface SidebarMenuProps {
@@ -11,19 +11,16 @@ interface SidebarMenuProps {
   onHelp: () => void;
   onHistory: () => void;
   onSets: () => void;
-  onThemes: () => void;
+  onCustomize: () => void;
   onDeleteAll: () => void;
   onSave: () => void;
   onShare: () => void;
   onSetDefault: () => void;
-  showModifier: boolean;
-  onToggleModifier: () => void;
-  soundEnabled: boolean;
-  onToggleSound: () => void;
+  onLoad: () => void;
 }
 
 export const SidebarMenu: React.FC<SidebarMenuProps> = ({
-  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onSets, onThemes, onDeleteAll, onSave, onShare, onSetDefault, showModifier, onToggleModifier, soundEnabled, onToggleSound
+  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, onLoad
 }) => {
   return (
     <>
@@ -60,21 +57,14 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
                 <div className={styles.menuColumnHeader}>Saves</div>
                 <button className={styles.menuItem} onClick={onSets}><Dice6 size={18} /> <span>Games</span></button>
                 <button className={styles.menuItem} onClick={onSave}><Save size={18} /> <span>Save</span></button>
+                <button className={styles.menuItem} onClick={onLoad}><Download size={18} /> <span>Load</span></button>
                 <button className={styles.menuItem} onClick={onSetDefault} title="Pin as startup default"><Pin size={18} /> <span>Set Default</span></button>
               </div>
 
               <div className={styles.menuColumn}>
                 <div className={styles.menuColumnHeader}>Tools</div>
                 <button className={styles.menuItem} onClick={onHistory}><History size={18} /> <span>History</span></button>
-                <button className={styles.menuItem} onClick={onThemes}><Palette size={18} /> <span>Themes</span></button>
-                <button className={styles.menuItem} onClick={onToggleModifier}>
-                  {showModifier ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
-                  <span>Modifier</span>
-                </button>
-                <button className={styles.menuItem} onClick={onToggleSound}>
-                  {soundEnabled ? <Volume2 size={18} color="var(--md-sys-color-primary)" /> : <VolumeX size={18} />}
-                  <span>Sounds</span>
-                </button>
+                <button className={styles.menuItem} onClick={onCustomize}><Palette size={18} /> <span>Customize</span></button>
                 <button className={styles.menuItem} style={{ color: 'var(--md-sys-color-error)' }} onClick={onDeleteAll}><Trash2 size={18} /> <span>Clear All</span></button>
               </div>
             </motion.div>

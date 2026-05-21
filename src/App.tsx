@@ -10,7 +10,7 @@ import { Modal } from './components/Modal';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { dicePresets } from './utils/presets';
 import { generateId } from './utils/diceUtils';
-import { Trash2, FileUp, FileDown } from 'lucide-react';
+import { Trash2, FileUp, FileDown, Volume2, VolumeX, ToggleLeft, ToggleRight } from 'lucide-react';
 import { playRollSound } from './utils/soundEffects';
 import type { DiceData } from './types';
 
@@ -63,7 +63,7 @@ function App() {
   }, [soundEnabled]);
 
   // Modals state
-  const [modalOpen, setModalOpen] = useState<'help' | 'history' | 'sets' | 'themes' | null>(null);
+  const [modalOpen, setModalOpen] = useState<'help' | 'history' | 'sets' | 'customize' | null>(null);
 
   useEffect(() => {
     // Remove old theme classes, then add the current one
@@ -357,15 +357,12 @@ function App() {
         onHelp={() => setModalOpen('help')}
         onHistory={() => setModalOpen('history')}
         onSets={() => setModalOpen('sets')}
-        onThemes={() => setModalOpen('themes')}
+        onCustomize={() => setModalOpen('customize')}
         onDeleteAll={handleDeleteAll}
         onSave={handleSave}
         onShare={handleShare}
         onSetDefault={handleSetDefault}
-        showModifier={showModifier}
-        onToggleModifier={() => setShowModifier(!showModifier)}
-        soundEnabled={soundEnabled}
-        onToggleSound={() => setSoundEnabled(!soundEnabled)}
+        onLoad={() => setModalOpen('sets')}
       />
 
       <ActionBar
@@ -511,37 +508,75 @@ function App() {
         </div>
       </Modal>
 
-      {/* Themes Modal */}
-      <Modal isOpen={modalOpen === 'themes'} onClose={() => setModalOpen(null)} title="App Themes">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <button 
-            className={`md-card ${styles.setCard}`} 
-            style={{ backgroundColor: '#1E1E1E', color: '#FFF', border: theme === 'theme-dark' ? '2px solid #A8C7FA' : 'none' }}
-            onClick={() => { setTheme('theme-dark'); setModalOpen(null); setMenuOpen(false); }}
-          >
-            Default Dark
-          </button>
-          <button 
-            className={`md-card ${styles.setCard}`} 
-            style={{ backgroundColor: '#F0F0F0', color: '#000', border: theme === 'theme-light' ? '2px solid #0056D2' : 'none' }}
-            onClick={() => { setTheme('theme-light'); setModalOpen(null); setMenuOpen(false); }}
-          >
-            Clean Light
-          </button>
-          <button 
-            className={`md-card ${styles.setCard}`} 
-            style={{ backgroundColor: '#1B4D3E', color: '#FFF', border: theme === 'theme-felt' ? '2px solid #FFD700' : 'none' }}
-            onClick={() => { setTheme('theme-felt'); setModalOpen(null); setMenuOpen(false); }}
-          >
-            Casino Felt
-          </button>
-          <button 
-            className={`md-card ${styles.setCard}`} 
-            style={{ backgroundColor: '#090B10', color: '#DFE0FF', border: theme === 'theme-midnight' ? '2px solid #8E99F3' : 'none' }}
-            onClick={() => { setTheme('theme-midnight'); setModalOpen(null); setMenuOpen(false); }}
-          >
-            Midnight
-          </button>
+      {/* Customize Modal (Themes + Sounds + Modifier) */}
+      <Modal isOpen={modalOpen === 'customize'} onClose={() => setModalOpen(null)} title="Customize App">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <h3 style={{ margin: '0 0 8px 0', fontSize: 16, fontWeight: 600 }}>Visual Themes</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <button 
+              className={`md-card ${styles.setCard}`} 
+              style={{ margin: 0, padding: '16px 8px', backgroundColor: '#1E1E1E', color: '#FFF', border: theme === 'theme-dark' ? '2px solid var(--md-sys-color-primary)' : 'none' }}
+              onClick={() => { setTheme('theme-dark'); }}
+            >
+              Default Dark
+            </button>
+            <button 
+              className={`md-card ${styles.setCard}`} 
+              style={{ margin: 0, padding: '16px 8px', backgroundColor: '#F0F0F0', color: '#000', border: theme === 'theme-light' ? '2px solid var(--md-sys-color-primary)' : 'none' }}
+              onClick={() => { setTheme('theme-light'); }}
+            >
+              Clean Light
+            </button>
+            <button 
+              className={`md-card ${styles.setCard}`} 
+              style={{ margin: 0, padding: '16px 8px', backgroundColor: '#1B4D3E', color: '#FFF', border: theme === 'theme-felt' ? '2px solid #FFD700' : 'none' }}
+              onClick={() => { setTheme('theme-felt'); }}
+            >
+              Casino Felt
+            </button>
+            <button 
+              className={`md-card ${styles.setCard}`} 
+              style={{ margin: 0, padding: '16px 8px', backgroundColor: '#090B10', color: '#DFE0FF', border: theme === 'theme-midnight' ? '2px solid #8E99F3' : 'none' }}
+              onClick={() => { setTheme('theme-midnight'); }}
+            >
+              Midnight
+            </button>
+          </div>
+
+          <h3 style={{ margin: '16px 0 8px 0', fontSize: 16, fontWeight: 600, borderTop: '1px solid var(--md-sys-color-outline-variant)', paddingTop: 16 }}>Preferences</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Sound Toggle Row */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontWeight: 600, fontSize: 15 }}>Sound Effects</span>
+                <span style={{ fontSize: 13, color: 'var(--md-sys-color-on-surface-variant)' }}>Play synthesized rolling rattles & landing thuds</span>
+              </div>
+              <button 
+                className="md-icon-button"
+                onClick={() => setSoundEnabled(!soundEnabled)}
+                title={soundEnabled ? "Mute Sounds" : "Unmute Sounds"}
+                style={{ padding: 8, borderRadius: '50%', background: soundEnabled ? 'var(--md-sys-color-primary-container)' : 'var(--md-sys-color-surface-variant)' }}
+              >
+                {soundEnabled ? <Volume2 size={20} color="var(--md-sys-color-on-primary-container)" /> : <VolumeX size={20} />}
+              </button>
+            </div>
+
+            {/* Modifier Toggle Row */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontWeight: 600, fontSize: 15 }}>Roll Modifier</span>
+                <span style={{ fontSize: 13, color: 'var(--md-sys-color-on-surface-variant)' }}>Show mathematical offset adder bar</span>
+              </div>
+              <button 
+                className="md-icon-button"
+                onClick={() => setShowModifier(!showModifier)}
+                title={showModifier ? "Hide Modifier" : "Show Modifier"}
+                style={{ padding: 8, borderRadius: '50%', background: showModifier ? 'var(--md-sys-color-primary-container)' : 'var(--md-sys-color-surface-variant)' }}
+              >
+                {showModifier ? <ToggleRight size={20} color="var(--md-sys-color-on-primary-container)" /> : <ToggleLeft size={20} />}
+              </button>
+            </div>
+          </div>
         </div>
       </Modal>
 
