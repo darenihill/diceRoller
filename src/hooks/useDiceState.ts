@@ -150,7 +150,7 @@ export const useDiceState = () => {
         details
       }, ...h]);
       setIsRolling(false);
-    }, 3200);
+    }, 800);
   }, [diceList, modifier]);
 
   const clearHistory = useCallback(() => {
