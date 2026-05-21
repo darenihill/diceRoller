@@ -1,0 +1,3 @@
+# AI Development Rules
+
+* **Git Push Safety**: Always wait for the user's explicit personal sign-off and approval on local testing before running any `git push` commands. Never attempt to push commits to a remote repository automatically.
