@@ -29,15 +29,6 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
       return;
     }
 
-    // Set initial random shuffle face immediately so it starts animate cycle right away
-    if (dice.customFaces.length > 0) {
-      const idx = Math.floor(Math.random() * dice.customFaces.length);
-      setTempFaceIndex(idx);
-    } else {
-      const val = Math.floor(Math.random() * dice.faces) + 1;
-      setTempValue(val);
-    }
-
     const intervalId = setInterval(() => {
       if (dice.customFaces.length > 0) {
         const idx = Math.floor(Math.random() * dice.customFaces.length);
@@ -46,7 +37,7 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
         const val = Math.floor(Math.random() * dice.faces) + 1;
         setTempValue(val);
       }
-    }, 120); // Syncs beautifully with the 4 direction shifts of the 500ms shake
+    }, 125); // Ticks precisely at 125ms (Max Left), 250ms (Max Right), and 375ms (Max Left)
 
     return () => clearInterval(intervalId);
   }, [isRolling, dice.held, dice.faces, dice.customFaces]);
