@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './SidebarMenu.module.css';
-import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Download, ChevronUp, ChevronDown, Share2, Palette, Pin } from 'lucide-react';
+import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Download, ChevronUp, ChevronDown, Share2, Palette, Pin, ToggleLeft, ToggleRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface SidebarMenuProps {
@@ -17,10 +17,12 @@ interface SidebarMenuProps {
   onShare: () => void;
   onSetDefault: () => void;
   onLoad: () => void;
+  showModifier: boolean;
+  onToggleModifier: () => void;
 }
 
 export const SidebarMenu: React.FC<SidebarMenuProps> = ({
-  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, onLoad
+  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, onLoad, showModifier, onToggleModifier
 }) => {
   return (
     <>
@@ -65,6 +67,10 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
                 <div className={styles.menuColumnHeader}>Tools</div>
                 <button className={styles.menuItem} onClick={onHistory}><History size={18} /> <span>History</span></button>
                 <button className={styles.menuItem} onClick={onCustomize}><Palette size={18} /> <span>Customize</span></button>
+                <button className={styles.menuItem} onClick={onToggleModifier}>
+                  {showModifier ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
+                  <span>Modifier</span>
+                </button>
                 <button className={styles.menuItem} style={{ color: 'var(--md-sys-color-error)' }} onClick={onDeleteAll}><Trash2 size={18} /> <span>Clear All</span></button>
               </div>
             </motion.div>

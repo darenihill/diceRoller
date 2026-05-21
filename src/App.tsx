@@ -363,6 +363,8 @@ function App() {
         onShare={handleShare}
         onSetDefault={handleSetDefault}
         onLoad={() => setModalOpen('sets')}
+        showModifier={showModifier}
+        onToggleModifier={() => setShowModifier(!showModifier)}
       />
 
       <ActionBar
