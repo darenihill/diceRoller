@@ -65,66 +65,85 @@ export const useDiceState = () => {
 
   const rollDice = useCallback(() => {
     setIsRolling(true);
-    setTimeout(() => {
-      let rollTotal = 0;
-      const details: string[] = [];
-      
-      const nextList = diceList.map(d => {
-        if (d.held) {
-          let val = d.numberValue;
-          let display = val.toString();
-          if (d.customFaces.length > 0) {
-            const idx = d.currentFaceIndex ?? 0;
-            const parsed = parseFaceContent(d.customFaces[idx]);
-            display = parsed.content;
-            if (!parsed.content.startsWith(FACE_ICON_PREFIX)) {
-              const num = parseInt(parsed.content);
-              if (!isNaN(num)) val = num;
-              else val = 0;
-            } else {
-              val = 0;
-            }
-          }
-          rollTotal += val;
-          if (d.name) details.push(`${d.name}: ${display}`);
-          return d;
-        }
-
-        let val = Math.floor(Math.random() * d.faces) + 1;
-        let idx = 0;
-        if (d.customFaces.length > 0) {
-          idx = Math.floor(Math.random() * d.customFaces.length);
-        }
-        
+    
+    let rollTotal = 0;
+    const details: string[] = [];
+    
+    // 1. Pre-calculate final targets immediately at 0ms
+    const targetList = diceList.map(d => {
+      if (d.held) {
+        let val = d.numberValue;
         let display = val.toString();
         if (d.customFaces.length > 0) {
+          const idx = d.currentFaceIndex ?? 0;
           const parsed = parseFaceContent(d.customFaces[idx]);
           display = parsed.content;
-          if (parsed.content.startsWith(FACE_ICON_PREFIX)) {
-            val = 0;
-          } else {
+          if (!parsed.content.startsWith(FACE_ICON_PREFIX)) {
             const num = parseInt(parsed.content);
             if (!isNaN(num)) val = num;
             else val = 0;
+          } else {
+            val = 0;
           }
         }
-        
         rollTotal += val;
         if (d.name) details.push(`${d.name}: ${display}`);
-
         return {
           ...d,
-          numberValue: val,
-          currentFaceIndex: idx
+          targetValue: val,
+          targetFaceIndex: d.currentFaceIndex
         };
-      });
-
-      const finalTotal = rollTotal + modifier;
-      if (modifier !== 0) {
-        details.push(`Modifier: ${modifier > 0 ? '+' : ''}${modifier}`);
       }
 
-      setDiceList(nextList);
+      let val = Math.floor(Math.random() * d.faces) + 1;
+      let idx = 0;
+      if (d.customFaces.length > 0) {
+        idx = Math.floor(Math.random() * d.customFaces.length);
+      }
+      
+      let display = val.toString();
+      if (d.customFaces.length > 0) {
+        const parsed = parseFaceContent(d.customFaces[idx]);
+        display = parsed.content;
+        if (parsed.content.startsWith(FACE_ICON_PREFIX)) {
+          val = 0;
+        } else {
+          const num = parseInt(parsed.content);
+          if (!isNaN(num)) val = num;
+          else val = 0;
+        }
+      }
+      
+      rollTotal += val;
+      if (d.name) details.push(`${d.name}: ${display}`);
+
+      return {
+        ...d,
+        targetValue: val,
+        targetFaceIndex: idx
+      };
+    });
+
+    const finalTotal = rollTotal + modifier;
+    if (modifier !== 0) {
+      details.push(`Modifier: ${modifier > 0 ? '+' : ''}${modifier}`);
+    }
+
+    // Set the list with target values immediately so the shuffling components know the landing targets
+    setDiceList(targetList);
+
+    // 2. Set timeout to finalize and reveal history
+    setTimeout(() => {
+      setDiceList(prev => prev.map(d => {
+        return {
+          ...d,
+          numberValue: d.targetValue ?? d.numberValue,
+          currentFaceIndex: d.targetFaceIndex ?? d.currentFaceIndex,
+          targetValue: undefined,
+          targetFaceIndex: undefined
+        };
+      }));
+
       setRollHistory(h => [{
         id: generateId(),
         total: finalTotal,

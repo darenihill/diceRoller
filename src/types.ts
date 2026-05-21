@@ -7,6 +7,8 @@ export interface DiceData {
   customFaces: string[];
   color: string;
   held: boolean;
+  targetValue?: number;
+  targetFaceIndex?: number;
 }
 
 export interface DiceConfig {

@@ -29,18 +29,34 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
       return;
     }
 
+    let tickCount = 0;
+
     const intervalId = setInterval(() => {
-      if (dice.customFaces.length > 0) {
-        const idx = Math.floor(Math.random() * dice.customFaces.length);
-        setTempFaceIndex(idx);
+      tickCount++;
+      
+      if (tickCount === 3) {
+        // 3rd peak (Max Left peak before settling): reveal the predetermined target value!
+        if (dice.targetValue !== undefined) {
+          if (dice.customFaces.length > 0 && dice.targetFaceIndex !== undefined) {
+            setTempFaceIndex(dice.targetFaceIndex);
+          } else {
+            setTempValue(dice.targetValue);
+          }
+        }
       } else {
-        const val = Math.floor(Math.random() * dice.faces) + 1;
-        setTempValue(val);
+        // T1 and T2: show standard random faces
+        if (dice.customFaces.length > 0) {
+          const idx = Math.floor(Math.random() * dice.customFaces.length);
+          setTempFaceIndex(idx);
+        } else {
+          const val = Math.floor(Math.random() * dice.faces) + 1;
+          setTempValue(val);
+        }
       }
     }, 800); // Ticks precisely at 800ms (Max Left), 1600ms (Max Right), and 2400ms (Max Left)
 
     return () => clearInterval(intervalId);
-  }, [isRolling, dice.held, dice.faces, dice.customFaces]);
+  }, [isRolling, dice.held, dice.faces, dice.customFaces, dice.targetValue, dice.targetFaceIndex]);
 
   const getDisplayText = () => {
     if (isRolling && !dice.held) {
