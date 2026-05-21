@@ -150,7 +150,32 @@ function App() {
     const autosave = getSystemAutosave();
     if (autosave && autosave.config.length > 0) {
       setDiceList(autosave.config.map(d => ({ ...d, id: generateId() })));
+      return;
     }
+
+    // Default to 2 basic dice if the app has never been used / no configs exist
+    setDiceList([
+      {
+        id: generateId(),
+        numberValue: 1,
+        faces: 6,
+        currentFaceIndex: 0,
+        name: '',
+        customFaces: [],
+        color: '#E9EAEC',
+        held: false
+      },
+      {
+        id: generateId(),
+        numberValue: 1,
+        faces: 6,
+        currentFaceIndex: 0,
+        name: '',
+        customFaces: [],
+        color: '#E9EAEC',
+        held: false
+      }
+    ]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
