@@ -105,7 +105,7 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
           rotate: [0, -45, 10, 0],
           color: dice.held ? "#FFD700" : "#FFFFFF"
         }}
-        transition={{ duration: 0.5, ease: "easeInOut" } as any}
+        transition={{ duration: 0.5, ease: "easeInOut" }}
         className={`${styles.actionBtn} ${dice.held ? styles.holdIcon : styles.unlockIcon}`}
       >
         <div style={{ position: 'relative', width: 20, height: 20 }}>

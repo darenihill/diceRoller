@@ -11,6 +11,8 @@ import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { dicePresets } from './utils/presets';
 import { generateId } from './utils/diceUtils';
 import { Trash2 } from 'lucide-react';
+import { playRollSound } from './utils/soundEffects';
+import type { DiceData } from './types';
 
 function App() {
   const {
@@ -53,6 +55,12 @@ function App() {
   useEffect(() => {
     localStorage.setItem('showModifier', String(showModifier));
   }, [showModifier]);
+
+  const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('soundEnabled') !== 'false');
+
+  useEffect(() => {
+    localStorage.setItem('soundEnabled', String(soundEnabled));
+  }, [soundEnabled]);
 
   // Modals state
   const [modalOpen, setModalOpen] = useState<'help' | 'history' | 'sets' | 'themes' | null>(null);
@@ -102,7 +110,7 @@ function App() {
         if (json) {
           const parsed = JSON.parse(json);
           if (Array.isArray(parsed)) {
-            setDiceList(parsed.map((d: any) => ({ ...d, id: generateId() })));
+            setDiceList(parsed.map((d: DiceData) => ({ ...d, id: generateId() })));
             // Remove hash from URL so it doesn't persist on reload
             window.history.replaceState(null, '', window.location.pathname + window.location.search);
             return;
@@ -118,7 +126,7 @@ function App() {
       try {
         const parsed = JSON.parse(defaultSet);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setDiceList(parsed.map((d: any) => ({ ...d, id: generateId() })));
+          setDiceList(parsed.map((d: DiceData) => ({ ...d, id: generateId() })));
           return;
         }
       } catch (e) {
@@ -130,6 +138,7 @@ function App() {
     if (autosave && autosave.config.length > 0) {
       setDiceList(autosave.config.map(d => ({ ...d, id: generateId() })));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Save autosave on unload
@@ -197,8 +206,17 @@ function App() {
     }
   };
 
-  const handleLoadSet = (config: any) => {
-    setDiceList(config.map((d: any) => ({ ...d, id: generateId() })));
+  const handleLoadSet = (config: Partial<DiceData>[]) => {
+    setDiceList(config.map((d) => ({
+      id: d.id || generateId(),
+      numberValue: d.numberValue ?? 1,
+      faces: d.faces ?? 6,
+      currentFaceIndex: d.currentFaceIndex,
+      name: d.name,
+      customFaces: d.customFaces ?? [],
+      color: d.color ?? '#E9EAEC',
+      held: d.held ?? false
+    })));
     setModalOpen(null);
     setMenuOpen(false);
   };
@@ -247,6 +265,73 @@ function App() {
     setMenuOpen(false);
   };
 
+  const handleExportData = () => {
+    try {
+      const data = {
+        version: "1.0",
+        configs: JSON.parse(localStorage.getItem('diceConfigs') || '{}'),
+        defaultSet: JSON.parse(localStorage.getItem('defaultDiceSet') || '[]'),
+        rollHistory: JSON.parse(localStorage.getItem('rollHistory') || '[]'),
+        theme: localStorage.getItem('appTheme') || 'theme-dark',
+        soundEnabled: localStorage.getItem('soundEnabled') !== 'false'
+      };
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `diceroller_backup.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      showToast('Exported backup successfully!');
+    } catch (e) {
+      console.error(e);
+      showToast('Failed to export backup.');
+    }
+  };
+
+  const handleImportData = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target?.result as string);
+        if (data && typeof data === 'object') {
+          if (data.configs) {
+            const currentConfigs = JSON.parse(localStorage.getItem('diceConfigs') || '{}');
+            const mergedConfigs = { ...currentConfigs, ...data.configs };
+            localStorage.setItem('diceConfigs', JSON.stringify(mergedConfigs));
+          }
+          if (data.defaultSet) {
+            localStorage.setItem('defaultDiceSet', JSON.stringify(data.defaultSet));
+          }
+          if (data.rollHistory) {
+            localStorage.setItem('rollHistory', JSON.stringify(data.rollHistory));
+          }
+          if (data.theme) {
+            localStorage.setItem('appTheme', data.theme);
+          }
+          if (data.soundEnabled !== undefined) {
+            localStorage.setItem('soundEnabled', String(data.soundEnabled));
+          }
+          
+          showToast('Imported backup successfully! Reloading...');
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          showToast('Invalid backup file structure.');
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Failed to parse backup file.');
+      }
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <div className={styles.app} style={{ paddingBottom: showModifier ? '360px' : '120px' }}>
       <div ref={containerRef} className={styles.diceContainer} style={diceStyles}>
@@ -280,11 +365,20 @@ function App() {
         onSetDefault={handleSetDefault}
         showModifier={showModifier}
         onToggleModifier={() => setShowModifier(!showModifier)}
+        soundEnabled={soundEnabled}
+        onToggleSound={() => setSoundEnabled(!soundEnabled)}
+        onExport={handleExportData}
+        onImport={handleImportData}
       />
 
       <ActionBar
         onAdd={addDice}
-        onRoll={rollDice}
+        onRoll={() => {
+          rollDice();
+          if (soundEnabled) {
+            playRollSound();
+          }
+        }}
         onHoldAll={toggleHoldAll}
         allHeld={allHeld}
         totalVisible={totalVisible}

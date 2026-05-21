@@ -3,12 +3,34 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#121212" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dice Roller</title>
-    <meta name="description" content="A web app for rolling customizable virtual dice with various faces and colors">
+    <meta name="description" content="Roll completely customizable virtual dice, choose colors, set custom values, icons, and share your dice presets instantly!">
+
+    <!-- Open Graph / Discord / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Dice Roller - Customizable Virtual Dice" />
+    <meta property="og:description" content="Roll completely customizable virtual dice, choose colors, set custom values, icons, and share your dice presets instantly!" />
+    <meta property="og:image" content="/og-image.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="Dice Roller - Customizable Virtual Dice" />
+    <meta property="twitter:description" content="Roll completely customizable virtual dice, choose colors, set custom values, icons, and share your dice presets instantly!" />
+    <meta property="twitter:image" content="/og-image.png" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .catch(err => console.log('Service Worker registration failed:', err));
+        });
+      }
+    </script>
   </body>
 </html>

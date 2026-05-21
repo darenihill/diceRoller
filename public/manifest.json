@@ -1,0 +1,17 @@
+{
+  "short_name": "Dice Roller",
+  "name": "Dice Roller - Customizable Virtual Dice",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "display": "standalone",
+  "orientation": "any"
+}

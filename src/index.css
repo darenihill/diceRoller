@@ -164,16 +164,45 @@ button {
   border-radius: 4px;
 }
 
-/* Shake Animation */
-@keyframes shake {
-  0% { transform: translateX(0) rotate(0deg); }
-  25% { transform: translateX(-8px) rotate(-8deg); }
-  50% { transform: translateX(8px) rotate(8deg); }
-  75% { transform: translateX(-8px) rotate(-8deg); }
-  100% { transform: translateX(0) rotate(0deg); }
+/* Premium 3D Tumbling Roll Animation */
+@keyframes dynamicRoll3D {
+  0% {
+    transform: scale(1) rotate(0deg) translate3d(0, 0, 0);
+    filter: brightness(1);
+  }
+  15% {
+    transform: scale(1.15) rotate(45deg) translate3d(-10px, -15px, 20px);
+    filter: brightness(1.2);
+  }
+  30% {
+    transform: scale(0.9) rotate(-90deg) translate3d(15px, 10px, -10px);
+    filter: brightness(0.85);
+  }
+  45% {
+    transform: scale(1.1) rotate(180deg) translate3d(-8px, -5px, 15px);
+    filter: brightness(1.1);
+  }
+  60% {
+    transform: scale(0.95) rotate(270deg) translate3d(10px, -8px, -5px);
+    filter: brightness(0.9);
+  }
+  75% {
+    transform: scale(1.05) rotate(315deg) translate3d(-5px, 8px, 10px);
+    filter: brightness(1.05);
+  }
+  90% {
+    transform: scale(0.98) rotate(350deg) translate3d(2px, -2px, -2px);
+    filter: brightness(0.98);
+  }
+  100% {
+    transform: scale(1) rotate(360deg) translate3d(0, 0, 0);
+    filter: brightness(1);
+  }
 }
 
 .dice-shake {
-  animation: shake 0.5s ease-in-out;
+  animation: dynamicRoll3D 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  transform-style: preserve-3d;
+  perspective: 1000px;
   transform-origin: center;
 }

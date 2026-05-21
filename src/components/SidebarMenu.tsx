@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './SidebarMenu.module.css';
-import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Download, ChevronUp, ChevronDown, Share2, Palette, ToggleLeft, ToggleRight, Pin } from 'lucide-react';
+import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Download, ChevronUp, ChevronDown, Share2, Palette, ToggleLeft, ToggleRight, Pin, FileUp, FileDown, Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface SidebarMenuProps {
@@ -19,10 +19,14 @@ interface SidebarMenuProps {
   onSetDefault: () => void;
   showModifier: boolean;
   onToggleModifier: () => void;
+  soundEnabled: boolean;
+  onToggleSound: () => void;
+  onExport: () => void;
+  onImport: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const SidebarMenu: React.FC<SidebarMenuProps> = ({
-  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onSets, onThemes, onDeleteAll, onSave, onLoad, onShare, onSetDefault, showModifier, onToggleModifier
+  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onSets, onThemes, onDeleteAll, onSave, onLoad, onShare, onSetDefault, showModifier, onToggleModifier, soundEnabled, onToggleSound, onExport, onImport
 }) => {
   return (
     <>
@@ -61,6 +65,15 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
                 <button className={styles.menuItem} onClick={onSave}><Save size={18} /> <span>Save</span></button>
                 <button className={styles.menuItem} onClick={onLoad}><Download size={18} /> <span>Load</span></button>
                 <button className={styles.menuItem} onClick={onSetDefault} title="Pin as startup default"><Pin size={18} /> <span>Set Default</span></button>
+                <button className={styles.menuItem} onClick={onExport} title="Export games & settings"><FileDown size={18} /> <span>Export</span></button>
+                <button className={styles.menuItem} onClick={() => document.getElementById('import-backup-input')?.click()} title="Import games & settings"><FileUp size={18} /> <span>Import</span></button>
+                <input 
+                  type="file" 
+                  id="import-backup-input" 
+                  accept=".json" 
+                  onChange={onImport} 
+                  style={{ display: 'none' }} 
+                />
               </div>
 
               <div className={styles.menuColumn}>
@@ -70,6 +83,10 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
                 <button className={styles.menuItem} onClick={onToggleModifier}>
                   {showModifier ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
                   <span>Modifier</span>
+                </button>
+                <button className={styles.menuItem} onClick={onToggleSound}>
+                  {soundEnabled ? <Volume2 size={18} color="var(--md-sys-color-primary)" /> : <VolumeX size={18} />}
+                  <span>Sounds</span>
                 </button>
                 <button className={styles.menuItem} style={{ color: 'var(--md-sys-color-error)' }} onClick={onDeleteAll}><Trash2 size={18} /> <span>Clear All</span></button>
               </div>
