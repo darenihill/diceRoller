@@ -447,12 +447,15 @@ function App() {
             </>
           )}
 
-          <div className={styles.backupSection}>
-            <button className="md-button md-button-surface" onClick={handleExportData} title="Export games & settings to a backup file">
-              <FileDown size={18} style={{ marginRight: 8, verticalAlign: 'middle' }} /> Export Backup
+          <h3 style={{ marginTop: 24, borderTop: '1px solid var(--md-sys-color-outline-variant)', paddingTop: 16 }}>Backup</h3>
+          <div className={styles.setsGrid}>
+            <button className={`md-card ${styles.setCard}`} onClick={handleExportData} title="Export games & settings to a backup file" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+              <FileDown size={20} />
+              <span>Export Backup</span>
             </button>
-            <button className="md-button md-button-surface" onClick={() => document.getElementById('import-backup-input-modal')?.click()} title="Import games & settings from a backup file">
-              <FileUp size={18} style={{ marginRight: 8, verticalAlign: 'middle' }} /> Import Backup
+            <button className={`md-card ${styles.setCard}`} onClick={() => document.getElementById('import-backup-input-modal')?.click()} title="Import games & settings from a backup file" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+              <FileUp size={20} />
+              <span>Import Backup</span>
             </button>
             <input 
               type="file" 
