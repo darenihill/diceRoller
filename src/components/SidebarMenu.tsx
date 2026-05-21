@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './SidebarMenu.module.css';
-import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Download, ChevronUp, ChevronDown, Share2, Palette, ToggleLeft, ToggleRight, Pin, FileUp, FileDown, Volume2, VolumeX } from 'lucide-react';
+import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, ChevronUp, ChevronDown, Share2, Palette, ToggleLeft, ToggleRight, Pin, Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface SidebarMenuProps {
@@ -14,19 +14,16 @@ interface SidebarMenuProps {
   onThemes: () => void;
   onDeleteAll: () => void;
   onSave: () => void;
-  onLoad: () => void;
   onShare: () => void;
   onSetDefault: () => void;
   showModifier: boolean;
   onToggleModifier: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
-  onExport: () => void;
-  onImport: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const SidebarMenu: React.FC<SidebarMenuProps> = ({
-  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onSets, onThemes, onDeleteAll, onSave, onLoad, onShare, onSetDefault, showModifier, onToggleModifier, soundEnabled, onToggleSound, onExport, onImport
+  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onSets, onThemes, onDeleteAll, onSave, onShare, onSetDefault, showModifier, onToggleModifier, soundEnabled, onToggleSound
 }) => {
   return (
     <>
@@ -63,17 +60,7 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
                 <div className={styles.menuColumnHeader}>Saves</div>
                 <button className={styles.menuItem} onClick={onSets}><Dice6 size={18} /> <span>Games</span></button>
                 <button className={styles.menuItem} onClick={onSave}><Save size={18} /> <span>Save</span></button>
-                <button className={styles.menuItem} onClick={onLoad}><Download size={18} /> <span>Load</span></button>
                 <button className={styles.menuItem} onClick={onSetDefault} title="Pin as startup default"><Pin size={18} /> <span>Set Default</span></button>
-                <button className={styles.menuItem} onClick={onExport} title="Export games & settings"><FileDown size={18} /> <span>Export</span></button>
-                <button className={styles.menuItem} onClick={() => document.getElementById('import-backup-input')?.click()} title="Import games & settings"><FileUp size={18} /> <span>Import</span></button>
-                <input 
-                  type="file" 
-                  id="import-backup-input" 
-                  accept=".json" 
-                  onChange={onImport} 
-                  style={{ display: 'none' }} 
-                />
               </div>
 
               <div className={styles.menuColumn}>

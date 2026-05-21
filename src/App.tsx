@@ -10,7 +10,7 @@ import { Modal } from './components/Modal';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { dicePresets } from './utils/presets';
 import { generateId } from './utils/diceUtils';
-import { Trash2 } from 'lucide-react';
+import { Trash2, FileUp, FileDown } from 'lucide-react';
 import { playRollSound } from './utils/soundEffects';
 import type { DiceData } from './types';
 
@@ -360,15 +360,12 @@ function App() {
         onThemes={() => setModalOpen('themes')}
         onDeleteAll={handleDeleteAll}
         onSave={handleSave}
-        onLoad={() => setModalOpen('sets')}
         onShare={handleShare}
         onSetDefault={handleSetDefault}
         showModifier={showModifier}
         onToggleModifier={() => setShowModifier(!showModifier)}
         soundEnabled={soundEnabled}
         onToggleSound={() => setSoundEnabled(!soundEnabled)}
-        onExport={handleExportData}
-        onImport={handleImportData}
       />
 
       <ActionBar
@@ -450,6 +447,22 @@ function App() {
               </div>
             </>
           )}
+
+          <div className={styles.backupSection}>
+            <button className="md-button md-button-surface" onClick={handleExportData} title="Export games & settings to a backup file">
+              <FileDown size={18} style={{ marginRight: 8, verticalAlign: 'middle' }} /> Export Backup
+            </button>
+            <button className="md-button md-button-surface" onClick={() => document.getElementById('import-backup-input-modal')?.click()} title="Import games & settings from a backup file">
+              <FileUp size={18} style={{ marginRight: 8, verticalAlign: 'middle' }} /> Import Backup
+            </button>
+            <input 
+              type="file" 
+              id="import-backup-input-modal" 
+              accept=".json" 
+              onChange={handleImportData} 
+              style={{ display: 'none' }} 
+            />
+          </div>
         </div>
       </Modal>
 
