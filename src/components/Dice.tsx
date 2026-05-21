@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import type { DiceData } from '../types';
 import styles from './Dice.module.css';
 import { Lock, Unlock, Settings, X } from 'lucide-react';
@@ -19,7 +19,46 @@ interface DiceProps {
 export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isRevealed, onReveal, onToggleHold, onRemove, onOpenSettings }) => {
   const diceRef = useRef<HTMLDivElement>(null);
 
+  const [tempValue, setTempValue] = useState<number | null>(null);
+  const [tempFaceIndex, setTempFaceIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!isRolling || dice.held) {
+      setTempValue(null);
+      setTempFaceIndex(null);
+      return;
+    }
+
+    // Set initial random shuffle face immediately so it starts animate cycle right away
+    if (dice.customFaces.length > 0) {
+      const idx = Math.floor(Math.random() * dice.customFaces.length);
+      setTempFaceIndex(idx);
+    } else {
+      const val = Math.floor(Math.random() * dice.faces) + 1;
+      setTempValue(val);
+    }
+
+    const intervalId = setInterval(() => {
+      if (dice.customFaces.length > 0) {
+        const idx = Math.floor(Math.random() * dice.customFaces.length);
+        setTempFaceIndex(idx);
+      } else {
+        const val = Math.floor(Math.random() * dice.faces) + 1;
+        setTempValue(val);
+      }
+    }, 120); // Syncs beautifully with the 4 direction shifts of the 500ms shake
+
+    return () => clearInterval(intervalId);
+  }, [isRolling, dice.held, dice.faces, dice.customFaces]);
+
   const getDisplayText = () => {
+    if (isRolling && !dice.held) {
+      if (dice.customFaces.length > 0 && tempFaceIndex !== null) {
+        return dice.customFaces[tempFaceIndex];
+      } else if (tempValue !== null) {
+        return tempValue.toString();
+      }
+    }
     if (dice.customFaces.length > 0) {
       return dice.customFaces[dice.currentFaceIndex ?? 0];
     }
