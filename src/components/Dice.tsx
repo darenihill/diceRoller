@@ -37,7 +37,7 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
         const val = Math.floor(Math.random() * dice.faces) + 1;
         setTempValue(val);
       }
-    }, 125); // Ticks precisely at 125ms (Max Left), 250ms (Max Right), and 375ms (Max Left)
+    }, 200); // Ticks precisely at 200ms (Max Left), 400ms (Max Right), and 600ms (Max Left)
 
     return () => clearInterval(intervalId);
   }, [isRolling, dice.held, dice.faces, dice.customFaces]);

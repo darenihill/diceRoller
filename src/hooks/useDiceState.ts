@@ -134,7 +134,7 @@ export const useDiceState = () => {
         return nextList;
       });
       setIsRolling(false);
-    }, 500);
+    }, 800);
   }, [modifier]);
 
   const clearHistory = useCallback(() => {
