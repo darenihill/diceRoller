@@ -11,7 +11,7 @@ import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { dicePresets } from './utils/presets';
 import { generateId } from './utils/diceUtils';
 import { Trash2, FileUp, FileDown, Volume2, VolumeX, ToggleLeft, ToggleRight } from 'lucide-react';
-import { playRollSound } from './utils/soundEffects';
+import { playRattleSound, playThudSound } from './utils/soundEffects';
 import type { DiceData } from './types';
 
 function App() {
@@ -56,11 +56,24 @@ function App() {
     localStorage.setItem('showModifier', String(showModifier));
   }, [showModifier]);
 
-  const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('soundEnabled') !== 'false');
+  const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('soundEnabled') === 'true');
 
   useEffect(() => {
     localStorage.setItem('soundEnabled', String(soundEnabled));
   }, [soundEnabled]);
+
+  const soundTimersRef = useRef<number[]>([]);
+
+  const clearSoundTimers = () => {
+    soundTimersRef.current.forEach(timerId => clearTimeout(timerId));
+    soundTimersRef.current = [];
+  };
+
+  useEffect(() => {
+    return () => {
+      soundTimersRef.current.forEach(timerId => clearTimeout(timerId));
+    };
+  }, []);
 
   // Modals state
   const [modalOpen, setModalOpen] = useState<'help' | 'history' | 'sets' | 'customize' | null>(null);
@@ -273,7 +286,7 @@ function App() {
         defaultSet: JSON.parse(localStorage.getItem('defaultDiceSet') || '[]'),
         rollHistory: JSON.parse(localStorage.getItem('rollHistory') || '[]'),
         theme: localStorage.getItem('appTheme') || 'theme-dark',
-        soundEnabled: localStorage.getItem('soundEnabled') !== 'false'
+        soundEnabled: localStorage.getItem('soundEnabled') === 'true'
       };
       const json = JSON.stringify(data, null, 2);
       const blob = new Blob([json], { type: 'application/json' });
@@ -370,9 +383,35 @@ function App() {
       <ActionBar
         onAdd={addDice}
         onRoll={() => {
+          const hasUnheldDice = diceList.some(d => !d.held);
           rollDice();
-          if (soundEnabled) {
-            playRollSound();
+          if (soundEnabled && hasUnheldDice && diceList.length > 0) {
+            clearSoundTimers();
+            
+            // Play rattle immediately at 0ms
+            playRattleSound();
+            
+            // T1: 200ms
+            const t1 = window.setTimeout(() => {
+              playRattleSound();
+            }, 200);
+
+            // T2: 400ms
+            const t2 = window.setTimeout(() => {
+              playRattleSound();
+            }, 400);
+
+            // T3: 600ms
+            const t3 = window.setTimeout(() => {
+              playRattleSound();
+            }, 600);
+
+            // Land: 800ms
+            const t4 = window.setTimeout(() => {
+              playThudSound();
+            }, 800);
+
+            soundTimersRef.current = [t1, t2, t3, t4];
           }
         }}
         onHoldAll={toggleHoldAll}
