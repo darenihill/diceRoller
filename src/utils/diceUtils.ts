@@ -86,8 +86,8 @@ export function calculateGridDimensions(
 
   if (diceCount > 0 && containerWidth > 0 && containerHeight > 0) {
     let maxDieSize = 0;
-    const safeWidth = Math.max(0, containerWidth - 24);
-    const safeHeight = Math.max(0, containerHeight - 24);
+    const safeWidth = Math.max(0, containerWidth - 36);
+    const safeHeight = Math.max(0, containerHeight - 36);
 
     for (let c = 1; c <= diceCount; c++) {
       const r = Math.ceil(diceCount / c);

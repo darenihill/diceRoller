@@ -123,3 +123,9 @@
   from { opacity: 0; transform: translate(-50%, -20px); }
   to { opacity: 1; transform: translate(-50%, 0); }
 }
+
+@media (max-width: 768px) {
+  .diceContainer {
+    padding-bottom: 96px !important; /* Reserve spacing for bottom action buttons on mobile */
+  }
+}
