@@ -50,11 +50,6 @@ export function getContrastColor(hex: string): string {
   return getColorBrightness(hex) > 125 ? '#000000' : '#FFFFFF';
 }
 
-/** Returns true if the hex color is perceptually light. */
-export function isLightColor(hex: string): boolean {
-  return getColorBrightness(hex) > 186;
-}
-
 export const COLORS = [
   "#E9EAEC", // white
   "#C0C0C0", // gray
@@ -68,3 +63,47 @@ export const COLORS = [
   "#FF69B4", // pink
   "#AA5518"  // brown
 ];
+
+export interface GridDimensions {
+  optimalSize: number;
+  optimalColumns: number;
+  dynamicGap: number;
+}
+
+/**
+ * Calculates optimal dice size, columns, and gaps based on container dimensions
+ * and the number of dice currently active.
+ */
+export function calculateGridDimensions(
+  diceCount: number,
+  containerWidth: number,
+  containerHeight: number
+): GridDimensions {
+  let optimalSize = 0;
+  let optimalColumns = 1;
+  let dynamicGap = 0;
+  const GAP_RATIO = 0.10; // 10% gap ratio
+
+  if (diceCount > 0 && containerWidth > 0 && containerHeight > 0) {
+    let maxDieSize = 0;
+    const safeWidth = Math.max(0, containerWidth - 24);
+    const safeHeight = Math.max(0, containerHeight - 24);
+
+    for (let c = 1; c <= diceCount; c++) {
+      const r = Math.ceil(diceCount / c);
+      const sizeW = safeWidth / (c + GAP_RATIO * (c - 1));
+      const sizeH = safeHeight / (r + GAP_RATIO * (r - 1));
+      const size = Math.min(sizeW, sizeH);
+
+      if (size > maxDieSize) {
+        maxDieSize = size;
+        optimalColumns = c;
+      }
+    }
+
+    optimalSize = Math.floor(Math.min(maxDieSize, 480));
+    dynamicGap = Math.floor(optimalSize * GAP_RATIO);
+  }
+
+  return { optimalSize, optimalColumns, dynamicGap };
+}

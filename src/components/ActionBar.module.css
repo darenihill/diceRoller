@@ -3,7 +3,7 @@
   bottom: 24px;
   right: 24px;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 16px;
   z-index: 100;
 }
@@ -22,6 +22,42 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.rollGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 156px;
+  align-items: flex-end;
+}
+
+.modifierColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.modifierBtn {
+  width: 72px;
+  height: 72px;
+  background-color: var(--md-sys-color-surface-variant);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: var(--elevation-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s, background-color 0.2s;
+}
+
+.modifierBtn:hover {
+  background-color: var(--md-sys-color-surface-hover);
+}
+
+.modifierBtnDisabled {
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 @media (max-width: 468px) {

@@ -9,7 +9,7 @@ import { SidebarMenu } from './components/SidebarMenu';
 import { Modal } from './components/Modal';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { dicePresets } from './utils/presets';
-import { generateId } from './utils/diceUtils';
+import { generateId, calculateGridDimensions } from './utils/diceUtils';
 import { Trash2, FileUp, FileDown, Volume2, VolumeX, ToggleLeft, ToggleRight } from 'lucide-react';
 import { playRattleSound, playThudSound } from './utils/soundEffects';
 import type { DiceData } from './types';
@@ -193,36 +193,12 @@ function App() {
   const totalVisible = rollHistory.length > 0;
   const lastTotal = totalVisible ? rollHistory[0].total : 0;
 
-  // Dice Size Calculation based on count
-  const diceCount = diceList.length;
-  let optimalSize = 0;
-  let optimalColumns = 1;
-  let dynamicGap = 0;
-  const GAP_RATIO = 0.10; // 10% gap relative to size ensures the 4% corner buttons never collide
-
-  if (diceCount > 0 && containerSize.width > 0 && containerSize.height > 0) {
-    let maxDieSize = 0;
-    
-    // Add a safety margin to account for absolute-positioned corner buttons and shadows
-    const safeWidth = Math.max(0, containerSize.width - 24);
-    const safeHeight = Math.max(0, containerSize.height - 24);
-    
-    for (let c = 1; c <= diceCount; c++) {
-      const r = Math.ceil(diceCount / c);
-      // Math: size * columns + size * gapRatio * (columns - 1) = available container width
-      const sizeW = safeWidth / (c + GAP_RATIO * (c - 1));
-      const sizeH = safeHeight / (r + GAP_RATIO * (r - 1));
-      const size = Math.min(sizeW, sizeH);
-      
-      if (size > maxDieSize) {
-        maxDieSize = size;
-        optimalColumns = c;
-      }
-    }
-    
-    optimalSize = Math.floor(Math.min(maxDieSize, 480));
-    dynamicGap = Math.floor(optimalSize * GAP_RATIO);
-  }
+  // Dice Size & Grid layout calculations extracted to utility
+  const { optimalSize, optimalColumns, dynamicGap } = calculateGridDimensions(
+    diceList.length,
+    containerSize.width,
+    containerSize.height
+  );
 
   const diceStyles = {
     '--dice-size': `${optimalSize}px`,

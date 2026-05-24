@@ -37,17 +37,21 @@ export function useStorage() {
   }, []);
 
   const getSystemAutosave = useCallback((): DiceConfig | null => {
-    const stored = localStorage.getItem('diceConfigs');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (parsed['systemAutosave']) {
-        const autosave = parsed['systemAutosave'];
-        // After loading autosave, we should delete it
-        delete parsed['systemAutosave'];
-        localStorage.setItem('diceConfigs', JSON.stringify(parsed));
-        setSavedConfigs(parsed);
-        return autosave;
+    try {
+      const stored = localStorage.getItem('diceConfigs');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed['systemAutosave']) {
+          const autosave = parsed['systemAutosave'];
+          // After loading autosave, we should delete it
+          delete parsed['systemAutosave'];
+          localStorage.setItem('diceConfigs', JSON.stringify(parsed));
+          setSavedConfigs(parsed);
+          return autosave;
+        }
       }
+    } catch (e) {
+      console.error("Failed to load system autosave", e);
     }
     return null;
   }, []);

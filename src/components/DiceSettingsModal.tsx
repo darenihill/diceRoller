@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { DiceData } from '../types';
 import { Modal } from './Modal';
-import { COLORS, FACE_BG_DELIMITER, FACE_ICON_PREFIX, parseFaceContent, isLightColor } from '../utils/diceUtils';
+import { COLORS, FACE_BG_DELIMITER, FACE_ICON_PREFIX, parseFaceContent, getContrastColor } from '../utils/diceUtils';
 import { X, Plus, Minus, Star, Check, Copy, Trash2, Palette } from 'lucide-react';
 import { ALL_ICONS, COMMON_ICONS } from '../utils/iconUtils';
 import styles from './DiceSettingsModal.module.css';
@@ -78,7 +78,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               <button 
                 onClick={(e) => { e.stopPropagation(); setActiveColorPicker({ type: 'base' }); }}
                 className={styles.colorSwatch}
-                style={{ backgroundColor: dice.color, color: isLightColor(dice.color) ? '#121212' : '#ffffff' }}
+                style={{ backgroundColor: dice.color, color: getContrastColor(dice.color) }}
                 title="Pick base color"
               >
                 <Palette size={20} strokeWidth={2} />
