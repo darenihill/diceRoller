@@ -1,0 +1,133 @@
+.sectionHeader {
+  margin: 16px 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+  padding-top: 16px;
+}
+
+.sectionHeaderFirst {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  padding-top: 0;
+  border-top: none;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formLabel {
+  font-size: 14px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.formInput {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--md-sys-color-outline, rgba(255, 255, 255, 0.2));
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.formInput:focus {
+  border-color: var(--md-sys-color-primary);
+}
+
+.formInputReadOnly {
+  background: var(--md-sys-color-surface-variant);
+  font-size: 14px;
+}
+
+.buttonRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.toggleLabelCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.toggleTitle {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.toggleDesc {
+  font-size: 13px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+/* Metrics Dashboard Styling */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.metricCard {
+  background-color: var(--md-sys-color-surface-variant);
+  padding: 16px 12px;
+  border-radius: var(--shape-medium);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+}
+
+.metricValue {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--md-sys-color-primary);
+  line-height: 1.1;
+}
+
+.metricLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.presetList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.presetRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: var(--md-sys-color-surface-variant);
+  border-radius: var(--shape-small);
+  font-size: 14px;
+}
+
+.presetName {
+  font-weight: 500;
+}
+
+.presetCount {
+  font-weight: 700;
+  color: var(--md-sys-color-primary);
+}

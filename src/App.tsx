@@ -6,13 +6,21 @@ import { useStorage } from './hooks/useStorage';
 import { Dice } from './components/Dice';
 import { ActionBar } from './components/ActionBar';
 import { SidebarMenu } from './components/SidebarMenu';
-import { Modal } from './components/Modal';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
-import { dicePresets } from './utils/presets';
 import { generateId, calculateGridDimensions } from './utils/diceUtils';
-import { Trash2, FileUp, FileDown, Volume2, VolumeX, ToggleLeft, ToggleRight } from 'lucide-react';
-import { playRattleSound, playThudSound } from './utils/soundEffects';
+import { playRollSequence } from './utils/soundEffects';
+import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import type { DiceData } from './types';
+
+// Decomposed Modals
+import { HelpModal } from './components/modals/HelpModal';
+import { HistoryModal } from './components/modals/HistoryModal';
+import { SetsModal } from './components/modals/SetsModal';
+import { CustomizeModal } from './components/modals/CustomizeModal';
+import { MetricsModal } from './components/modals/MetricsModal';
+import { SaveDialog } from './components/modals/SaveDialog';
+import { ConfirmDialog } from './components/modals/ConfirmDialog';
+import { ShareModal } from './components/modals/ShareModal';
 
 function App() {
   const {
@@ -62,24 +70,21 @@ function App() {
     localStorage.setItem('soundEnabled', String(soundEnabled));
   }, [soundEnabled]);
 
+  const [telemetryState, setTelemetryState] = useState(() => localStorage.getItem('telemetryEnabled') !== 'false');
+
   const soundTimersRef = useRef<number[]>([]);
 
-  const clearSoundTimers = () => {
-    soundTimersRef.current.forEach(timerId => clearTimeout(timerId));
-    soundTimersRef.current = [];
-  };
-
   useEffect(() => {
+    const timers = soundTimersRef.current;
     return () => {
-      soundTimersRef.current.forEach(timerId => clearTimeout(timerId));
+      timers.forEach(timerId => clearTimeout(timerId));
     };
   }, []);
 
   // Modals state
-  const [modalOpen, setModalOpen] = useState<'help' | 'history' | 'sets' | 'customize' | null>(null);
+  const [modalOpen, setModalOpen] = useState<'help' | 'history' | 'sets' | 'customize' | 'metrics' | null>(null);
 
   useEffect(() => {
-    // Remove old theme classes, then add the current one
     document.body.classList.remove('theme-dark', 'theme-light', 'theme-felt', 'theme-midnight');
     document.body.classList.add(theme);
     localStorage.setItem('appTheme', theme);
@@ -89,7 +94,7 @@ function App() {
     document.body.classList.toggle('menu-open', menuOpen);
   }, [menuOpen]);
 
-  // Auto-deselect active die on mobile after 5 seconds, or if any other button/area is clicked
+  // Auto-deselect active die on mobile after 5 seconds
   useEffect(() => {
     if (!revealedDiceId) return;
 
@@ -113,8 +118,10 @@ function App() {
     };
   }, [revealedDiceId]);
 
-  // Load shared config from URL or autosave on mount
+  // Load shared config from URL, default set, or autosave on mount & record session telemetry
   useEffect(() => {
+    recordSessionStart();
+
     const hash = window.location.hash;
     if (hash.startsWith('#share=')) {
       try {
@@ -124,7 +131,6 @@ function App() {
           const parsed = JSON.parse(json);
           if (Array.isArray(parsed)) {
             setDiceList(parsed.map((d: DiceData) => ({ ...d, id: generateId() })));
-            // Remove hash from URL so it doesn't persist on reload
             window.history.replaceState(null, '', window.location.pathname + window.location.search);
             return;
           }
@@ -153,7 +159,7 @@ function App() {
       return;
     }
 
-    // Default to 2 basic dice if the app has never been used / no configs exist
+    // Default to 2 basic dice if the app has never been used
     setDiceList([
       {
         id: generateId(),
@@ -193,7 +199,7 @@ function App() {
   const totalVisible = rollHistory.length > 0;
   const lastTotal = totalVisible ? rollHistory[0].total : 0;
 
-  // Dice Size & Grid layout calculations extracted to utility
+  // Dice Size & Grid layout calculations
   const { optimalSize, optimalColumns, dynamicGap } = calculateGridDimensions(
     diceList.length,
     containerSize.width,
@@ -215,12 +221,13 @@ function App() {
   const executeSave = () => {
     if (saveName.trim()) {
       saveConfig(saveName.trim(), diceList);
+      trackEvent('preset_saved', { name: saveName.trim(), diceCount: diceList.length });
       showToast('Saved!');
       setSavePromptOpen(false);
     }
   };
 
-  const handleLoadSet = (config: Partial<DiceData>[]) => {
+  const handleLoadSet = (config: Partial<DiceData>[], presetName?: string) => {
     setDiceList(config.map((d) => ({
       id: d.id || generateId(),
       numberValue: d.numberValue ?? 1,
@@ -231,6 +238,9 @@ function App() {
       color: d.color ?? '#E9EAEC',
       held: d.held ?? false
     })));
+    if (presetName) {
+      trackEvent('preset_loaded', { presetName });
+    }
     setModalOpen(null);
     setMenuOpen(false);
   };
@@ -266,6 +276,8 @@ function App() {
     const compressed = LZString.compressToEncodedURIComponent(json);
     const url = `${window.location.origin}${window.location.pathname}#share=${compressed}`;
     
+    trackEvent('share_link_copied', { diceCount: diceList.length });
+
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(url).then(() => {
         showToast("Share link copied to clipboard!");
@@ -297,6 +309,7 @@ function App() {
       link.download = `diceroller_backup.json`;
       link.click();
       URL.revokeObjectURL(url);
+      trackEvent('backup_exported');
       showToast('Exported backup successfully!');
     } catch (e) {
       console.error(e);
@@ -331,6 +344,7 @@ function App() {
             localStorage.setItem('soundEnabled', String(data.soundEnabled));
           }
           
+          trackEvent('backup_imported');
           showToast('Imported backup successfully! Reloading...');
           setTimeout(() => {
             window.location.reload();
@@ -344,6 +358,22 @@ function App() {
       }
     };
     reader.readAsText(file);
+  };
+
+  const handleAddDice = (template?: Partial<DiceData>) => {
+    addDice(template);
+    trackEvent('dice_added');
+  };
+
+  const handleSelectTheme = (newTheme: string) => {
+    setTheme(newTheme);
+    trackEvent('theme_changed', { theme: newTheme });
+  };
+
+  const handleToggleTelemetry = () => {
+    const nextState = !telemetryState;
+    setTelemetryState(nextState);
+    setTelemetryEnabled(nextState);
   };
 
   return (
@@ -372,47 +402,32 @@ function App() {
         onHistory={() => setModalOpen('history')}
         onSets={() => setModalOpen('sets')}
         onCustomize={() => setModalOpen('customize')}
+        onMetrics={() => setModalOpen('metrics')}
         onDeleteAll={handleDeleteAll}
         onSave={handleSave}
         onShare={handleShare}
         onSetDefault={handleSetDefault}
         onLoad={() => setModalOpen('sets')}
         showModifier={showModifier}
-        onToggleModifier={() => setShowModifier(!showModifier)}
+        onToggleModifier={() => {
+          const next = !showModifier;
+          setShowModifier(next);
+          trackEvent('modifier_toggled', { enabled: next });
+        }}
       />
 
       <ActionBar
-        onAdd={addDice}
+        onAdd={handleAddDice}
         onRoll={() => {
           const hasUnheldDice = diceList.some(d => !d.held);
           rollDice();
-          if (soundEnabled && hasUnheldDice && diceList.length > 0) {
-            clearSoundTimers();
-            
-            // Play rattle immediately at 0ms
-            playRattleSound();
-            
-            // T1: 200ms
-            const t1 = window.setTimeout(() => {
-              playRattleSound();
-            }, 200);
-
-            // T2: 400ms
-            const t2 = window.setTimeout(() => {
-              playRattleSound();
-            }, 400);
-
-            // T3: 600ms
-            const t3 = window.setTimeout(() => {
-              playRattleSound();
-            }, 600);
-
-            // Land: 800ms
-            const t4 = window.setTimeout(() => {
-              playThudSound();
-            }, 800);
-
-            soundTimersRef.current = [t1, t2, t3, t4];
+          
+          if (hasUnheldDice && diceList.length > 0) {
+            const unheldCount = diceList.filter(d => !d.held).length;
+            trackEvent('roll_dice', { diceCount: unheldCount, modifier });
+            if (soundEnabled) {
+              playRollSequence(soundTimersRef);
+            }
           }
         }}
         onHoldAll={toggleHoldAll}
@@ -424,206 +439,73 @@ function App() {
         onChangeModifier={setModifier}
       />
 
-      {/* Help Modal */}
-      <Modal isOpen={modalOpen === 'help'} onClose={() => setModalOpen(null)} title="Help & Guide">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, color: 'var(--md-sys-color-on-surface-variant)', fontSize: 14, lineHeight: 1.6 }}>
-          <p>Welcome to <strong>Dice Roller</strong>! Here is how to use the available features:</p>
-          <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <li><strong>Add / Roll Dice:</strong> Use the <code>+</code> button at the bottom to add dice, and the main button to roll all unheld dice.</li>
-            <li><strong>Hold individual dice:</strong> Simply click/tap any die to hold or release it. Held dice stay locked across rolls.</li>
-            <li><strong>Lock All:</strong> Toggle the Lock icon in the action bar to instantly hold or release all dice at once.</li>
-            <li><strong>Custom Faces:</strong> Click the gear icon on a die to open settings. You can add custom text, special icons, and pick custom background colors for each face.</li>
-            <li><strong>Games & Presets:</strong> Quickly load predefined configurations like <em>Cities & Knights</em> or <em>That's Pretty Clever</em>, or save and load your own custom games!</li>
-            <li><strong>Colorblind Friendly:</strong> Automatic contrast coloring ensures text and icons are perfectly readable against any background color.</li>
-          </ul>
-        </div>
-      </Modal>
+      {/* Decomposed Modals & Dialogs */}
+      <HelpModal 
+        isOpen={modalOpen === 'help'} 
+        onClose={() => setModalOpen(null)} 
+      />
 
-      {/* History Modal */}
-      <Modal isOpen={modalOpen === 'history'} onClose={() => setModalOpen(null)} title="Roll History">
-        {rollHistory.length === 0 ? (
-          <p>No History</p>
-        ) : (
-          <div className={styles.historyList}>
-            <button className="md-button md-button-surface" onClick={clearHistory}>Clear History</button>
-            {rollHistory.map((roll, i) => (
-              <div key={roll.id} className={styles.historyItem}>
-                <div className={styles.historyIndex}>Roll {rollHistory.length - i}</div>
-                <div className={styles.historyDetails}>{roll.details.join(', ')}</div>
-                <div className={styles.historyTotal}>Total: {roll.total}</div>
-              </div>
-            ))}
-          </div>
-        )}
-      </Modal>
+      <HistoryModal 
+        isOpen={modalOpen === 'history'} 
+        onClose={() => setModalOpen(null)} 
+        rollHistory={rollHistory}
+        onClearHistory={clearHistory}
+      />
 
-      {/* Sets Modal */}
-      <Modal isOpen={modalOpen === 'sets'} onClose={() => setModalOpen(null)} title="Games & Saves">
-        <div className={styles.setsContainer}>
-          <h3>Presets</h3>
-          <div className={styles.setsGrid}>
-            {dicePresets.map((preset) => (
-              <button key={preset.name} className={`md-card ${styles.setCard}`} onClick={() => handleLoadSet(preset.dice)}>
-                {preset.name}
-              </button>
-            ))}
-          </div>
+      <SetsModal 
+        isOpen={modalOpen === 'sets'} 
+        onClose={() => setModalOpen(null)} 
+        savedConfigs={savedConfigs}
+        onLoadSet={(config) => handleLoadSet(config)}
+        onDeleteConfig={deleteConfig}
+        onExportBackup={handleExportData}
+        onImportBackup={handleImportData}
+      />
 
-          {Object.keys(savedConfigs).filter(k => k !== 'systemAutosave').length > 0 && (
-            <>
-              <h3 style={{ marginTop: 24 }}>Your Saves</h3>
-              <div className={styles.setsGrid}>
-                {Object.values(savedConfigs).filter(c => c.name !== 'systemAutosave').map((config) => (
-                  <div key={config.name} className={`md-card ${styles.setCard} ${styles.saveCard}`}>
-                    <button className={styles.saveCardBtn} onClick={() => handleLoadSet(config.config)}>
-                      {config.name}
-                    </button>
-                    <button className="md-icon-button" onClick={(e) => { e.stopPropagation(); deleteConfig(config.name); }}>
-                      <Trash2 size={16} color="var(--md-sys-color-error)" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+      <CustomizeModal 
+        isOpen={modalOpen === 'customize'} 
+        onClose={() => setModalOpen(null)} 
+        theme={theme}
+        onSelectTheme={handleSelectTheme}
+        soundEnabled={soundEnabled}
+        onToggleSound={() => {
+          const next = !soundEnabled;
+          setSoundEnabled(next);
+          trackEvent('sound_toggled', { enabled: next });
+        }}
+        showModifier={showModifier}
+        onToggleModifier={() => {
+          const next = !showModifier;
+          setShowModifier(next);
+          trackEvent('modifier_toggled', { enabled: next });
+        }}
+        telemetryEnabled={telemetryState}
+        onToggleTelemetry={handleToggleTelemetry}
+      />
 
-          <h3 style={{ marginTop: 24, borderTop: '1px solid var(--md-sys-color-outline-variant)', paddingTop: 16 }}>Backup</h3>
-          <div className={styles.setsGrid}>
-            <button className={`md-card ${styles.setCard}`} onClick={handleExportData} title="Export games & settings to a backup file" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
-              <FileDown size={20} />
-              <span>Export Backup</span>
-            </button>
-            <button className={`md-card ${styles.setCard}`} onClick={() => document.getElementById('import-backup-input-modal')?.click()} title="Import games & settings from a backup file" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
-              <FileUp size={20} />
-              <span>Import Backup</span>
-            </button>
-            <input 
-              type="file" 
-              id="import-backup-input-modal" 
-              accept=".json" 
-              onChange={handleImportData} 
-              style={{ display: 'none' }} 
-            />
-          </div>
-        </div>
-      </Modal>
+      <MetricsModal 
+        isOpen={modalOpen === 'metrics'} 
+        onClose={() => setModalOpen(null)} 
+      />
 
-      {/* Custom Dialogs */}
-      <Modal isOpen={savePromptOpen} onClose={() => setSavePromptOpen(false)} title="Save Game">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <label style={{ fontSize: 14, color: 'var(--md-sys-color-on-surface-variant)' }}>Enter a name for this game:</label>
-          <input 
-            autoFocus
-            type="text" 
-            value={saveName} 
-            onChange={(e) => setSaveName(e.target.value)}
-            style={{ padding: 12, borderRadius: 8, border: '1px solid var(--md-sys-color-outline)', background: 'transparent', color: 'var(--md-sys-color-on-surface)', fontSize: 16 }}
-            onKeyDown={(e) => e.key === 'Enter' && executeSave()}
-          />
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
-            <button className="md-button md-button-surface" onClick={() => setSavePromptOpen(false)}>Cancel</button>
-            <button className="md-button md-button-primary" onClick={executeSave} disabled={!saveName.trim()}>Save</button>
-          </div>
-        </div>
-      </Modal>
+      <SaveDialog 
+        isOpen={savePromptOpen} 
+        onClose={() => setSavePromptOpen(false)} 
+        saveName={saveName}
+        onChangeSaveName={setSaveName}
+        onSave={executeSave}
+      />
 
-      <Modal isOpen={confirmDeleteOpen} onClose={() => setConfirmDeleteOpen(false)} title="Confirm Delete">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <p style={{ margin: 0, color: 'var(--md-sys-color-on-surface-variant)' }}>Are you sure you want to delete all dice?</p>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
-            <button className="md-button md-button-surface" onClick={() => setConfirmDeleteOpen(false)}>Cancel</button>
-            <button className="md-button" style={{ backgroundColor: 'var(--md-sys-color-error)', color: 'var(--md-sys-color-on-error)' }} onClick={executeDeleteAll}>Delete All</button>
-          </div>
-        </div>
-      </Modal>
+      <ConfirmDialog 
+        isOpen={confirmDeleteOpen} 
+        onClose={() => setConfirmDeleteOpen(false)} 
+        onConfirm={executeDeleteAll}
+      />
 
-      <Modal isOpen={!!shareFallbackUrl} onClose={() => setShareFallbackUrl(null)} title="Share Link">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <label style={{ fontSize: 14, color: 'var(--md-sys-color-on-surface-variant)' }}>Copy this link to share:</label>
-          <input 
-            type="text" 
-            readOnly
-            value={shareFallbackUrl || ''} 
-            style={{ padding: 12, borderRadius: 8, border: '1px solid var(--md-sys-color-outline)', background: 'var(--md-sys-color-surface-variant)', color: 'var(--md-sys-color-on-surface)', fontSize: 14 }}
-            onClick={(e) => (e.target as HTMLInputElement).select()}
-          />
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
-            <button className="md-button md-button-primary" onClick={() => setShareFallbackUrl(null)}>Done</button>
-          </div>
-        </div>
-      </Modal>
-
-      {/* Customize Modal (Themes + Sounds + Modifier) */}
-      <Modal isOpen={modalOpen === 'customize'} onClose={() => setModalOpen(null)} title="Customize App">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: 16, fontWeight: 600 }}>Visual Themes</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <button 
-              className={`md-card ${styles.setCard}`} 
-              style={{ margin: 0, padding: '16px 8px', backgroundColor: '#1E1E1E', color: '#FFF', border: theme === 'theme-dark' ? '2px solid var(--md-sys-color-primary)' : 'none' }}
-              onClick={() => { setTheme('theme-dark'); }}
-            >
-              Default Dark
-            </button>
-            <button 
-              className={`md-card ${styles.setCard}`} 
-              style={{ margin: 0, padding: '16px 8px', backgroundColor: '#F0F0F0', color: '#000', border: theme === 'theme-light' ? '2px solid var(--md-sys-color-primary)' : 'none' }}
-              onClick={() => { setTheme('theme-light'); }}
-            >
-              Clean Light
-            </button>
-            <button 
-              className={`md-card ${styles.setCard}`} 
-              style={{ margin: 0, padding: '16px 8px', backgroundColor: '#1B4D3E', color: '#FFF', border: theme === 'theme-felt' ? '2px solid #FFD700' : 'none' }}
-              onClick={() => { setTheme('theme-felt'); }}
-            >
-              Casino Felt
-            </button>
-            <button 
-              className={`md-card ${styles.setCard}`} 
-              style={{ margin: 0, padding: '16px 8px', backgroundColor: '#090B10', color: '#DFE0FF', border: theme === 'theme-midnight' ? '2px solid #8E99F3' : 'none' }}
-              onClick={() => { setTheme('theme-midnight'); }}
-            >
-              Midnight
-            </button>
-          </div>
-
-          <h3 style={{ margin: '16px 0 8px 0', fontSize: 16, fontWeight: 600, borderTop: '1px solid var(--md-sys-color-outline-variant)', paddingTop: 16 }}>Preferences</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {/* Sound Toggle Row */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontWeight: 600, fontSize: 15 }}>Sound Effects</span>
-                <span style={{ fontSize: 13, color: 'var(--md-sys-color-on-surface-variant)' }}>Play synthesized rolling rattles & landing thuds</span>
-              </div>
-              <button 
-                className="md-icon-button"
-                onClick={() => setSoundEnabled(!soundEnabled)}
-                title={soundEnabled ? "Mute Sounds" : "Unmute Sounds"}
-                style={{ padding: 8, borderRadius: '50%', background: soundEnabled ? 'var(--md-sys-color-primary-container)' : 'var(--md-sys-color-surface-variant)' }}
-              >
-                {soundEnabled ? <Volume2 size={20} color="var(--md-sys-color-on-primary-container)" /> : <VolumeX size={20} />}
-              </button>
-            </div>
-
-            {/* Modifier Toggle Row */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontWeight: 600, fontSize: 15 }}>Roll Modifier</span>
-                <span style={{ fontSize: 13, color: 'var(--md-sys-color-on-surface-variant)' }}>Show mathematical offset adder bar</span>
-              </div>
-              <button 
-                className="md-icon-button"
-                onClick={() => setShowModifier(!showModifier)}
-                title={showModifier ? "Hide Modifier" : "Show Modifier"}
-                style={{ padding: 8, borderRadius: '50%', background: showModifier ? 'var(--md-sys-color-primary-container)' : 'var(--md-sys-color-surface-variant)' }}
-              >
-                {showModifier ? <ToggleRight size={20} color="var(--md-sys-color-on-primary-container)" /> : <ToggleLeft size={20} />}
-              </button>
-            </div>
-          </div>
-        </div>
-      </Modal>
+      <ShareModal 
+        url={shareFallbackUrl} 
+        onClose={() => setShareFallbackUrl(null)} 
+      />
 
       {/* Toast Notification */}
       {toast && (
@@ -640,7 +522,7 @@ function App() {
           onClose={() => setEditingDiceId(null)}
           onUpdate={updateDice}
           onRemove={removeDice}
-          onClone={addDice}
+          onClone={handleAddDice}
         />
       )}
     </div>

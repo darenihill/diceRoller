@@ -76,3 +76,24 @@ export const playThudSound = () => {
     console.error("Failed to play synthesized thud sound:", e);
   }
 };
+
+/**
+ * Schedules a sequence of rattle clicks aligned with visual ticks (0ms, 200ms, 400ms, 600ms)
+ * followed by a final impact thud at 800ms when the dice land.
+ * Automatically clears any pending timers from previous rolls.
+ */
+export const playRollSequence = (soundTimersRef: React.MutableRefObject<number[]>) => {
+  // Clear any active timers
+  soundTimersRef.current.forEach(id => clearTimeout(id));
+  soundTimersRef.current = [];
+
+  // Play immediately at 0ms
+  playRattleSound();
+
+  const t1 = window.setTimeout(() => playRattleSound(), 200);
+  const t2 = window.setTimeout(() => playRattleSound(), 400);
+  const t3 = window.setTimeout(() => playRattleSound(), 600);
+  const t4 = window.setTimeout(() => playThudSound(), 800);
+
+  soundTimersRef.current = [t1, t2, t3, t4];
+};
