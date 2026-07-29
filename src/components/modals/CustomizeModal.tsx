@@ -15,7 +15,6 @@ interface CustomizeModalProps {
   onToggleModifier: () => void;
   telemetryEnabled: boolean;
   onToggleTelemetry: () => void;
-  onOpenMetrics?: () => void;
 }
 
 export const CustomizeModal: React.FC<CustomizeModalProps> = ({
@@ -29,7 +28,6 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
   onToggleModifier,
   telemetryEnabled,
   onToggleTelemetry,
-  onOpenMetrics,
 }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Customize App">
@@ -100,32 +98,20 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
             </button>
           </div>
 
-          {/* Usage Telemetry Privacy Toggle & Dashboard Access */}
+          {/* Usage Telemetry Privacy Toggle */}
           <div className={modalStyles.toggleRow}>
             <div className={modalStyles.toggleLabelCol}>
               <span className={modalStyles.toggleTitle}>Anonymous Page Metrics</span>
-              <span className={modalStyles.toggleDesc}>Record anonymous feature usage stats & session telemetry</span>
+              <span className={modalStyles.toggleDesc}>Allow recording anonymous usage stats & session telemetry</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              {onOpenMetrics && (
-                <button 
-                  className="md-button md-button-surface" 
-                  onClick={onOpenMetrics}
-                  style={{ padding: '6px 12px', fontSize: 12, height: 36 }}
-                  title="View usage statistics dashboard"
-                >
-                  Stats
-                </button>
-              )}
-              <button 
-                className="md-icon-button"
-                onClick={onToggleTelemetry}
-                title={telemetryEnabled ? "Disable Telemetry" : "Enable Telemetry"}
-                style={{ padding: 8, borderRadius: '50%', background: telemetryEnabled ? 'var(--md-sys-color-primary-container)' : 'var(--md-sys-color-surface-variant)' }}
-              >
-                <BarChart2 size={20} color={telemetryEnabled ? "var(--md-sys-color-on-primary-container)" : "inherit"} />
-              </button>
-            </div>
+            <button 
+              className="md-icon-button"
+              onClick={onToggleTelemetry}
+              title={telemetryEnabled ? "Disable Telemetry" : "Enable Telemetry"}
+              style={{ padding: 8, borderRadius: '50%', background: telemetryEnabled ? 'var(--md-sys-color-primary-container)' : 'var(--md-sys-color-surface-variant)' }}
+            >
+              <BarChart2 size={20} color={telemetryEnabled ? "var(--md-sys-color-on-primary-container)" : "inherit"} />
+            </button>
           </div>
         </div>
       </div>

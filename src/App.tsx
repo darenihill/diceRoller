@@ -17,7 +17,6 @@ import { HelpModal } from './components/modals/HelpModal';
 import { HistoryModal } from './components/modals/HistoryModal';
 import { SetsModal } from './components/modals/SetsModal';
 import { CustomizeModal } from './components/modals/CustomizeModal';
-import { MetricsModal } from './components/modals/MetricsModal';
 import { SaveDialog } from './components/modals/SaveDialog';
 import { ConfirmDialog } from './components/modals/ConfirmDialog';
 import { ShareModal } from './components/modals/ShareModal';
@@ -82,7 +81,7 @@ function App() {
   }, []);
 
   // Modals state
-  const [modalOpen, setModalOpen] = useState<'help' | 'history' | 'sets' | 'customize' | 'metrics' | null>(null);
+  const [modalOpen, setModalOpen] = useState<'help' | 'history' | 'sets' | 'customize' | null>(null);
 
   useEffect(() => {
     document.body.classList.remove('theme-dark', 'theme-light', 'theme-felt', 'theme-midnight');
@@ -480,12 +479,6 @@ function App() {
         }}
         telemetryEnabled={telemetryState}
         onToggleTelemetry={handleToggleTelemetry}
-        onOpenMetrics={() => setModalOpen('metrics')}
-      />
-
-      <MetricsModal 
-        isOpen={modalOpen === 'metrics'} 
-        onClose={() => setModalOpen(null)} 
       />
 
       <SaveDialog 
