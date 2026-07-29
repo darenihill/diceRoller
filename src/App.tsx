@@ -402,7 +402,6 @@ function App() {
         onHistory={() => setModalOpen('history')}
         onSets={() => setModalOpen('sets')}
         onCustomize={() => setModalOpen('customize')}
-        onMetrics={() => setModalOpen('metrics')}
         onDeleteAll={handleDeleteAll}
         onSave={handleSave}
         onShare={handleShare}
@@ -481,6 +480,7 @@ function App() {
         }}
         telemetryEnabled={telemetryState}
         onToggleTelemetry={handleToggleTelemetry}
+        onOpenMetrics={() => setModalOpen('metrics')}
       />
 
       <MetricsModal 
