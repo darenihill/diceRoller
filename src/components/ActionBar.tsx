@@ -19,8 +19,7 @@ interface ActionBarProps {
   onChangeRollAdvantage: (mode: RollAdvantageMode) => void;
 }
 
-const DND_DICE_OPTIONS = [
-  { label: 'd20', faces: 20, name: 'd20', color: '#1A1A1A' },
+const DND_GRID_DICE = [
   { label: 'd12', faces: 12, name: 'd12', color: '#1A1A1A' },
   { label: 'd10', faces: 10, name: 'd10', color: '#1A1A1A' },
   { label: 'd00', faces: 10, name: 'd10 (tens)', customFaces: ["00", "10", "20", "30", "40", "50", "60", "70", "80", "90"], color: '#1A1A1A' },
@@ -28,6 +27,8 @@ const DND_DICE_OPTIONS = [
   { label: 'd6', faces: 6, name: 'd6', color: '#1A1A1A' },
   { label: 'd4', faces: 4, name: 'd4', color: '#1A1A1A' }
 ];
+
+const D20_OPTION = { label: '🔷 d20', faces: 20, name: 'd20', color: '#1A1A1A' };
 
 export const ActionBar: React.FC<ActionBarProps> = ({ 
   onAdd, onRoll, onHoldAll, allHeld, totalVisible, lastTotal, modifier, onChangeModifier,
@@ -43,7 +44,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
     }
   };
 
-  const handleSelectDndDice = (opt: typeof DND_DICE_OPTIONS[0]) => {
+  const handleSelectDndDice = (opt: { faces: number; name: string; customFaces?: string[]; color: string }) => {
     onAdd({
       numberValue: 1,
       faces: opt.faces,
@@ -86,7 +87,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
               >
                 <div className={styles.addPopoverTitle}>Add D&D Die</div>
                 <div className={styles.dndGrid}>
-                  {DND_DICE_OPTIONS.map(opt => (
+                  {DND_GRID_DICE.map(opt => (
                     <button 
                       key={opt.label} 
                       className={styles.dndOptionBtn}
@@ -95,6 +96,14 @@ export const ActionBar: React.FC<ActionBarProps> = ({
                       {opt.label}
                     </button>
                   ))}
+                  
+                  {/* Double-wide Primary Colored d20 at the Bottom */}
+                  <button 
+                    className={styles.d20OptionBtn}
+                    onClick={() => handleSelectDndDice(D20_OPTION)}
+                  >
+                    {D20_OPTION.label}
+                  </button>
                 </div>
               </motion.div>
             </>

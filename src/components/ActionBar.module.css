@@ -139,6 +139,28 @@
   transform: scale(1.03);
 }
 
+.d20OptionBtn {
+  grid-column: 1 / -1;
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  border: 1px solid var(--md-sys-color-primary);
+  border-radius: var(--shape-small);
+  padding: 12px 8px;
+  font-size: 15px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: var(--elevation-1);
+  transition: background-color 0.2s, transform 0.1s, filter 0.2s;
+}
+
+.d20OptionBtn:hover {
+  filter: brightness(1.1);
+  transform: scale(1.02);
+}
+
 @media (max-width: 468px) {
   .lockBtn {
     position: fixed !important;
