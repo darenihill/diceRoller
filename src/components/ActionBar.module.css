@@ -32,75 +32,48 @@
   align-items: flex-end;
 }
 
-.rpgToolbar {
+.rpgColumns {
   display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.verticalColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   align-items: center;
+}
+
+.rpgFabBtn {
+  width: 72px;
+  height: 72px;
   background-color: var(--md-sys-color-surface-variant);
-  border-radius: var(--shape-medium);
-  padding: 4px;
-  gap: 6px;
-  box-shadow: var(--elevation-2);
-}
-
-.modifierStepper {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.stepperBtn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.08);
   color: var(--md-sys-color-on-surface);
+  box-shadow: var(--elevation-3);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 50%;
+  transition: opacity 0.2s, background-color 0.2s, color 0.2s, transform 0.2s;
 }
 
-.stepperBtn:hover {
+.rpgFabBtn:hover {
   background-color: var(--md-sys-color-surface-hover);
+  transform: scale(1.05);
 }
 
-.modifierValueBtn {
-  padding: 4px 8px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--md-sys-color-primary);
-  border-radius: var(--shape-small);
-  min-width: 32px;
-  text-align: center;
+.rpgFabActive {
+  background-color: var(--md-sys-color-primary-container) !important;
+  color: var(--md-sys-color-on-primary-container) !important;
+  border: 2px solid var(--md-sys-color-primary);
 }
 
-.toolbarDivider {
-  width: 1px;
-  height: 20px;
-  background-color: rgba(255, 255, 255, 0.15);
-}
-
-.advGroup {
-  display: flex;
-  gap: 2px;
-}
-
-.advPill {
-  border: none;
-  background: transparent;
-  color: var(--md-sys-color-on-surface-variant);
-  font-size: 12px;
-  font-weight: 700;
-  padding: 6px 10px;
-  border-radius: var(--shape-small);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.advPillActive {
-  background-color: var(--md-sys-color-primary);
-  color: var(--md-sys-color-on-primary);
-  box-shadow: var(--elevation-1);
+.modifierBtnDisabled {
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 @media (max-width: 468px) {
@@ -110,5 +83,9 @@
     left: 24px !important;
     right: auto !important;
     z-index: 101 !important;
+  }
+
+  :global(.menu-open) .rpgColumns {
+    display: none !important;
   }
 }

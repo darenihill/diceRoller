@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './ActionBar.module.css';
-import { Plus, Minus, Dice5, Lock, Unlock } from 'lucide-react';
+import { Plus, Minus, Dice5, Lock, Unlock, RotateCcw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { RollAdvantageMode } from '../hooks/useDiceState';
 
@@ -46,58 +46,59 @@ export const ActionBar: React.FC<ActionBarProps> = ({
       <div className={styles.rollGroup}>
         {rpgMode && (
           <motion.div 
-            className={styles.rpgToolbar}
+            className={styles.rpgColumns}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
           >
-            {/* Horizontal Modifier Stepper on Left */}
-            <div className={styles.modifierStepper} title="Roll Modifier (+/-)">
+            {/* Left Vertical Column: Advantage / Disadvantage FABs */}
+            <div className={styles.verticalColumn}>
               <button
-                className={styles.stepperBtn}
-                onClick={() => onChangeModifier(modifier - 1)}
-                title="Decrease modifier"
-              >
-                <Minus size={14} strokeWidth={2.5} />
-              </button>
-              <button 
-                className={styles.modifierValueBtn} 
-                onClick={() => onChangeModifier(0)} 
-                title="Click to reset modifier"
-              >
-                {modifier > 0 ? `+${modifier}` : modifier}
-              </button>
-              <button
-                className={styles.stepperBtn}
-                onClick={() => onChangeModifier(modifier + 1)}
-                title="Increase modifier"
-              >
-                <Plus size={14} strokeWidth={2.5} />
-              </button>
-            </div>
-
-            <div className={styles.toolbarDivider} />
-
-            {/* Advantage Mode Selector Pills on Right */}
-            <div className={styles.advGroup}>
-              <button 
-                className={`${styles.advPill} ${rollAdvantage === 'normal' ? styles.advPillActive : ''}`}
-                onClick={() => onChangeRollAdvantage('normal')}
-              >
-                NORM
-              </button>
-              <button 
-                className={`${styles.advPill} ${rollAdvantage === 'advantage' ? styles.advPillActive : ''}`}
+                className={`${styles.rpgFabBtn} ${rollAdvantage === 'advantage' ? styles.rpgFabActive : ''}`}
                 onClick={() => onChangeRollAdvantage('advantage')}
                 title="Advantage: Keep Highest"
               >
                 ADV
               </button>
-              <button 
-                className={`${styles.advPill} ${rollAdvantage === 'disadvantage' ? styles.advPillActive : ''}`}
+              <button
+                className={`${styles.rpgFabBtn} ${rollAdvantage === 'normal' ? styles.rpgFabActive : ''}`}
+                onClick={() => onChangeRollAdvantage('normal')}
+                title="Normal Roll"
+              >
+                NORM
+              </button>
+              <button
+                className={`${styles.rpgFabBtn} ${rollAdvantage === 'disadvantage' ? styles.rpgFabActive : ''}`}
                 onClick={() => onChangeRollAdvantage('disadvantage')}
-                title="Disadvantage: Drop Highest"
+                title="Disadvantage: Keep Lowest"
               >
                 DIS
+              </button>
+            </div>
+
+            {/* Right Vertical Column: Modifier Stepper FABs */}
+            <div className={styles.verticalColumn}>
+              <button
+                className={`md-icon-button ${styles.rpgFabBtn}`}
+                onClick={() => onChangeModifier(modifier + 1)}
+                title="Increase modifier"
+              >
+                <Plus size={28} strokeWidth={2.5} />
+              </button>
+              <button
+                className={`md-icon-button ${styles.rpgFabBtn} ${modifier === 0 ? styles.modifierBtnDisabled : ''}`}
+                onClick={() => onChangeModifier(0)}
+                title="Reset modifier"
+                disabled={modifier === 0}
+              >
+                <RotateCcw size={22} />
+              </button>
+              <button
+                className={`md-icon-button ${styles.rpgFabBtn}`}
+                onClick={() => onChangeModifier(modifier - 1)}
+                title="Decrease modifier"
+              >
+                <Minus size={28} strokeWidth={2.5} />
               </button>
             </div>
           </motion.div>
