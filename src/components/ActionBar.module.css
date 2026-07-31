@@ -32,54 +32,57 @@
   align-items: flex-end;
 }
 
-.modifierColumn {
+.rpgToolbar {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
   align-items: center;
+  background-color: var(--md-sys-color-surface-variant);
+  border-radius: var(--shape-medium);
+  padding: 4px;
+  gap: 6px;
+  box-shadow: var(--elevation-2);
 }
 
-.modifierBtn {
-  width: 72px;
-  height: 72px;
-  background-color: var(--md-sys-color-surface-variant);
+.modifierStepper {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.stepperBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.08);
   color: var(--md-sys-color-on-surface);
-  box-shadow: var(--elevation-3);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.2s, background-color 0.2s;
+  transition: background-color 0.2s;
 }
 
-.modifierBtn:hover {
+.stepperBtn:hover {
   background-color: var(--md-sys-color-surface-hover);
 }
 
-.modifierBtnDisabled {
-  opacity: 0.4;
-  pointer-events: none;
+.modifierValueBtn {
+  padding: 4px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--md-sys-color-primary);
+  border-radius: var(--shape-small);
+  min-width: 32px;
+  text-align: center;
 }
 
-@media (max-width: 468px) {
-  .lockBtn {
-    position: fixed !important;
-    bottom: 24px !important;
-    left: 24px !important;
-    right: auto !important;
-    z-index: 101 !important;
-  }
-  
-  :global(.menu-open) .modifierColumn {
-    display: none !important;
-  }
+.toolbarDivider {
+  width: 1px;
+  height: 20px;
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
 .advGroup {
   display: flex;
-  background-color: var(--md-sys-color-surface-variant);
-  border-radius: var(--shape-small);
-  padding: 4px;
-  gap: 4px;
+  gap: 2px;
 }
 
 .advPill {
@@ -98,4 +101,14 @@
   background-color: var(--md-sys-color-primary);
   color: var(--md-sys-color-on-primary);
   box-shadow: var(--elevation-1);
+}
+
+@media (max-width: 468px) {
+  .lockBtn {
+    position: fixed !important;
+    bottom: 24px !important;
+    left: 24px !important;
+    right: auto !important;
+    z-index: 101 !important;
+  }
 }
