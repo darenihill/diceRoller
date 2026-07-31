@@ -103,10 +103,16 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
     return faceStr;
   };
 
+  const extraClass = [
+    dice.dropped ? styles.dropped : '',
+    dice.isCrit20 ? styles.crit20 : '',
+    dice.isCrit1 ? styles.crit1 : ''
+  ].filter(Boolean).join(' ');
+
   return (
     <motion.div 
       ref={diceRef}
-      className={`${styles.dice} ${isRolling && !dice.held ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''}`}
+      className={`${styles.dice} ${isRolling && !dice.held ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''} ${extraClass}`}
       style={{ backgroundColor }}
       data-dice-id={dice.id}
       onClick={(e) => {
@@ -123,6 +129,12 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
       <div className={styles.number} style={{ fontSize: fontScale, color: textColor }}>
         {renderFace(faceContent)}
       </div>
+
+      {dice.dropped && (
+        <div className={styles.droppedBadge}>
+          DROPPED
+        </div>
+      )}
 
       {dice.name && (
         <div style={{

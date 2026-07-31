@@ -73,3 +73,29 @@
     display: none !important;
   }
 }
+
+.advGroup {
+  display: flex;
+  background-color: var(--md-sys-color-surface-variant);
+  border-radius: var(--shape-small);
+  padding: 4px;
+  gap: 4px;
+}
+
+.advPill {
+  border: none;
+  background: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: var(--shape-small);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.advPillActive {
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  box-shadow: var(--elevation-1);
+}

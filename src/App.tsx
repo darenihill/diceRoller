@@ -24,6 +24,7 @@ import { ShareModal } from './components/modals/ShareModal';
 function App() {
   const {
     diceList, setDiceList, rollHistory, isRolling, modifier, setModifier,
+    rpgMode, toggleRpgMode, rollAdvantage, setRollAdvantage,
     addDice, removeDice, updateDice, toggleHold, toggleHoldAll,
     clearAllDice, rollDice, clearHistory, toast, showToast
   } = useDiceState();
@@ -406,12 +407,8 @@ function App() {
         onShare={handleShare}
         onSetDefault={handleSetDefault}
         onLoad={() => setModalOpen('sets')}
-        showModifier={showModifier}
-        onToggleModifier={() => {
-          const next = !showModifier;
-          setShowModifier(next);
-          trackEvent('modifier_toggled', { enabled: next });
-        }}
+        rpgMode={rpgMode}
+        onToggleRpgMode={toggleRpgMode}
       />
 
       <ActionBar
@@ -422,7 +419,7 @@ function App() {
           
           if (hasUnheldDice && diceList.length > 0) {
             const unheldCount = diceList.filter(d => !d.held).length;
-            trackEvent('roll_dice', { diceCount: unheldCount, modifier });
+            trackEvent('roll_dice', { diceCount: unheldCount, modifier, rpgMode, rollAdvantage });
             if (soundEnabled) {
               playRollSequence(soundTimersRef);
             }
@@ -433,8 +430,10 @@ function App() {
         totalVisible={totalVisible}
         lastTotal={lastTotal}
         modifier={modifier}
-        showModifier={showModifier}
         onChangeModifier={setModifier}
+        rpgMode={rpgMode}
+        rollAdvantage={rollAdvantage}
+        onChangeRollAdvantage={setRollAdvantage}
       />
 
       {/* Decomposed Modals & Dialogs */}

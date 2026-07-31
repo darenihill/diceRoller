@@ -17,12 +17,12 @@ interface SidebarMenuProps {
   onShare: () => void;
   onSetDefault: () => void;
   onLoad: () => void;
-  showModifier: boolean;
-  onToggleModifier: () => void;
+  rpgMode: boolean;
+  onToggleRpgMode: () => void;
 }
 
 export const SidebarMenu: React.FC<SidebarMenuProps> = ({
-  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, onLoad, showModifier, onToggleModifier
+  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, onLoad, rpgMode, onToggleRpgMode
 }) => {
   return (
     <>
@@ -67,9 +67,9 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
                 <div className={styles.menuColumnHeader}>Tools</div>
                 <button className={styles.menuItem} onClick={onHistory}><History size={18} /> <span>History</span></button>
                 <button className={styles.menuItem} onClick={onCustomize}><Palette size={18} /> <span>Customize</span></button>
-                <button className={styles.menuItem} onClick={onToggleModifier}>
-                  {showModifier ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
-                  <span>Modifier</span>
+                <button className={styles.menuItem} onClick={onToggleRpgMode} title="Toggle RPG Mode (Advantage & Modifiers)">
+                  {rpgMode ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
+                  <span>RPG Mode</span>
                 </button>
                 <button className={styles.menuItem} style={{ color: 'var(--md-sys-color-error)' }} onClick={onDeleteAll}><Trash2 size={18} /> <span>Clear All</span></button>
               </div>

@@ -1,5 +1,40 @@
 export const dicePresets = [
   {
+    name: "D&D 5e Advantage",
+    dice: [
+      { numberValue: 1, faces: 20, customFaces: [], color: "#1A1A1A", name: "d20 A" },
+      { numberValue: 1, faces: 20, customFaces: [], color: "#0056D2", name: "d20 B" }
+    ],
+  },
+  {
+    name: "D&D Stat Roller",
+    dice: [
+      { numberValue: 1, faces: 6, customFaces: [], color: "#E32227", name: "Stat Die 1" },
+      { numberValue: 1, faces: 6, customFaces: [], color: "#E32227", name: "Stat Die 2" },
+      { numberValue: 1, faces: 6, customFaces: [], color: "#E32227", name: "Stat Die 3" },
+      { numberValue: 1, faces: 6, customFaces: [], color: "#E32227", name: "Stat Die 4" }
+    ],
+  },
+  {
+    name: "Call of Cthulhu",
+    dice: [
+      { numberValue: 10, faces: 10, customFaces: ["00", "10", "20", "30", "40", "50", "60", "70", "80", "90"], color: "#1A1A1A", name: "Tens (d100)" },
+      { numberValue: 1, faces: 10, customFaces: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], color: "#D32F2F", name: "Units (d10)" }
+    ],
+  },
+  {
+    name: "Dungeons & Dragons",
+    dice: [
+      { numberValue: 1, faces: 20, customFaces: [], color: "#1A1A1A", name: "d20" },
+      { numberValue: 2, faces: 12, customFaces: [], color: "#1A1A1A", name: "d12" },
+      { numberValue: 3, faces: 10, customFaces: ["00", "10", "20", "30", "40", "50", "60", "70", "80", "90"], color: "#1A1A1A", name: "d10 (tens)" },
+      { numberValue: 4, faces: 10, customFaces: [], color: "#1A1A1A", name: "d10" },
+      { numberValue: 5, faces: 8, customFaces: [], color: "#1A1A1A", name: "d8" },
+      { numberValue: 6, faces: 6, customFaces: [], color: "#1A1A1A", name: "d6" },
+      { numberValue: 7, faces: 4, customFaces: [], color: "#1A1A1A", name: "d4" }
+    ],
+  },
+  {
     name: "Yatzee",
     dice: [
       { numberValue: 1, faces: 6, customFaces: [], color: "#E9EAEC" },
@@ -7,6 +42,13 @@ export const dicePresets = [
       { numberValue: 3, faces: 6, customFaces: [], color: "#E9EAEC" },
       { numberValue: 4, faces: 6, customFaces: [], color: "#E9EAEC" },
       { numberValue: 5, faces: 6, customFaces: [], color: "#E9EAEC" }
+    ],
+  },
+  {
+    name: "Catan",
+    dice: [
+      { numberValue: 1, faces: 6, customFaces: [], color: "#E32227", name: "Red" },
+      { numberValue: 2, faces: 6, customFaces: [], color: "#FFD700", name: "Yellow" }
     ],
   },
   {
@@ -29,18 +71,6 @@ export const dicePresets = [
     ],
   },
   {
-    name: "Dungeons & Dragons",
-    dice: [
-      { numberValue: 1, faces: 20, customFaces: [], color: "#1A1A1A", name: "d20" },
-      { numberValue: 2, faces: 12, customFaces: [], color: "#1A1A1A", name: "d12" },
-      { numberValue: 3, faces: 10, customFaces: ["00", "10", "20", "30", "40", "50", "60", "70", "80", "90"], color: "#1A1A1A", name: "d10 (tens)" },
-      { numberValue: 4, faces: 10, customFaces: [], color: "#1A1A1A", name: "d10" },
-      { numberValue: 5, faces: 8, customFaces: [], color: "#1A1A1A", name: "d8" },
-      { numberValue: 6, faces: 6, customFaces: [], color: "#1A1A1A", name: "d6" },
-      { numberValue: 7, faces: 4, customFaces: [], color: "#1A1A1A", name: "d4" }
-    ],
-  },
-  {
     name: "Risk",
     dice: [
       { numberValue: 1, faces: 6, customFaces: [], color: "#E32227", name: "Attacker 1" },
@@ -51,10 +81,30 @@ export const dicePresets = [
     ],
   },
   {
-    name: "Catan",
+    name: "Warhammer 40k",
     dice: [
-      { numberValue: 1, faces: 6, customFaces: [], color: "#E32227", name: "Red" },
-      { numberValue: 2, faces: 6, customFaces: [], color: "#FFD700", name: "Yellow" }
+      { numberValue: 1, faces: 6, customFaces: [], color: "#1A1A1A", name: "Attack 1" },
+      { numberValue: 2, faces: 6, customFaces: [], color: "#1A1A1A", name: "Attack 2" },
+      { numberValue: 3, faces: 6, customFaces: [], color: "#1A1A1A", name: "Attack 3" },
+      { numberValue: 4, faces: 6, customFaces: [], color: "#1A1A1A", name: "Attack 4" },
+      { numberValue: 5, faces: 6, customFaces: [], color: "#1A1A1A", name: "Attack 5" },
+      { numberValue: 6, faces: 6, customFaces: [], color: "#1A1A1A", name: "Attack 6" }
+    ],
+  },
+  {
+    name: "Blades in the Dark",
+    dice: [
+      { numberValue: 1, faces: 6, customFaces: [], color: "#0056D2", name: "Action 1" },
+      { numberValue: 2, faces: 6, customFaces: [], color: "#0056D2", name: "Action 2" },
+      { numberValue: 3, faces: 6, customFaces: [], color: "#0056D2", name: "Action 3" }
+    ],
+  },
+  {
+    name: "Left Center Right (LCR)",
+    dice: [
+      { numberValue: 1, faces: 6, customFaces: ["L:bg:#0056D2", "C:bg:#FFD700", "R:bg:#2E7D32", "•:bg:transparent", "•:bg:transparent", "•:bg:transparent"], color: "#E9EAEC", name: "Die 1" },
+      { numberValue: 2, faces: 6, customFaces: ["L:bg:#0056D2", "C:bg:#FFD700", "R:bg:#2E7D32", "•:bg:transparent", "•:bg:transparent", "•:bg:transparent"], color: "#E9EAEC", name: "Die 2" },
+      { numberValue: 3, faces: 6, customFaces: ["L:bg:#0056D2", "C:bg:#FFD700", "R:bg:#2E7D32", "•:bg:transparent", "•:bg:transparent", "•:bg:transparent"], color: "#E9EAEC", name: "Die 3" }
     ],
   },
   {
@@ -84,6 +134,12 @@ export const dicePresets = [
       { numberValue: 1, faces: 6, customFaces: ["+:bg:#2E7D32", "+:bg:#2E7D32", "-:bg:#D32F2F", "-:bg:#D32F2F", " :bg:transparent", " :bg:transparent"], color: "#0056D2", name: "Fate 3" },
       { numberValue: 1, faces: 6, customFaces: ["+:bg:#2E7D32", "+:bg:#2E7D32", "-:bg:#D32F2F", "-:bg:#D32F2F", " :bg:transparent", " :bg:transparent"], color: "#0056D2", name: "Fate 4" }
     ],
+  },
+  {
+    name: "Farkle",
+    dice: Array.from({ length: 6 }).map((_, i) => ({
+      numberValue: i + 1, faces: 6, customFaces: [], color: "#E32227", name: `Farkle ${i + 1}`
+    }))
   },
   {
     name: "Tenzi",

@@ -108,6 +108,44 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
         {/* Custom Faces */}
         <div className={styles.sectionCard}>
           <h3 className={styles.sectionTitle}>Custom Faces</h3>
+
+          <div style={{ marginBottom: 12 }}>
+            <label className={styles.sublabel} style={{ marginBottom: 6, display: 'block' }}>Quick Templates:</label>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              <button 
+                type="button"
+                className="md-button md-button-surface"
+                style={{ padding: '4px 10px', fontSize: 12, height: 32 }}
+                onClick={() => onUpdate(dice.id, { faces: 2, customFaces: [":icon:Sun:bg:#FFD700", ":icon:Moon:bg:#0056D2"] })}
+              >
+                🪙 Coin Flip
+              </button>
+              <button 
+                type="button"
+                className="md-button md-button-surface"
+                style={{ padding: '4px 10px', fontSize: 12, height: 32 }}
+                onClick={() => onUpdate(dice.id, { faces: 3, customFaces: [":icon:Mountain:bg:#757575", ":icon:FileText:bg:#E9EAEC", ":icon:Scissors:bg:#E32227"] })}
+              >
+                ✂️ Rock Paper Scissors
+              </button>
+              <button 
+                type="button"
+                className="md-button md-button-surface"
+                style={{ padding: '4px 10px', fontSize: 12, height: 32 }}
+                onClick={() => onUpdate(dice.id, { faces: 3, customFaces: ["YES:bg:#2E7D32", "NO:bg:#D32F2F", "MAYBE:bg:#FFD700"] })}
+              >
+                ❓ Decision Maker
+              </button>
+              <button 
+                type="button"
+                className="md-button md-button-surface"
+                style={{ padding: '4px 10px', fontSize: 12, height: 32 }}
+                onClick={() => onUpdate(dice.id, { faces: 4, customFaces: ["N:bg:#0056D2", "S:bg:#0056D2", "E:bg:#0056D2", "W:bg:#0056D2"] })}
+              >
+                🧭 Compass
+              </button>
+            </div>
+          </div>
           
           <div className={styles.facesGrid}>
             {dice.customFaces.length === 0 && <span className={styles.emptyText}>No custom faces added</span>}

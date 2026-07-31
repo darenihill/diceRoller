@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './ActionBar.module.css';
 import { Plus, Minus, Dice5, Lock, Unlock, RotateCcw } from 'lucide-react';
 import { motion } from 'framer-motion';
+import type { RollAdvantageMode } from '../hooks/useDiceState';
 
 interface ActionBarProps {
   onAdd: () => void;
@@ -11,12 +12,15 @@ interface ActionBarProps {
   totalVisible: boolean;
   lastTotal: number;
   modifier: number;
-  showModifier: boolean;
   onChangeModifier: (val: number) => void;
+  rpgMode: boolean;
+  rollAdvantage: RollAdvantageMode;
+  onChangeRollAdvantage: (mode: RollAdvantageMode) => void;
 }
 
 export const ActionBar: React.FC<ActionBarProps> = ({ 
-  onAdd, onRoll, onHoldAll, allHeld, totalVisible, lastTotal, modifier, showModifier, onChangeModifier
+  onAdd, onRoll, onHoldAll, allHeld, totalVisible, lastTotal, modifier, onChangeModifier,
+  rpgMode, rollAdvantage, onChangeRollAdvantage
 }) => {
   return (
     <div className={styles.actionBar}>
@@ -40,7 +44,36 @@ export const ActionBar: React.FC<ActionBarProps> = ({
       </button>
 
       <div className={styles.rollGroup}>
-        {showModifier && (
+        {rpgMode && (
+          <motion.div 
+            className={styles.advGroup}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <button 
+              className={`${styles.advPill} ${rollAdvantage === 'normal' ? styles.advPillActive : ''}`}
+              onClick={() => onChangeRollAdvantage('normal')}
+            >
+              NORM
+            </button>
+            <button 
+              className={`${styles.advPill} ${rollAdvantage === 'advantage' ? styles.advPillActive : ''}`}
+              onClick={() => onChangeRollAdvantage('advantage')}
+              title="Advantage: Keep Highest"
+            >
+              ADV
+            </button>
+            <button 
+              className={`${styles.advPill} ${rollAdvantage === 'disadvantage' ? styles.advPillActive : ''}`}
+              onClick={() => onChangeRollAdvantage('disadvantage')}
+              title="Disadvantage: Drop Highest"
+            >
+              DIS
+            </button>
+          </motion.div>
+        )}
+
+        {rpgMode && (
           <motion.div 
             className={styles.modifierColumn}
             initial={{ opacity: 0, y: 10 }}
@@ -78,7 +111,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
           whileTap={{ scale: 0.95 }}
         >
           <Dice5 size={24} strokeWidth={2.5} />
-          <span>{totalVisible ? lastTotal : "Roll"}{modifier !== 0 ? ` (${modifier > 0 ? '+' : ''}${modifier})` : ''}</span>
+          <span>{totalVisible ? lastTotal : "Roll"}{rpgMode && modifier !== 0 ? ` (${modifier > 0 ? '+' : ''}${modifier})` : ''}</span>
         </motion.button>
       </div>
     </div>

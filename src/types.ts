@@ -9,6 +9,9 @@ export interface DiceData {
   held: boolean;
   targetValue?: number;
   targetFaceIndex?: number;
+  dropped?: boolean;
+  isCrit20?: boolean;
+  isCrit1?: boolean;
 }
 
 export interface DiceConfig {

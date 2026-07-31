@@ -108,3 +108,35 @@
 .removeBtn:hover {
   transform: scale(1.1);
 }
+
+.dropped {
+  opacity: 0.45;
+  filter: grayscale(40%);
+}
+
+.droppedBadge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-15deg);
+  background-color: var(--md-sys-color-error);
+  color: #FFF;
+  font-size: calc(var(--dice-size) * 0.16);
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 15;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  letter-spacing: 0.5px;
+}
+
+.crit20 {
+  box-shadow: 0 0 20px 4px #FFD700, var(--elevation-3) !important;
+  border: 2px solid #FFD700;
+}
+
+.crit1 {
+  box-shadow: 0 0 20px 4px #D32F2F, var(--elevation-3) !important;
+  border: 2px solid #D32F2F;
+}

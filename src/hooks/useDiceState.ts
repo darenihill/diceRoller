@@ -6,18 +6,40 @@ export interface RollHistoryItem {
   id: string;
   total: number;
   details: string[];
+  isTargetHit?: boolean;
 }
+
+export type RollAdvantageMode = 'normal' | 'advantage' | 'disadvantage';
 
 export const useDiceState = () => {
   const [diceList, setDiceList] = useState<DiceData[]>([]);
   const [rollHistory, setRollHistory] = useState<RollHistoryItem[]>([]);
   const [isRolling, setIsRolling] = useState(false);
   const [modifier, setModifier] = useState<number>(0);
+  const [rpgMode, setRpgMode] = useState<boolean>(() => localStorage.getItem('rpgMode') === 'true');
+  const [rollAdvantage, setRollAdvantage] = useState<RollAdvantageMode>('normal');
+  const [targetHighlight, setTargetHighlightState] = useState<string>(() => localStorage.getItem('targetHighlight') || '');
   const [toast, setToast] = useState<string | null>(null);
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
+  }, []);
+
+  const toggleRpgMode = useCallback(() => {
+    setRpgMode(prev => {
+      const next = !prev;
+      localStorage.setItem('rpgMode', String(next));
+      if (!next) {
+        setRollAdvantage('normal');
+      }
+      return next;
+    });
+  }, []);
+
+  const setTargetHighlight = useCallback((val: string) => {
+    setTargetHighlightState(val);
+    localStorage.setItem('targetHighlight', val);
   }, []);
 
   const addDice = useCallback((template?: Partial<DiceData>) => {
@@ -70,14 +92,12 @@ export const useDiceState = () => {
     const details: string[] = [];
     
     // 1. Pre-calculate final targets immediately at 0ms
-    const targetList = diceList.map(d => {
+    const rawTargetList = diceList.map(d => {
       if (d.held) {
         let val = d.numberValue;
-        let display = val.toString();
         if (d.customFaces.length > 0) {
           const idx = d.currentFaceIndex ?? 0;
           const parsed = parseFaceContent(d.customFaces[idx]);
-          display = parsed.content;
           if (!parsed.content.startsWith(FACE_ICON_PREFIX)) {
             const num = parseInt(parsed.content);
             if (!isNaN(num)) val = num;
@@ -86,12 +106,13 @@ export const useDiceState = () => {
             val = 0;
           }
         }
-        rollTotal += val;
-        if (d.name) details.push(`${d.name}: ${display}`);
         return {
           ...d,
           targetValue: val,
-          targetFaceIndex: d.currentFaceIndex
+          targetFaceIndex: d.currentFaceIndex,
+          dropped: false,
+          isCrit20: d.faces === 20 && val === 20,
+          isCrit1: d.faces === 20 && val === 1
         };
       }
 
@@ -101,10 +122,8 @@ export const useDiceState = () => {
         idx = Math.floor(Math.random() * d.customFaces.length);
       }
       
-      let display = val.toString();
       if (d.customFaces.length > 0) {
         const parsed = parseFaceContent(d.customFaces[idx]);
-        display = parsed.content;
         if (parsed.content.startsWith(FACE_ICON_PREFIX)) {
           val = 0;
         } else {
@@ -113,24 +132,80 @@ export const useDiceState = () => {
           else val = 0;
         }
       }
-      
-      rollTotal += val;
-      if (d.name) details.push(`${d.name}: ${display}`);
 
       return {
         ...d,
         targetValue: val,
-        targetFaceIndex: idx
+        targetFaceIndex: idx,
+        dropped: false,
+        isCrit20: d.faces === 20 && val === 20,
+        isCrit1: d.faces === 20 && val === 1
       };
     });
 
-    const finalTotal = rollTotal + modifier;
-    if (modifier !== 0) {
-      details.push(`Modifier: ${modifier > 0 ? '+' : ''}${modifier}`);
+    // Handle Advantage / Disadvantage drop logic if rollAdvantage is active
+    const processedList = [...rawTargetList];
+    if (rpgMode && rollAdvantage !== 'normal' && processedList.length > 1) {
+      // Find matching faces group (e.g. d20s)
+      const d20Indices = processedList
+        .map((d, i) => ({ index: i, val: d.targetValue ?? 0, faces: d.faces }))
+        .filter(x => x.faces === 20);
+
+      if (d20Indices.length >= 2) {
+        if (rollAdvantage === 'advantage') {
+          // Keep highest, drop lower ones
+          const maxVal = Math.max(...d20Indices.map(x => x.val));
+          let kept = false;
+          d20Indices.forEach(item => {
+            if (item.val === maxVal && !kept) {
+              kept = true;
+            } else {
+              processedList[item.index].dropped = true;
+            }
+          });
+        } else if (rollAdvantage === 'disadvantage') {
+          // Keep lowest, drop higher ones
+          const minVal = Math.min(...d20Indices.map(x => x.val));
+          let kept = false;
+          d20Indices.forEach(item => {
+            if (item.val === minVal && !kept) {
+              kept = true;
+            } else {
+              processedList[item.index].dropped = true;
+            }
+          });
+        }
+      }
     }
 
-    // Set the list with target values immediately so the shuffling components know the landing targets
-    setDiceList(targetList);
+    // Calculate sum total from non-dropped dice
+    processedList.forEach(d => {
+      const val = d.targetValue ?? d.numberValue;
+      if (!d.dropped) {
+        rollTotal += val;
+      }
+      if (d.name) {
+        const dropSuffix = d.dropped ? ' (dropped)' : '';
+        details.push(`${d.name}: ${val}${dropSuffix}`);
+      }
+    });
+
+    const activeModifier = rpgMode ? modifier : 0;
+    const finalTotal = rollTotal + activeModifier;
+    if (rpgMode && activeModifier !== 0) {
+      details.push(`Modifier: ${activeModifier > 0 ? '+' : ''}${activeModifier}`);
+    }
+
+    // Evaluate Target Highlight Match (e.g. "7" or "6, 8")
+    let isTargetHit = false;
+    if (targetHighlight.trim()) {
+      const targets = targetHighlight.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+      if (targets.includes(finalTotal)) {
+        isTargetHit = true;
+      }
+    }
+
+    setDiceList(processedList);
 
     // 2. Set timeout to finalize and reveal history
     setTimeout(() => {
@@ -147,11 +222,16 @@ export const useDiceState = () => {
       setRollHistory(h => [{
         id: generateId(),
         total: finalTotal,
-        details
+        details,
+        isTargetHit
       }, ...h]);
       setIsRolling(false);
+
+      if (isTargetHit) {
+        showToast(`🎯 Target Hit: ${finalTotal}!`);
+      }
     }, 800);
-  }, [diceList, modifier]);
+  }, [diceList, modifier, rpgMode, rollAdvantage, targetHighlight, showToast]);
 
   const clearHistory = useCallback(() => {
     setRollHistory([]);
@@ -164,6 +244,12 @@ export const useDiceState = () => {
     isRolling,
     modifier,
     setModifier,
+    rpgMode,
+    toggleRpgMode,
+    rollAdvantage,
+    setRollAdvantage,
+    targetHighlight,
+    setTargetHighlight,
     addDice,
     removeDice,
     updateDice,

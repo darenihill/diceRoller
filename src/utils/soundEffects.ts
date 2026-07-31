@@ -72,6 +72,11 @@ export const playThudSound = () => {
     
     oscThud.start(now);
     oscThud.stop(now + 0.09);
+
+    // Trigger mobile haptic vibration on landing impact
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      navigator.vibrate([15, 30, 15]);
+    }
   } catch (e) {
     console.error("Failed to play synthesized thud sound:", e);
   }
