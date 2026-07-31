@@ -14,9 +14,10 @@ interface DiceProps {
   onToggleHold: (id: string) => void;
   onRemove: (id: string) => void;
   onOpenSettings: (id: string) => void;
+  rpgMode?: boolean;
 }
 
-export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isRevealed, onReveal, onToggleHold, onRemove, onOpenSettings }) => {
+export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isRevealed, onReveal, onToggleHold, onRemove, onOpenSettings, rpgMode }) => {
   const diceRef = useRef<HTMLDivElement>(null);
 
   const [tempValue, setTempValue] = useState<number | null>(null);
@@ -35,7 +36,6 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
       tickCount++;
       
       if (tickCount === 3) {
-        // 3rd peak (Max Left peak before settling): reveal the predetermined target value!
         if (dice.targetValue !== undefined) {
           if (dice.customFaces.length > 0 && dice.targetFaceIndex !== undefined) {
             setTempFaceIndex(dice.targetFaceIndex);
@@ -44,7 +44,6 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
           }
         }
       } else {
-        // T1 and T2: show standard random faces
         if (dice.customFaces.length > 0) {
           const idx = Math.floor(Math.random() * dice.customFaces.length);
           setTempFaceIndex(idx);
@@ -53,7 +52,7 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
           setTempValue(val);
         }
       }
-    }, 200); // Ticks precisely at 200ms (Max Left), 400ms (Max Right), and 600ms (Max Left)
+    }, 200);
 
     return () => clearInterval(intervalId);
   }, [isRolling, dice.held, dice.faces, dice.customFaces, dice.targetValue, dice.targetFaceIndex]);
@@ -79,7 +78,6 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
 
   const textColor = getContrastColor(backgroundColor);
 
-  // Calculate font size using calc instead of DOM measurements to prevent layout thrashing
   let longestFace = 1;
   if (dice.customFaces.length > 0) {
     const textFaces = dice.customFaces.map(f => parseFaceContent(f).content).filter(f => !f.startsWith(FACE_ICON_PREFIX));
@@ -90,7 +88,6 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
     longestFace = dice.numberValue.toString().length;
   }
   
-  // Max height 70% of box. Char width is ~0.6 of height, so max size based on width is width / (chars * 0.6) = width * 1.66 / chars
   const fontScale = `min(calc(var(--dice-size) * 0.7), calc(var(--dice-size) * 1.66 / ${longestFace || 1}))`;
 
   const renderFace = (faceStr: string) => {
@@ -103,7 +100,18 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
     return faceStr;
   };
 
+  // Determine polyhedral RPG shape when rpgMode is active and faces match d4, d8, d10, d12, d20
+  let shapeClass = '';
+  if (rpgMode && dice.customFaces.length === 0) {
+    if (dice.faces === 4) shapeClass = styles.shapeD4;
+    else if (dice.faces === 8) shapeClass = styles.shapeD8;
+    else if (dice.faces === 10) shapeClass = styles.shapeD10;
+    else if (dice.faces === 12) shapeClass = styles.shapeD12;
+    else if (dice.faces === 20) shapeClass = styles.shapeD20;
+  }
+
   const extraClass = [
+    shapeClass,
     dice.dropped ? styles.dropped : '',
     dice.isCrit20 ? styles.crit20 : '',
     dice.isCrit1 ? styles.crit1 : ''

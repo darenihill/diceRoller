@@ -389,6 +389,7 @@ function App() {
             onToggleHold={toggleHold}
             onRemove={removeDice}
             onOpenSettings={setEditingDiceId}
+            rpgMode={rpgMode}
           />
         ))}
       </div>

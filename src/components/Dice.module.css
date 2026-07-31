@@ -140,3 +140,29 @@
   box-shadow: 0 0 20px 4px #D32F2F, var(--elevation-3) !important;
   border: 2px solid #D32F2F;
 }
+
+/* Polyhedral RPG Shapes (active when rpgMode is ON) */
+.shapeD4 {
+  clip-path: polygon(50% 2%, 96% 92%, 4% 92%);
+  border-radius: 0 !important;
+}
+
+.shapeD8 {
+  clip-path: polygon(50% 2%, 96% 50%, 50% 98%, 4% 50%);
+  border-radius: 0 !important;
+}
+
+.shapeD10 {
+  clip-path: polygon(50% 2%, 96% 36%, 76% 98%, 24% 98%, 4% 36%);
+  border-radius: 0 !important;
+}
+
+.shapeD12 {
+  clip-path: polygon(50% 2%, 96% 35%, 78% 97%, 22% 97%, 4% 35%);
+  border-radius: 0 !important;
+}
+
+.shapeD20 {
+  clip-path: polygon(50% 2%, 95% 25%, 95% 75%, 50% 98%, 5% 75%, 5% 25%);
+  border-radius: 0 !important;
+}
