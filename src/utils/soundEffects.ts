@@ -1,3 +1,5 @@
+import { ROLL_TICK_INTERVAL_MS, ROLL_DURATION_MS } from './constants';
+
 let audioCtx: AudioContext | null = null;
 
 const getAudioContext = (): AudioContext => {
@@ -95,10 +97,10 @@ export const playRollSequence = (soundTimersRef: React.MutableRefObject<number[]
   // Play immediately at 0ms
   playRattleSound();
 
-  const t1 = window.setTimeout(() => playRattleSound(), 200);
-  const t2 = window.setTimeout(() => playRattleSound(), 400);
-  const t3 = window.setTimeout(() => playRattleSound(), 600);
-  const t4 = window.setTimeout(() => playThudSound(), 800);
+  const t1 = window.setTimeout(() => playRattleSound(), ROLL_TICK_INTERVAL_MS);
+  const t2 = window.setTimeout(() => playRattleSound(), ROLL_TICK_INTERVAL_MS * 2);
+  const t3 = window.setTimeout(() => playRattleSound(), ROLL_TICK_INTERVAL_MS * 3);
+  const t4 = window.setTimeout(() => playThudSound(), ROLL_DURATION_MS);
 
   soundTimersRef.current = [t1, t2, t3, t4];
 };

@@ -22,6 +22,14 @@
   --shape-medium: 12px;
   --shape-large: 16px;
 
+  /* Accent & Highlight Design Tokens */
+  --color-gold: #FFD700;
+  --color-crit-red: #D32F2F;
+  --color-success: #2E7D32;
+  --color-accent-blue: #0056D2;
+  --color-orange: #F28500;
+  --color-purple: #B24BF3;
+
   /* Dice sizing defaults (overridden by JS based on dice count) */
   --dice-size: 150px;
   --dice-gap: 24px;

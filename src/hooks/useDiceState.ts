@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { DiceData } from '../types';
 import { generateId, parseFaceContent, FACE_ICON_PREFIX } from '../utils/diceUtils';
+import { MAX_DICE_LIMIT, ROLL_DURATION_MS, TOAST_DURATION_MS } from '../utils/constants';
 
 export interface RollHistoryItem {
   id: string;
@@ -23,7 +24,7 @@ export const useDiceState = () => {
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);
-    setTimeout(() => setToast(null), 3000);
+    setTimeout(() => setToast(null), TOAST_DURATION_MS);
   }, []);
 
   const toggleRpgMode = useCallback(() => {
@@ -44,8 +45,8 @@ export const useDiceState = () => {
 
   const addDice = useCallback((template?: Partial<DiceData>) => {
     setDiceList(prev => {
-      if (prev.length >= 50) {
-        showToast("Maximum of 50 dice reached.");
+      if (prev.length >= MAX_DICE_LIMIT) {
+        showToast(`Maximum of ${MAX_DICE_LIMIT} dice reached.`);
         return prev;
       }
       const newDice: DiceData = {
@@ -230,7 +231,7 @@ export const useDiceState = () => {
       if (isTargetHit) {
         showToast(`🎯 Target Hit: ${finalTotal}!`);
       }
-    }, 800);
+    }, ROLL_DURATION_MS);
   }, [diceList, modifier, rpgMode, rollAdvantage, targetHighlight, showToast]);
 
   const clearHistory = useCallback(() => {

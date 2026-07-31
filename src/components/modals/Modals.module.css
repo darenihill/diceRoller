@@ -131,3 +131,49 @@
   font-weight: 700;
   color: var(--md-sys-color-primary);
 }
+
+/* Frequency Histogram Styling */
+.freqCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-color: var(--md-sys-color-surface-variant);
+  padding: 12px;
+  border-radius: var(--shape-small);
+}
+
+.freqRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.freqLabel {
+  width: 48px;
+  font-weight: 700;
+  text-align: right;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.freqBarContainer {
+  flex: 1;
+  background-color: rgba(255, 255, 255, 0.08);
+  height: 18px;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.freqBarFill {
+  height: 100%;
+  background-color: var(--md-sys-color-primary);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.freqCount {
+  width: 32px;
+  font-weight: 700;
+  color: var(--md-sys-color-primary);
+}

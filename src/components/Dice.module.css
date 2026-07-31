@@ -132,13 +132,13 @@
 }
 
 .crit20 {
-  box-shadow: 0 0 20px 4px #FFD700, var(--elevation-3) !important;
-  border: 2px solid #FFD700;
+  box-shadow: 0 0 20px 4px var(--color-gold), var(--elevation-3) !important;
+  border: 2px solid var(--color-gold);
 }
 
 .crit1 {
-  box-shadow: 0 0 20px 4px #D32F2F, var(--elevation-3) !important;
-  border: 2px solid #D32F2F;
+  box-shadow: 0 0 20px 4px var(--color-crit-red), var(--elevation-3) !important;
+  border: 2px solid var(--color-crit-red);
 }
 
 /* Polyhedral RPG Shapes (active when rpgMode is ON) */
