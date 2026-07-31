@@ -18,18 +18,16 @@ interface DiceProps {
   rpgMode?: boolean;
 }
 
-export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isRevealed, onReveal, onToggleHold, onRemove, onOpenSettings, onClone, rpgMode }) => {
+const DiceComponent: React.FC<DiceProps> = ({ 
+  dice, isRolling, isRevealed, onReveal, onToggleHold, onRemove, onOpenSettings, onClone, rpgMode 
+}) => {
   const diceRef = useRef<HTMLDivElement>(null);
 
   const [tempValue, setTempValue] = useState<number | null>(null);
   const [tempFaceIndex, setTempFaceIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!isRolling || dice.held) {
-      setTempValue(null);
-      setTempFaceIndex(null);
-      return;
-    }
+    if (!isRolling || dice.held) return;
 
     let tickCount = 0;
 
@@ -55,7 +53,11 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
       }
     }, 200);
 
-    return () => clearInterval(intervalId);
+    return () => {
+      clearInterval(intervalId);
+      setTempValue(null);
+      setTempFaceIndex(null);
+    };
   }, [isRolling, dice.held, dice.faces, dice.customFaces, dice.targetValue, dice.targetFaceIndex]);
 
   const getDisplayText = () => {
@@ -224,4 +226,7 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
       </button>
     </motion.div>
   );
-});
+};
+
+export const Dice = React.memo(DiceComponent);
+Dice.displayName = 'Dice';
