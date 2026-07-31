@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './ActionBar.module.css';
 import { Plus, Minus, Dice5, Lock, Unlock, RotateCcw } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { RollAdvantageMode } from '../hooks/useDiceState';
+import type { DiceData } from '../types';
 
 interface ActionBarProps {
-  onAdd: () => void;
+  onAdd: (template?: Partial<DiceData>) => void;
   onRoll: () => void;
   onHoldAll: () => void;
   allHeld: boolean;
@@ -18,10 +19,41 @@ interface ActionBarProps {
   onChangeRollAdvantage: (mode: RollAdvantageMode) => void;
 }
 
+const DND_DICE_OPTIONS = [
+  { label: 'd20', faces: 20, name: 'd20', color: '#1A1A1A' },
+  { label: 'd12', faces: 12, name: 'd12', color: '#1A1A1A' },
+  { label: 'd10', faces: 10, name: 'd10', color: '#1A1A1A' },
+  { label: 'd00', faces: 10, name: 'd10 (tens)', customFaces: ["00", "10", "20", "30", "40", "50", "60", "70", "80", "90"], color: '#1A1A1A' },
+  { label: 'd8', faces: 8, name: 'd8', color: '#1A1A1A' },
+  { label: 'd6', faces: 6, name: 'd6', color: '#1A1A1A' },
+  { label: 'd4', faces: 4, name: 'd4', color: '#1A1A1A' }
+];
+
 export const ActionBar: React.FC<ActionBarProps> = ({ 
   onAdd, onRoll, onHoldAll, allHeld, totalVisible, lastTotal, modifier, onChangeModifier,
   rpgMode, rollAdvantage, onChangeRollAdvantage
 }) => {
+  const [popoverOpen, setPopoverOpen] = useState(false);
+
+  const handleAddClick = () => {
+    if (rpgMode) {
+      setPopoverOpen(prev => !prev);
+    } else {
+      onAdd();
+    }
+  };
+
+  const handleSelectDndDice = (opt: typeof DND_DICE_OPTIONS[0]) => {
+    onAdd({
+      numberValue: 1,
+      faces: opt.faces,
+      name: opt.name,
+      customFaces: opt.customFaces ? [...opt.customFaces] : [],
+      color: opt.color
+    });
+    setPopoverOpen(false);
+  };
+
   return (
     <div className={styles.actionBar}>
       <motion.button 
@@ -38,10 +70,45 @@ export const ActionBar: React.FC<ActionBarProps> = ({
       >
         {allHeld ? <Unlock size={24} strokeWidth={2.5} /> : <Lock size={24} strokeWidth={2.5} />}
       </motion.button>
-      
-      <button className={`md-icon-button ${styles.actionBtn}`} onClick={onAdd} title="Add Dice">
-        <Plus size={24} strokeWidth={2.5} />
-      </button>
+
+      {/* Add Button & Quick D&D Popover */}
+      <div className={styles.addPopoverContainer}>
+        <AnimatePresence>
+          {rpgMode && popoverOpen && (
+            <>
+              <div className={styles.addPopoverBackdrop} onClick={() => setPopoverOpen(false)} />
+              <motion.div 
+                className={styles.addPopover}
+                initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                transition={{ duration: 0.15 }}
+              >
+                <div className={styles.addPopoverTitle}>Add D&D Die</div>
+                <div className={styles.dndGrid}>
+                  {DND_DICE_OPTIONS.map(opt => (
+                    <button 
+                      key={opt.label} 
+                      className={styles.dndOptionBtn}
+                      onClick={() => handleSelectDndDice(opt)}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        <button 
+          className={`md-icon-button ${styles.actionBtn}`} 
+          onClick={handleAddClick} 
+          title={rpgMode ? "Add D&D Dice Menu" : "Add Dice"}
+        >
+          <Plus size={24} strokeWidth={2.5} />
+        </button>
+      </div>
 
       <div className={styles.rollGroup}>
         {rpgMode && (

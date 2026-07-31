@@ -76,6 +76,69 @@
   pointer-events: none;
 }
 
+/* Quick D&D Dice Add Popover */
+.addPopoverContainer {
+  position: relative;
+}
+
+.addPopoverBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 110;
+}
+
+.addPopover {
+  position: absolute;
+  bottom: 84px;
+  left: 0;
+  background-color: var(--md-sys-color-surface);
+  border-radius: var(--shape-large);
+  padding: 12px;
+  box-shadow: var(--elevation-3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  width: 210px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 120;
+}
+
+.addPopoverTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--md-sys-color-primary);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.dndGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.dndOptionBtn {
+  background-color: var(--md-sys-color-surface-variant);
+  color: var(--md-sys-color-on-surface);
+  border-radius: var(--shape-small);
+  padding: 10px 8px;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.dndOptionBtn:hover {
+  background-color: var(--md-sys-color-surface-hover);
+  transform: scale(1.03);
+}
+
 @media (max-width: 468px) {
   .lockBtn {
     position: fixed !important;
