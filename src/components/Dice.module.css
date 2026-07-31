@@ -18,6 +18,18 @@
   box-shadow: var(--elevation-2);
 }
 
+.diceShapeBg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: var(--shape-large);
+  z-index: 0;
+  pointer-events: none;
+  transition: background-color 0.2s;
+}
+
 .number {
   margin: 0;
   font-weight: 500;
@@ -29,6 +41,7 @@
   width: 90%;
   word-wrap: break-word;
   line-height: 1;
+  z-index: 2;
 }
 
 .actionBtn {
@@ -83,6 +96,19 @@
   pointer-events: auto;
 }
 
+.cloneBtn {
+  bottom: calc(var(--dice-size) * -0.04);
+  left: calc(var(--dice-size) * -0.04);
+  background-color: var(--md-sys-color-surface-variant);
+  color: var(--md-sys-color-on-surface);
+  transition: opacity 0.2s, transform 0.2s, background-color 0.2s;
+}
+
+.dice:hover .cloneBtn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .removeBtn {
   top: calc(var(--dice-size) * -0.04);
   left: calc(var(--dice-size) * -0.04);
@@ -99,7 +125,8 @@
 @media (hover: none) {
   .dice.revealed .unlockIcon,
   .dice.revealed .settingsBtn,
-  .dice.revealed .removeBtn {
+  .dice.revealed .removeBtn,
+  .dice.revealed .cloneBtn {
     opacity: 1;
     pointer-events: auto;
   }

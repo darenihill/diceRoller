@@ -144,39 +144,45 @@ export const useDiceState = () => {
       };
     });
 
-    // Handle Advantage / Disadvantage drop logic if rollAdvantage is active
+    // Handle Advantage / Disadvantage drop logic if rollAdvantage is active across any matching dice pool
     const processedList = [...rawTargetList];
     if (rpgMode && rollAdvantage !== 'normal' && processedList.length > 1) {
-      // Find matching faces group (e.g. d20s)
-      const d20Indices = processedList
-        .map((d, i) => ({ index: i, val: d.targetValue ?? 0, faces: d.faces }))
-        .filter(x => x.faces === 20);
-
-      if (d20Indices.length >= 2) {
-        if (rollAdvantage === 'advantage') {
-          // Keep highest, drop lower ones
-          const maxVal = Math.max(...d20Indices.map(x => x.val));
-          let kept = false;
-          d20Indices.forEach(item => {
-            if (item.val === maxVal && !kept) {
-              kept = true;
-            } else {
-              processedList[item.index].dropped = true;
-            }
-          });
-        } else if (rollAdvantage === 'disadvantage') {
-          // Keep lowest, drop higher ones
-          const minVal = Math.min(...d20Indices.map(x => x.val));
-          let kept = false;
-          d20Indices.forEach(item => {
-            if (item.val === minVal && !kept) {
-              kept = true;
-            } else {
-              processedList[item.index].dropped = true;
-            }
-          });
+      // Group dice by face count (e.g. 2d20s, 4d6s, 2d10s)
+      const faceGroups: Record<number, { index: number; val: number }[]> = {};
+      processedList.forEach((d, i) => {
+        if (!faceGroups[d.faces]) {
+          faceGroups[d.faces] = [];
         }
-      }
+        faceGroups[d.faces].push({ index: i, val: d.targetValue ?? 0 });
+      });
+
+      Object.values(faceGroups).forEach(group => {
+        if (group.length >= 2) {
+          if (rollAdvantage === 'advantage') {
+            // Keep highest, drop lower ones
+            const maxVal = Math.max(...group.map(x => x.val));
+            let kept = false;
+            group.forEach(item => {
+              if (item.val === maxVal && !kept) {
+                kept = true;
+              } else {
+                processedList[item.index].dropped = true;
+              }
+            });
+          } else if (rollAdvantage === 'disadvantage') {
+            // Keep lowest, drop higher ones
+            const minVal = Math.min(...group.map(x => x.val));
+            let kept = false;
+            group.forEach(item => {
+              if (item.val === minVal && !kept) {
+                kept = true;
+              } else {
+                processedList[item.index].dropped = true;
+              }
+            });
+          }
+        }
+      });
     }
 
     // Calculate sum total from non-dropped dice

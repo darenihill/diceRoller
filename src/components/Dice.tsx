@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import type { DiceData } from '../types';
 import styles from './Dice.module.css';
-import { Lock, Unlock, Settings, X } from 'lucide-react';
+import { Lock, Unlock, Settings, X, Copy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ALL_ICONS } from '../utils/iconUtils';
 import { parseFaceContent, FACE_ICON_PREFIX, getContrastColor } from '../utils/diceUtils';
@@ -14,10 +14,11 @@ interface DiceProps {
   onToggleHold: (id: string) => void;
   onRemove: (id: string) => void;
   onOpenSettings: (id: string) => void;
+  onClone?: (template: Partial<DiceData>) => void;
   rpgMode?: boolean;
 }
 
-export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isRevealed, onReveal, onToggleHold, onRemove, onOpenSettings, rpgMode }) => {
+export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isRevealed, onReveal, onToggleHold, onRemove, onOpenSettings, onClone, rpgMode }) => {
   const diceRef = useRef<HTMLDivElement>(null);
 
   const [tempValue, setTempValue] = useState<number | null>(null);
@@ -111,7 +112,6 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
   }
 
   const extraClass = [
-    shapeClass,
     dice.dropped ? styles.dropped : '',
     dice.isCrit20 ? styles.crit20 : '',
     dice.isCrit1 ? styles.crit1 : ''
@@ -121,7 +121,6 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
     <motion.div 
       ref={diceRef}
       className={`${styles.dice} ${isRolling && !dice.held ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''} ${extraClass}`}
-      style={{ backgroundColor }}
       data-dice-id={dice.id}
       onClick={(e) => {
         if ((e.target as HTMLElement).closest('button')) return;
@@ -134,6 +133,9 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
       animate={{ scale: 1 }}
       exit={{ scale: 0 }}
     >
+      {/* Background shape container so clip-path does NOT clip action buttons */}
+      <div className={`${styles.diceShapeBg} ${shapeClass}`} style={{ backgroundColor }} />
+
       <div className={styles.number} style={{ fontSize: fontScale, color: textColor }}>
         {renderFace(faceContent)}
       </div>
@@ -158,7 +160,8 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
           textOverflow: 'ellipsis',
           fontWeight: 500,
           pointerEvents: 'none',
-          opacity: 0.8
+          opacity: 0.8,
+          zIndex: 3
         }}>
           {dice.name}
         </div>
@@ -192,16 +195,30 @@ export const Dice: React.FC<DiceProps> = React.memo(({ dice, isRolling, isReveal
         </div>
       </motion.div>
 
+      {/* Settings Button (Bottom-Right) */}
       <button className={`${styles.actionBtn} ${styles.settingsBtn}`} onClick={(e) => {
         e.stopPropagation();
         onOpenSettings(dice.id);
-      }}>
+      }} title="Dice Settings">
         <Settings size={20} strokeWidth={2.5} color="currentColor" />
       </button>
 
+      {/* Clone Button (Bottom-Left) */}
+      {onClone && (
+        <button 
+          className={`${styles.actionBtn} ${styles.cloneBtn}`} 
+          onClick={(e) => { e.stopPropagation(); onClone(dice); }}
+          title="Clone Die"
+        >
+          <Copy size={20} strokeWidth={2.5} color="currentColor" />
+        </button>
+      )}
+
+      {/* Remove Button (Top-Left) */}
       <button 
         className={`${styles.actionBtn} ${styles.removeBtn}`} 
         onClick={(e) => { e.stopPropagation(); onRemove(dice.id); }}
+        title="Remove Die"
       >
         <X size={20} strokeWidth={2.5} color="currentColor" />
       </button>

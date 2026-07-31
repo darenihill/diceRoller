@@ -389,6 +389,7 @@ function App() {
             onToggleHold={toggleHold}
             onRemove={removeDice}
             onOpenSettings={setEditingDiceId}
+            onClone={handleAddDice}
             rpgMode={rpgMode}
           />
         ))}
