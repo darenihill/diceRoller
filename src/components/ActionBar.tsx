@@ -4,6 +4,7 @@ import { Plus, Minus, Dice5, Lock, Unlock, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { RollAdvantageMode } from '../hooks/useDiceState';
 import type { DiceData } from '../types';
+import { DndShapeIcon } from './DndShapeIcon';
 
 interface ActionBarProps {
   onAdd: (template?: Partial<DiceData>) => void;
@@ -20,15 +21,15 @@ interface ActionBarProps {
 }
 
 const DND_GRID_DICE = [
-  { label: '⬟ d12', faces: 12, name: 'd12', color: '#384050' },
-  { label: '🛡️ d10', faces: 10, name: 'd10', color: '#384050' },
-  { label: '💯 d00', faces: 10, name: 'd10 (tens)', customFaces: ["00", "10", "20", "30", "40", "50", "60", "70", "80", "90"], color: '#384050' },
-  { label: '💎 d8', faces: 8, name: 'd8', color: '#384050' },
-  { label: '🎲 d6', faces: 6, name: 'd6', color: '#384050' },
-  { label: '🔺 d4', faces: 4, name: 'd4', color: '#384050' }
+  { label: 'D12', faces: 12, name: 'd12', color: '#384050' },
+  { label: 'D10', faces: 10, name: 'd10', color: '#384050' },
+  { label: 'D00', faces: 10, isD00: true, name: 'd10 (tens)', customFaces: ["00", "10", "20", "30", "40", "50", "60", "70", "80", "90"], color: '#384050' },
+  { label: 'D8', faces: 8, name: 'd8', color: '#384050' },
+  { label: 'D6', faces: 6, name: 'd6', color: '#384050' },
+  { label: 'D4', faces: 4, name: 'd4', color: '#384050' }
 ];
 
-const D20_OPTION = { label: '🔷 d20', faces: 20, name: 'd20', color: '#384050' };
+const D20_OPTION = { label: 'D20', faces: 20, name: 'd20', color: '#384050' };
 
 export const ActionBar: React.FC<ActionBarProps> = ({ 
   onAdd, onRoll, onHoldAll, allHeld, totalVisible, lastTotal, modifier, onChangeModifier,
@@ -93,7 +94,8 @@ export const ActionBar: React.FC<ActionBarProps> = ({
                       className={styles.dndOptionBtn}
                       onClick={() => handleSelectDndDice(opt)}
                     >
-                      {opt.label}
+                      <DndShapeIcon faces={opt.faces} isD00={opt.isD00} size={18} />
+                      <span>{opt.label}</span>
                     </button>
                   ))}
                   
@@ -102,7 +104,8 @@ export const ActionBar: React.FC<ActionBarProps> = ({
                     className={styles.d20OptionBtn}
                     onClick={() => handleSelectDndDice(D20_OPTION)}
                   >
-                    {D20_OPTION.label}
+                    <DndShapeIcon faces={20} size={20} color="currentColor" />
+                    <span>{D20_OPTION.label}</span>
                   </button>
                 </div>
               </motion.div>
