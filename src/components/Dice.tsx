@@ -137,12 +137,12 @@ const DiceComponent: React.FC<DiceProps> = ({
       exit={{ scale: 0 }}
     >
       {/* Background shape container so clip-path does NOT clip action buttons */}
-      <div className={`${styles.diceShapeBg} ${shapeClass}`} style={{ backgroundColor }} />
-
-      {/* 3D Wireframe Facet Lines Overlay */}
-      {rpgMode && dice.customFaces.length === 0 && (
-        <PolyhedralWireframe faces={dice.faces} />
-      )}
+      <div className={`${styles.diceShapeBg} ${shapeClass}`} style={{ backgroundColor }}>
+        {/* 3D Wireframe Facet Lines Overlay - placed INSIDE diceShapeBg to match silhouette bounds perfectly */}
+        {rpgMode && dice.customFaces.length === 0 && (
+          <PolyhedralWireframe faces={dice.faces} textColor={textColor} />
+        )}
+      </div>
 
       <div className={styles.number} style={{ fontSize: fontScale, color: textColor, zIndex: 2 }}>
         {renderFace(faceContent)}
@@ -183,7 +183,7 @@ const DiceComponent: React.FC<DiceProps> = ({
           color: dice.held ? "#FFD700" : "#FFFFFF"
         }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className={`${styles.actionBtn} ${styles.holdIcon}`}
+        className={`${styles.actionBtn} ${dice.held ? styles.holdIcon : styles.unlockIcon}`}
       >
         <div style={{ position: 'relative', width: 20, height: 20 }}>
           <motion.div 
