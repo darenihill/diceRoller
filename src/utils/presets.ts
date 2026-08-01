@@ -2,7 +2,7 @@ export const dicePresets = [
   {
     name: "D&D 5e Advantage",
     dice: [
-      { numberValue: 1, faces: 20, customFaces: [], color: "#1A1A1A", name: "d20 A" },
+      { numberValue: 1, faces: 20, customFaces: [], color: "#384050", name: "d20 A" },
       { numberValue: 1, faces: 20, customFaces: [], color: "#0056D2", name: "d20 B" }
     ],
   },
@@ -18,20 +18,20 @@ export const dicePresets = [
   {
     name: "Call of Cthulhu",
     dice: [
-      { numberValue: 10, faces: 10, customFaces: ["00", "10", "20", "30", "40", "50", "60", "70", "80", "90"], color: "#1A1A1A", name: "Tens (d100)" },
+      { numberValue: 10, faces: 10, customFaces: ["00", "10", "20", "30", "40", "50", "60", "70", "80", "90"], color: "#384050", name: "Tens (d100)" },
       { numberValue: 1, faces: 10, customFaces: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], color: "#D32F2F", name: "Units (d10)" }
     ],
   },
   {
     name: "Dungeons & Dragons",
     dice: [
-      { numberValue: 1, faces: 20, customFaces: [], color: "#1A1A1A", name: "d20" },
-      { numberValue: 2, faces: 12, customFaces: [], color: "#1A1A1A", name: "d12" },
-      { numberValue: 3, faces: 10, customFaces: ["00", "10", "20", "30", "40", "50", "60", "70", "80", "90"], color: "#1A1A1A", name: "d10 (tens)" },
-      { numberValue: 4, faces: 10, customFaces: [], color: "#1A1A1A", name: "d10" },
-      { numberValue: 5, faces: 8, customFaces: [], color: "#1A1A1A", name: "d8" },
-      { numberValue: 6, faces: 6, customFaces: [], color: "#1A1A1A", name: "d6" },
-      { numberValue: 7, faces: 4, customFaces: [], color: "#1A1A1A", name: "d4" }
+      { numberValue: 1, faces: 20, customFaces: [], color: "#384050", name: "d20" },
+      { numberValue: 2, faces: 12, customFaces: [], color: "#384050", name: "d12" },
+      { numberValue: 3, faces: 10, customFaces: ["00", "10", "20", "30", "40", "50", "60", "70", "80", "90"], color: "#384050", name: "d10 (tens)" },
+      { numberValue: 4, faces: 10, customFaces: [], color: "#384050", name: "d10" },
+      { numberValue: 5, faces: 8, customFaces: [], color: "#384050", name: "d8" },
+      { numberValue: 6, faces: 6, customFaces: [], color: "#384050", name: "d6" },
+      { numberValue: 7, faces: 4, customFaces: [], color: "#384050", name: "d4" }
     ],
   },
   {
@@ -56,7 +56,7 @@ export const dicePresets = [
     dice: [
       { numberValue: 1, faces: 6, customFaces: [], color: "#E9EAEC", name: "Regular" },
       { numberValue: 2, faces: 6, customFaces: [], color: "#E32227", name: "Event" },
-      { numberValue: 3, faces: 6, customFaces: ["Barbarian:bg:#1A1A1A", "Barbarian:bg:#1A1A1A", "Barbarian:bg:#1A1A1A", "Blue:bg:#0056D2", "Yellow:bg:#FFD700", "Green:bg:#2E7D32"], color: "#C0C0C0", name: "Progress" }
+      { numberValue: 3, faces: 6, customFaces: ["Barbarian:bg:#384050", "Barbarian:bg:#384050", "Barbarian:bg:#384050", "Blue:bg:#0056D2", "Yellow:bg:#FFD700", "Green:bg:#2E7D32"], color: "#C0C0C0", name: "Progress" }
     ],
   },
   {
@@ -83,12 +83,12 @@ export const dicePresets = [
   {
     name: "Warhammer 40k",
     dice: [
-      { numberValue: 1, faces: 6, customFaces: [], color: "#1A1A1A", name: "Attack 1" },
-      { numberValue: 2, faces: 6, customFaces: [], color: "#1A1A1A", name: "Attack 2" },
-      { numberValue: 3, faces: 6, customFaces: [], color: "#1A1A1A", name: "Attack 3" },
-      { numberValue: 4, faces: 6, customFaces: [], color: "#1A1A1A", name: "Attack 4" },
-      { numberValue: 5, faces: 6, customFaces: [], color: "#1A1A1A", name: "Attack 5" },
-      { numberValue: 6, faces: 6, customFaces: [], color: "#1A1A1A", name: "Attack 6" }
+      { numberValue: 1, faces: 6, customFaces: [], color: "#384050", name: "Attack 1" },
+      { numberValue: 2, faces: 6, customFaces: [], color: "#384050", name: "Attack 2" },
+      { numberValue: 3, faces: 6, customFaces: [], color: "#384050", name: "Attack 3" },
+      { numberValue: 4, faces: 6, customFaces: [], color: "#384050", name: "Attack 4" },
+      { numberValue: 5, faces: 6, customFaces: [], color: "#384050", name: "Attack 5" },
+      { numberValue: 6, faces: 6, customFaces: [], color: "#384050", name: "Attack 6" }
     ],
   },
   {
@@ -110,12 +110,12 @@ export const dicePresets = [
   {
     name: "King of Tokyo",
     dice: [
-      { numberValue: 1, faces: 6, customFaces: ["1", "2", "3", ":icon:Heart:bg:#2E7D32", ":icon:Zap:bg:#0056D2", ":icon:Skull:bg:#D32F2F"], color: "#1A1A1A", name: "Tokyo Die 1" },
-      { numberValue: 1, faces: 6, customFaces: ["1", "2", "3", ":icon:Heart:bg:#2E7D32", ":icon:Zap:bg:#0056D2", ":icon:Skull:bg:#D32F2F"], color: "#1A1A1A", name: "Tokyo Die 2" },
-      { numberValue: 1, faces: 6, customFaces: ["1", "2", "3", ":icon:Heart:bg:#2E7D32", ":icon:Zap:bg:#0056D2", ":icon:Skull:bg:#D32F2F"], color: "#1A1A1A", name: "Tokyo Die 3" },
-      { numberValue: 1, faces: 6, customFaces: ["1", "2", "3", ":icon:Heart:bg:#2E7D32", ":icon:Zap:bg:#0056D2", ":icon:Skull:bg:#D32F2F"], color: "#1A1A1A", name: "Tokyo Die 4" },
-      { numberValue: 1, faces: 6, customFaces: ["1", "2", "3", ":icon:Heart:bg:#2E7D32", ":icon:Zap:bg:#0056D2", ":icon:Skull:bg:#D32F2F"], color: "#1A1A1A", name: "Tokyo Die 5" },
-      { numberValue: 1, faces: 6, customFaces: ["1", "2", "3", ":icon:Heart:bg:#2E7D32", ":icon:Zap:bg:#0056D2", ":icon:Skull:bg:#D32F2F"], color: "#1A1A1A", name: "Tokyo Die 6" }
+      { numberValue: 1, faces: 6, customFaces: ["1", "2", "3", ":icon:Heart:bg:#2E7D32", ":icon:Zap:bg:#0056D2", ":icon:Skull:bg:#D32F2F"], color: "#384050", name: "Tokyo Die 1" },
+      { numberValue: 1, faces: 6, customFaces: ["1", "2", "3", ":icon:Heart:bg:#2E7D32", ":icon:Zap:bg:#0056D2", ":icon:Skull:bg:#D32F2F"], color: "#384050", name: "Tokyo Die 2" },
+      { numberValue: 1, faces: 6, customFaces: ["1", "2", "3", ":icon:Heart:bg:#2E7D32", ":icon:Zap:bg:#0056D2", ":icon:Skull:bg:#D32F2F"], color: "#384050", name: "Tokyo Die 3" },
+      { numberValue: 1, faces: 6, customFaces: ["1", "2", "3", ":icon:Heart:bg:#2E7D32", ":icon:Zap:bg:#0056D2", ":icon:Skull:bg:#D32F2F"], color: "#384050", name: "Tokyo Die 4" },
+      { numberValue: 1, faces: 6, customFaces: ["1", "2", "3", ":icon:Heart:bg:#2E7D32", ":icon:Zap:bg:#0056D2", ":icon:Skull:bg:#D32F2F"], color: "#384050", name: "Tokyo Die 5" },
+      { numberValue: 1, faces: 6, customFaces: ["1", "2", "3", ":icon:Heart:bg:#2E7D32", ":icon:Zap:bg:#0056D2", ":icon:Skull:bg:#D32F2F"], color: "#384050", name: "Tokyo Die 6" }
     ],
   },
   {
