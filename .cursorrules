@@ -1,3 +1,37 @@
-# AI Development Rules
+# AI Development & Pre-Commit Rules
 
-* **Git Push Safety**: Always wait for the user's explicit personal sign-off and approval on local testing before running any `git push` commands. Never attempt to push commits to a remote repository automatically.
+## 🛡️ Standard Pre-Commit & Verification Workflow
+Prior to declaring a task complete, proposing code changes for approval, or committing changes, you MUST run the automated pre-commit verification script:
+
+```bash
+npm run precommit
+```
+
+This automated suite enforces:
+1. **Adversarial ESLint Audit**: Zero linter errors or warnings.
+2. **Vitest Automated Regression Suite**: 19+ unit, state, utility, and layout tests must pass cleanly.
+3. **TypeScript Typecheck & Production Build**: `tsc -b && vite build` must compile in < 3s.
+4. **Adversarial CSS & Layout Guard Inspection**: Automated structural checks ensuring no layout regressions.
+
+---
+
+## 🔬 Adversarial Code Review Protocol (Checklist)
+
+Before writing or editing code, verify these 5 invariant layout rules:
+
+1. **Grid Math Protection**:
+   * `.dice` in `Dice.module.css` MUST NEVER declare `margin`.
+   * Grid cell sizing (`optimalSize`) assumes item width equals cell width. All item spacing is controlled 100% by CSS grid track `--dice-gap`. Adding `margin` breaks column wrapping, forces extra rows, and pushes dice off-screen.
+
+2. **Container Height Stability**:
+   * `App.tsx` main container `paddingBottom` MUST remain constant (`120px`).
+   * Dynamic height changes recalculate `containerSize.height`, causing `--dice-size` to shrink dynamically and re-wrap dice unpredictably. All bottom toolbar controls (Advantage pills, Modifier steppers, Popovers) MUST render as fixed floating overlays.
+
+3. **Action Button Scaling**:
+   * Corner `.actionBtn` elements must use proportional padding (`padding: calc(var(--dice-size) * 0.05)`) and corner offsets (`calc(var(--dice-size) * -0.04)`). Never hardcode static pixel sizes or outer margins that blow up on high-resolution displays.
+
+4. **Single-Path SVG Alpha Rendering**:
+   * All 3D wireframe facet lines (`PolyhedralWireframe.tsx`) MUST be combined into a single SVG `<path d="..." />` to prevent semi-transparent stroke overlap accumulation at vertex nodes.
+
+5. **Git Push Safety**:
+   * Always wait for the user's explicit personal sign-off and approval on local testing before running any `git push` commands. Never attempt to push commits to a remote repository automatically.

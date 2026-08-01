@@ -377,7 +377,7 @@ function App() {
   };
 
   return (
-    <div className={styles.app} style={{ paddingBottom: rpgMode ? '360px' : '110px' }}>
+    <div className={styles.app} style={{ paddingBottom: '120px' }}>
       <div ref={containerRef} className={styles.diceContainer} style={diceStyles}>
         {diceList.map((dice) => (
           <Dice
