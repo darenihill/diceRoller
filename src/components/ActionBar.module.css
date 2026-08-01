@@ -93,7 +93,8 @@
 .addPopover {
   position: absolute;
   bottom: 84px;
-  left: 0;
+  right: 0;
+  left: auto;
   background-color: var(--md-sys-color-surface);
   border-radius: var(--shape-large);
   padding: 12px;

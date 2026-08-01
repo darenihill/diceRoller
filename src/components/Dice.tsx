@@ -5,6 +5,7 @@ import { Lock, Unlock, Settings, X, Copy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ALL_ICONS } from '../utils/iconUtils';
 import { parseFaceContent, FACE_ICON_PREFIX, getContrastColor } from '../utils/diceUtils';
+import { PolyhedralWireframe } from './PolyhedralWireframe';
 
 interface DiceProps {
   dice: DiceData;
@@ -138,7 +139,12 @@ const DiceComponent: React.FC<DiceProps> = ({
       {/* Background shape container so clip-path does NOT clip action buttons */}
       <div className={`${styles.diceShapeBg} ${shapeClass}`} style={{ backgroundColor }} />
 
-      <div className={styles.number} style={{ fontSize: fontScale, color: textColor }}>
+      {/* 3D Wireframe Facet Lines Overlay */}
+      {rpgMode && dice.customFaces.length === 0 && (
+        <PolyhedralWireframe faces={dice.faces} />
+      )}
+
+      <div className={styles.number} style={{ fontSize: fontScale, color: textColor, zIndex: 2 }}>
         {renderFace(faceContent)}
       </div>
 
@@ -177,7 +183,7 @@ const DiceComponent: React.FC<DiceProps> = ({
           color: dice.held ? "#FFD700" : "#FFFFFF"
         }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className={`${styles.actionBtn} ${dice.held ? styles.holdIcon : styles.unlockIcon}`}
+        className={`${styles.actionBtn} ${styles.holdIcon}`}
       >
         <div style={{ position: 'relative', width: 20, height: 20 }}>
           <motion.div 
