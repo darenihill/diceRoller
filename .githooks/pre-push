@@ -1,0 +1,11 @@
+#!/bin/sh
+# Git Pre-Push Hook
+# Automatically runs pre-commit check suite prior to allowing any external git push
+
+echo "🛡️  Running Git Pre-Push Hook Verification..."
+npm run precommit
+
+if [ $? -ne 0 ]; then
+  echo "⛔ Git push to remote GitHub aborted due to verification failures."
+  exit 1
+fi

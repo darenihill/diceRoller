@@ -1,0 +1,11 @@
+#!/bin/sh
+# Git Pre-Commit Hook
+# Automatically runs pre-commit check suite prior to allowing any local git commit
+
+echo "🛡️  Running Git Pre-Commit Hook Verification..."
+npm run precommit
+
+if [ $? -ne 0 ]; then
+  echo "⛔ Git commit aborted due to pre-commit verification failures."
+  exit 1
+fi

@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "precommit": "node scripts/pre-commit-check.mjs"
+    "precommit": "node scripts/pre-commit-check.mjs",
+    "prepare": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "framer-motion": "^12.38.0",

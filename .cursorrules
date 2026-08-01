@@ -1,23 +1,21 @@
 # AI Development & Pre-Commit Rules
 
-## 🛡️ Standard Pre-Commit & Verification Workflow
-Prior to declaring a task complete, proposing code changes for approval, or committing changes, you MUST run the automated pre-commit verification script:
+## 🛡️ Automated Git Hooks & Pre-Commit Workflow
+This repository is configured with automated **Git Pre-Commit** and **Git Pre-Push Hooks** (`.githooks/pre-commit` & `.githooks/pre-push`).
+
+Whenever `git commit` or `git push` is initiated, Git automatically executes the adversarial verification suite:
 
 ```bash
 npm run precommit
 ```
 
-This automated suite enforces:
-1. **Adversarial ESLint Audit**: Zero linter errors or warnings.
-2. **Vitest Automated Regression Suite**: 19+ unit, state, utility, and layout tests must pass cleanly.
-3. **TypeScript Typecheck & Production Build**: `tsc -b && vite build` must compile in < 3s.
-4. **Adversarial CSS & Layout Guard Inspection**: Automated structural checks ensuring no layout regressions.
+If any linter error, Vitest test failure, TypeScript build error, or CSS layout guard violation occurs, **Git will automatically block and abort the commit/push**.
 
 ---
 
 ## 🔬 Adversarial Code Review Protocol (Checklist)
 
-Before writing or editing code, verify these 5 invariant layout rules:
+Before writing or editing code, verify these 5 invariant system rules:
 
 1. **Grid Math Protection**:
    * `.dice` in `Dice.module.css` MUST NEVER declare `margin`.
