@@ -21,12 +21,12 @@ interface ActionBarProps {
 }
 
 const DND_GRID_DICE = [
-  { label: 'D12', faces: 12, name: 'd12', color: '#384050' },
   { label: 'D10', faces: 10, name: 'd10', color: '#384050' },
   { label: 'D00', faces: 10, isD00: true, name: 'd10 (tens)', customFaces: ["00", "10", "20", "30", "40", "50", "60", "70", "80", "90"], color: '#384050' },
-  { label: 'D8', faces: 8, name: 'd8', color: '#384050' },
   { label: 'D6', faces: 6, name: 'd6', color: '#384050' },
-  { label: 'D4', faces: 4, name: 'd4', color: '#384050' }
+  { label: 'D12', faces: 12, name: 'd12', color: '#384050' },
+  { label: 'D4', faces: 4, name: 'd4', color: '#384050' },
+  { label: 'D8', faces: 8, name: 'd8', color: '#384050' }
 ];
 
 const D20_OPTION = { label: 'D20', faces: 20, name: 'd20', color: '#384050' };

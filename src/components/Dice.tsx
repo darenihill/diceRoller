@@ -108,6 +108,7 @@ const DiceComponent: React.FC<DiceProps> = ({
   let shapeClass = '';
   if (rpgMode && dice.customFaces.length === 0) {
     if (dice.faces === 4) shapeClass = styles.shapeD4;
+    else if (dice.faces === 6) shapeClass = styles.shapeD6;
     else if (dice.faces === 8) shapeClass = styles.shapeD8;
     else if (dice.faces === 10) shapeClass = styles.shapeD10;
     else if (dice.faces === 12) shapeClass = styles.shapeD12;
