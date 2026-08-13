@@ -124,8 +124,26 @@
   to { opacity: 1; transform: translate(-50%, 0); }
 }
 
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 @media (max-width: 768px) {
   .diceContainer {
     padding-bottom: 96px !important; /* Reserve spacing for bottom action buttons on mobile */
+  }
+
+  /* RPG mode stacks ~314px of FABs (ADV/NORM/DIS + modifier + roll) above the bottom
+     edge; reserve that space so the dice grid never sizes itself underneath them. */
+  :global(body.rpg-mode) .diceContainer {
+    padding-bottom: 340px !important;
   }
 }

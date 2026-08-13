@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from '../Modal';
-import { Volume2, VolumeX, ToggleLeft, ToggleRight, BarChart2 } from 'lucide-react';
+import { Volume2, VolumeX, BarChart2 } from 'lucide-react';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
 
@@ -11,8 +11,8 @@ interface CustomizeModalProps {
   onSelectTheme: (theme: string) => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
-  showModifier: boolean;
-  onToggleModifier: () => void;
+  targetHighlight: string;
+  onChangeTargetHighlight: (val: string) => void;
   telemetryEnabled: boolean;
   onToggleTelemetry: () => void;
 }
@@ -24,8 +24,8 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
   onSelectTheme,
   soundEnabled,
   onToggleSound,
-  showModifier,
-  onToggleModifier,
+  targetHighlight,
+  onChangeTargetHighlight,
   telemetryEnabled,
   onToggleTelemetry,
 }) => {
@@ -82,20 +82,21 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
             </button>
           </div>
 
-          {/* Modifier Toggle */}
+          {/* Target Total Highlight */}
           <div className={modalStyles.toggleRow}>
             <div className={modalStyles.toggleLabelCol}>
-              <span className={modalStyles.toggleTitle}>Roll Modifier</span>
-              <span className={modalStyles.toggleDesc}>Show mathematical offset adder bar</span>
+              <span className={modalStyles.toggleTitle}>Target Highlight</span>
+              <span className={modalStyles.toggleDesc}>Celebrate when the roll total hits these numbers (comma-separated, e.g. 7, 11)</span>
             </div>
-            <button 
-              className="md-icon-button"
-              onClick={onToggleModifier}
-              title={showModifier ? "Hide Modifier" : "Show Modifier"}
-              style={{ padding: 8, borderRadius: '50%', background: showModifier ? 'var(--md-sys-color-primary-container)' : 'var(--md-sys-color-surface-variant)' }}
-            >
-              {showModifier ? <ToggleRight size={20} color="var(--md-sys-color-on-primary-container)" /> : <ToggleLeft size={20} />}
-            </button>
+            <input
+              type="text"
+              value={targetHighlight}
+              onChange={(e) => onChangeTargetHighlight(e.target.value)}
+              placeholder="e.g. 7, 11"
+              className={modalStyles.formInput}
+              style={{ width: 110, textAlign: 'center' }}
+              aria-label="Target totals to highlight, comma-separated"
+            />
           </div>
 
           {/* Usage Telemetry Privacy Toggle */}

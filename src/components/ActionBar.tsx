@@ -183,13 +183,25 @@ export const ActionBar: React.FC<ActionBarProps> = ({
           </motion.div>
         )}
 
-        <motion.button 
-          className={`md-button md-button-filled ${styles.rollBtn}`} 
+        {totalVisible && (
+          <motion.div
+            className={styles.totalChip}
+            key={lastTotal}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            Total: {lastTotal}
+          </motion.div>
+        )}
+
+        <motion.button
+          className={`md-button md-button-filled ${styles.rollBtn}`}
           onClick={onRoll}
           whileTap={{ scale: 0.95 }}
+          aria-label="Roll dice"
         >
           <Dice5 size={24} strokeWidth={2.5} />
-          <span>{totalVisible ? lastTotal : "Roll"}{rpgMode && modifier !== 0 ? ` (${modifier > 0 ? '+' : ''}${modifier})` : ''}</span>
+          <span>Roll{rpgMode && modifier !== 0 ? ` (${modifier > 0 ? '+' : ''}${modifier})` : ''}</span>
         </motion.button>
       </div>
     </div>

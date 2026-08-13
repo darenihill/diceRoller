@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { DiceData } from '../types';
 import { generateId, parseFaceContent, FACE_ICON_PREFIX } from '../utils/diceUtils';
-import { MAX_DICE_LIMIT, ROLL_DURATION_MS, TOAST_DURATION_MS } from '../utils/constants';
+import { MAX_DICE_LIMIT, MAX_HISTORY_LENGTH, ROLL_DURATION_MS, TOAST_DURATION_MS } from '../utils/constants';
 
 export interface RollHistoryItem {
   id: string;
@@ -10,11 +10,39 @@ export interface RollHistoryItem {
   isTargetHit?: boolean;
 }
 
+export interface RollSummary {
+  total: number;
+  diceCount: number;
+  isTargetHit: boolean;
+}
+
 export type RollAdvantageMode = 'normal' | 'advantage' | 'disadvantage';
+
+const loadStoredHistory = (): RollHistoryItem[] => {
+  try {
+    const stored = localStorage.getItem('rollHistory');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (e) {
+    console.error('Failed to load roll history', e);
+  }
+  return [];
+};
 
 export const useDiceState = () => {
   const [diceList, setDiceList] = useState<DiceData[]>([]);
-  const [rollHistory, setRollHistory] = useState<RollHistoryItem[]>([]);
+  const [rollHistory, setRollHistory] = useState<RollHistoryItem[]>(loadStoredHistory);
+
+  // Persist roll history (capped) so it survives reloads and is included in backups
+  useEffect(() => {
+    try {
+      localStorage.setItem('rollHistory', JSON.stringify(rollHistory.slice(0, MAX_HISTORY_LENGTH)));
+    } catch (e) {
+      console.error('Failed to save roll history', e);
+    }
+  }, [rollHistory]);
   const [isRolling, setIsRolling] = useState(false);
   const [modifier, setModifier] = useState<number>(0);
   const [rpgMode, setRpgMode] = useState<boolean>(() => localStorage.getItem('rpgMode') === 'true');
@@ -86,7 +114,7 @@ export const useDiceState = () => {
     setDiceList([]);
   }, []);
 
-  const rollDice = useCallback(() => {
+  const rollDice = useCallback((onComplete?: (summary: RollSummary) => void) => {
     setIsRolling(true);
     
     let rollTotal = 0;
@@ -147,9 +175,12 @@ export const useDiceState = () => {
     // Handle Advantage / Disadvantage drop logic if rollAdvantage is active across any matching dice pool
     const processedList = [...rawTargetList];
     if (rpgMode && rollAdvantage !== 'normal' && processedList.length > 1) {
-      // Group dice by face count (e.g. 2d20s, 4d6s, 2d10s)
+      // Group PLAIN dice by face count (e.g. 2d20s, 4d6s). Custom-faced dice are excluded:
+      // a percentile pair (tens + units) is two different dice that both report faces=10,
+      // and grouping them would silently drop one half of every d100 roll.
       const faceGroups: Record<number, { index: number; val: number }[]> = {};
       processedList.forEach((d, i) => {
+        if (d.customFaces.length > 0) return;
         if (!faceGroups[d.faces]) {
           faceGroups[d.faces] = [];
         }
@@ -231,17 +262,28 @@ export const useDiceState = () => {
         total: finalTotal,
         details,
         isTargetHit
-      }, ...h]);
+      }, ...h].slice(0, MAX_HISTORY_LENGTH));
       setIsRolling(false);
 
       if (isTargetHit) {
         showToast(`🎯 Target Hit: ${finalTotal}!`);
       }
+
+      onComplete?.({
+        total: finalTotal,
+        diceCount: diceList.filter(d => !d.held).length,
+        isTargetHit
+      });
     }, ROLL_DURATION_MS);
   }, [diceList, modifier, rpgMode, rollAdvantage, targetHighlight, showToast]);
 
   const clearHistory = useCallback(() => {
     setRollHistory([]);
+    try {
+      localStorage.removeItem('rollHistory');
+    } catch (e) {
+      console.error(e);
+    }
   }, []);
 
   return {

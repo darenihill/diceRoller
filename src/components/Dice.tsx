@@ -35,7 +35,9 @@ const DiceComponent: React.FC<DiceProps> = ({
     const intervalId = setInterval(() => {
       tickCount++;
       
-      if (tickCount === 3) {
+      // Clamp all ticks from the 3rd onward to the final value so a late tick
+      // firing near the roll-finalize timeout can't flash a random face.
+      if (tickCount >= 3) {
         if (dice.targetValue !== undefined) {
           if (dice.customFaces.length > 0 && dice.targetFaceIndex !== undefined) {
             setTempFaceIndex(dice.targetFaceIndex);
@@ -122,14 +124,25 @@ const DiceComponent: React.FC<DiceProps> = ({
   ].filter(Boolean).join(' ');
 
   return (
-    <motion.div 
+    <motion.div
       ref={diceRef}
       className={`${styles.dice} ${isRolling && !dice.held ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''} ${extraClass}`}
       data-dice-id={dice.id}
+      role="button"
+      tabIndex={0}
+      aria-label={`${dice.name || `d${dice.faces}`} showing ${faceContent.startsWith(FACE_ICON_PREFIX) ? faceContent.replace(FACE_ICON_PREFIX, '') : faceContent}${dice.held ? ', held' : ''}. Press to ${dice.held ? 'release' : 'hold'}.`}
       onClick={(e) => {
         if ((e.target as HTMLElement).closest('button')) return;
         onReveal();
         onToggleHold(dice.id);
+      }}
+      onKeyDown={(e) => {
+        if (e.target !== e.currentTarget) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onReveal();
+          onToggleHold(dice.id);
+        }
       }}
       onTouchStart={() => onReveal()}
       layout

@@ -25,6 +25,7 @@ function App() {
   const {
     diceList, setDiceList, rollHistory, isRolling, modifier, setModifier,
     rpgMode, toggleRpgMode, rollAdvantage, setRollAdvantage,
+    targetHighlight, setTargetHighlight,
     addDice, removeDice, updateDice, toggleHold, toggleHoldAll,
     clearAllDice, rollDice, clearHistory, toast, showToast
   } = useDiceState();
@@ -58,12 +59,6 @@ function App() {
   const [revealedDiceId, setRevealedDiceId] = useState<string | null>(null);
   const [theme, setTheme] = useState(() => localStorage.getItem('appTheme') || 'theme-dark');
   
-  const [showModifier, setShowModifier] = useState(() => localStorage.getItem('showModifier') === 'true');
-
-  useEffect(() => {
-    localStorage.setItem('showModifier', String(showModifier));
-  }, [showModifier]);
-
   const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('soundEnabled') === 'true');
 
   useEffect(() => {
@@ -93,6 +88,11 @@ function App() {
   useEffect(() => {
     document.body.classList.toggle('menu-open', menuOpen);
   }, [menuOpen]);
+
+  // Expose RPG mode to CSS so mobile layout can reserve room for the taller FAB stack
+  useEffect(() => {
+    document.body.classList.toggle('rpg-mode', rpgMode);
+  }, [rpgMode]);
 
   // Auto-deselect active die on mobile after 5 seconds
   useEffect(() => {
@@ -185,13 +185,23 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Save autosave on unload
+  // Save autosave when the page is hidden or unloading. `pagehide` and
+  // `visibilitychange` fire reliably on mobile where `beforeunload` often doesn't.
   useEffect(() => {
     const handleUnload = () => {
       saveConfig('systemAutosave', diceList);
     };
+    const handleVisibility = () => {
+      if (document.visibilityState === 'hidden') handleUnload();
+    };
     window.addEventListener('beforeunload', handleUnload);
-    return () => window.removeEventListener('beforeunload', handleUnload);
+    window.addEventListener('pagehide', handleUnload);
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      window.removeEventListener('beforeunload', handleUnload);
+      window.removeEventListener('pagehide', handleUnload);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, [diceList, saveConfig]);
 
   // Derived state
@@ -417,14 +427,15 @@ function App() {
         onAdd={handleAddDice}
         onRoll={() => {
           const hasUnheldDice = diceList.some(d => !d.held);
-          rollDice();
-          
-          if (hasUnheldDice && diceList.length > 0) {
-            const unheldCount = diceList.filter(d => !d.held).length;
-            trackEvent('roll_dice', { diceCount: unheldCount, modifier, rpgMode, rollAdvantage });
-            if (soundEnabled) {
-              playRollSequence(soundTimersRef);
+          rollDice(({ total, diceCount }) => {
+            // Fires when the roll resolves, so the actual total reaches analytics
+            if (diceCount > 0) {
+              trackEvent('roll_dice', { diceCount, sum: total, modifier, rpgMode, rollAdvantage });
             }
+          });
+
+          if (hasUnheldDice && diceList.length > 0 && soundEnabled) {
+            playRollSequence(soundTimersRef);
           }
         }}
         onHoldAll={toggleHoldAll}
@@ -472,12 +483,8 @@ function App() {
           setSoundEnabled(next);
           trackEvent('sound_toggled', { enabled: next });
         }}
-        showModifier={showModifier}
-        onToggleModifier={() => {
-          const next = !showModifier;
-          setShowModifier(next);
-          trackEvent('modifier_toggled', { enabled: next });
-        }}
+        targetHighlight={targetHighlight}
+        onChangeTargetHighlight={setTargetHighlight}
         telemetryEnabled={telemetryState}
         onToggleTelemetry={handleToggleTelemetry}
       />
@@ -507,6 +514,11 @@ function App() {
           {toast}
         </div>
       )}
+
+      {/* Screen-reader announcement of roll results */}
+      <div aria-live="polite" className={styles.srOnly}>
+        {totalVisible && !isRolling ? `Rolled ${lastTotal}` : ''}
+      </div>
 
       {/* Dice Settings Modal */}
       {editingDiceId && (

@@ -18,6 +18,11 @@
   box-shadow: var(--elevation-2);
 }
 
+.dice:focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 3px;
+}
+
 .diceShapeBg {
   position: absolute;
   top: 0;
@@ -79,7 +84,8 @@
   transition: opacity 0.2s;
 }
 
-.dice:hover .unlockIcon {
+.dice:hover .unlockIcon,
+.dice:focus-within .unlockIcon {
   opacity: 1;
 }
 
@@ -91,7 +97,8 @@
   transition: opacity 0.2s, transform 0.2s, background-color 0.2s;
 }
 
-.dice:hover .settingsBtn {
+.dice:hover .settingsBtn,
+.dice:focus-within .settingsBtn {
   opacity: 1;
   pointer-events: auto;
 }
@@ -104,7 +111,8 @@
   transition: opacity 0.2s, transform 0.2s, background-color 0.2s;
 }
 
-.dice:hover .cloneBtn {
+.dice:hover .cloneBtn,
+.dice:focus-within .cloneBtn {
   opacity: 1;
   pointer-events: auto;
 }
@@ -117,7 +125,8 @@
   transition: opacity 0.2s, transform 0.2s;
 }
 
-.dice:hover .removeBtn {
+.dice:hover .removeBtn,
+.dice:focus-within .removeBtn {
   opacity: 1;
   pointer-events: auto;
 }

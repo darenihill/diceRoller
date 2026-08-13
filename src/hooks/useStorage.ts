@@ -42,12 +42,10 @@ export function useStorage() {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed['systemAutosave']) {
-          const autosave = parsed['systemAutosave'];
-          // After loading autosave, we should delete it
-          delete parsed['systemAutosave'];
-          localStorage.setItem('diceConfigs', JSON.stringify(parsed));
-          setSavedConfigs(parsed);
-          return autosave;
+          // Intentionally NOT deleted after reading: mobile browsers frequently
+          // skip unload events, so a delete-on-read would lose the autosave if
+          // the next session ends without a successful re-save.
+          return parsed['systemAutosave'];
         }
       }
     } catch (e) {

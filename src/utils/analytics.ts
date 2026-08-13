@@ -1,4 +1,5 @@
 import { generateId } from './diceUtils';
+import { GA_MEASUREMENT_ID } from './constants';
 
 export interface LocalAnalyticsStats {
   visitorId: string;
@@ -70,6 +71,10 @@ export function setTelemetryEnabled(enabled: boolean): void {
   const stats = getLocalStats();
   stats.telemetryEnabled = enabled;
   saveLocalStats(stats);
+
+  // Google Analytics' official kill switch: when set, gtag drops all hits
+  // (including automatic page_views), making the privacy toggle actually binding.
+  (window as unknown as Record<string, unknown>)[`ga-disable-${GA_MEASUREMENT_ID}`] = !enabled;
 }
 
 /** Detect device classification for metrics */
