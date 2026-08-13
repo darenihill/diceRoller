@@ -15,7 +15,6 @@ dist-ssr
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.claude
 .idea
 .DS_Store
 *.suo
@@ -23,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# BEGIN sync-agents untrackAgentFiles — do not edit this block; managed by tools/sync-agents.py
+/AGENTS.md
+/CLAUDE.md
+/.agents/
+/.claude/
+/agent-system/
+# END sync-agents untrackAgentFiles
