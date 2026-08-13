@@ -190,21 +190,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
           aria-label="Roll dice"
         >
           <Dice5 size={24} strokeWidth={2.5} />
-          {totalVisible ? (
-            <span className={styles.rollBtnStack}>
-              <span className={styles.rollBtnCaption}>Roll{rpgMode && modifier !== 0 ? ` ${modifier > 0 ? '+' : ''}${modifier}` : ''}</span>
-              <motion.span
-                className={styles.rollBtnTotal}
-                key={lastTotal}
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                {lastTotal}
-              </motion.span>
-            </span>
-          ) : (
-            <span>Roll{rpgMode && modifier !== 0 ? ` (${modifier > 0 ? '+' : ''}${modifier})` : ''}</span>
-          )}
+          <span>{totalVisible ? lastTotal : "Roll"}{rpgMode && modifier !== 0 ? ` (${modifier > 0 ? '+' : ''}${modifier})` : ''}</span>
         </motion.button>
       </div>
     </div>

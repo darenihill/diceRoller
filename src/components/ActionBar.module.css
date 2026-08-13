@@ -32,27 +32,6 @@
   align-items: flex-end;
 }
 
-/* Roll button once a total exists: small "ROLL" caption over the big total */
-.rollBtnStack {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  line-height: 1.05;
-}
-
-.rollBtnCaption {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  opacity: 0.85;
-}
-
-.rollBtnTotal {
-  font-size: 26px;
-  font-weight: 700;
-}
-
 .rpgColumns {
   display: flex;
   gap: 12px;
