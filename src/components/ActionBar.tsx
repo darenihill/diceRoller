@@ -66,6 +66,11 @@ export const ActionBar: React.FC<ActionBarProps> = ({
     }
   };
 
+  // Scale the total to fill the label area: large for short totals, stepping
+  // down as digits are added so long totals still fit beside the pinned icon.
+  const totalDigits = String(lastTotal).length;
+  const totalFontSize = totalDigits <= 3 ? 40 : totalDigits === 4 ? 32 : totalDigits === 5 ? 26 : 22;
+
   const handleSelectDndDice = (opt: { faces: number; name: string; customFaces?: string[]; color: string }) => {
     onAdd({
       numberValue: 1,
@@ -207,7 +212,21 @@ export const ActionBar: React.FC<ActionBarProps> = ({
           aria-label="Roll dice"
         >
           <Dice5 size={24} strokeWidth={2.5} className={styles.rollBtnIcon} />
-          <span className={styles.rollBtnLabel}>{totalVisible ? lastTotal : "Roll"}{rpgMode && modifier !== 0 ? ` (${modifier > 0 ? '+' : ''}${modifier})` : ''}</span>
+          {totalVisible ? (
+            <span className={styles.rollBtnLabel} style={{ fontSize: totalFontSize }}>
+              {lastTotal}
+              {rpgMode && modifier !== 0 && (
+                <span className={styles.rollBtnModSuffix}>{`${modifier > 0 ? '+' : ''}${modifier}`}</span>
+              )}
+            </span>
+          ) : (
+            <span className={styles.rollBtnLabel}>
+              Roll
+              {rpgMode && modifier !== 0 && (
+                <span className={styles.rollBtnModSuffix}>{`${modifier > 0 ? '+' : ''}${modifier}`}</span>
+              )}
+            </span>
+          )}
         </motion.button>
       </div>
     </div>
