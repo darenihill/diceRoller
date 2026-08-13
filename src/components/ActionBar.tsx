@@ -69,7 +69,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
   // Scale the total to fill the label area: large for short totals, stepping
   // down as digits are added so long totals still fit beside the pinned icon.
   const totalDigits = String(lastTotal).length;
-  const totalFontSize = totalDigits <= 3 ? 40 : totalDigits === 4 ? 32 : totalDigits === 5 ? 26 : 22;
+  const totalFontSize = totalDigits <= 3 ? 30 : totalDigits === 4 ? 26 : totalDigits === 5 ? 22 : 19;
 
   const handleSelectDndDice = (opt: { faces: number; name: string; customFaces?: string[]; color: string }) => {
     onAdd({
