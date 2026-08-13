@@ -1,4 +1,4 @@
-const CACHE_NAME = 'diceroller-v1';
+const CACHE_NAME = 'diceroller-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -45,6 +45,29 @@ self.addEventListener('fetch', (e) => {
   const isGoogleFont = url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
   
   if (!isLocal && !isGoogleFont) return;
+
+  // Navigation requests (the HTML shell) use network-first. Under
+  // stale-while-revalidate a returning visitor would render the PREVIOUS
+  // deploy's index.html on every visit — permanently one release behind,
+  // since the fresh copy only lands in cache after the page has rendered.
+  // Hashed assets are immutable, so they stay stale-while-revalidate.
+  const isNavigation = e.request.mode === 'navigate' || e.request.destination === 'document';
+
+  if (isNavigation) {
+    e.respondWith(
+      fetch(e.request).then((networkResponse) => {
+        if (networkResponse.status === 200) {
+          const copy = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, copy));
+        }
+        return networkResponse;
+      }).catch(() => {
+        // Offline: fall back to the cached shell
+        return caches.match(e.request).then((cached) => cached || caches.match('/index.html'));
+      })
+    );
+    return;
+  }
 
   e.respondWith(
     caches.open(CACHE_NAME).then((cache) => {

@@ -41,7 +41,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {/* Session Frequency Histogram */}
           <div>
-            <h3 className={modalStyles.sectionHeaderFirst}>Session Frequency ("Luck Meter")</h3>
+            <h3 className={modalStyles.sectionHeaderFirst}>Roll Frequency ("Luck Meter")</h3>
             <div className={modalStyles.freqCard}>
               {sortedTotals.map(tot => {
                 const count = frequencyMap[tot];
