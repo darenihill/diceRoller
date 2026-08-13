@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import type { DiceData } from '../types';
 import styles from './Dice.module.css';
 import { Lock, Unlock, Settings, X, Copy } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, useAnimationControls } from 'framer-motion';
 import { ALL_ICONS } from '../utils/iconUtils';
 import { parseFaceContent, FACE_ICON_PREFIX, getContrastColor } from '../utils/diceUtils';
 import { PolyhedralWireframe } from './PolyhedralWireframe';
@@ -26,6 +26,26 @@ const DiceComponent: React.FC<DiceProps> = ({
 
   const [tempValue, setTempValue] = useState<number | null>(null);
   const [tempFaceIndex, setTempFaceIndex] = useState<number | null>(null);
+
+  // Wiggle the lock icon only when held actually changes — not when the die mounts
+  // (page load, preset load). NOTE: the mount-flag effect must be declared AFTER
+  // this one so the first run sees lockMountedRef=false and skips the wiggle.
+  const lockControls = useAnimationControls();
+  const lockMountedRef = useRef(false);
+  useEffect(() => {
+    if (!lockMountedRef.current) return;
+    lockControls.start({
+      rotate: [0, -45, 10, 0],
+      color: dice.held ? '#FFD700' : '#FFFFFF',
+      transition: { duration: 0.5, ease: 'easeInOut' }
+    });
+  }, [dice.held, lockControls]);
+  useEffect(() => {
+    lockMountedRef.current = true;
+    return () => {
+      lockMountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!isRolling || dice.held) return;
@@ -189,14 +209,10 @@ const DiceComponent: React.FC<DiceProps> = ({
         </div>
       )}
 
-      <motion.div 
-        key={`${dice.id}-${dice.held}`}
+      <motion.div
         initial={{ rotate: 0 }}
-        animate={{
-          rotate: [0, -45, 10, 0],
-          color: dice.held ? "#FFD700" : "#FFFFFF"
-        }}
-        transition={{ duration: 0.5, ease: "easeInOut" }}
+        animate={lockControls}
+        style={{ color: dice.held ? '#FFD700' : '#FFFFFF' }}
         className={`${styles.actionBtn} ${dice.held ? styles.holdIcon : styles.unlockIcon}`}
       >
         <div style={{ position: 'relative', width: 20, height: 20 }}>

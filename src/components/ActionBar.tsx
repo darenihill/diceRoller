@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styles from './ActionBar.module.css';
 import { Plus, Minus, Dice5, Lock, Unlock, RotateCcw } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useAnimationControls } from 'framer-motion';
 import type { RollAdvantageMode } from '../hooks/useDiceState';
 import type { DiceData } from '../types';
 import { DndShapeIcon } from './DndShapeIcon';
@@ -37,6 +37,27 @@ export const ActionBar: React.FC<ActionBarProps> = ({
 }) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
 
+  // Wiggle the lock only when allHeld actually changes — not on initial page load.
+  // Imperative controls replace the old keyed-remount pattern so the mount render
+  // stays static. NOTE: the mount-flag effect must be declared AFTER this one so
+  // the first run of this effect sees mountedRef=false and skips the wiggle.
+  const lockControls = useAnimationControls();
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    if (!mountedRef.current) return;
+    lockControls.start({
+      rotate: [0, -45, 10, 0],
+      color: allHeld ? '#FFD700' : 'var(--md-sys-color-on-surface)',
+      transition: { duration: 0.5, ease: 'easeInOut' }
+    });
+  }, [allHeld, lockControls]);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
   const handleAddClick = () => {
     if (rpgMode) {
       setPopoverOpen(prev => !prev);
@@ -58,17 +79,13 @@ export const ActionBar: React.FC<ActionBarProps> = ({
 
   return (
     <div className={styles.actionBar}>
-      <motion.button 
-        className={`md-icon-button ${styles.actionBtn} ${styles.lockBtn}`} 
-        onClick={onHoldAll} 
+      <motion.button
+        className={`md-icon-button ${styles.actionBtn} ${styles.lockBtn}`}
+        onClick={onHoldAll}
         title="Toggle Hold All"
-        key={String(allHeld)}
         initial={{ rotate: 0 }}
-        animate={{
-          rotate: [0, -45, 10, 0],
-          color: allHeld ? "#FFD700" : "currentColor"
-        }}
-        transition={{ duration: 0.5, ease: "easeInOut" }}
+        animate={lockControls}
+        style={{ color: allHeld ? '#FFD700' : undefined }}
       >
         {allHeld ? <Unlock size={24} strokeWidth={2.5} /> : <Lock size={24} strokeWidth={2.5} />}
       </motion.button>
@@ -189,8 +206,8 @@ export const ActionBar: React.FC<ActionBarProps> = ({
           whileTap={{ scale: 0.95 }}
           aria-label="Roll dice"
         >
-          <Dice5 size={24} strokeWidth={2.5} />
-          <span>{totalVisible ? lastTotal : "Roll"}{rpgMode && modifier !== 0 ? ` (${modifier > 0 ? '+' : ''}${modifier})` : ''}</span>
+          <Dice5 size={24} strokeWidth={2.5} className={styles.rollBtnIcon} />
+          <span className={styles.rollBtnLabel}>{totalVisible ? lastTotal : "Roll"}{rpgMode && modifier !== 0 ? ` (${modifier > 0 ? '+' : ''}${modifier})` : ''}</span>
         </motion.button>
       </div>
     </div>

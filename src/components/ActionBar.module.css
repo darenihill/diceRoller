@@ -21,7 +21,19 @@
   gap: 16px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+}
+
+/* Icon stays pinned at the left edge; the label centers in the remaining space,
+   so varying text width ("Roll" vs "104") never shifts the icon. */
+.rollBtnIcon {
+  flex: none;
+}
+
+.rollBtnLabel {
+  flex: 1;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .rollGroup {
