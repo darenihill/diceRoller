@@ -1,7 +1,9 @@
 {
-  "name": "temp-app",
+  "name": "custom-dice-roller",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Customizable virtual dice roller for board games and tabletop RPGs",
+  "homepage": "https://customdiceroller.com",
   "type": "module",
   "scripts": {
     "dev": "vite",
