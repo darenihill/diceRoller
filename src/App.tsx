@@ -32,6 +32,10 @@ function App() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   
+  // Roll history persists across reloads, but the roll button should read "Roll"
+  // on every fresh load and only show a total once a roll happens this session.
+  const [hasRolledThisSession, setHasRolledThisSession] = useState(false);
+
   const [savePromptOpen, setSavePromptOpen] = useState(false);
   const [saveName, setSaveName] = useState('');
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -206,7 +210,7 @@ function App() {
 
   // Derived state
   const allHeld = diceList.length > 0 && diceList.every(d => d.held);
-  const totalVisible = rollHistory.length > 0;
+  const totalVisible = hasRolledThisSession && rollHistory.length > 0;
   const lastTotal = totalVisible ? rollHistory[0].total : 0;
 
   // Dice Size & Grid layout calculations
@@ -429,6 +433,7 @@ function App() {
           const hasUnheldDice = diceList.some(d => !d.held);
           rollDice(({ total, diceCount }) => {
             // Fires when the roll resolves, so the actual total reaches analytics
+            setHasRolledThisSession(true);
             if (diceCount > 0) {
               trackEvent('roll_dice', { diceCount, sum: total, modifier, rpgMode, rollAdvantage });
             }
