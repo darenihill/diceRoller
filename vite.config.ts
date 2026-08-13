@@ -10,6 +10,11 @@ interface VitestConfigExport extends UserConfig {
 export default defineConfig({
   base: '/',
   plugins: [react()],
+  // Port block 4500 per aiprojects/PORTS.md — strictPort exits instead of hopping
+  server: {
+    port: 4500,
+    strictPort: true,
+  },
   test: {
     globals: true,
     environment: 'jsdom',
