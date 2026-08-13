@@ -183,17 +183,6 @@ export const ActionBar: React.FC<ActionBarProps> = ({
           </motion.div>
         )}
 
-        {totalVisible && (
-          <motion.div
-            className={styles.totalChip}
-            key={lastTotal}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            Total: {lastTotal}
-          </motion.div>
-        )}
-
         <motion.button
           className={`md-button md-button-filled ${styles.rollBtn}`}
           onClick={onRoll}
@@ -201,7 +190,21 @@ export const ActionBar: React.FC<ActionBarProps> = ({
           aria-label="Roll dice"
         >
           <Dice5 size={24} strokeWidth={2.5} />
-          <span>Roll{rpgMode && modifier !== 0 ? ` (${modifier > 0 ? '+' : ''}${modifier})` : ''}</span>
+          {totalVisible ? (
+            <span className={styles.rollBtnStack}>
+              <span className={styles.rollBtnCaption}>Roll{rpgMode && modifier !== 0 ? ` ${modifier > 0 ? '+' : ''}${modifier}` : ''}</span>
+              <motion.span
+                className={styles.rollBtnTotal}
+                key={lastTotal}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                {lastTotal}
+              </motion.span>
+            </span>
+          ) : (
+            <span>Roll{rpgMode && modifier !== 0 ? ` (${modifier > 0 ? '+' : ''}${modifier})` : ''}</span>
+          )}
         </motion.button>
       </div>
     </div>
