@@ -206,8 +206,9 @@
 
 /* d10: the standard kite profile — apex, wide shoulders about a third down,
    then tapering to a point, as a pentagonal trapezohedron actually presents. */
+/* d10: rhombus, with the kite-shaped front face filling the upper half. */
 .shapeD10 {
-  clip-path: polygon(50% 1%, 95% 35%, 78% 76%, 50% 99%, 22% 76%, 5% 35%);
+  clip-path: polygon(50% 2%, 96% 50%, 50% 98%, 4% 50%);
   border-radius: 0 !important;
 }
 

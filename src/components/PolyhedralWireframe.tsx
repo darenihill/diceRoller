@@ -20,6 +20,8 @@ interface PolyhedralWireframeProps {
 
 const OUTER_STROKE = 5;
 const INNER_STROKE = 1;
+/** Applied to the group, not the strokes — see the note in the component. */
+const LINE_OPACITY = 0.36;
 
 type Facets = { outline: string; inner: string };
 
@@ -30,26 +32,24 @@ const SHAPES: Record<number, Facets> = {
     inner: 'M 50 2 L 50 62 M 4 92 L 50 62 M 96 92 L 50 62',
   },
 
-  // Cube seen corner-on: hexagon with three faces meeting at the near corner
+  // Cube seen from slightly above: the edges rise to the upper vertices so the
+  // top face reads as the rhombus across the top, with the two side faces below.
   6: {
     outline: 'M 50 2 L 95 26 L 95 74 L 50 98 L 5 74 L 5 26 Z',
-    inner: 'M 50 50 L 50 2 M 50 50 L 95 74 M 50 50 L 5 74',
+    inner: 'M 50 50 L 5 26 M 50 50 L 95 26 M 50 50 L 50 98',
   },
 
-  // Octahedron face-on: hexagon around a central triangular face
+  // Octahedron face-on: hexagon with the front face inscribed on alternating
+  // vertices. Just the triangle — extra spokes made it read as a d20.
   8: {
     outline: 'M 50 3 L 94 28 L 94 72 L 50 97 L 6 72 L 6 28 Z',
-    inner:
-      'M 50 26 L 77 71 L 23 71 Z M 50 26 L 50 3 M 50 26 L 6 28 M 50 26 L 94 28 ' +
-      'M 23 71 L 6 72 M 77 71 L 94 72 M 23 71 L 50 97 M 77 71 L 50 97',
+    inner: 'M 50 3 L 94 72 L 6 72 Z',
   },
 
-  // Pentagonal trapezohedron: kite with a shouldered waist
+  // Pentagonal trapezohedron: rhombus with the kite-shaped front face on top
   10: {
-    outline: 'M 50 1 L 95 35 L 78 76 L 50 99 L 22 76 L 5 35 Z',
-    inner:
-      'M 5 35 L 50 56 L 95 35 M 50 1 L 50 56 ' +
-      'M 50 56 L 22 76 M 50 56 L 78 76 M 50 56 L 50 99',
+    outline: 'M 50 2 L 96 50 L 50 98 L 4 50 Z',
+    inner: 'M 4 50 L 50 64 L 96 50 M 50 64 L 50 98',
   },
 
   // Dodecahedron: decagon outline around a central pentagonal face
@@ -75,9 +75,7 @@ export const PolyhedralWireframe: React.FC<PolyhedralWireframeProps> = React.mem
   if (!shape) return null;
 
   const isLightText = textColor.toUpperCase() === '#FFFFFF' || textColor.toUpperCase() === '#FFF';
-  const base = isLightText ? '255, 255, 255' : '0, 0, 0';
-  const outlineColor = `rgba(${base}, 0.45)`;
-  const innerColor = `rgba(${base}, 0.20)`;
+  const lineColor = isLightText ? '#FFFFFF' : '#000000';
 
   return (
     <svg
@@ -85,22 +83,28 @@ export const PolyhedralWireframe: React.FC<PolyhedralWireframeProps> = React.mem
       preserveAspectRatio="none"
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
     >
-      <path
-        d={shape.outline}
-        fill="none"
-        stroke={outlineColor}
-        strokeWidth={OUTER_STROKE}
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
-      <path
-        d={shape.inner}
-        fill="none"
-        stroke={innerColor}
-        strokeWidth={INNER_STROKE}
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
+      {/* Opacity lives on the group, and both strokes are fully opaque. Drawing
+          them semi-transparent instead would darken every point where a facet
+          meets the outline, since the two strokes composite against each other.
+          A group renders flat first, so junctions stay one even colour. */}
+      <g opacity={LINE_OPACITY}>
+        <path
+          d={shape.outline}
+          fill="none"
+          stroke={lineColor}
+          strokeWidth={OUTER_STROKE}
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+        <path
+          d={shape.inner}
+          fill="none"
+          stroke={lineColor}
+          strokeWidth={INNER_STROKE}
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+      </g>
     </svg>
   );
 });
