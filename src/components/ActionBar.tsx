@@ -22,7 +22,8 @@ interface ActionBarProps {
 
 const DND_GRID_DICE = [
   { label: 'D10', faces: 10, name: 'd10', color: '#384050' },
-  { label: 'D00', faces: 10, isD00: true, name: 'd10 (tens)', customFaces: ["00", "10", "20", "30", "40", "50", "60", "70", "80", "90"], color: '#384050' },
+  // Same shape as the D10 by design — a percentile pair really is two d10s
+  { label: 'D00', faces: 10, name: 'd10 (tens)', customFaces: ["00", "10", "20", "30", "40", "50", "60", "70", "80", "90"], color: '#384050' },
   { label: 'D6', faces: 6, name: 'd6', color: '#384050' },
   { label: 'D12', faces: 12, name: 'd12', color: '#384050' },
   { label: 'D4', faces: 4, name: 'd4', color: '#384050' },
@@ -116,7 +117,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
                       className={styles.dndOptionBtn}
                       onClick={() => handleSelectDndDice(opt)}
                     >
-                      <DndShapeIcon faces={opt.faces} isD00={opt.isD00} size={18} />
+                      <DndShapeIcon faces={opt.faces} size={18} />
                       <span>{opt.label}</span>
                     </button>
                   ))}
