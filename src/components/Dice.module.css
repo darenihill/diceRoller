@@ -183,6 +183,10 @@
   border-radius: 0 !important;
 }
 
+/* d10 / d20 keep their outlines below; every silhouette here is mirrored by a
+   matching `outline` path in PolyhedralWireframe so the heavy border traces the
+   real edge. Change one and you must change the other. */
+
 /* d6: isometric cube, per the conventional dice-icon set. Its hexagonal
    outline is shared with the d20 by design — in every standard depiction the
    two are told apart by the interior linework, not the silhouette: the cube
@@ -193,27 +197,30 @@
   border-radius: 0 !important;
 }
 
+/* d8: an octahedron face-on is a hexagon around a central triangular face,
+   not the flat rhombus it was drawn as before. */
 .shapeD8 {
-  clip-path: polygon(50% 2%, 96% 50%, 50% 98%, 4% 50%);
+  clip-path: polygon(50% 3%, 94% 28%, 94% 72%, 50% 97%, 6% 72%, 6% 28%);
   border-radius: 0 !important;
 }
 
 /* d10: the standard kite profile — apex, wide shoulders about a third down,
    then tapering to a point, as a pentagonal trapezohedron actually presents. */
 .shapeD10 {
-  clip-path: polygon(50% 0%, 95% 35%, 78% 76%, 50% 100%, 22% 76%, 5% 35%);
+  clip-path: polygon(50% 1%, 95% 35%, 78% 76%, 50% 99%, 22% 76%, 5% 35%);
   border-radius: 0 !important;
 }
 
-/* d12: dodecahedron face-on is a regular pentagon, point up. */
+/* d12: a dodecahedron presents a decagon outline with a central pentagonal
+   face — the plain pentagon it used before read as a d12 icon, not a d12. */
 .shapeD12 {
-  clip-path: polygon(50% 0%, 99% 37%, 80% 99%, 20% 99%, 1% 37%);
+  clip-path: polygon(50% 1%, 79% 10%, 97% 35%, 97% 65%, 79% 90%, 50% 99%, 21% 90%, 3% 65%, 3% 35%, 21% 10%);
   border-radius: 0 !important;
 }
 
 /* d20: icosahedron face-on is a hexagon with a triangular face at its centre —
    the classic d20 silhouette. Now unambiguous since the d6 is a square. */
 .shapeD20 {
-  clip-path: polygon(50% 0%, 94% 25%, 94% 75%, 50% 100%, 6% 75%, 6% 25%);
+  clip-path: polygon(50% 2%, 94% 26%, 94% 74%, 50% 98%, 6% 74%, 6% 26%);
   border-radius: 0 !important;
 }

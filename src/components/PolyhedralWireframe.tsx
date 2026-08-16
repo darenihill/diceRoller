@@ -5,113 +5,104 @@ interface PolyhedralWireframeProps {
   textColor?: string;
 }
 
+/**
+ * Facet overlays for RPG mode, drawn to match the conventional dice-icon set.
+ *
+ * Each die is two paths: a heavy `outline` tracing the silhouette and a light
+ * `inner` carrying the facets. The outline is deliberately much thicker than it
+ * looks — this SVG sits inside `.diceShapeBg`, which carries the clip-path, so
+ * roughly half of an edge stroke is clipped away and only the inner half paints.
+ *
+ * Note the d6 and d20 share a hexagonal outline. That is correct and matches
+ * every standard depiction: a cube and an icosahedron are told apart by their
+ * interior linework, not their silhouette.
+ */
+
+const OUTER_STROKE = 5;
+const INNER_STROKE = 1;
+
+type Facets = { outline: string; inner: string };
+
+const SHAPES: Record<number, Facets> = {
+  // Tetrahedron: triangle with edges converging on the near apex
+  4: {
+    outline: 'M 50 2 L 96 92 L 4 92 Z',
+    inner: 'M 50 2 L 50 62 M 4 92 L 50 62 M 96 92 L 50 62',
+  },
+
+  // Cube seen corner-on: hexagon with three faces meeting at the near corner
+  6: {
+    outline: 'M 50 2 L 95 26 L 95 74 L 50 98 L 5 74 L 5 26 Z',
+    inner: 'M 50 50 L 50 2 M 50 50 L 95 74 M 50 50 L 5 74',
+  },
+
+  // Octahedron face-on: hexagon around a central triangular face
+  8: {
+    outline: 'M 50 3 L 94 28 L 94 72 L 50 97 L 6 72 L 6 28 Z',
+    inner:
+      'M 50 26 L 77 71 L 23 71 Z M 50 26 L 50 3 M 50 26 L 6 28 M 50 26 L 94 28 ' +
+      'M 23 71 L 6 72 M 77 71 L 94 72 M 23 71 L 50 97 M 77 71 L 50 97',
+  },
+
+  // Pentagonal trapezohedron: kite with a shouldered waist
+  10: {
+    outline: 'M 50 1 L 95 35 L 78 76 L 50 99 L 22 76 L 5 35 Z',
+    inner:
+      'M 5 35 L 50 56 L 95 35 M 50 1 L 50 56 ' +
+      'M 50 56 L 22 76 M 50 56 L 78 76 M 50 56 L 50 99',
+  },
+
+  // Dodecahedron: decagon outline around a central pentagonal face
+  12: {
+    outline:
+      'M 50 1 L 79 10 L 97 35 L 97 65 L 79 90 L 50 99 L 21 90 L 3 65 L 3 35 L 21 10 Z',
+    inner:
+      'M 50 30 L 71 45 L 63 70 L 37 70 L 29 45 Z ' +
+      'M 50 30 L 50 1 M 71 45 L 97 35 M 63 70 L 79 90 M 37 70 L 21 90 M 29 45 L 3 35',
+  },
+
+  // Icosahedron face-on: hexagon, inscribed triangle, inverted central face
+  20: {
+    outline: 'M 50 2 L 94 26 L 94 74 L 50 98 L 6 74 L 6 26 Z',
+    inner:
+      'M 50 2 L 94 74 L 6 74 Z M 72 38 L 50 74 L 28 38 Z ' +
+      'M 94 26 L 72 38 M 6 26 L 28 38 M 50 98 L 50 74',
+  },
+};
+
 export const PolyhedralWireframe: React.FC<PolyhedralWireframeProps> = React.memo(({ faces, textColor = '#FFFFFF' }) => {
+  const shape = SHAPES[faces];
+  if (!shape) return null;
+
   const isLightText = textColor.toUpperCase() === '#FFFFFF' || textColor.toUpperCase() === '#FFF';
-  const strokeColor = isLightText ? 'rgba(255, 255, 255, 0.22)' : 'rgba(0, 0, 0, 0.22)';
-  const strokeWidth = 1.2;
+  const base = isLightText ? '255, 255, 255' : '0, 0, 0';
+  const outlineColor = `rgba(${base}, 0.45)`;
+  const innerColor = `rgba(${base}, 0.20)`;
 
-  if (faces === 4) {
-    // d4 Pyramid: outer triangle + inner apex node at (50, 60)
-    return (
-      <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-        <path 
-          d="M 50 2 L 96 92 L 4 92 Z M 50 2 L 50 60 M 4 92 L 50 60 M 96 92 L 50 60 M 50 60 L 50 92" 
-          fill="none" 
-          stroke={strokeColor} 
-          strokeWidth={strokeWidth} 
-          strokeLinejoin="round" 
-          strokeLinecap="round" 
-        />
-      </svg>
-    );
-  }
-
-  if (faces === 6) {
-    // d6 isometric cube: hexagonal outline with the three visible faces meeting
-    // at the near corner — the Y is what separates it from the d20 at a glance,
-    // so it is drawn a little stronger than the other wireframes.
-    return (
-      <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-        <path
-          d="M 50 2 L 95 26 L 95 74 L 50 98 L 5 74 L 5 26 Z M 50 50 L 50 2 M 50 50 L 95 74 M 50 50 L 5 74"
-          fill="none"
-          stroke={strokeColor}
-          strokeWidth={strokeWidth * 1.4}
-          strokeLinejoin="round"
-          strokeLinecap="round"
-        />
-      </svg>
-    );
-  }
-
-  if (faces === 8) {
-    // d8 Octahedron / Diamond
-    return (
-      <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-        <path 
-          d="M 50 2 L 96 50 L 50 98 L 4 50 Z M 50 25 L 75 50 L 50 75 L 25 50 Z M 50 2 L 50 25 M 96 50 L 75 50 M 50 98 L 50 75 M 4 50 L 25 50" 
-          fill="none" 
-          stroke={strokeColor} 
-          strokeWidth={strokeWidth} 
-          strokeLinejoin="round" 
-          strokeLinecap="round" 
-        />
-      </svg>
-    );
-  }
-
-  if (faces === 10) {
-    // d10 pentagonal trapezohedron: sharp apex, narrow waist, pointed base.
-    // Geometry mirrors .shapeD10's clip-path so facets stay inside the silhouette.
-    return (
-      <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-        <path
-          d="M 50 0 L 95 35 L 78 76 L 50 100 L 22 76 L 5 35 Z M 5 35 L 50 55 L 95 35 M 50 0 L 50 55 M 50 55 L 22 76 M 50 55 L 78 76 M 50 55 L 50 100"
-          fill="none"
-          stroke={strokeColor}
-          strokeWidth={strokeWidth}
-          strokeLinejoin="round"
-          strokeLinecap="round"
-        />
-      </svg>
-    );
-  }
-
-  if (faces === 12) {
-    // d12 dodecahedron: flat-topped pentagon with a concentric inner face.
-    // Matches .shapeD12's clip-path.
-    return (
-      <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-        <path
-          d="M 50 0 L 99 37 L 80 99 L 20 99 L 1 37 Z M 50 22 L 77 42 L 67 74 L 33 74 L 23 42 Z M 50 0 L 50 22 M 99 37 L 77 42 M 80 99 L 67 74 M 20 99 L 33 74 M 1 37 L 23 42"
-          fill="none"
-          stroke={strokeColor}
-          strokeWidth={strokeWidth}
-          strokeLinejoin="round"
-          strokeLinecap="round"
-        />
-      </svg>
-    );
-  }
-
-  if (faces === 20) {
-    // d20 icosahedron face-on: hexagon with the central triangular face ringed
-    // by its neighbours. Matches .shapeD20's clip-path.
-    return (
-      <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-        <path
-          d="M 50 0 L 94 25 L 94 75 L 50 100 L 6 75 L 6 25 Z M 27 27 L 73 27 L 50 72 Z M 27 27 L 50 0 M 73 27 L 50 0 M 27 27 L 6 25 M 73 27 L 94 25 M 27 27 L 6 75 M 73 27 L 94 75 M 50 72 L 50 100 M 50 72 L 6 75 M 50 72 L 94 75"
-          fill="none"
-          stroke={strokeColor}
-          strokeWidth={strokeWidth}
-          strokeLinejoin="round"
-          strokeLinecap="round"
-        />
-      </svg>
-    );
-  }
-
-  return null;
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+    >
+      <path
+        d={shape.outline}
+        fill="none"
+        stroke={outlineColor}
+        strokeWidth={OUTER_STROKE}
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+      <path
+        d={shape.inner}
+        fill="none"
+        stroke={innerColor}
+        strokeWidth={INNER_STROKE}
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
 });
 
 PolyhedralWireframe.displayName = 'PolyhedralWireframe';
