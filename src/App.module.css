@@ -141,9 +141,11 @@
     padding-bottom: 96px !important; /* Reserve spacing for bottom action buttons on mobile */
   }
 
-  /* RPG mode stacks ~314px of FABs (ADV/NORM/DIS + modifier + roll) above the bottom
-     edge; reserve that space so the dice grid never sizes itself underneath them. */
+  /* RPG mode stacks its controls above the bottom edge; reserve that space so the
+     dice grid never sizes itself underneath them. Since the controls rotate to two
+     rows here: 2 rows of FABs (152) + gap (10) + roll button (72) + the bar's own
+     24px offset. */
   :global(body.rpg-mode) .diceContainer {
-    padding-bottom: 340px !important;
+    padding-bottom: 270px !important;
   }
 }

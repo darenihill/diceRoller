@@ -124,10 +124,19 @@
     line-height: 1.1;
   }
 
-  /* On mobile the columns flatten into a 4-up grid, so the footer sits as a
-     normal square tile rather than a full-width bar. */
+  /* The footer spans here too, but has to opt out of the square-tile styling
+     the other items take on at this width, or the grid stretches it into a
+     full-width block. */
   .menuFooterItem {
-    grid-column: auto;
-    margin-top: 0;
+    grid-column: 1 / -1;
+    aspect-ratio: auto;
+    flex-direction: row;
+    gap: 8px;
+    padding: 10px;
+    margin-top: 2px;
+  }
+
+  .menuFooterItem span {
+    font-size: 12px;
   }
 }

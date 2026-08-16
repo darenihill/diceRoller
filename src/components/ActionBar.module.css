@@ -184,6 +184,20 @@
   transform: scale(1.02);
 }
 
+@media (max-width: 768px) {
+  /* Rotate the RPG controls: two rows of three instead of three rows of two.
+     Same buttons, ~80px shorter, and that height goes back to the dice. */
+  .rpgColumns {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .verticalColumn {
+    flex-direction: row;
+  }
+}
+
 @media (max-width: 468px) {
   .lockBtn {
     position: fixed !important;
