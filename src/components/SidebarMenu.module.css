@@ -64,6 +64,14 @@
   gap: 6px;
 }
 
+/* Spans every column beneath the grid, keeping the columns 4-for-4 */
+.menuFooterItem {
+  grid-column: 1 / -1;
+  justify-content: center;
+  color: var(--md-sys-color-error);
+  margin-top: 4px;
+}
+
 .menuColumnHeader {
   font-size: 11px;
   font-weight: 600;
@@ -114,5 +122,12 @@
   .menuItem span {
     font-size: 9px;
     line-height: 1.1;
+  }
+
+  /* On mobile the columns flatten into a 4-up grid, so the footer sits as a
+     normal square tile rather than a full-width bar. */
+  .menuFooterItem {
+    grid-column: auto;
+    margin-top: 0;
   }
 }

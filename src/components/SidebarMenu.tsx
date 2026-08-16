@@ -73,8 +73,16 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
                   {rpgMode ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
                   <span>RPG Mode</span>
                 </button>
-                <button className={styles.menuItem} style={{ color: 'var(--md-sys-color-error)' }} onClick={onDeleteAll}><Trash2 size={18} /> <span>Clear All</span></button>
               </div>
+
+              {/* Destructive action gets its own full-width row so the three
+                  columns stay even at four items each. */}
+              <button
+                className={`${styles.menuItem} ${styles.menuFooterItem}`}
+                onClick={onDeleteAll}
+              >
+                <Trash2 size={18} /> <span>Clear All</span>
+              </button>
             </motion.div>
           </>
         )}
