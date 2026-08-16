@@ -51,7 +51,7 @@ const SHAPES: Record<number, Facets> = {
   // inward — tilting them the other way reads as the die facing downward.
   10: {
     outline: 'M 50 2 L 96 50 L 50 98 L 4 50 Z',
-    inner: 'M 50 2 L 72 40 L 50 68 L 28 40 Z M 28 40 L 4 50 M 72 40 L 96 50 M 50 68 L 50 98',
+    inner: 'M 50 2 L 72 44 L 50 70 L 28 44 Z M 28 44 L 4 50 M 72 44 L 96 50 M 50 70 L 50 98',
   },
 
   // Dodecahedron: decagon outline around a central pentagonal face
