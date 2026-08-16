@@ -86,23 +86,29 @@ export const PolyhedralWireframe: React.FC<PolyhedralWireframeProps> = React.mem
       {/* Opacity lives on the group, and both strokes are fully opaque. Drawing
           them semi-transparent instead would darken every point where a facet
           meets the outline, since the two strokes composite against each other.
-          A group renders flat first, so junctions stay one even colour. */}
+          A group renders flat first, so junctions stay one even colour.
+
+          Joins are mitered, not rounded: the clip-path corners are sharp, so a
+          round join pulls the stroke away from each corner and blunts it. The
+          miter spike runs past the silhouette and the clip trims it flush,
+          which fills the corner exactly. Butt caps keep facet ends from
+          bulging past the edges they land on. */}
       <g opacity={LINE_OPACITY}>
         <path
           d={shape.outline}
           fill="none"
           stroke={lineColor}
           strokeWidth={OUTER_STROKE}
-          strokeLinejoin="round"
-          strokeLinecap="round"
+          strokeLinejoin="miter"
+          strokeLinecap="butt"
         />
         <path
           d={shape.inner}
           fill="none"
           stroke={lineColor}
           strokeWidth={INNER_STROKE}
-          strokeLinejoin="round"
-          strokeLinecap="round"
+          strokeLinejoin="miter"
+          strokeLinecap="butt"
         />
       </g>
     </svg>
