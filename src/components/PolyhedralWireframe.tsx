@@ -27,14 +27,16 @@ export const PolyhedralWireframe: React.FC<PolyhedralWireframeProps> = React.mem
   }
 
   if (faces === 6) {
-    // d6 cube face-on: bevelled square with an inset face edge
+    // d6 isometric cube: hexagonal outline with the three visible faces meeting
+    // at the near corner — the Y is what separates it from the d20 at a glance,
+    // so it is drawn a little stronger than the other wireframes.
     return (
       <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
         <path
-          d="M 8 1 L 92 1 L 99 8 L 99 92 L 92 99 L 8 99 L 1 92 L 1 8 Z M 12 12 L 88 12 L 88 88 L 12 88 Z M 8 1 L 12 12 M 92 1 L 88 12 M 99 92 L 88 88 M 8 99 L 12 88"
+          d="M 50 2 L 95 26 L 95 74 L 50 98 L 5 74 L 5 26 Z M 50 50 L 50 2 M 50 50 L 95 74 M 50 50 L 5 74"
           fill="none"
           stroke={strokeColor}
-          strokeWidth={strokeWidth}
+          strokeWidth={strokeWidth * 1.4}
           strokeLinejoin="round"
           strokeLinecap="round"
         />

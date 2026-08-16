@@ -183,10 +183,13 @@
   border-radius: 0 !important;
 }
 
-/* d6: a cube face-on is a square. It previously reused the icosahedron hexagon,
-   which is what actually made it indistinguishable from the d20. */
+/* d6: isometric cube, per the conventional dice-icon set. Its hexagonal
+   outline is shared with the d20 by design — in every standard depiction the
+   two are told apart by the interior linework, not the silhouette: the cube
+   shows three quadrilateral faces meeting at a near corner, the icosahedron a
+   field of triangles. */
 .shapeD6 {
-  clip-path: polygon(8% 1%, 92% 1%, 99% 8%, 99% 92%, 92% 99%, 8% 99%, 1% 92%, 1% 8%);
+  clip-path: polygon(50% 2%, 95% 26%, 95% 74%, 50% 98%, 5% 74%, 5% 26%);
   border-radius: 0 !important;
 }
 

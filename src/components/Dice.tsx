@@ -5,6 +5,7 @@ import { Lock, Unlock, Settings, X, Copy } from 'lucide-react';
 import { motion, useAnimationControls } from 'framer-motion';
 import { ALL_ICONS } from '../utils/iconUtils';
 import { parseFaceContent, FACE_ICON_PREFIX, getContrastColor } from '../utils/diceUtils';
+import { MAX_SHAPED_FACE_LENGTH } from '../utils/constants';
 import { PolyhedralWireframe } from './PolyhedralWireframe';
 
 interface DiceProps {
@@ -126,9 +127,22 @@ const DiceComponent: React.FC<DiceProps> = ({
     return faceStr;
   };
 
-  // Determine polyhedral RPG shape when rpgMode is active and faces match d4, d8, d10, d12, d20
+  // Custom-faced dice normally stay plain tiles, because a long label like
+  // "Barbarian" would clip inside a pointed silhouette. Short numeric faces are
+  // safe though, which is what lets a percentile pair (00-90 plus 0-9) render
+  // as the two d10s it actually is.
+  const customFacesFitShape =
+    dice.customFaces.length > 0 &&
+    dice.customFaces.every(f => {
+      const content = parseFaceContent(f).content;
+      return !content.startsWith(FACE_ICON_PREFIX) && content.trim().length <= MAX_SHAPED_FACE_LENGTH;
+    });
+
+  // Determine polyhedral RPG shape when rpgMode is active and faces match d4, d6, d8, d10, d12, d20
+  const shapeEligible = rpgMode && (dice.customFaces.length === 0 || customFacesFitShape);
+
   let shapeClass = '';
-  if (rpgMode && dice.customFaces.length === 0) {
+  if (shapeEligible) {
     if (dice.faces === 4) shapeClass = styles.shapeD4;
     else if (dice.faces === 6) shapeClass = styles.shapeD6;
     else if (dice.faces === 8) shapeClass = styles.shapeD8;
@@ -173,7 +187,7 @@ const DiceComponent: React.FC<DiceProps> = ({
       {/* Background shape container so clip-path does NOT clip action buttons */}
       <div className={`${styles.diceShapeBg} ${shapeClass}`} style={{ backgroundColor }}>
         {/* 3D Wireframe Facet Lines Overlay - placed INSIDE diceShapeBg to match silhouette bounds perfectly */}
-        {rpgMode && dice.customFaces.length === 0 && (
+        {shapeEligible && (
           <PolyhedralWireframe faces={dice.faces} textColor={textColor} />
         )}
       </div>
