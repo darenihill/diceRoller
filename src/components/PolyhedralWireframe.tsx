@@ -46,10 +46,12 @@ const SHAPES: Record<number, Facets> = {
     inner: 'M 50 3 L 94 72 L 6 72 Z',
   },
 
-  // Pentagonal trapezohedron: rhombus with the kite-shaped front face on top
+  // Pentagonal trapezohedron: rhombus with a kite front face. The kite's side
+  // corners sit ABOVE the halfway line so the side lines rise as they run
+  // inward — tilting them the other way reads as the die facing downward.
   10: {
     outline: 'M 50 2 L 96 50 L 50 98 L 4 50 Z',
-    inner: 'M 4 50 L 50 64 L 96 50 M 50 64 L 50 98',
+    inner: 'M 50 2 L 72 40 L 50 68 L 28 40 Z M 28 40 L 4 50 M 72 40 L 96 50 M 50 68 L 50 98',
   },
 
   // Dodecahedron: decagon outline around a central pentagonal face
