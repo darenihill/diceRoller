@@ -7,9 +7,10 @@ import { Dice } from './components/Dice';
 import { ActionBar } from './components/ActionBar';
 import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
-import { generateId, calculateGridDimensions } from './utils/diceUtils';
+import { generateId, calculateGridDimensions, sanitizeDiceList } from './utils/diceUtils';
 import { playRollSequence } from './utils/soundEffects';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
+import { MAX_HISTORY_LENGTH } from './utils/constants';
 import type { DiceData } from './types';
 
 // Decomposed Modals
@@ -20,6 +21,7 @@ import { CustomizeModal } from './components/modals/CustomizeModal';
 import { SaveDialog } from './components/modals/SaveDialog';
 import { ConfirmDialog } from './components/modals/ConfirmDialog';
 import { ShareModal } from './components/modals/ShareModal';
+import { StatsModal } from './components/modals/StatsModal';
 
 function App() {
   const {
@@ -81,7 +83,7 @@ function App() {
   }, []);
 
   // Modals state
-  const [modalOpen, setModalOpen] = useState<'help' | 'history' | 'sets' | 'customize' | null>(null);
+  const [modalOpen, setModalOpen] = useState<'help' | 'history' | 'sets' | 'customize' | 'stats' | null>(null);
 
   useEffect(() => {
     document.body.classList.remove('theme-dark', 'theme-light', 'theme-felt', 'theme-midnight');
@@ -128,28 +130,33 @@ function App() {
 
     const hash = window.location.hash;
     if (hash.startsWith('#share=')) {
+      // A share link is a hand-craftable URL, so treat the payload as untrusted
+      // and always tell the recipient when it cannot be read — previously a
+      // malformed link silently fell through to the default dice.
+      let shared: DiceData[] = [];
       try {
         const compressed = hash.replace('#share=', '');
         const json = LZString.decompressFromEncodedURIComponent(compressed);
-        if (json) {
-          const parsed = JSON.parse(json);
-          if (Array.isArray(parsed)) {
-            setDiceList(parsed.map((d: DiceData) => ({ ...d, id: generateId() })));
-            window.history.replaceState(null, '', window.location.pathname + window.location.search);
-            return;
-          }
-        }
+        shared = json ? sanitizeDiceList(JSON.parse(json)) : [];
       } catch (e) {
         console.error("Failed to load shared dice set from URL", e);
       }
+
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+
+      if (shared.length > 0) {
+        setDiceList(shared);
+        return;
+      }
+      showToast("That share link couldn't be read — loading your usual dice instead.");
     }
 
     const defaultSet = localStorage.getItem('defaultDiceSet');
     if (defaultSet) {
       try {
-        const parsed = JSON.parse(defaultSet);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setDiceList(parsed.map((d: DiceData) => ({ ...d, id: generateId() })));
+        const parsed = sanitizeDiceList(JSON.parse(defaultSet));
+        if (parsed.length > 0) {
+          setDiceList(parsed);
           return;
         }
       } catch (e) {
@@ -158,9 +165,12 @@ function App() {
     }
 
     const autosave = getSystemAutosave();
-    if (autosave && autosave.config.length > 0) {
-      setDiceList(autosave.config.map(d => ({ ...d, id: generateId() })));
-      return;
+    if (autosave) {
+      const restored = sanitizeDiceList(autosave.config);
+      if (restored.length > 0) {
+        setDiceList(restored);
+        return;
+      }
     }
 
     // Default to 2 basic dice if the app has never been used
@@ -242,16 +252,7 @@ function App() {
   };
 
   const handleLoadSet = (config: Partial<DiceData>[], presetName?: string) => {
-    setDiceList(config.map((d) => ({
-      id: d.id || generateId(),
-      numberValue: d.numberValue ?? 1,
-      faces: d.faces ?? 6,
-      currentFaceIndex: d.currentFaceIndex,
-      name: d.name,
-      customFaces: d.customFaces ?? [],
-      color: d.color ?? '#E9EAEC',
-      held: d.held ?? false
-    })));
+    setDiceList(sanitizeDiceList(config));
     if (presetName) {
       trackEvent('preset_loaded', { presetName });
     }
@@ -339,7 +340,21 @@ function App() {
     reader.onload = (event) => {
       try {
         const data = JSON.parse(event.target?.result as string);
-        if (data && typeof data === 'object') {
+        if (data && typeof data === 'object' && !Array.isArray(data)) {
+          // Sanitize every dice list inside the backup before it reaches storage
+          if (data.configs && typeof data.configs === 'object') {
+            for (const key of Object.keys(data.configs)) {
+              const entry = data.configs[key];
+              if (entry && typeof entry === 'object') {
+                entry.config = sanitizeDiceList(entry.config);
+              } else {
+                delete data.configs[key];
+              }
+            }
+          }
+          if (data.defaultSet) {
+            data.defaultSet = sanitizeDiceList(data.defaultSet);
+          }
           if (data.configs) {
             const currentConfigs = JSON.parse(localStorage.getItem('diceConfigs') || '{}');
             const mergedConfigs = { ...currentConfigs, ...data.configs };
@@ -348,8 +363,8 @@ function App() {
           if (data.defaultSet) {
             localStorage.setItem('defaultDiceSet', JSON.stringify(data.defaultSet));
           }
-          if (data.rollHistory) {
-            localStorage.setItem('rollHistory', JSON.stringify(data.rollHistory));
+          if (Array.isArray(data.rollHistory)) {
+            localStorage.setItem('rollHistory', JSON.stringify(data.rollHistory.slice(0, MAX_HISTORY_LENGTH)));
           }
           if (data.theme) {
             localStorage.setItem('appTheme', data.theme);
@@ -416,6 +431,7 @@ function App() {
         onIdeas={() => window.open('https://forms.gle/wqYaKsEZ5FQwizuMA', '_blank')}
         onHelp={() => setModalOpen('help')}
         onHistory={() => setModalOpen('history')}
+        onStats={() => setModalOpen('stats')}
         onSets={() => setModalOpen('sets')}
         onCustomize={() => setModalOpen('customize')}
         onDeleteAll={handleDeleteAll}
@@ -508,9 +524,14 @@ function App() {
         onConfirm={executeDeleteAll}
       />
 
-      <ShareModal 
-        url={shareFallbackUrl} 
-        onClose={() => setShareFallbackUrl(null)} 
+      <ShareModal
+        url={shareFallbackUrl}
+        onClose={() => setShareFallbackUrl(null)}
+      />
+
+      <StatsModal
+        isOpen={modalOpen === 'stats'}
+        onClose={() => setModalOpen(null)}
       />
 
       {/* Toast Notification */}

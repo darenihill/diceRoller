@@ -1,5 +1,12 @@
 export const MAX_DICE_LIMIT = 50;
 export const MAX_HISTORY_LENGTH = 200;
+
+// Bounds applied to untrusted dice payloads (share links, backups, autosave)
+export const MIN_FACES = 1;
+export const MAX_FACES = 1000;
+export const MAX_CUSTOM_FACES = 100;
+export const MAX_FACE_TEXT_LENGTH = 60;
+export const MAX_NAME_LENGTH = 40;
 export const GA_MEASUREMENT_ID = 'G-LF0JH7CVP6';
 export const ROLL_TICK_INTERVAL_MS = 200;
 export const ROLL_DURATION_MS = 800;

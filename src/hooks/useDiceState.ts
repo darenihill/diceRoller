@@ -216,16 +216,29 @@ export const useDiceState = () => {
       });
     }
 
-    // Calculate sum total from non-dropped dice
+    // Calculate sum total from non-dropped dice.
+    // Every die gets a history line — unnamed dice fall back to a dN label, so
+    // the default 2d6 no longer produce blank rows in the roll log. Custom-faced
+    // dice show the face they landed on, since their numeric value is often 0.
+    const ordinals: Record<number, number> = {};
     processedList.forEach(d => {
       const val = d.targetValue ?? d.numberValue;
       if (!d.dropped) {
         rollTotal += val;
       }
-      if (d.name) {
-        const dropSuffix = d.dropped ? ' (dropped)' : '';
-        details.push(`${d.name}: ${val}${dropSuffix}`);
+
+      ordinals[d.faces] = (ordinals[d.faces] || 0) + 1;
+      const label = d.name || `d${d.faces} #${ordinals[d.faces]}`;
+
+      let shown = String(val);
+      if (d.customFaces.length > 0) {
+        const idx = d.targetFaceIndex ?? d.currentFaceIndex ?? 0;
+        const face = parseFaceContent(d.customFaces[idx] ?? '').content;
+        shown = face.startsWith(FACE_ICON_PREFIX) ? face.replace(FACE_ICON_PREFIX, '') : (face || String(val));
       }
+
+      const dropSuffix = d.dropped ? ' (dropped)' : '';
+      details.push(`${label}: ${shown}${dropSuffix}`);
     });
 
     const activeModifier = rpgMode ? modifier : 0;

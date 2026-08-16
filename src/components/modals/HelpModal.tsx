@@ -19,6 +19,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
           <li><strong>Games & Presets:</strong> Quickly load predefined configurations like <em>Cities & Knights</em> or <em>That's Pretty Clever</em>, or save and load your own custom games!</li>
           <li><strong>RPG Mode:</strong> Toggle under Tools to unlock polyhedral dice shapes, a roll modifier, and Advantage / Disadvantage. Advantage keeps the highest (Disadvantage the lowest) among identical plain dice — custom-faced dice like percentile pairs always count normally.</li>
           <li><strong>Target Highlight:</strong> Set target totals under Tools &gt; Customize (e.g. <code>7, 11</code>) and get a 🎯 celebration whenever a roll hits one.</li>
+          <li><strong>Usage Stats:</strong> Track total rolls, highest and average roll, and your most-played games under Tools &gt; Usage Stats. Everything is stored on your device only.</li>
           <li><strong>Colorblind Friendly:</strong> Automatic contrast coloring ensures text and icons are perfectly readable against any background color.</li>
         </ul>
       </div>

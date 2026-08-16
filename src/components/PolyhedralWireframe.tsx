@@ -59,48 +59,51 @@ export const PolyhedralWireframe: React.FC<PolyhedralWireframeProps> = React.mem
   }
 
   if (faces === 10) {
-    // d10 Kite Shield
+    // d10 pentagonal trapezohedron: sharp apex, narrow waist, pointed base.
+    // Geometry mirrors .shapeD10's clip-path so facets stay inside the silhouette.
     return (
       <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-        <path 
-          d="M 50 2 L 96 36 L 76 98 L 24 98 L 4 36 Z M 50 2 L 50 55 M 4 36 L 50 55 M 96 36 L 50 55 M 24 98 L 50 55 M 76 98 L 50 55 M 50 55 L 50 98" 
-          fill="none" 
-          stroke={strokeColor} 
-          strokeWidth={strokeWidth} 
-          strokeLinejoin="round" 
-          strokeLinecap="round" 
+        <path
+          d="M 50 0 L 90 32 L 72 78 L 50 100 L 28 78 L 10 32 Z M 50 0 L 50 52 M 10 32 L 50 52 M 90 32 L 50 52 M 28 78 L 50 52 M 72 78 L 50 52 M 50 52 L 50 100"
+          fill="none"
+          stroke={strokeColor}
+          strokeWidth={strokeWidth}
+          strokeLinejoin="round"
+          strokeLinecap="round"
         />
       </svg>
     );
   }
 
   if (faces === 12) {
-    // d12 Dodecahedron
+    // d12 dodecahedron: flat-topped pentagon with a concentric inner face.
+    // Matches .shapeD12's clip-path.
     return (
       <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-        <path 
-          d="M 50 2 L 96 35 L 78 97 L 22 97 L 4 35 Z M 50 20 L 78 40 L 68 72 L 32 72 L 22 40 Z M 50 2 L 50 20 M 96 35 L 78 40 M 78 97 L 68 72 M 22 97 L 32 72 M 4 35 L 22 40" 
-          fill="none" 
-          stroke={strokeColor} 
-          strokeWidth={strokeWidth} 
-          strokeLinejoin="round" 
-          strokeLinecap="round" 
+        <path
+          d="M 50 2 L 98 38 L 79 96 L 21 96 L 2 38 Z M 50 24 L 76 43 L 66 74 L 34 74 L 24 43 Z M 50 2 L 50 24 M 98 38 L 76 43 M 79 96 L 66 74 M 21 96 L 34 74 M 2 38 L 24 43"
+          fill="none"
+          stroke={strokeColor}
+          strokeWidth={strokeWidth}
+          strokeLinejoin="round"
+          strokeLinecap="round"
         />
       </svg>
     );
   }
 
   if (faces === 20) {
-    // Classic 3D D20 Icosahedron: Outer hexagon + central face triangle + 9 radial facet lines
+    // d20 icosahedron viewed face-on: corner-clipped triangle with the central
+    // face ringed by its three neighbours. Matches .shapeD20's clip-path.
     return (
       <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-        <path 
-          d="M 50 2 L 95 25 L 95 75 L 50 98 L 5 75 L 5 25 Z M 25 25 L 75 25 L 50 75 Z M 25 25 L 50 2 M 75 25 L 50 2 M 25 25 L 5 25 M 75 25 L 95 25 M 25 25 L 5 75 M 75 25 L 95 75 M 50 75 L 50 98 M 50 75 L 5 75 M 50 75 L 95 75" 
-          fill="none" 
-          stroke={strokeColor} 
-          strokeWidth={strokeWidth} 
-          strokeLinejoin="round" 
-          strokeLinecap="round" 
+        <path
+          d="M 50 0 L 68 12 L 96 62 L 90 84 L 10 84 L 4 62 L 32 12 Z M 50 30 L 74 72 L 26 72 Z M 50 30 L 32 12 M 50 30 L 68 12 M 26 72 L 4 62 M 26 72 L 10 84 M 74 72 L 96 62 M 74 72 L 90 84 M 26 72 L 74 72"
+          fill="none"
+          stroke={strokeColor}
+          strokeWidth={strokeWidth}
+          strokeLinejoin="round"
+          strokeLinecap="round"
         />
       </svg>
     );

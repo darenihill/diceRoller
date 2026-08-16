@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { DiceData } from '../types';
 import { Modal } from './Modal';
 import { COLORS, FACE_BG_DELIMITER, FACE_ICON_PREFIX, parseFaceContent, getContrastColor } from '../utils/diceUtils';
 import { X, Plus, Minus, Star, Check, Copy, Trash2, Palette } from 'lucide-react';
 import { ALL_ICONS, COMMON_ICONS } from '../utils/iconUtils';
 import styles from './DiceSettingsModal.module.css';
+
+/** Approximate rendered height of the colour popover, used to clamp its position. */
+const POPOVER_HEIGHT = 170;
 
 interface DiceSettingsModalProps {
   dice: DiceData;
@@ -18,7 +21,28 @@ interface DiceSettingsModalProps {
 export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOpen, onClose, onUpdate, onRemove, onClone }) => {
   const [customInput, setCustomInput] = useState('');
   const [showAllIcons, setShowAllIcons] = useState(false);
-  const [activeColorPicker, setActiveColorPicker] = useState<{ type: 'base' | 'custom'; index?: number } | null>(null);
+  const [activeColorPicker, setActiveColorPicker] = useState<{ type: 'base' | 'custom'; index?: number; top: number } | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * Anchor the popover just below whichever swatch opened it. Previously the
+   * offset was hardcoded (65px / 230px), so editing a face far down a long list
+   * left the popover floating near the top of the modal.
+   */
+  const openPicker = (e: React.MouseEvent, picker: { type: 'base' | 'custom'; index?: number }) => {
+    e.stopPropagation();
+    const container = containerRef.current;
+    const trigger = e.currentTarget as HTMLElement;
+    let top = 65;
+    if (container) {
+      const cRect = container.getBoundingClientRect();
+      const tRect = trigger.getBoundingClientRect();
+      // Position relative to the scrolled container, clamped so it stays inside
+      const raw = tRect.bottom - cRect.top + container.scrollTop + 8;
+      top = Math.max(8, Math.min(raw, container.scrollHeight - POPOVER_HEIGHT));
+    }
+    setActiveColorPicker({ ...picker, top });
+  };
 
   const setFaces = (num: number) => {
     if (num > 0) onUpdate(dice.id, { faces: num, customFaces: [] });
@@ -56,7 +80,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Dice Settings">
-      <div className={styles.container}>
+      <div className={styles.container} ref={containerRef}>
 
         {/* General Settings */}
         <div className={styles.sectionCard}>
@@ -75,8 +99,8 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
           <div className={styles.twoColumnRow}>
             <div>
               <label className={styles.label}>Base Color</label>
-              <button 
-                onClick={(e) => { e.stopPropagation(); setActiveColorPicker({ type: 'base' }); }}
+              <button
+                onClick={(e) => openPicker(e, { type: 'base' })}
                 className={styles.colorSwatch}
                 style={{ backgroundColor: dice.color, color: getContrastColor(dice.color) }}
                 title="Pick base color"
@@ -164,7 +188,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                     </div>
                     <div className={styles.faceActions}>
                       <button 
-                        onClick={(e) => { e.stopPropagation(); setActiveColorPicker({ type: 'custom', index: i }); }} 
+                        onClick={(e) => openPicker(e, { type: 'custom', index: i })}
                         className={styles.faceColorBtn}
                         style={{ backgroundColor: bgColor !== 'transparent' ? bgColor : 'rgba(255,255,255,0.08)' }}
                         title="Edit Color"
@@ -241,7 +265,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
         {activeColorPicker && (
           <>
             <div onClick={() => setActiveColorPicker(null)} className={styles.popoverBackdrop} />
-            <div className={styles.colorPopover} style={{ top: activeColorPicker.type === 'base' ? '65px' : '230px' }}>
+            <div className={styles.colorPopover} style={{ top: `${activeColorPicker.top}px` }}>
               <div className={styles.popoverHeader}>
                 <span className={styles.popoverTitle}>Choose Color</span>
                 <button onClick={() => setActiveColorPicker(null)} className={styles.popoverClose}><X size={18} /></button>

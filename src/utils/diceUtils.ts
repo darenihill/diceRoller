@@ -1,3 +1,9 @@
+import type { DiceData } from '../types';
+import {
+  MAX_DICE_LIMIT, MIN_FACES, MAX_FACES, MAX_CUSTOM_FACES,
+  MAX_FACE_TEXT_LENGTH, MAX_NAME_LENGTH
+} from './constants';
+
 export const FACE_BG_DELIMITER = ':bg:';
 export const FACE_ICON_PREFIX = ':icon:';
 
@@ -48,6 +54,53 @@ function getColorBrightness(hex: string): number {
 /** Returns '#000000' or '#FFFFFF' for maximum contrast against the given hex color. */
 export function getContrastColor(hex: string): string {
   return getColorBrightness(hex) > 125 ? '#000000' : '#FFFFFF';
+}
+
+/**
+ * Coerces an untrusted dice payload (share link, saved default, autosave,
+ * imported backup) into well-formed DiceData. Anything from those sources is
+ * attacker-controllable in practice — a share link is just a URL someone can
+ * hand-craft — so every field is clamped rather than trusted, and the list is
+ * capped at MAX_DICE_LIMIT, which the in-app add path already enforces.
+ * Returns [] for anything that isn't a usable array.
+ */
+export function sanitizeDiceList(input: unknown): DiceData[] {
+  if (!Array.isArray(input)) return [];
+
+  return input.slice(0, MAX_DICE_LIMIT).map((raw): DiceData => {
+    const d = (raw && typeof raw === 'object' ? raw : {}) as Partial<DiceData>;
+
+    const faces = Math.min(Math.max(Math.trunc(Number(d.faces) || 6), MIN_FACES), MAX_FACES);
+
+    const customFaces = Array.isArray(d.customFaces)
+      ? d.customFaces
+          .slice(0, MAX_CUSTOM_FACES)
+          .filter((f): f is string => typeof f === 'string')
+          .map(f => f.slice(0, MAX_FACE_TEXT_LENGTH))
+      : [];
+
+    const numberValue = Number.isFinite(Number(d.numberValue)) ? Number(d.numberValue) : 1;
+
+    const rawIndex = Math.trunc(Number(d.currentFaceIndex));
+    const faceCount = customFaces.length || faces;
+    const currentFaceIndex = Number.isFinite(rawIndex) && rawIndex >= 0 && rawIndex < faceCount ? rawIndex : 0;
+
+    return {
+      id: generateId(),
+      numberValue,
+      faces,
+      currentFaceIndex,
+      name: typeof d.name === 'string' ? d.name.slice(0, MAX_NAME_LENGTH) : '',
+      customFaces,
+      color: isSafeColor(d.color) ? d.color : '#E9EAEC',
+      held: d.held === true,
+    };
+  });
+}
+
+/** Only hex literals and 'transparent' reach a style attribute. */
+function isSafeColor(value: unknown): value is string {
+  return typeof value === 'string' && (value === 'transparent' || /^#[0-9a-fA-F]{3,8}$/.test(value));
 }
 
 export const COLORS = [

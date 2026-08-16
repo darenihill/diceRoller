@@ -193,17 +193,22 @@
   border-radius: 0 !important;
 }
 
+/* d10: elongated kite — a sharp top apex over a narrow waist and a pointed base,
+   which is what actually distinguishes a pentagonal trapezohedron in silhouette. */
 .shapeD10 {
-  clip-path: polygon(50% 2%, 96% 36%, 76% 98%, 24% 98%, 4% 36%);
+  clip-path: polygon(50% 0%, 90% 32%, 72% 78%, 50% 100%, 28% 78%, 10% 32%);
   border-radius: 0 !important;
 }
 
+/* d12: regular pentagon, flat-topped — reads clearly apart from the d10 kite. */
 .shapeD12 {
-  clip-path: polygon(50% 2%, 96% 35%, 78% 97%, 22% 97%, 4% 35%);
+  clip-path: polygon(50% 2%, 98% 38%, 79% 96%, 21% 96%, 2% 38%);
   border-radius: 0 !important;
 }
 
+/* d20: triangle with clipped corners, the classic icosahedron face-on view.
+   Previously reused the d6 hexagon, which made the flagship RPG die anonymous. */
 .shapeD20 {
-  clip-path: polygon(50% 2%, 95% 25%, 95% 75%, 50% 98%, 5% 75%, 5% 25%);
+  clip-path: polygon(50% 0%, 68% 12%, 96% 62%, 90% 84%, 10% 84%, 4% 62%, 32% 12%);
   border-radius: 0 !important;
 }

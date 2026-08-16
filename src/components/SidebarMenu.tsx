@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './SidebarMenu.module.css';
-import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Download, ChevronUp, ChevronDown, Share2, Palette, Pin, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Download, ChevronUp, ChevronDown, Share2, Palette, Pin, ToggleLeft, ToggleRight, BarChart2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface SidebarMenuProps {
@@ -10,6 +10,7 @@ interface SidebarMenuProps {
   onIdeas: () => void;
   onHelp: () => void;
   onHistory: () => void;
+  onStats: () => void;
   onSets: () => void;
   onCustomize: () => void;
   onDeleteAll: () => void;
@@ -22,7 +23,7 @@ interface SidebarMenuProps {
 }
 
 export const SidebarMenu: React.FC<SidebarMenuProps> = ({
-  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, onLoad, rpgMode, onToggleRpgMode
+  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onStats, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, onLoad, rpgMode, onToggleRpgMode
 }) => {
   return (
     <>
@@ -66,6 +67,7 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
               <div className={styles.menuColumn}>
                 <div className={styles.menuColumnHeader}>Tools</div>
                 <button className={styles.menuItem} onClick={onHistory}><History size={18} /> <span>History</span></button>
+                <button className={styles.menuItem} onClick={onStats}><BarChart2 size={18} /> <span>Usage Stats</span></button>
                 <button className={styles.menuItem} onClick={onCustomize}><Palette size={18} /> <span>Customize</span></button>
                 <button className={styles.menuItem} onClick={onToggleRpgMode} title="Toggle RPG Mode (Advantage & Modifiers)">
                   {rpgMode ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
