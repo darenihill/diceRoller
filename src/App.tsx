@@ -407,6 +407,11 @@ function App() {
 
   return (
     <div className={styles.app} style={{ paddingBottom: '120px' }}>
+      {/* The UI is all dice and icons, so the document had no heading at all —
+          a screen reader landed on an unnamed page, and a crawler found nothing
+          to index. Hidden rather than drawn, since the dice are the interface. */}
+      <h1 className={styles.srOnly}>Custom Dice Roller — build and roll any dice online</h1>
+
       <div ref={containerRef} className={styles.diceContainer} style={diceStyles}>
         {diceList.map((dice) => (
           <Dice

@@ -6,23 +6,56 @@
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#121212" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dice Roller</title>
-    <meta name="description" content="Roll completely customizable virtual dice, choose colors, set custom values, icons, and share your dice presets instantly!">
+    <title>Custom Dice Roller — Build and Roll Any Dice Online</title>
+    <meta name="description" content="Free online dice roller for board games and tabletop RPGs. Build custom dice with any faces, colours and icons, then share your set with a link.">
 
     <!-- Open Graph / Discord / Facebook (scrapers require absolute image URLs) -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://customdiceroller.com/" />
-    <meta property="og:title" content="Dice Roller - Customizable Virtual Dice" />
-    <meta property="og:description" content="Roll completely customizable virtual dice, choose colors, set custom values, icons, and share your dice presets instantly!" />
+    <meta property="og:title" content="Custom Dice Roller — Build and Roll Any Dice Online" />
+    <meta property="og:description" content="Free online dice roller for board games and tabletop RPGs. Build custom dice with any faces, colours and icons, then share your set with a link." />
     <meta property="og:image" content="https://customdiceroller.com/og-image.jpg" />
+    <meta property="og:site_name" content="Custom Dice Roller" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:title" content="Dice Roller - Customizable Virtual Dice" />
-    <meta property="twitter:description" content="Roll completely customizable virtual dice, choose colors, set custom values, icons, and share your dice presets instantly!" />
+    <meta property="twitter:title" content="Custom Dice Roller — Build and Roll Any Dice Online" />
+    <meta property="twitter:description" content="Free online dice roller for board games and tabletop RPGs. Build custom dice with any faces, colours and icons, then share your set with a link." />
     <meta property="twitter:image" content="https://customdiceroller.com/og-image.jpg" />
     <link rel="canonical" href="https://customdiceroller.com/" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Structured data. The app carries almost no crawlable text by nature, so
+         this is most of what a search engine has to go on until the per-preset
+         landing pages exist. No ratings claimed — none have been collected. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Custom Dice Roller",
+      "url": "https://customdiceroller.com/",
+      "description": "Free online dice roller for board games and tabletop RPGs. Build custom dice with any number of faces, custom text, icons and per-face colours, then share a set with a link.",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Any device with a web browser",
+      "browserRequirements": "Requires JavaScript",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Custom dice with any number of faces",
+        "Custom text, icons and per-face colours",
+        "Polyhedral RPG dice: d4, d6, d8, d10, d12, d20",
+        "Advantage and disadvantage rolls with modifiers",
+        "Hold dice between rolls",
+        "Share a dice set with a link",
+        "Roll history and frequency chart",
+        "Works offline"
+      ]
+    }
+    </script>
     <!-- Google Analytics (GA4) — honors the in-app telemetry toggle and skips localhost -->
     <script>
       (function () {
@@ -49,6 +82,30 @@
   </head>
   <body>
     <div id="root"></div>
+
+    <!-- Genuine content for anyone (or anything) without JavaScript. The app is
+         interactive by nature and renders almost no text, so without this a
+         non-rendering crawler sees an empty page. -->
+    <noscript>
+      <h1>Custom Dice Roller</h1>
+      <p>
+        A free online dice roller for board games and tabletop RPGs. Build a die with
+        any number of faces, put your own text, icons or colours on each face, and roll
+        as many as you need at once. Nothing to install and no account to create.
+      </p>
+      <p>
+        Turn on RPG Mode for polyhedral dice — d4, d6, d8, d10, d12 and d20 — with
+        advantage and disadvantage rolls, roll modifiers, and natural 20 and natural 1
+        highlighting. Hold dice between rolls, save your sets, and share one with a link.
+      </p>
+      <p>
+        Ready-made sets are included for Dungeons &amp; Dragons, Call of Cthulhu, Catan,
+        Cities &amp; Knights, Risk, Warhammer 40,000, Blades in the Dark, King of Tokyo,
+        Zombie Dice, Fate and Fudge, Farkle, Tenzi, Left Center Right and more.
+      </p>
+      <p>This app needs JavaScript enabled to roll dice.</p>
+    </noscript>
+
     <script type="module" src="/src/main.tsx"></script>
     <script>
       if ('serviceWorker' in navigator) {

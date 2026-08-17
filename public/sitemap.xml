@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  One URL today because the app is a single page. When per-preset landing pages
+  land (see ROADMAP.md), generate this at build time from the preset list rather
+  than maintaining it by hand, and drop the hardcoded lastmod with it.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://customdiceroller.com/</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
