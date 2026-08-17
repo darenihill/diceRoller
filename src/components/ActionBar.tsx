@@ -179,7 +179,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
             </div>
 
             {/* Right Vertical Column: Modifier Stepper FABs */}
-            <div className={styles.verticalColumn}>
+            <div className={`${styles.verticalColumn} ${styles.modifierColumn}`}>
               <button
                 className={`md-icon-button ${styles.rpgFabBtn}`}
                 onClick={() => onChangeModifier(modifier + 1)}

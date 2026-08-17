@@ -185,16 +185,34 @@
 }
 
 @media (max-width: 768px) {
-  /* Rotate the RPG controls: two rows of three instead of three rows of two.
-     Same buttons, ~80px shorter, and that height goes back to the dice. */
+  /* Float the RPG controls above the roll button rather than leaving them in
+     the flow. In flow, the 232px-wide block widens the roll group and shoves
+     the add-dice button 76px left the instant RPG mode is switched on. */
+  .rollGroup {
+    position: relative;
+  }
+
+  /* Rotate the controls: two rows of three instead of three rows of two.
+     Same buttons, ~80px shorter, and that height goes back to the dice.
+     column-reverse lifts the modifier stepper to the top row, so its "+" is
+     no longer sitting directly above the add-dice "+". */
   .rpgColumns {
-    flex-direction: column;
+    position: absolute;
+    bottom: calc(100% + 10px);
+    right: 0;
+    flex-direction: column-reverse;
     align-items: flex-end;
     gap: 8px;
   }
 
   .verticalColumn {
     flex-direction: row;
+  }
+
+  /* Minus on the left, plus on the right — the usual reading order for a
+     horizontal stepper, and the reverse of how it sits stacked vertically. */
+  .modifierColumn {
+    flex-direction: row-reverse;
   }
 }
 
