@@ -4,8 +4,12 @@ Working document for the 2026-08-18 discussion. Built from the 24 responses in
 the Customer Feedback form, deduplicated into 23 distinct asks. Status of every
 request lives in the companion sheet, *Dice Roller — Feedback Status*.
 
-Nothing here is committed to. The point is to have the arguments already made so
-the conversation is about choosing, not discovering.
+**Three decisions were settled by the owner on 2026-08-17, ahead of the
+discussion.** They are recorded in place below and marked **DECIDED**:
+
+1. Images stay local and are excluded from share links (item 4)
+2. The face format gains an additive `:val:` sentinel rather than a rewrite (item 3)
+3. Discoverability is solved in the app; no replies to feedback (final section)
 
 ---
 
@@ -60,37 +64,46 @@ that people write in about it.
 entry, and does it count toward the running total? My instinct is yes to the log,
 no to replacing the total.
 
-### 3. Let a face's label differ from its value
+### 3. Let a face's label differ from its value — **DECIDED**
 **Asked by:** Daniel (2024-10-09) directly; unlocks neek (2024-10-04)
-**Effort:** medium — touches the face format, which is also the share format
+**Effort:** small-to-medium, now that the approach is settled
 
-The sleeper item. Daniel asked for a Marvel die where the face shows "M" but
-scores 6. The current face format cannot express that: a face is a string, and
-its value is whatever `parseInt` makes of it, so a symbol scores zero.
+Daniel asked for a Marvel die where the face shows "M" but scores 6. The current
+format cannot express it: a face is a string and its value is whatever
+`parseInt` makes of it, so a symbol scores zero.
 
-Generalising it — a face carries an optional value separate from its label —
-also makes icon and colour faces properly scoreable, which is the missing half of
-several other requests.
+**Decision (2026-08-17): additive `:val:` sentinel, not a format rewrite.**
 
-**This is the one item with real design risk.** Faces are encoded as strings with
-`:icon:` and `:bg:` sentinels, and that format is not private: it appears in
-share links and in exported backups. Changing it means versioning the format and
-keeping a read path for the old one. Worth doing deliberately, not casually.
+A face gains an optional `:val:N` marker alongside the existing `:icon:` and
+`:bg:` — so `":icon:Star:bg:#FFD700:val:6"` shows a gold star worth 6. Because it
+is purely additive:
 
-**Recommendation:** build the general capability. Do **not** ship a "Marvel
-Multiverse" preset — the name is trademarked and this is a public app. A generic
-symbol-die preset gets the same user there without the exposure.
+- every existing share link and backup keeps parsing byte-for-byte unchanged
+- no version tag, no migration, no dual read path
+- `parseFaceContent()` gains one more split; faces without `:val:` behave exactly
+  as they do today
+
+The rejected alternative was restructuring faces into objects with a version tag
+and a legacy read path. Same user outcome, but it is a migration on data sitting
+in other people's saved links — not worth it for this.
+
+**One caveat to handle:** a link containing `:val:` opened against an older
+cached build would render the sentinel as literal text. The service worker now
+serves HTML network-first, so the window is small, but the parser should be
+tolerant of unknown sentinels going forward.
+
+**Do not ship a "Marvel Multiverse" preset** — the name is trademarked and this
+is a public app. A generic symbol-die preset gets the user to the same place.
 
 ---
 
 ## Tier 2 — worth discussing, lower conviction
 
-### 4. Images on dice faces
+### 4. Images on dice faces — **DECIDED**, promote to Tier 1 when scheduled
 **Asked by:** Zack Gotsch (2023-11-03), Tony (2024-09-25), Snato (2024-11-03) — 3 asks, the most of anything open
-**Effort:** large, and blocked on a decision
+**Effort:** large
 
-The most-requested missing feature, and the one I would think hardest about
-before starting, because it collides with two hard limits:
+Two hard limits shape this:
 
 - **Storage.** `localStorage` is roughly 5MB for the whole origin, shared across
   saved sets, default set, autosave and history. Base64 images consume that fast.
@@ -98,15 +111,26 @@ before starting, because it collides with two hard limits:
   runs about 5,600 characters; a single small base64 image would add thousands
   more, and browsers and chat clients start refusing long URLs.
 
-**The decision to make first:** what happens to an image when the set is shared?
-Either images are excluded from share links and degrade to a placeholder, or
-images stay tiny and heavily compressed and sharing still gets fragile. There is
-no third option that preserves both. Do not start building until this is settled.
+**Decision (2026-08-17): images live locally and are excluded from share links.**
 
-**Also worth weighing:** the three requesters are teachers and hobbyists who
-mostly want *recognisable* faces. The existing 63-icon set may already cover much
-of the intent, which would make this a discoverability problem rather than a
-build. Worth asking one of them before committing to it.
+What that means concretely, and the part worth getting right:
+
+| Path | Carries images? | Why |
+|---|---|---|
+| Share link | **No** | Keeps URLs short and robust — the property that makes sharing work at all |
+| Export / Import Backup | **Yes** | A local JSON file has no URL limit, so this becomes the way to move image sets between machines |
+| Saved sets / autosave | Yes, under a cap | Bounded by the 5MB origin budget |
+
+A shared die keeps its shape, colour, name and text; only the picture is absent.
+That needs a visible, non-alarming fallback rather than an empty face.
+
+**Worth noting:** putting images in backups but not links makes Export/Import
+materially more useful, and quietly answers part of Lucas's cross-machine sync
+request without any server.
+
+**Still to decide before building:** the storage cap and downscale target (a
+64–128px square, re-encoded on import, would keep a 50-die set well inside
+budget), and what a shared image face falls back to.
 
 ### 5. Turn / round tracker
 **Asked by:** Flávio (2024-05-05) — 1 ask
@@ -166,28 +190,49 @@ which is the offline-friendly 80% of "we're playing together".
 
 ---
 
-## The thing worth doing before any of it
+## Discoverability — **DECIDED**
 
 **Seven of the twenty-four responses asked for features that already exist.**
 
-- Four people asked for share links: Rob, Ben, Rhys, Jackson Wilson
+- Four asked for share links: Rob, Ben, Rhys, Jackson Wilson
 - Three asked for per-face colours: Rafael, Klark, Flip — and Flip's exact use
   case, "roll a die and get a colour result", works today
 
-That is a discoverability problem, not a backlog. Nothing on the roadmap will
-help those users; a better empty state, a first-run hint, or a visible Share
-affordance would.
+That is a discoverability problem, not a backlog. Nothing else on this roadmap
+helps those users.
 
-**Cheapest version:** the Help modal already documents these. Getting people to
-open Help at all is the actual problem.
+**Decision (2026-08-17): fix it in the app. Do not reply to feedback.**
+
+No mass reply. Most of these are one to two years old, and answering a 2023
+feature request is odd whatever address it comes from. The work is making the
+features visible in the product instead:
+
+- Share is a menu item behind a caret; it deserves a visible affordance
+- Per-face colour is three levels deep — die settings, custom faces, palette icon
+- The Help modal documents both, but nothing prompts anyone to open Help
+
+**Three exceptions worth a second look** (owner's call, not a mass reply):
+
+| Who | When | Why this one is different |
+|---|---|---|
+| **Amy** | 2026-08-04 | Said she would donate *"as soon as I'm SURE everything saved properly"* — actively deciding to pay, blocked on precisely the save bug fixed 2026-08-13 |
+| **Claudia** | 2025-09-15 | Filed a *Question*, not a request, and never got an answer. It has a one-line answer: yes, Save/Load does exactly that |
+| **Eva** | 2025-03-26 | Reported the save-loss bug that is now fixed, and asked directly whether her work could be recovered |
+
+**On the personal-email concern:** the domain is already owned and on a
+GoDaddy-managed zone, so a forwarding alias such as `hello@customdiceroller.com`
+→ the personal inbox is free on most registrars and removes the objection
+permanently. It also fits the brand identity work in the publishing map
+(PUB-01/PUB-02).
 
 ---
 
 ## Suggested order
 
-1. Reply to the seven people asking for shipped features (no code)
-2. Resize / zoom — small, 2 asks, immediate relief
-3. Single-die roll — small, removes a genuinely awkward workaround
-4. Decide the images question — a conversation, not a build
-5. Face label vs value — the format change, done deliberately
-6. Then reassess Tier 2 against whatever feedback has arrived by then
+1. **Resize / zoom** — small, 2 asks, immediate relief
+2. **Single-die roll** — small, removes a genuinely awkward workaround
+3. **In-app discoverability** — surface Share and per-face colour; ~a third of
+   all feedback is people missing what exists
+4. **Face `:val:` sentinel** — additive, unlocks Daniel and neek
+5. **Images** — the large one, now unblocked: local-only, in backups, not in links
+6. Reassess the rest against whatever feedback has arrived by then
