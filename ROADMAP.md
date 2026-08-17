@@ -241,22 +241,70 @@ previously had no heading and a screen reader landed on an unnamed page.
 Crawlable text went from 11 characters to 820. Google Search Console was verified
 by DNS, the sitemap submitted, and indexing requested.
 
-### The actual lever: per-preset landing pages
+### The actual lever: landing pages that preload state
 
-The 17 game presets are 17 unindexed landing pages. People search "catan dice
-roller", "yahtzee dice online", "zombie dice online", "fate dice roller" — all
+People search "catan dice roller", "d20 roller", "zombie dice online" — all
 supported, none rankable, because everything lives at one contentless URL.
 
-Vite supports a multi-page build, so each preset can become a real static HTML
-file — `/catan-dice-roller`, `/zombie-dice` — with its own title, `h1` and a
-paragraph about that game's dice, loading the app with that preset selected. Still
-GitHub Pages, still no server. That is 1 empty page becoming 18 intent-matched
-ones.
+**Half the mechanism already exists.** Share links already load a full dice set
+from a URL. What they cannot do is rank: a hash fragment is not a separate page,
+so every share link in existence is, to a crawler, the same single URL. The new
+part is a real *path* — a distinct HTML file with its own title, description and
+copy, which happens to boot the app into a chosen state.
+
+**A URL can carry any starting state, not only a preset** — RPG mode on, a
+particular set loaded, or both.
+
+**The pages should not map one-to-one to presets.** Dice-*type* pages likely
+carry more search volume than several of the game names:
+
+| Candidate | Starting state | Note |
+|---|---|---|
+| `/dnd-dice-roller` | RPG mode, full polyhedral set | Probably the highest-volume term on the list |
+| `/d20-roller` | RPG mode, single d20 | Dice-type, not a game |
+| `/d100-roller` | RPG mode, percentile pair | Dice-type, not a game |
+| `/catan-dice-roller` | 2d6, red and yellow | |
+| `/zombie-dice`, `/king-of-tokyo`, `/fate-dice-roller` | their presets | |
+
+Nobody searches "Blades in the Dark dice roller" in volume; plenty search
+"d20 roller".
+
+**Build shape:** Vite's multi-page build emits `/catan-dice-roller/index.html`,
+which GitHub Pages serves at `/catan-dice-roller/` with no SPA fallback hack. All
+pages share one cached JS bundle, so page count costs nothing at runtime.
+
+### Two constraints that shape the work
+
+**1. Doorway pages are penalised.** A set of near-identical pages whose only
+purpose is funnelling to the same destination is a pattern Google acts against —
+and seventeen pages generated from one template with the name swapped is exactly
+that. Each page needs genuinely distinct, useful content: what dice the game
+uses, how its rolls work, why the preset is built that way. Realistically
+**150–300 words of real writing each**, which makes this a writing project more
+than a coding one. **Four good pages beat seventeen thin ones.**
+
+**2. The app does not scroll.** `index.css` sets `body { overflow: hidden }` so
+the app fills the viewport. Visible copy therefore means one of:
+
+- text below the app, requiring those routes to scroll — changes the app's feel
+- text in a collapsed section — in the HTML, but Google discounts hidden content
+- a content page that links into the app — ranks best, costs a click
+
+The version that ranks best is the one that most compromises the open-it-and-roll
+quality the feedback praises. Worth choosing deliberately.
+
+### The cheaper alternative, worth weighing first
+
+**There is already evidence backlinks work.** One respondent found the app via
+"Magic the Noah" — a single creator mention produced a real user who then filled
+in the feedback form. Three or four board-game or TTRPG creator mentions would
+plausibly beat seventeen landing pages, for less work and with no compromise to
+the app. SEO for a contentless tool is genuinely hard; being *the thing people
+link to* suits what this is.
 
 **Sequencing note:** Search Console collects from verification onward and does not
-backfill, so there is no query data yet. Waiting a week or two before choosing
-which games to write means picking from real impressions instead of guessing
-across 17. The small stuff is done; this can wait for evidence.
+backfill, so there is no query data yet. Waiting a week or two means writing four
+pages with known demand instead of seventeen on spec.
 
 **Open question:** the preset is spelled **"Yatzee"**, while the search term is
 "Yahtzee" — which is a Hasbro trademark. If the misspelling was deliberate
