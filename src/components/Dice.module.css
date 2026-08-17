@@ -12,15 +12,34 @@
   z-index: 1;
   box-shadow: var(--elevation-1);
   transition: box-shadow 0.2s;
+  /* The element is a rounded SQUARE even when the die inside it is clipped to a
+     polyhedron, so the default touch highlight paints a square block over the
+     shape. Buttons already opt out in index.css; this element is a focusable
+     div, so it has to opt out too. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .dice:hover, .dice.revealed {
   box-shadow: var(--elevation-2);
 }
 
+/* Tapping focuses the die, and a UA focus ring would be square for the same
+   reason. Keyboard focus still gets a visible ring below. */
+.dice:focus {
+  outline: none;
+}
+
 .dice:focus-visible {
   outline: 3px solid var(--md-sys-color-primary);
   outline-offset: 3px;
+}
+
+/* A polyhedral die is not a rounded square, so the card shadow would halo the
+   silhouette with one. The facet outline carries the edge instead. */
+.dice.shaped,
+.dice.shaped:hover,
+.dice.shaped.revealed {
+  box-shadow: none;
 }
 
 .diceShapeBg {

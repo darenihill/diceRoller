@@ -160,7 +160,7 @@ const DiceComponent: React.FC<DiceProps> = ({
   return (
     <motion.div
       ref={diceRef}
-      className={`${styles.dice} ${isRolling && !dice.held ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''} ${extraClass}`}
+      className={`${styles.dice} ${shapeClass ? styles.shaped : ''} ${isRolling && !dice.held ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''} ${extraClass}`}
       data-dice-id={dice.id}
       role="button"
       tabIndex={0}
