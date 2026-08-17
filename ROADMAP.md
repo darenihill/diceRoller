@@ -227,6 +227,44 @@ permanently. It also fits the brand identity work in the publishing map
 
 ---
 
+## Search visibility — added 2026-08-17
+
+Measured before touching anything: the rendered homepage carried **8 characters
+of text** (`"1 1 Roll"`), no heading at any level, no structured data, and both
+`robots.txt` and `sitemap.xml` returned 404. An interactive app renders almost no
+prose by nature, so there was effectively nothing for a search engine to index.
+
+**Shipped that evening:** robots.txt, sitemap.xml, a non-generic title and
+description, `WebApplication` JSON-LD, a `noscript` block with real prose, and a
+visually hidden `h1` — which was also an accessibility fix, since the document
+previously had no heading and a screen reader landed on an unnamed page.
+Crawlable text went from 11 characters to 820. Google Search Console was verified
+by DNS, the sitemap submitted, and indexing requested.
+
+### The actual lever: per-preset landing pages
+
+The 17 game presets are 17 unindexed landing pages. People search "catan dice
+roller", "yahtzee dice online", "zombie dice online", "fate dice roller" — all
+supported, none rankable, because everything lives at one contentless URL.
+
+Vite supports a multi-page build, so each preset can become a real static HTML
+file — `/catan-dice-roller`, `/zombie-dice` — with its own title, `h1` and a
+paragraph about that game's dice, loading the app with that preset selected. Still
+GitHub Pages, still no server. That is 1 empty page becoming 18 intent-matched
+ones.
+
+**Sequencing note:** Search Console collects from verification onward and does not
+backfill, so there is no query data yet. Waiting a week or two before choosing
+which games to write means picking from real impressions instead of guessing
+across 17. The small stuff is done; this can wait for evidence.
+
+**Open question:** the preset is spelled **"Yatzee"**, while the search term is
+"Yahtzee" — which is a Hasbro trademark. If the misspelling was deliberate
+trademark avoidance, keep it and do not name a landing page after it either. If
+it was a typo, it is costing the term. Owner's call.
+
+---
+
 ## Suggested order
 
 1. **Resize / zoom** — small, 2 asks, immediate relief
