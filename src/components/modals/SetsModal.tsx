@@ -10,7 +10,7 @@ interface SetsModalProps {
   isOpen: boolean;
   onClose: () => void;
   savedConfigs: Record<string, DiceConfig>;
-  onLoadSet: (config: Partial<DiceData>[]) => void;
+  onLoadSet: (config: Partial<DiceData>[], name: string) => void;
   onDeleteConfig: (name: string) => void;
   onExportBackup: () => void;
   onImportBackup: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -33,7 +33,7 @@ export const SetsModal: React.FC<SetsModalProps> = ({
         <h3 className={modalStyles.sectionHeaderFirst}>Presets</h3>
         <div className={styles.setsGrid}>
           {dicePresets.map((preset) => (
-            <button key={preset.name} className={`md-card ${styles.setCard}`} onClick={() => onLoadSet(preset.dice)}>
+            <button key={preset.name} className={`md-card ${styles.setCard}`} onClick={() => onLoadSet(preset.dice, preset.name)}>
               {preset.name}
             </button>
           ))}
@@ -45,7 +45,7 @@ export const SetsModal: React.FC<SetsModalProps> = ({
             <div className={styles.setsGrid}>
               {userSaves.map((config) => (
                 <div key={config.name} className={`md-card ${styles.setCard} ${styles.saveCard}`}>
-                  <button className={styles.saveCardBtn} onClick={() => onLoadSet(config.config)}>
+                  <button className={styles.saveCardBtn} onClick={() => onLoadSet(config.config, config.name)}>
                     {config.name}
                   </button>
                   <button className="md-icon-button" onClick={(e) => { e.stopPropagation(); onDeleteConfig(config.name); }}>

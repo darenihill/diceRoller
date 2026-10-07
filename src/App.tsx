@@ -11,6 +11,7 @@ import { generateId, calculateGridDimensions, sanitizeDiceList } from './utils/d
 import { playRollSequence } from './utils/soundEffects';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { MAX_HISTORY_LENGTH } from './utils/constants';
+import { dicePresets } from './utils/presets';
 import type { DiceData } from './types';
 
 // Decomposed Modals
@@ -251,10 +252,15 @@ function App() {
     }
   };
 
-  const handleLoadSet = (config: Partial<DiceData>[], presetName?: string) => {
+  const handleLoadSet = (config: Partial<DiceData>[], setName?: string) => {
     setDiceList(sanitizeDiceList(config));
-    if (presetName) {
-      trackEvent('preset_loaded', { presetName });
+    if (setName) {
+      // Only built-in preset names go to analytics; a save's name is the user's own text
+      if (dicePresets.some(p => p.name === setName)) {
+        trackEvent('preset_loaded', { presetName: setName });
+      }
+      // The main screen never names the set, so say which one just loaded
+      showToast(`Loaded ${setName}`);
     }
     setModalOpen(null);
     setMenuOpen(false);
@@ -492,7 +498,7 @@ function App() {
         isOpen={modalOpen === 'sets'} 
         onClose={() => setModalOpen(null)} 
         savedConfigs={savedConfigs}
-        onLoadSet={(config) => handleLoadSet(config)}
+        onLoadSet={handleLoadSet}
         onDeleteConfig={deleteConfig}
         onExportBackup={handleExportData}
         onImportBackup={handleImportData}
