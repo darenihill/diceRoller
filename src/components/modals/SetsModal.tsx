@@ -59,11 +59,11 @@ export const SetsModal: React.FC<SetsModalProps> = ({
 
         <h3 className={modalStyles.sectionHeader}>Backup</h3>
         <div className={styles.setsGrid}>
-          <button className={`md-card ${styles.setCard}`} onClick={onExportBackup} title="Export games & settings to a backup file" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+          <button className={`md-card ${styles.setCard} ${modalStyles.iconCard}`} onClick={onExportBackup} title="Export games & settings to a backup file">
             <FileDown size={20} />
             <span>Export Backup</span>
           </button>
-          <button className={`md-card ${styles.setCard}`} onClick={() => document.getElementById('import-backup-input-modal')?.click()} title="Import games & settings from a backup file" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+          <button className={`md-card ${styles.setCard} ${modalStyles.iconCard}`} onClick={() => document.getElementById('import-backup-input-modal')?.click()} title="Import games & settings from a backup file">
             <FileUp size={20} />
             <span>Import Backup</span>
           </button>

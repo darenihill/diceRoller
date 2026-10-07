@@ -38,6 +38,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
             className={`md-card ${styles.setCard}`} 
             style={{ margin: 0, padding: '16px 8px', backgroundColor: '#1E1E1E', color: '#FFF', border: theme === 'theme-dark' ? '2px solid var(--md-sys-color-primary)' : 'none' }}
             onClick={() => onSelectTheme('theme-dark')}
+            aria-pressed={theme === 'theme-dark'}
           >
             Default Dark
           </button>
@@ -45,6 +46,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
             className={`md-card ${styles.setCard}`} 
             style={{ margin: 0, padding: '16px 8px', backgroundColor: '#F0F0F0', color: '#000', border: theme === 'theme-light' ? '2px solid var(--md-sys-color-primary)' : 'none' }}
             onClick={() => onSelectTheme('theme-light')}
+            aria-pressed={theme === 'theme-light'}
           >
             Clean Light
           </button>
@@ -52,6 +54,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
             className={`md-card ${styles.setCard}`} 
             style={{ margin: 0, padding: '16px 8px', backgroundColor: '#1B4D3E', color: '#FFF', border: theme === 'theme-felt' ? '2px solid #FFD700' : 'none' }}
             onClick={() => onSelectTheme('theme-felt')}
+            aria-pressed={theme === 'theme-felt'}
           >
             Casino Felt
           </button>
@@ -59,6 +62,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
             className={`md-card ${styles.setCard}`} 
             style={{ margin: 0, padding: '16px 8px', backgroundColor: '#090B10', color: '#DFE0FF', border: theme === 'theme-midnight' ? '2px solid #8E99F3' : 'none' }}
             onClick={() => onSelectTheme('theme-midnight')}
+            aria-pressed={theme === 'theme-midnight'}
           >
             Midnight
           </button>
@@ -76,9 +80,10 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
               className="md-icon-button"
               onClick={onToggleSound}
               title={soundEnabled ? "Mute Sounds" : "Unmute Sounds"}
-              style={{ padding: 8, borderRadius: '50%', background: soundEnabled ? 'var(--md-sys-color-primary-container)' : 'var(--md-sys-color-surface-variant)' }}
+              aria-label="Sound effects"
+              aria-pressed={soundEnabled}
             >
-              {soundEnabled ? <Volume2 size={20} color="var(--md-sys-color-on-primary-container)" /> : <VolumeX size={20} />}
+              {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
             </button>
           </div>
 
@@ -109,9 +114,10 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
               className="md-icon-button"
               onClick={onToggleTelemetry}
               title={telemetryEnabled ? "Disable Telemetry" : "Enable Telemetry"}
-              style={{ padding: 8, borderRadius: '50%', background: telemetryEnabled ? 'var(--md-sys-color-primary-container)' : 'var(--md-sys-color-surface-variant)' }}
+              aria-label="Anonymous page metrics"
+              aria-pressed={telemetryEnabled}
             >
-              <BarChart2 size={20} color={telemetryEnabled ? "var(--md-sys-color-on-primary-container)" : "inherit"} />
+              <BarChart2 size={20} />
             </button>
           </div>
         </div>
