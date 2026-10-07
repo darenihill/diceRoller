@@ -1,4 +1,4 @@
-Next: held - trunk-test and ui-components work ready on the item branch; this repo is public, so the push waits on Daren's OK.
+Next: pull request open for the trunk-test and ui-components reviews; waits on Daren's merge (merging publishes the site).
 
 # State
 
