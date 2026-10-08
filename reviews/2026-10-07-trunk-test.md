@@ -35,8 +35,7 @@ and Apple Music's "Now Playing" line (always naming what is loaded).
    back as "close the sheet or dialog".
 5. **"Games" and "Load" are the same dialog** under two names in the menu.
 6. Found on the way: **Most Played Games in Usage Stats never filled in**,
-   because loading from the Games dialog never passed the preset's name. And
-   the Yahtzee preset was spelled "Yatzee".
+   because loading from the Games dialog never passed the preset's name.
 
 ## What was done (this pull request)
 
@@ -47,11 +46,10 @@ and Apple Music's "Now Playing" line (always naming what is loaded).
   built-in preset names go to analytics; a save's own name never does.
 - The menu button has a name for screen readers ("Open menu" / "Close menu"),
   says whether it is open, and its hover text is "Menu".
-- "Yatzee" is now "Yahtzee".
 
 Checked: lint, 34 tests, type check and build pass; in the browser the menu
 button is found by its new name, "Loaded Catan" appears, Usage Stats lists
-Catan, and the preset list shows Yahtzee.
+Catan.
 
 ## Next
 

@@ -35,7 +35,7 @@ export const dicePresets = [
     ],
   },
   {
-    name: "Yahtzee",
+    name: "Yatzee",
     dice: [
       { numberValue: 1, faces: 6, customFaces: [], color: "#E9EAEC" },
       { numberValue: 2, faces: 6, customFaces: [], color: "#E9EAEC" },
