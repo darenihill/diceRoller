@@ -1,4 +1,4 @@
-Next: pull request open for the trunk-test and ui-components reviews; waits on Daren's merge (merging publishes the site).
+Next: held - pull request 9 waits on Daren's merge; the next-goals item added Dice size steps to GOAL.md locally, and pushing them needs Daren's OK (public repo).
 
 # State
 
