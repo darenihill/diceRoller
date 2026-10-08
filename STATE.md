@@ -1,4 +1,4 @@
-Next: held - pull request 9 waits on Daren's merge; the next-goals item added Dice size steps to GOAL.md locally, and pushing them needs Daren's OK (public repo).
+Next: held - the app-name line and game chip are built and checked locally; pushing them to pull request 9 needs Daren's OK (public repo), then the back-gesture item.
 
 # State
 

@@ -5,6 +5,14 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- Name the app and the loaded game on screen. The top of the screen shows only
+  dice and icons, so someone opening a shared link cannot tell which app they
+  are in, and after loading Catan nothing on screen says Catan. A slim top line
+  would read Dice Roller, followed by a chip with the loaded game's name. The
+  chip clears or changes when you load another game or edit the dice into
+  something of your own. Changes: A top line names the app: Dice Roller; The
+  loaded game shows as a chip, for example Catan; Shared links open with both
+  names visible; The chip clears when the dice no longer match the game.
 - The phone's back gesture closes the open dialog or menu first, instead of
   leaving the app (trunk test, reviews/2026-10-07-trunk-test.md, finding 4).
 - Dice size, step 1: add a stored dice-size preference (default 1.0, range

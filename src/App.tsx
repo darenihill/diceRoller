@@ -12,6 +12,7 @@ import { playRollSequence } from './utils/soundEffects';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { MAX_HISTORY_LENGTH } from './utils/constants';
 import { dicePresets } from './utils/presets';
+import { currentSetName, diceSignature, readShareLink, type LoadedSet } from './utils/setName';
 import type { DiceData } from './types';
 
 // Decomposed Modals
@@ -62,6 +63,13 @@ function App() {
   const { savedConfigs, saveConfig, deleteConfig, getSystemAutosave } = useStorage();
 
   const [menuOpen, setMenuOpen] = useState(false);
+  // The set last loaded by name (a save or a named share link); built-in games are also recognised by their dice
+  const [loadedSet, setLoadedSet] = useState<LoadedSet | null>(() => {
+    // A named share link opens with its name; read before the mount effect clears the hash
+    if (!window.location.hash.startsWith('#share=')) return null;
+    const { dice, name } = readShareLink(window.location.hash);
+    return name && dice.length > 0 ? { name, signature: diceSignature(dice) } : null;
+  });
   const [editingDiceId, setEditingDiceId] = useState<string | null>(null);
   const [revealedDiceId, setRevealedDiceId] = useState<string | null>(null);
   const [theme, setTheme] = useState(() => localStorage.getItem('appTheme') || 'theme-dark');
@@ -134,14 +142,7 @@ function App() {
       // A share link is a hand-craftable URL, so treat the payload as untrusted
       // and always tell the recipient when it cannot be read — previously a
       // malformed link silently fell through to the default dice.
-      let shared: DiceData[] = [];
-      try {
-        const compressed = hash.replace('#share=', '');
-        const json = LZString.decompressFromEncodedURIComponent(compressed);
-        shared = json ? sanitizeDiceList(JSON.parse(json)) : [];
-      } catch (e) {
-        console.error("Failed to load shared dice set from URL", e);
-      }
+      const shared = readShareLink(hash).dice;
 
       window.history.replaceState(null, '', window.location.pathname + window.location.search);
 
@@ -223,6 +224,7 @@ function App() {
   const allHeld = diceList.length > 0 && diceList.every(d => d.held);
   const totalVisible = hasRolledThisSession && rollHistory.length > 0;
   const lastTotal = totalVisible ? rollHistory[0].total : 0;
+  const setName = currentSetName(diceList, loadedSet);
 
   // Dice Size & Grid layout calculations
   const { optimalSize, optimalColumns, dynamicGap } = calculateGridDimensions(
@@ -253,7 +255,9 @@ function App() {
   };
 
   const handleLoadSet = (config: Partial<DiceData>[], setName?: string) => {
-    setDiceList(sanitizeDiceList(config));
+    const loaded = sanitizeDiceList(config);
+    setDiceList(loaded);
+    setLoadedSet(setName ? { name: setName, signature: diceSignature(loaded) } : null);
     if (setName) {
       // Only built-in preset names go to analytics; a save's name is the user's own text
       if (dicePresets.some(p => p.name === setName)) {
@@ -295,7 +299,9 @@ function App() {
   const handleShare = () => {
     const json = JSON.stringify(diceList);
     const compressed = LZString.compressToEncodedURIComponent(json);
-    const url = `${window.location.origin}${window.location.pathname}#share=${compressed}`;
+    // A named set travels with the link, so the person opening it sees the game's name
+    const nameParam = setName ? `&name=${encodeURIComponent(setName)}` : '';
+    const url = `${window.location.origin}${window.location.pathname}#share=${compressed}${nameParam}`;
     
     trackEvent('share_link_copied', { diceCount: diceList.length });
 
@@ -417,6 +423,16 @@ function App() {
           a screen reader landed on an unnamed page, and a crawler found nothing
           to index. Hidden rather than drawn, since the dice are the interface. */}
       <h1 className={styles.srOnly}>Custom Dice Roller — build and roll any dice online</h1>
+
+      {/* A slim top line, so a shared link says which app it opened and which game is loaded */}
+      <header className={styles.topLine}>
+        <span className={styles.appName} aria-hidden="true">Dice Roller</span>
+        {setName && (
+          <span className={styles.setChip} title={setName}>
+            <span className={styles.srOnly}>Loaded game: </span>{setName}
+          </span>
+        )}
+      </header>
 
       <div ref={containerRef} className={styles.diceContainer} style={diceStyles}>
         {diceList.map((dice) => (
