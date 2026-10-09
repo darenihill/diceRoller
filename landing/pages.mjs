@@ -77,7 +77,7 @@ export const landingPages = [
   {
     slug: 'classroom-dice-roller',
     title: 'Classroom Dice Roller — Free Virtual Dice for Teachers',
-    description: 'Free virtual dice for the classroom: big dice for the projector, a frequency chart for probability lessons, and custom faces. No accounts, no ads.',
+    description: 'Free virtual dice for the classroom: big dice for the projector, a frequency chart for probability lessons, and word dice. No accounts, no ads.',
     heading: 'Classroom dice roller',
     start: {
       name: 'Classroom',
@@ -97,7 +97,7 @@ export const landingPages = [
 </ol>
 <p>Add a third die with the + button and the shape of the chart changes, which makes a good follow-up question.</p>
 <h2>Make your own dice</h2>
-<p>Any face can carry a word, a number or an icon. Teachers use that for:</p>
+<p>Any face can carry a word, a number or an icon, so you can make word dice as easily as number dice. Teachers use them for:</p>
 <ul>
   <li>times-table and number-bond practice,</li>
   <li>story starters and vocabulary review,</li>
