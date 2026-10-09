@@ -449,9 +449,9 @@ function App() {
           </span>
         )}
         {landingAbout && (
-          <button className={styles.aboutButton} onClick={() => setModalOpen('about')}>
-            <Info size={16} aria-hidden="true" />
-            About
+          <button className={styles.aboutButton} onClick={() => setModalOpen('about')} aria-label="About" title="About">
+            <Info size={20} aria-hidden="true" />
+            <span className={styles.aboutLabel}>About</span>
           </button>
         )}
       </header>

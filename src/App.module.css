@@ -199,3 +199,16 @@
 .aboutButton:hover {
   background-color: var(--md-sys-color-surface-hover);
 }
+
+/* On a phone the game's name gets the room; the About button keeps its icon */
+@media (max-width: 468px) {
+  .aboutLabel {
+    display: none;
+  }
+
+  .aboutButton {
+    width: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+}
