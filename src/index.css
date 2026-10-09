@@ -135,6 +135,23 @@ button {
   box-shadow: var(--elevation-2);
 }
 
+/* Compact button: in-dialog secondary actions and template chips */
+.md-button-compact {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+/* Destructive confirm action */
+.md-button-danger {
+  background-color: var(--md-sys-color-error);
+  color: var(--md-sys-color-on-error);
+}
+
+.md-button-danger:hover {
+  filter: brightness(1.1);
+}
+
 .md-icon-button {
   display: inline-flex;
   align-items: center;
@@ -150,6 +167,12 @@ button {
 .md-icon-button:hover {
   background-color: var(--md-sys-color-surface-hover);
   box-shadow: var(--elevation-1);
+}
+
+/* On/off icon button (M3 icon toggle): the on state uses the primary container */
+.md-icon-button[aria-pressed="true"] {
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
 }
 
 /* Card Surface */
@@ -184,4 +207,46 @@ button {
 .dice-shake {
   animation: shake 0.8s ease-in-out;
   transform-origin: center;
+}
+
+/* Search landing pages (landing/pages.mjs). The writing ships in the page
+   HTML for search engines; the app shows it in its About dialog instead of
+   below the dice, so the page never scrolls. */
+body.landing > .landing-article {
+  display: none;
+}
+
+.landing-about {
+  font-size: 15px;
+  line-height: 1.6;
+  user-select: text;
+}
+
+.landing-about h2 {
+  font-size: 17px;
+  font-weight: 500;
+  margin: 20px 0 6px;
+}
+
+.landing-about p {
+  margin: 0 0 10px;
+}
+
+.landing-about ul,
+.landing-about ol {
+  padding-left: 22px;
+  margin: 0 0 10px;
+}
+
+.landing-about li {
+  margin-bottom: 4px;
+}
+
+.landing-about a {
+  color: var(--md-sys-color-primary);
+}
+
+.landing-more {
+  margin-top: 20px;
+  font-size: 14px;
 }

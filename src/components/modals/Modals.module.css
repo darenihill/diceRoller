@@ -177,3 +177,12 @@
   font-weight: 700;
   color: var(--md-sys-color-primary);
 }
+
+/* Card button with an icon stacked over its label (Backup actions) */
+.iconCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
