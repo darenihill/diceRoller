@@ -248,7 +248,8 @@ function App() {
   const executeSave = () => {
     if (saveName.trim()) {
       saveConfig(saveName.trim(), diceList);
-      trackEvent('preset_saved', { name: saveName.trim(), diceCount: diceList.length });
+      // The save's name is the user's own text, so only the dice count goes to analytics
+      trackEvent('preset_saved', { diceCount: diceList.length });
       showToast('Saved!');
       setSavePromptOpen(false);
     }
