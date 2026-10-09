@@ -1,4 +1,4 @@
-Next: held - the app-name line and game chip are built and checked locally; pushing them to pull request 9 needs Daren's OK (public repo), then the back-gesture item.
+Next: held - pull request 9 (name line, game chip, save-name analytics fix) waits on Daren's merge, which publishes the site; then the back-gesture item.
 
 # State
 

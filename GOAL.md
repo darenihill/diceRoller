@@ -15,6 +15,11 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   names visible; The chip clears when the dice no longer match the game.
 - The phone's back gesture closes the open dialog or menu first, instead of
   leaving the app (trunk test, reviews/2026-10-07-trunk-test.md, finding 4).
+- Donations cover the domain: count Donate taps (a donate_clicked event, no
+  personal data) and offer the Donate link at a good moment, such as after a
+  share link is copied. Done when the event fires in a test and the prompt
+  shows once after a share at 390 px and 1280 px (Daren 2026-10-09: no ads;
+  hopes the app covers its own costs, which is about the domain).
 - Dice size, step 1: add a stored dice-size preference (default 1.0, range
   0.6 to 1.6) applied as a multiplier on top of `calculateGridDimensions()`,
   clamped so dice never overflow the screen. Done when a unit test shows the
