@@ -208,3 +208,57 @@ button {
   animation: shake 0.8s ease-in-out;
   transform-origin: center;
 }
+
+/* Search landing pages (landing/pages.mjs): the dice fill the first screen as
+   on the home page, and the page scrolls to the writing below them. */
+body.landing {
+  overflow-y: auto;
+}
+
+/* The app's buttons are position: fixed. A transform makes the first screen
+   their containing block, so they scroll away with the dice instead of
+   floating over the writing. */
+body.landing #root > div {
+  transform: translateZ(0);
+  height: 100vh;
+  height: 100dvh;
+}
+
+.landing-article {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--md-sys-color-on-background);
+  user-select: text;
+}
+
+.landing-article h2 {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 32px 0 8px;
+}
+
+.landing-article .landing-title {
+  font-size: 28px;
+  margin-top: 0;
+}
+
+.landing-article ul,
+.landing-article ol {
+  padding-left: 24px;
+}
+
+.landing-article li {
+  margin-bottom: 6px;
+}
+
+.landing-article a {
+  color: var(--md-sys-color-primary);
+}
+
+.landing-more {
+  margin-top: 40px;
+  font-size: 14px;
+}

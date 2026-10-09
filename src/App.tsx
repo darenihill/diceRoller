@@ -13,6 +13,7 @@ import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/ana
 import { MAX_HISTORY_LENGTH } from './utils/constants';
 import { dicePresets } from './utils/presets';
 import { currentSetName, diceSignature, readShareLink, type LoadedSet } from './utils/setName';
+import { readLandingStart } from './utils/landing';
 import type { DiceData } from './types';
 
 // Decomposed Modals
@@ -35,6 +36,8 @@ function App() {
   } = useDiceState();
 
   const containerRef = useRef<HTMLDivElement>(null);
+  // A search landing page opens with its own dice; null on the home page
+  const [landing] = useState(readLandingStart);
   
   // Roll history persists across reloads, but the roll button should read "Roll"
   // on every fresh load and only show a total once a roll happens this session.
@@ -66,9 +69,11 @@ function App() {
   // The set last loaded by name (a save or a named share link); built-in games are also recognised by their dice
   const [loadedSet, setLoadedSet] = useState<LoadedSet | null>(() => {
     // A named share link opens with its name; read before the mount effect clears the hash
-    if (!window.location.hash.startsWith('#share=')) return null;
-    const { dice, name } = readShareLink(window.location.hash);
-    return name && dice.length > 0 ? { name, signature: diceSignature(dice) } : null;
+    if (window.location.hash.startsWith('#share=')) {
+      const { dice, name } = readShareLink(window.location.hash);
+      return name && dice.length > 0 ? { name, signature: diceSignature(dice) } : null;
+    }
+    return landing?.name ? { name: landing.name, signature: diceSignature(landing.dice) } : null;
   });
   const [editingDiceId, setEditingDiceId] = useState<string | null>(null);
   const [revealedDiceId, setRevealedDiceId] = useState<string | null>(null);
@@ -151,6 +156,13 @@ function App() {
         return;
       }
       showToast("That share link couldn't be read — loading your usual dice instead.");
+    }
+
+    // A landing page opens with its game, ahead of the visitor's usual dice
+    if (landing) {
+      setDiceList(landing.dice);
+      if (landing.rpg && !rpgMode) toggleRpgMode();
+      return;
     }
 
     const defaultSet = localStorage.getItem('defaultDiceSet');
@@ -423,7 +435,7 @@ function App() {
       {/* The UI is all dice and icons, so the document had no heading at all —
           a screen reader landed on an unnamed page, and a crawler found nothing
           to index. Hidden rather than drawn, since the dice are the interface. */}
-      <h1 className={styles.srOnly}>Custom Dice Roller — build and roll any dice online</h1>
+      <h1 className={styles.srOnly}>{landing?.heading ? `${landing.heading} — Custom Dice Roller` : 'Custom Dice Roller — build and roll any dice online'}</h1>
 
       {/* A slim top line, so a shared link says which app it opened and which game is loaded */}
       <header className={styles.topLine}>

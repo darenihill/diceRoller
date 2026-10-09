@@ -13,6 +13,11 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   something of your own. Changes: A top line names the app: Dice Roller; The
   loaded game shows as a chip, for example Catan; Shared links open with both
   names visible; The chip clears when the dice no longer match the game.
+- Four search landing pages (Daren 2026-10-09, "start on the plan"):
+  /dnd-dice-roller, /d20-roller, /catan-dice-roller, /classroom-dice-roller.
+  Each opens the app with its dice loaded and has 150-300 words below the
+  dice. Built locally 2026-10-09; next, check Search Console queries to tune
+  the titles.
 - The phone's back gesture closes the open dialog or menu first, instead of
   leaving the app (trunk test, reviews/2026-10-07-trunk-test.md, finding 4).
 - Donations cover the domain: count Donate taps (a donate_clicked event, no
