@@ -182,3 +182,20 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.aboutButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 44px; /* phone tap target */
+  padding: 0 12px;
+  border-radius: var(--shape-small);
+  color: var(--md-sys-color-primary);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.aboutButton:hover {
+  background-color: var(--md-sys-color-surface-hover);
+}

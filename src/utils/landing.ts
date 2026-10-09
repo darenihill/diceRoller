@@ -36,3 +36,14 @@ export function parseLandingStart(raw: string | undefined): LandingStart | null 
 export function readLandingStart(): LandingStart | null {
   return parseLandingStart(document.getElementById('root')?.dataset.start);
 }
+
+// The page's writing ships in the HTML (for search engines) but is shown in
+// the About dialog rather than below the dice. Returns it without its heading,
+// which the dialog title already shows.
+export function readLandingAbout(): string | null {
+  const article = document.querySelector('.landing-article');
+  if (!article) return null;
+  const copy = article.cloneNode(true) as HTMLElement;
+  copy.querySelector('.landing-title')?.remove();
+  return copy.innerHTML.trim() || null;
+}

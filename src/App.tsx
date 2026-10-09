@@ -13,7 +13,9 @@ import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/ana
 import { MAX_HISTORY_LENGTH } from './utils/constants';
 import { dicePresets } from './utils/presets';
 import { currentSetName, diceSignature, readShareLink, type LoadedSet } from './utils/setName';
-import { readLandingStart } from './utils/landing';
+import { readLandingStart, readLandingAbout } from './utils/landing';
+import { Info } from 'lucide-react';
+import { Modal } from './components/Modal';
 import type { DiceData } from './types';
 
 // Decomposed Modals
@@ -38,6 +40,7 @@ function App() {
   const containerRef = useRef<HTMLDivElement>(null);
   // A search landing page opens with its own dice; null on the home page
   const [landing] = useState(readLandingStart);
+  const [landingAbout] = useState(() => (landing ? readLandingAbout() : null));
   
   // Roll history persists across reloads, but the roll button should read "Roll"
   // on every fresh load and only show a total once a roll happens this session.
@@ -97,7 +100,7 @@ function App() {
   }, []);
 
   // Modals state
-  const [modalOpen, setModalOpen] = useState<'help' | 'history' | 'sets' | 'customize' | 'stats' | null>(null);
+  const [modalOpen, setModalOpen] = useState<'help' | 'history' | 'sets' | 'customize' | 'stats' | 'about' | null>(null);
 
   useEffect(() => {
     document.body.classList.remove('theme-dark', 'theme-light', 'theme-felt', 'theme-midnight');
@@ -445,6 +448,12 @@ function App() {
             <span className={styles.srOnly}>Loaded game: </span>{setName}
           </span>
         )}
+        {landingAbout && (
+          <button className={styles.aboutButton} onClick={() => setModalOpen('about')}>
+            <Info size={16} aria-hidden="true" />
+            About
+          </button>
+        )}
       </header>
 
       <div ref={containerRef} className={styles.diceContainer} style={diceStyles}>
@@ -515,6 +524,13 @@ function App() {
         isOpen={modalOpen === 'help'} 
         onClose={() => setModalOpen(null)} 
       />
+
+      {landingAbout && (
+        <Modal isOpen={modalOpen === 'about'} onClose={() => setModalOpen(null)} title={landing?.heading ?? 'About'}>
+          {/* The landing page's own static writing, copied from its HTML */}
+          <div className="landing-about" dangerouslySetInnerHTML={{ __html: landingAbout }} />
+        </Modal>
+      )}
 
       <HistoryModal 
         isOpen={modalOpen === 'history'} 
