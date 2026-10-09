@@ -103,7 +103,13 @@ export const landingPages = [
   <li>story starters and vocabulary review,</li>
   <li>picking groups or turn order fairly.</li>
 </ul>
-<p>Save a set and share it as a link, so students open exactly the dice you made. Anonymous page statistics can be switched off under Customize.</p>
+<h2>Save a set and share it with your class</h2>
+<ol>
+  <li>Build your dice, open the menu and tap Save. Name the set, for example "Week 3 vocabulary".</li>
+  <li>Tap Share. A link to exactly those dice is copied, set name included.</li>
+  <li>Paste it into Google Classroom, an email or a slide. Students open the same dice, named at the top, with no sign-in.</li>
+</ol>
+<p>Saved sets stay on that device under Load, ready for the next lesson. On a classroom computer, Set Default opens your set every time. Anonymous page statistics can be switched off under Customize.</p>
 `,
   },
 ];
