@@ -160,3 +160,37 @@ export function calculateGridDimensions(
 
   return { optimalSize, optimalColumns, dynamicGap };
 }
+
+export const DICE_SCALE_MIN = 0.6;
+export const DICE_SCALE_MAX = 1.6;
+export const DICE_SCALE_DEFAULT = 1;
+
+/** Reads a stored or imported dice-size value, falling back to the default. */
+export function sanitizeDiceScale(value: unknown): number {
+  const n = typeof value === 'string' ? parseFloat(value) : value;
+  if (typeof n !== 'number' || !Number.isFinite(n)) return DICE_SCALE_DEFAULT;
+  return Math.min(DICE_SCALE_MAX, Math.max(DICE_SCALE_MIN, n));
+}
+
+/**
+ * Applies the owner-set dice size on top of the fitted layout. At 1 the fitted
+ * layout is returned unchanged. Otherwise columns are re-fitted to the width, so
+ * bigger dice wrap onto more rows (the dice area scrolls) and smaller dice can
+ * sit more to a row. A die is never wider or taller than the visible area.
+ */
+export function scaleGridDimensions(
+  base: GridDimensions,
+  diceCount: number,
+  containerWidth: number,
+  containerHeight: number,
+  scale: number
+): GridDimensions {
+  if (scale === DICE_SCALE_DEFAULT || base.optimalSize === 0) return base;
+  const GAP_RATIO = 0.10;
+  const safeWidth = Math.max(0, containerWidth - 36);
+  const safeHeight = Math.max(0, containerHeight - 36);
+  const size = Math.max(1, Math.floor(Math.min(base.optimalSize * scale, safeWidth, safeHeight, 480 * scale)));
+  const fit = Math.floor((safeWidth + size * GAP_RATIO) / (size * (1 + GAP_RATIO)));
+  const columns = Math.min(diceCount, Math.max(1, fit));
+  return { optimalSize: size, optimalColumns: columns, dynamicGap: Math.floor(size * GAP_RATIO) };
+}

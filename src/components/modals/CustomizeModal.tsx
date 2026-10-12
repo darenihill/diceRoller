@@ -3,6 +3,7 @@ import { Modal } from '../Modal';
 import { Volume2, VolumeX, BarChart2 } from 'lucide-react';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
+import { DICE_SCALE_DEFAULT, DICE_SCALE_MAX, DICE_SCALE_MIN } from '../../utils/diceUtils';
 
 interface CustomizeModalProps {
   isOpen: boolean;
@@ -15,6 +16,8 @@ interface CustomizeModalProps {
   onChangeTargetHighlight: (val: string) => void;
   telemetryEnabled: boolean;
   onToggleTelemetry: () => void;
+  diceScale: number;
+  onChangeDiceScale: (scale: number) => void;
 }
 
 export const CustomizeModal: React.FC<CustomizeModalProps> = ({
@@ -28,6 +31,8 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
   onChangeTargetHighlight,
   telemetryEnabled,
   onToggleTelemetry,
+  diceScale,
+  onChangeDiceScale,
 }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Customize App">
@@ -70,6 +75,33 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
 
         <h3 className={modalStyles.sectionHeader}>Preferences</h3>
         <div className={modalStyles.formGroup}>
+          {/* Dice Size */}
+          <div className={modalStyles.toggleLabelCol}>
+            <div className={modalStyles.toggleRow}>
+              <span className={modalStyles.toggleTitle} id="dice-size-label">Dice Size</span>
+              {diceScale !== DICE_SCALE_DEFAULT && (
+                <button className="md-button md-button-surface md-button-compact" onClick={() => onChangeDiceScale(DICE_SCALE_DEFAULT)}>
+                  Reset
+                </button>
+              )}
+            </div>
+            <div className={modalStyles.sliderRow}>
+              <span className={modalStyles.toggleDesc} aria-hidden="true">Smaller</span>
+              <input
+                type="range"
+                min={DICE_SCALE_MIN}
+                max={DICE_SCALE_MAX}
+                step={0.1}
+                value={diceScale}
+                onChange={(e) => onChangeDiceScale(Number(e.target.value))}
+                className={modalStyles.slider}
+                aria-labelledby="dice-size-label"
+                aria-valuetext={`${Math.round(diceScale * 100)}%`}
+              />
+              <span className={modalStyles.toggleDesc} aria-hidden="true">Bigger</span>
+            </div>
+          </div>
+
           {/* Sound Toggle */}
           <div className={modalStyles.toggleRow}>
             <div className={modalStyles.toggleLabelCol}>

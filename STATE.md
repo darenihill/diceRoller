@@ -1,4 +1,4 @@
-Next: held - the four landing pages are built and checked locally; pushing them needs Daren's OK (public repo). Pull request 9 waits on Daren's merge.
+Next: held - dice size (steps 1-3) built and checked locally on top of pull request 9; pushing needs Daren's OK (public repo) after he merges pull request 9.
 
 # State
 

@@ -7,7 +7,7 @@ import { Dice } from './components/Dice';
 import { ActionBar } from './components/ActionBar';
 import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
-import { generateId, calculateGridDimensions, sanitizeDiceList } from './utils/diceUtils';
+import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList } from './utils/diceUtils';
 import { playRollSequence } from './utils/soundEffects';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { MAX_HISTORY_LENGTH } from './utils/constants';
@@ -83,6 +83,11 @@ function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('appTheme') || 'theme-dark');
   
   const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('soundEnabled') === 'true');
+  const [diceScale, setDiceScale] = useState(() => sanitizeDiceScale(localStorage.getItem('diceScale')));
+
+  useEffect(() => {
+    localStorage.setItem('diceScale', String(diceScale));
+  }, [diceScale]);
 
   useEffect(() => {
     localStorage.setItem('soundEnabled', String(soundEnabled));
@@ -242,10 +247,12 @@ function App() {
   const setName = currentSetName(diceList, loadedSet);
 
   // Dice Size & Grid layout calculations
-  const { optimalSize, optimalColumns, dynamicGap } = calculateGridDimensions(
+  const { optimalSize, optimalColumns, dynamicGap } = scaleGridDimensions(
+    calculateGridDimensions(diceList.length, containerSize.width, containerSize.height),
     diceList.length,
     containerSize.width,
-    containerSize.height
+    containerSize.height,
+    diceScale
   );
 
   const diceStyles = {
@@ -342,7 +349,8 @@ function App() {
         defaultSet: JSON.parse(localStorage.getItem('defaultDiceSet') || '[]'),
         rollHistory: JSON.parse(localStorage.getItem('rollHistory') || '[]'),
         theme: localStorage.getItem('appTheme') || 'theme-dark',
-        soundEnabled: localStorage.getItem('soundEnabled') === 'true'
+        soundEnabled: localStorage.getItem('soundEnabled') === 'true',
+        diceScale: sanitizeDiceScale(localStorage.getItem('diceScale'))
       };
       const json = JSON.stringify(data, null, 2);
       const blob = new Blob([json], { type: 'application/json' });
@@ -400,6 +408,8 @@ function App() {
           if (data.soundEnabled !== undefined) {
             localStorage.setItem('soundEnabled', String(data.soundEnabled));
           }
+          // Older backups have no dice size; they import at the default
+          localStorage.setItem('diceScale', String(sanitizeDiceScale(data.diceScale)));
           
           trackEvent('backup_imported');
           showToast('Imported backup successfully! Reloading...');
@@ -564,6 +574,8 @@ function App() {
         onChangeTargetHighlight={setTargetHighlight}
         telemetryEnabled={telemetryState}
         onToggleTelemetry={handleToggleTelemetry}
+        diceScale={diceScale}
+        onChangeDiceScale={setDiceScale}
       />
 
       <SaveDialog 
