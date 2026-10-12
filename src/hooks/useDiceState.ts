@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { DiceData } from '../types';
-import { generateId, parseFaceContent, FACE_ICON_PREFIX } from '../utils/diceUtils';
+import { generateId, parseFaceContent, faceNumericValue, FACE_ICON_PREFIX } from '../utils/diceUtils';
 import { MAX_DICE_LIMIT, MAX_HISTORY_LENGTH, ROLL_DURATION_MS, TOAST_DURATION_MS } from '../utils/constants';
 
 export interface RollHistoryItem {
@@ -133,15 +133,7 @@ export const useDiceState = () => {
       if (keep) {
         let val = d.numberValue;
         if (d.customFaces.length > 0) {
-          const idx = d.currentFaceIndex ?? 0;
-          const parsed = parseFaceContent(d.customFaces[idx]);
-          if (!parsed.content.startsWith(FACE_ICON_PREFIX)) {
-            const num = parseInt(parsed.content);
-            if (!isNaN(num)) val = num;
-            else val = 0;
-          } else {
-            val = 0;
-          }
+          val = faceNumericValue(d.customFaces[d.currentFaceIndex ?? 0]);
         }
         return {
           ...d,
@@ -160,14 +152,7 @@ export const useDiceState = () => {
       }
       
       if (d.customFaces.length > 0) {
-        const parsed = parseFaceContent(d.customFaces[idx]);
-        if (parsed.content.startsWith(FACE_ICON_PREFIX)) {
-          val = 0;
-        } else {
-          const num = parseInt(parsed.content);
-          if (!isNaN(num)) val = num;
-          else val = 0;
-        }
+        val = faceNumericValue(d.customFaces[idx]);
       }
 
       return {
@@ -242,8 +227,11 @@ export const useDiceState = () => {
       let shown = String(val);
       if (d.customFaces.length > 0) {
         const idx = d.targetFaceIndex ?? d.currentFaceIndex ?? 0;
-        const face = parseFaceContent(d.customFaces[idx] ?? '').content;
+        const parsedFace = parseFaceContent(d.customFaces[idx] ?? '');
+        const face = parsedFace.content;
         shown = face.startsWith(FACE_ICON_PREFIX) ? face.replace(FACE_ICON_PREFIX, '') : (face || String(val));
+        // A symbol or word that counts as a number shows both, e.g. "Star (6)"
+        if (parsedFace.value !== undefined && shown !== String(parsedFace.value)) shown = `${shown} (${parsedFace.value})`;
       }
 
       const dropSuffix = d.dropped ? ' (dropped)' : '';

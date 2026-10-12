@@ -300,6 +300,21 @@ describe('rollDice for one die', () => {
     expect(result.current.diceList[0].held).toBe(true);
   });
 
+  it('counts a symbol face as its number in the total, log and target highlight', () => {
+    const { result } = renderHook(() => useDiceState());
+    act(() => result.current.addDice({ ...plainDie(2, 'Star die', 1), customFaces: [':icon:Star:bg:#FFD700:val:6', 'Blank'] }));
+    act(() => result.current.setTargetHighlight('6'));
+
+    randQueue = [0.1, 0.1]; // first face
+    act(() => result.current.rollDice());
+    act(() => vi.advanceTimersByTime(ROLL_DURATION_MS));
+
+    const [entry] = result.current.rollHistory;
+    expect(entry.total).toBe(6);
+    expect(entry.details).toEqual(['Star die: Star (6)']);
+    expect(entry.isTargetHit).toBe(true);
+  });
+
   it('leaves a whole-set roll unmarked', () => {
     const { result } = renderHook(() => useDiceState());
     act(() => result.current.addDice(plainDie(6, 'Red', 2)));

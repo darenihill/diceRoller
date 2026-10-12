@@ -6,6 +6,9 @@ import {
 
 export const FACE_BG_DELIMITER = ':bg:';
 export const FACE_ICON_PREFIX = ':icon:';
+/** Optional suffix giving a symbol or word face a number to count as, e.g. ':icon:Star:bg:#FFD700:val:6' */
+export const FACE_VALUE_DELIMITER = ':val:';
+const FACE_VALUE_RE = /:val:(-?\d{1,4})$/;
 
 export function getRandomNumber(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -18,17 +21,38 @@ export function generateId(): string {
 export interface ParsedFace {
   content: string;
   bgColor: string;
+  /** The number this face counts as, when one was set */
+  value?: number;
 }
 
 export function parseFaceContent(faceStr: string, defaultBg: string = 'transparent'): ParsedFace {
   if (!faceStr) {
     return { content: '', bgColor: defaultBg };
   }
-  const parts = faceStr.split(FACE_BG_DELIMITER);
+  const valueMatch = faceStr.match(FACE_VALUE_RE);
+  const rest = valueMatch ? faceStr.slice(0, valueMatch.index) : faceStr;
+  const parts = rest.split(FACE_BG_DELIMITER);
   return {
     content: parts[0],
-    bgColor: parts[1] || defaultBg
+    bgColor: parts[1] || defaultBg,
+    ...(valueMatch ? { value: Number(valueMatch[1]) } : {})
   };
+}
+
+/** Builds a face string; leaves out the parts that aren't set. */
+export function buildFace(content: string, bgColor?: string, value?: number): string {
+  const bg = bgColor && bgColor !== 'transparent' ? `${FACE_BG_DELIMITER}${bgColor}` : '';
+  const val = value !== undefined && Number.isInteger(value) ? `${FACE_VALUE_DELIMITER}${value}` : '';
+  return `${content}${bg}${val}`;
+}
+
+/** What a face adds to a total: its Counts as number, else its number text, else 0. */
+export function faceNumericValue(faceStr: string): number {
+  const parsed = parseFaceContent(faceStr);
+  if (parsed.value !== undefined) return parsed.value;
+  if (parsed.content.startsWith(FACE_ICON_PREFIX)) return 0;
+  const num = parseInt(parsed.content);
+  return isNaN(num) ? 0 : num;
 }
 
 /** Parse a hex color string and return its perceived brightness (0-255). */
@@ -76,7 +100,12 @@ export function sanitizeDiceList(input: unknown): DiceData[] {
       ? d.customFaces
           .slice(0, MAX_CUSTOM_FACES)
           .filter((f): f is string => typeof f === 'string')
-          .map(f => f.slice(0, MAX_FACE_TEXT_LENGTH))
+          .map(f => {
+            // Trim the face text but keep a Counts as suffix intact
+            const m = f.match(FACE_VALUE_RE);
+            const base = m ? f.slice(0, m.index) : f;
+            return base.slice(0, MAX_FACE_TEXT_LENGTH) + (m ? m[0] : '');
+          })
       : [];
 
     const numberValue = Number.isFinite(Number(d.numberValue)) ? Number(d.numberValue) : 1;

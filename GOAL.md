@@ -31,6 +31,12 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   total stays as it was." Done when a unit test shows only that die changes and
   the log entry is marked single, and at 390 px the button rolls one die while
   the Roll button's total stays put. Built locally 2026-10-12.
+- Symbols that score a number (Daren 2026-10-12, Build): "A face with a symbol
+  or word counts as zero today. Each face would get an optional Counts as
+  number, so a gold star can count as 6 in totals and target highlights. Old
+  share links and backups keep working unchanged." No preset named after a
+  trademarked game. Done when unit tests show a star counting 6 in the total,
+  log and target, and old face strings read as before. Built locally 2026-10-12.
 - Dice size, step 1: add a stored dice-size preference (default 1.0, range
   0.6 to 1.6) applied as a multiplier on top of `calculateGridDimensions()`,
   clamped so dice never overflow the screen. Done when a unit test shows the
