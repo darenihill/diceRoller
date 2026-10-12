@@ -1,4 +1,4 @@
-Next: held - dice size (steps 1-3) built and checked locally on top of pull request 9; pushing needs Daren's OK (public repo) after he merges pull request 9.
+Next: held - dice size and roll-one-die built and checked locally on top of pull request 9; pushing needs Daren's OK (public repo) after he merges pull request 9.
 
 # State
 

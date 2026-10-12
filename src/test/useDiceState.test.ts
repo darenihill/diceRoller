@@ -239,3 +239,72 @@ describe('rollDice (Roll Resolution, Advantage & Modifier Logic)', () => {
     expect(JSON.parse(localStorage.getItem('rollHistory') || '[]').length).toBe(0);
   });
 });
+
+describe('rollDice for one die', () => {
+  let randQueue: number[];
+
+  beforeEach(() => {
+    localStorage.clear();
+    vi.useFakeTimers();
+    randQueue = [];
+    vi.spyOn(Math, 'random').mockImplementation(() => (randQueue.length ? randQueue.shift()! : 0.5));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  const plainDie = (faces: number, name: string, numberValue: number) => ({
+    faces, name, numberValue, currentFaceIndex: 0, customFaces: [], color: '#384050', held: false
+  });
+
+  it('rolls only the chosen die and logs it as its own single entry', () => {
+    const { result } = renderHook(() => useDiceState());
+    act(() => {
+      result.current.addDice(plainDie(6, 'Red', 2));
+      result.current.addDice(plainDie(6, 'Yellow', 3));
+    });
+    // Math.random is mocked, so both got the same generated id; give them their own
+    act(() => result.current.setDiceList(list => list.map((d, i) => ({ ...d, id: `die-${i}` }))));
+    if (!result.current.rpgMode) act(() => result.current.toggleRpgMode());
+    act(() => result.current.setModifier(5));
+    const [red, yellow] = result.current.diceList;
+
+    randQueue = [0.99]; // floor(0.99 * 6) + 1 = 6
+    act(() => result.current.rollDice(undefined, yellow.id));
+    expect(result.current.rollingId).toBe(yellow.id);
+    act(() => vi.advanceTimersByTime(ROLL_DURATION_MS));
+
+    const [entry] = result.current.rollHistory;
+    expect(entry.single).toBe(true);
+    expect(entry.total).toBe(6); // the die alone: no modifier, other dice not counted
+    expect(entry.details).toEqual(['Yellow: 6']);
+    expect(result.current.diceList.find(d => d.id === red.id)?.numberValue).toBe(2);
+    expect(result.current.diceList.find(d => d.id === yellow.id)?.numberValue).toBe(6);
+    expect(result.current.rollingId).toBe(null);
+  });
+
+  it('rolls a held die when it is the one chosen, and keeps it held', () => {
+    const { result } = renderHook(() => useDiceState());
+    act(() => result.current.addDice(plainDie(6, 'Red', 2)));
+    const [red] = result.current.diceList;
+    act(() => result.current.toggleHold(red.id));
+    expect(result.current.diceList[0].held).toBe(true);
+
+    randQueue = [0.99];
+    act(() => result.current.rollDice(undefined, red.id));
+    act(() => vi.advanceTimersByTime(ROLL_DURATION_MS));
+
+    expect(result.current.diceList[0].numberValue).toBe(6);
+    expect(result.current.diceList[0].held).toBe(true);
+  });
+
+  it('leaves a whole-set roll unmarked', () => {
+    const { result } = renderHook(() => useDiceState());
+    act(() => result.current.addDice(plainDie(6, 'Red', 2)));
+    act(() => result.current.rollDice());
+    act(() => vi.advanceTimersByTime(ROLL_DURATION_MS));
+    expect(result.current.rollHistory[0].single).toBeUndefined();
+  });
+});

@@ -21,7 +21,9 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   const frequencyMap: Record<number, number> = {};
   let maxFreq = 0;
 
+  // The chart counts whole-set rolls only; a die rolled on its own stays in the log
   rollHistory.forEach(item => {
+    if (item.single) return;
     const total = item.total;
     frequencyMap[total] = (frequencyMap[total] || 0) + 1;
     if (frequencyMap[total] > maxFreq) {
@@ -75,7 +77,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
             </div>
             {rollHistory.map((roll, i) => (
               <div key={roll.id} className={styles.historyItem} style={{ borderLeft: roll.isTargetHit ? '4px solid var(--color-gold)' : 'none' }}>
-                <div className={styles.historyIndex}>Roll {rollHistory.length - i}</div>
+                <div className={styles.historyIndex}>Roll {rollHistory.length - i}{roll.single ? ' · one die' : ''}</div>
                 <div className={styles.historyDetails}>{roll.details.join(', ')}</div>
                 <div className={styles.historyTotal}>
                   Total: {roll.total}

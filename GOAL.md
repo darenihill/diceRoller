@@ -25,6 +25,12 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   share link is copied. Done when the event fires in a test and the prompt
   shows once after a share at 390 px and 1280 px (Daren 2026-10-09: no ads;
   hopes the app covers its own costs, which is about the domain).
+- Roll just one die (Daren 2026-10-12, Build): "Tapping a die already shows
+  small buttons for settings, copy and remove. A fourth button would roll only
+  that die. The single roll goes in the roll log as its own entry, and the big
+  total stays as it was." Done when a unit test shows only that die changes and
+  the log entry is marked single, and at 390 px the button rolls one die while
+  the Roll button's total stays put. Built locally 2026-10-12.
 - Dice size, step 1: add a stored dice-size preference (default 1.0, range
   0.6 to 1.6) applied as a multiplier on top of `calculateGridDimensions()`,
   clamped so dice never overflow the screen. Done when a unit test shows the

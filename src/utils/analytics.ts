@@ -106,6 +106,7 @@ export function recordSessionStart(): LocalAnalyticsStats {
 export type AnalyticsEventName =
   | 'page_view'
   | 'roll_dice'
+  | 'roll_one_die'
   | 'preset_loaded'
   | 'preset_saved'
   | 'dice_added'
