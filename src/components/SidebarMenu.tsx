@@ -28,7 +28,11 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
   return (
     <>
       <div className={styles.toggleContainer}>
-        <button className={`md-icon-button ${styles.toggleBtn}`} onClick={onToggle} title="Toggle Menu">
+        <button className={`md-icon-button ${styles.toggleBtn}`} onClick={onToggle}
+          title="Menu"
+          aria-label={isOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={isOpen}
+        >
           {isOpen ? <ChevronDown size={28} /> : <ChevronUp size={28} />}
         </button>
       </div>

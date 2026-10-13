@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#121212" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Catan Dice Roller — Free Online Red and Yellow Dice</title>
+    <meta name="description" content="Roll Catan dice online: the red and yellow pair, with the total shown and a chart of how often each number comes up. Free, no sign-up.">
+
+    <!-- Open Graph / Discord / Facebook (scrapers require absolute image URLs) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://customdiceroller.com/catan-dice-roller/" />
+    <meta property="og:title" content="Catan Dice Roller — Free Online Red and Yellow Dice" />
+    <meta property="og:description" content="Roll Catan dice online: the red and yellow pair, with the total shown and a chart of how often each number comes up. Free, no sign-up." />
+    <meta property="og:image" content="https://customdiceroller.com/og-image.jpg" />
+    <meta property="og:site_name" content="Custom Dice Roller" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="Catan Dice Roller — Free Online Red and Yellow Dice" />
+    <meta property="twitter:description" content="Roll Catan dice online: the red and yellow pair, with the total shown and a chart of how often each number comes up. Free, no sign-up." />
+    <meta property="twitter:image" content="https://customdiceroller.com/og-image.jpg" />
+    <link rel="canonical" href="https://customdiceroller.com/catan-dice-roller/" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Structured data. The app carries almost no crawlable text by nature, so
+         this is most of what a search engine has to go on until the per-preset
+         landing pages exist. No ratings claimed — none have been collected. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Custom Dice Roller",
+      "url": "https://customdiceroller.com/",
+      "description": "Free online dice roller for board games and tabletop RPGs. Build custom dice with any number of faces, custom text, icons and per-face colours, then share a set with a link.",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Any device with a web browser",
+      "browserRequirements": "Requires JavaScript",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Custom dice with any number of faces",
+        "Custom text, icons and per-face colours",
+        "Polyhedral RPG dice: d4, d6, d8, d10, d12, d20",
+        "Advantage and disadvantage rolls with modifiers",
+        "Hold dice between rolls",
+        "Share a dice set with a link",
+        "Roll history and frequency chart",
+        "Works offline"
+      ]
+    }
+    </script>
+    <!-- Google Analytics (GA4) — honors the in-app telemetry toggle and skips localhost -->
+    <script>
+      (function () {
+        var GA_ID = 'G-LF0JH7CVP6';
+        var isDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        var optedOut = false;
+        try { optedOut = localStorage.getItem('telemetryEnabled') === 'false'; } catch (e) { /* private mode */ }
+        // Official GA4 kill switch: drops ALL hits, including automatic page_views
+        window['ga-disable-' + GA_ID] = isDev || optedOut;
+
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function () { dataLayer.push(arguments); };
+        gtag('js', new Date());
+        gtag('config', GA_ID);
+
+        if (!isDev) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+          document.head.appendChild(s);
+        }
+      })();
+    </script>
+  </head>
+  <body class="landing">
+    <div id="root" data-start="{&quot;heading&quot;:&quot;Catan dice roller&quot;,&quot;preset&quot;:&quot;Catan&quot;}"></div>
+
+    <!-- Genuine content for anyone (or anything) without JavaScript. The app is
+         interactive by nature and renders almost no text, so without this a
+         non-rendering crawler sees an empty page. -->
+    <!-- Generated from landing/pages.mjs by scripts/landing-pages.mjs. Edit those, not this. -->
+    <article class="landing-article">
+    <h2 class="landing-title">Catan dice roller</h2>
+    <p>Lost the dice, or want rolls everyone at the table can see? This page opens with Catan's red and yellow pair. Press Roll and the total appears on the button.</p>
+<h2>Why 7 comes up most</h2>
+<p>Two six-sided dice can land in 36 ways, and six of them add up to 7, so a 7 comes up about one roll in six. That is why the robber moves on a 7 and why nothing is built on it.</p>
+<h2>Reading the number tokens</h2>
+<p>The dots under each number on the board count the ways to roll it:</p>
+<ul>
+  <li><strong>6 and 8</strong>, the red numbers, have five ways each: about 14% of rolls.</li>
+  <li><strong>5 and 9</strong> have four ways, <strong>4 and 10</strong> three, <strong>3 and 11</strong> two.</li>
+  <li><strong>2 and 12</strong> have one way each: under 3% of rolls.</li>
+</ul>
+<p>A settlement on a 6, an 8 and a 5 collects on 14 of every 36 rolls on average. One on 2, 12 and 11 collects on 4.</p>
+<h2>Check your luck</h2>
+<p>Open History from the menu to see every roll and a chart of how often each total has come up this game. If the 6s seem to have vanished, the chart will tell you whether that is true. Playing Cities &amp; Knights? Load its set from Games to add the event die.</p>
+    <nav class="landing-more" aria-label="More dice rollers"><a href="/dnd-dice-roller/">D&D dice roller</a> · <a href="/d20-roller/">d20 roller</a> · <a href="/classroom-dice-roller/">Classroom dice roller</a> · <a href="/">Build your own dice</a></nav>
+    </article>
+    <noscript><p class="landing-article">This app needs JavaScript enabled to roll dice.</p></noscript>
+
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          // Unregister any active service worker on localhost to clean up cached dev state
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            for (let registration of registrations) {
+              registration.unregister();
+            }
+          });
+          // Also clear cache storage to ensure fresh asset fetching
+          if ('caches' in window) {
+            caches.keys().then((names) => {
+              for (let name of names) caches.delete(name);
+            });
+          }
+        } else {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+              .catch(err => console.log('Service Worker registration failed:', err));
+          });
+        }
+      }
+    </script>
+  </body>
+</html>

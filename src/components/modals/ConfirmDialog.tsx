@@ -23,11 +23,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         <p className={modalStyles.formLabel} style={{ margin: 0 }}>{message}</p>
         <div className={modalStyles.buttonRow}>
           <button className="md-button md-button-surface" onClick={onClose}>Cancel</button>
-          <button 
-            className="md-button" 
-            style={{ backgroundColor: 'var(--md-sys-color-error)', color: 'var(--md-sys-color-on-error)' }} 
-            onClick={onConfirm}
-          >
+          <button className="md-button md-button-danger" onClick={onConfirm}>
             Delete All
           </button>
         </div>

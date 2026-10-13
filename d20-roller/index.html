@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#121212" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d20 Roller — Roll a 20-Sided Die Online, With Advantage</title>
+    <meta name="description" content="Roll a d20 online for free. Advantage and disadvantage, modifiers, and natural 20 and natural 1 highlighting. No sign-up, no ads.">
+
+    <!-- Open Graph / Discord / Facebook (scrapers require absolute image URLs) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://customdiceroller.com/d20-roller/" />
+    <meta property="og:title" content="d20 Roller — Roll a 20-Sided Die Online, With Advantage" />
+    <meta property="og:description" content="Roll a d20 online for free. Advantage and disadvantage, modifiers, and natural 20 and natural 1 highlighting. No sign-up, no ads." />
+    <meta property="og:image" content="https://customdiceroller.com/og-image.jpg" />
+    <meta property="og:site_name" content="Custom Dice Roller" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="d20 Roller — Roll a 20-Sided Die Online, With Advantage" />
+    <meta property="twitter:description" content="Roll a d20 online for free. Advantage and disadvantage, modifiers, and natural 20 and natural 1 highlighting. No sign-up, no ads." />
+    <meta property="twitter:image" content="https://customdiceroller.com/og-image.jpg" />
+    <link rel="canonical" href="https://customdiceroller.com/d20-roller/" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Structured data. The app carries almost no crawlable text by nature, so
+         this is most of what a search engine has to go on until the per-preset
+         landing pages exist. No ratings claimed — none have been collected. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Custom Dice Roller",
+      "url": "https://customdiceroller.com/",
+      "description": "Free online dice roller for board games and tabletop RPGs. Build custom dice with any number of faces, custom text, icons and per-face colours, then share a set with a link.",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Any device with a web browser",
+      "browserRequirements": "Requires JavaScript",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Custom dice with any number of faces",
+        "Custom text, icons and per-face colours",
+        "Polyhedral RPG dice: d4, d6, d8, d10, d12, d20",
+        "Advantage and disadvantage rolls with modifiers",
+        "Hold dice between rolls",
+        "Share a dice set with a link",
+        "Roll history and frequency chart",
+        "Works offline"
+      ]
+    }
+    </script>
+    <!-- Google Analytics (GA4) — honors the in-app telemetry toggle and skips localhost -->
+    <script>
+      (function () {
+        var GA_ID = 'G-LF0JH7CVP6';
+        var isDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        var optedOut = false;
+        try { optedOut = localStorage.getItem('telemetryEnabled') === 'false'; } catch (e) { /* private mode */ }
+        // Official GA4 kill switch: drops ALL hits, including automatic page_views
+        window['ga-disable-' + GA_ID] = isDev || optedOut;
+
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function () { dataLayer.push(arguments); };
+        gtag('js', new Date());
+        gtag('config', GA_ID);
+
+        if (!isDev) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+          document.head.appendChild(s);
+        }
+      })();
+    </script>
+  </head>
+  <body class="landing">
+    <div id="root" data-start="{&quot;heading&quot;:&quot;d20 roller&quot;,&quot;name&quot;:&quot;d20&quot;,&quot;rpg&quot;:true,&quot;dice&quot;:[{&quot;numberValue&quot;:1,&quot;faces&quot;:20,&quot;customFaces&quot;:[],&quot;color&quot;:&quot;#384050&quot;,&quot;name&quot;:&quot;d20&quot;}]}"></div>
+
+    <!-- Genuine content for anyone (or anything) without JavaScript. The app is
+         interactive by nature and renders almost no text, so without this a
+         non-rendering crawler sees an empty page. -->
+    <!-- Generated from landing/pages.mjs by scripts/landing-pages.mjs. Edit those, not this. -->
+    <article class="landing-article">
+    <h2 class="landing-title">d20 roller</h2>
+    <p>One twenty-sided die, ready to roll. Press Roll. Each number from 1 to 20 has the same 5% chance, which is why a single d20 roll can swing a whole game.</p>
+<h2>Natural 20s and natural 1s</h2>
+<p>In most tabletop RPGs a natural 20 is a critical success and a natural 1 is a critical failure, whatever your modifier. Both are highlighted here, so the moment is hard to miss.</p>
+<h2>Advantage and disadvantage</h2>
+<p>RPG mode is already on. With advantage you roll two d20s and keep the higher; with disadvantage you keep the lower. The difference is bigger than it sounds:</p>
+<ul>
+  <li>The chance of rolling 11 or more goes from 50% to 75% with advantage, and down to 25% with disadvantage.</li>
+  <li>The chance of at least one natural 20 nearly doubles, from 5% to 9.75%.</li>
+</ul>
+<h2>Modifiers and more dice</h2>
+<p>Set your modifier once and every total includes it. Need damage dice too? Use the + button to add a d6, d8 or any die you like, or open the D&amp;D set from the menu. Roll history shows your last rolls if anyone asks what you got.</p>
+    <nav class="landing-more" aria-label="More dice rollers"><a href="/dnd-dice-roller/">D&D dice roller</a> · <a href="/catan-dice-roller/">Catan dice roller</a> · <a href="/classroom-dice-roller/">Classroom dice roller</a> · <a href="/">Build your own dice</a></nav>
+    </article>
+    <noscript><p class="landing-article">This app needs JavaScript enabled to roll dice.</p></noscript>
+
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          // Unregister any active service worker on localhost to clean up cached dev state
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            for (let registration of registrations) {
+              registration.unregister();
+            }
+          });
+          // Also clear cache storage to ensure fresh asset fetching
+          if ('caches' in window) {
+            caches.keys().then((names) => {
+              for (let name of names) caches.delete(name);
+            });
+          }
+        } else {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+              .catch(err => console.log('Service Worker registration failed:', err));
+          });
+        }
+      }
+    </script>
+  </body>
+</html>

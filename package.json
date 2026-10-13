@@ -13,6 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "precommit": "node scripts/pre-commit-check.mjs",
+    "landing": "node scripts/landing-pages.mjs",
     "prepare": "git config core.hooksPath .githooks || true"
   },
   "dependencies": {
