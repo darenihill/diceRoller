@@ -169,7 +169,8 @@ function App() {
     // A landing page opens with its game, ahead of the visitor's usual dice
     if (landing) {
       setDiceList(landing.dice);
-      if (landing.rpg && !rpgMode) toggleRpgMode();
+      // Match the page either way, so a D&D visit doesn't leave RPG mode on for Catan
+      if (landing.rpg !== rpgMode) toggleRpgMode();
       return;
     }
 
