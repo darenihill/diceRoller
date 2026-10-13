@@ -1,5 +1,7 @@
 .app {
-  min-height: 100vh;
+  /* A fixed height (body never scrolls) keeps the dice area's measured size
+     stable, so Bigger dice scroll inside it instead of stretching the page */
+  height: 100vh;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -9,7 +11,9 @@
   display: grid;
   grid-template-columns: repeat(var(--dice-columns), var(--dice-size));
   gap: var(--dice-gap);
-  place-content: center;
+  /* safe: when Bigger dice need more rows than fit, the area scrolls from the top instead of clipping */
+  place-content: safe center;
+  overflow-y: auto;
   flex: 1;
   min-height: 0;
   width: 100%;

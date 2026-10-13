@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { DiceData } from '../types';
-import { generateId, parseFaceContent, FACE_ICON_PREFIX } from '../utils/diceUtils';
+import { generateId, parseFaceContent, faceNumericValue, FACE_ICON_PREFIX } from '../utils/diceUtils';
 import { MAX_DICE_LIMIT, MAX_HISTORY_LENGTH, ROLL_DURATION_MS, TOAST_DURATION_MS } from '../utils/constants';
 
 export interface RollHistoryItem {
@@ -8,6 +8,8 @@ export interface RollHistoryItem {
   total: number;
   details: string[];
   isTargetHit?: boolean;
+  /** One die rolled on its own; kept out of the main total and the frequency chart */
+  single?: boolean;
 }
 
 export interface RollSummary {
@@ -44,6 +46,8 @@ export const useDiceState = () => {
     }
   }, [rollHistory]);
   const [isRolling, setIsRolling] = useState(false);
+  // The die rolling on its own, or null when the whole set rolls
+  const [rollingId, setRollingId] = useState<string | null>(null);
   const [modifier, setModifier] = useState<number>(0);
   const [rpgMode, setRpgMode] = useState<boolean>(() => localStorage.getItem('rpgMode') === 'true');
   const [rollAdvantage, setRollAdvantage] = useState<RollAdvantageMode>('normal');
@@ -114,26 +118,22 @@ export const useDiceState = () => {
     setDiceList([]);
   }, []);
 
-  const rollDice = useCallback((onComplete?: (summary: RollSummary) => void) => {
+  const rollDice = useCallback((onComplete?: (summary: RollSummary) => void, onlyId?: string) => {
     setIsRolling(true);
+    setRollingId(onlyId ?? null);
     
     let rollTotal = 0;
     const details: string[] = [];
     
     // 1. Pre-calculate final targets immediately at 0ms
     const rawTargetList = diceList.map(d => {
-      if (d.held) {
+      // Held dice keep their value, except the one die asked to roll on its own;
+      // every other die keeps its value during that single roll
+      const keep = onlyId !== undefined ? d.id !== onlyId : d.held;
+      if (keep) {
         let val = d.numberValue;
         if (d.customFaces.length > 0) {
-          const idx = d.currentFaceIndex ?? 0;
-          const parsed = parseFaceContent(d.customFaces[idx]);
-          if (!parsed.content.startsWith(FACE_ICON_PREFIX)) {
-            const num = parseInt(parsed.content);
-            if (!isNaN(num)) val = num;
-            else val = 0;
-          } else {
-            val = 0;
-          }
+          val = faceNumericValue(d.customFaces[d.currentFaceIndex ?? 0]);
         }
         return {
           ...d,
@@ -152,14 +152,7 @@ export const useDiceState = () => {
       }
       
       if (d.customFaces.length > 0) {
-        const parsed = parseFaceContent(d.customFaces[idx]);
-        if (parsed.content.startsWith(FACE_ICON_PREFIX)) {
-          val = 0;
-        } else {
-          const num = parseInt(parsed.content);
-          if (!isNaN(num)) val = num;
-          else val = 0;
-        }
+        val = faceNumericValue(d.customFaces[idx]);
       }
 
       return {
@@ -174,7 +167,7 @@ export const useDiceState = () => {
 
     // Handle Advantage / Disadvantage drop logic if rollAdvantage is active across any matching dice pool
     const processedList = [...rawTargetList];
-    if (rpgMode && rollAdvantage !== 'normal' && processedList.length > 1) {
+    if (onlyId === undefined && rpgMode && rollAdvantage !== 'normal' && processedList.length > 1) {
       // Group PLAIN dice by face count (e.g. 2d20s, 4d6s). Custom-faced dice are excluded:
       // a percentile pair (tens + units) is two different dice that both report faces=10,
       // and grouping them would silently drop one half of every d100 roll.
@@ -223,25 +216,29 @@ export const useDiceState = () => {
     const ordinals: Record<number, number> = {};
     processedList.forEach(d => {
       const val = d.targetValue ?? d.numberValue;
+      ordinals[d.faces] = (ordinals[d.faces] || 0) + 1;
+      if (onlyId !== undefined && d.id !== onlyId) return;
       if (!d.dropped) {
         rollTotal += val;
       }
 
-      ordinals[d.faces] = (ordinals[d.faces] || 0) + 1;
       const label = d.name || `d${d.faces} #${ordinals[d.faces]}`;
 
       let shown = String(val);
       if (d.customFaces.length > 0) {
         const idx = d.targetFaceIndex ?? d.currentFaceIndex ?? 0;
-        const face = parseFaceContent(d.customFaces[idx] ?? '').content;
+        const parsedFace = parseFaceContent(d.customFaces[idx] ?? '');
+        const face = parsedFace.content;
         shown = face.startsWith(FACE_ICON_PREFIX) ? face.replace(FACE_ICON_PREFIX, '') : (face || String(val));
+        // A symbol or word that counts as a number shows both, e.g. "Star (6)"
+        if (parsedFace.value !== undefined && shown !== String(parsedFace.value)) shown = `${shown} (${parsedFace.value})`;
       }
 
       const dropSuffix = d.dropped ? ' (dropped)' : '';
       details.push(`${label}: ${shown}${dropSuffix}`);
     });
 
-    const activeModifier = rpgMode ? modifier : 0;
+    const activeModifier = rpgMode && onlyId === undefined ? modifier : 0;
     const finalTotal = rollTotal + activeModifier;
     if (rpgMode && activeModifier !== 0) {
       details.push(`Modifier: ${activeModifier > 0 ? '+' : ''}${activeModifier}`);
@@ -249,7 +246,7 @@ export const useDiceState = () => {
 
     // Evaluate Target Highlight Match (e.g. "7" or "6, 8")
     let isTargetHit = false;
-    if (targetHighlight.trim()) {
+    if (onlyId === undefined && targetHighlight.trim()) {
       const targets = targetHighlight.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
       if (targets.includes(finalTotal)) {
         isTargetHit = true;
@@ -274,9 +271,11 @@ export const useDiceState = () => {
         id: generateId(),
         total: finalTotal,
         details,
-        isTargetHit
+        isTargetHit,
+        ...(onlyId !== undefined ? { single: true } : {})
       }, ...h].slice(0, MAX_HISTORY_LENGTH));
       setIsRolling(false);
+      setRollingId(null);
 
       if (isTargetHit) {
         showToast(`🎯 Target Hit: ${finalTotal}!`);
@@ -284,7 +283,7 @@ export const useDiceState = () => {
 
       onComplete?.({
         total: finalTotal,
-        diceCount: diceList.filter(d => !d.held).length,
+        diceCount: onlyId !== undefined ? 1 : diceList.filter(d => !d.held).length,
         isTargetHit
       });
     }, ROLL_DURATION_MS);
@@ -304,6 +303,7 @@ export const useDiceState = () => {
     setDiceList,
     rollHistory,
     isRolling,
+    rollingId,
     modifier,
     setModifier,
     rpgMode,

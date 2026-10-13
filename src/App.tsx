@@ -7,7 +7,7 @@ import { Dice } from './components/Dice';
 import { ActionBar } from './components/ActionBar';
 import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
-import { generateId, calculateGridDimensions, sanitizeDiceList } from './utils/diceUtils';
+import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList } from './utils/diceUtils';
 import { playRollSequence } from './utils/soundEffects';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { MAX_HISTORY_LENGTH } from './utils/constants';
@@ -30,7 +30,7 @@ import { StatsModal } from './components/modals/StatsModal';
 
 function App() {
   const {
-    diceList, setDiceList, rollHistory, isRolling, modifier, setModifier,
+    diceList, setDiceList, rollHistory, isRolling, rollingId, modifier, setModifier,
     rpgMode, toggleRpgMode, rollAdvantage, setRollAdvantage,
     targetHighlight, setTargetHighlight,
     addDice, removeDice, updateDice, toggleHold, toggleHoldAll,
@@ -83,6 +83,11 @@ function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('appTheme') || 'theme-dark');
   
   const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('soundEnabled') === 'true');
+  const [diceScale, setDiceScale] = useState(() => sanitizeDiceScale(localStorage.getItem('diceScale')));
+
+  useEffect(() => {
+    localStorage.setItem('diceScale', String(diceScale));
+  }, [diceScale]);
 
   useEffect(() => {
     localStorage.setItem('soundEnabled', String(soundEnabled));
@@ -164,7 +169,8 @@ function App() {
     // A landing page opens with its game, ahead of the visitor's usual dice
     if (landing) {
       setDiceList(landing.dice);
-      if (landing.rpg && !rpgMode) toggleRpgMode();
+      // Match the page either way, so a D&D visit doesn't leave RPG mode on for Catan
+      if (landing.rpg !== rpgMode) toggleRpgMode();
       return;
     }
 
@@ -238,14 +244,18 @@ function App() {
   // Derived state
   const allHeld = diceList.length > 0 && diceList.every(d => d.held);
   const totalVisible = hasRolledThisSession && rollHistory.length > 0;
-  const lastTotal = totalVisible ? rollHistory[0].total : 0;
+  // A die rolled on its own never replaces the big total
+  const lastMainRoll = rollHistory.find(r => !r.single);
+  const lastTotal = totalVisible && lastMainRoll ? lastMainRoll.total : 0;
   const setName = currentSetName(diceList, loadedSet);
 
   // Dice Size & Grid layout calculations
-  const { optimalSize, optimalColumns, dynamicGap } = calculateGridDimensions(
+  const { optimalSize, optimalColumns, dynamicGap } = scaleGridDimensions(
+    calculateGridDimensions(diceList.length, containerSize.width, containerSize.height),
     diceList.length,
     containerSize.width,
-    containerSize.height
+    containerSize.height,
+    diceScale
   );
 
   const diceStyles = {
@@ -342,7 +352,8 @@ function App() {
         defaultSet: JSON.parse(localStorage.getItem('defaultDiceSet') || '[]'),
         rollHistory: JSON.parse(localStorage.getItem('rollHistory') || '[]'),
         theme: localStorage.getItem('appTheme') || 'theme-dark',
-        soundEnabled: localStorage.getItem('soundEnabled') === 'true'
+        soundEnabled: localStorage.getItem('soundEnabled') === 'true',
+        diceScale: sanitizeDiceScale(localStorage.getItem('diceScale'))
       };
       const json = JSON.stringify(data, null, 2);
       const blob = new Blob([json], { type: 'application/json' });
@@ -400,6 +411,8 @@ function App() {
           if (data.soundEnabled !== undefined) {
             localStorage.setItem('soundEnabled', String(data.soundEnabled));
           }
+          // Older backups have no dice size; they import at the default
+          localStorage.setItem('diceScale', String(sanitizeDiceScale(data.diceScale)));
           
           trackEvent('backup_imported');
           showToast('Imported backup successfully! Reloading...');
@@ -415,6 +428,11 @@ function App() {
       }
     };
     reader.readAsText(file);
+  };
+
+  const handleRollOne = (id: string) => {
+    rollDice(() => trackEvent('roll_one_die'), id);
+    if (soundEnabled) playRollSequence(soundTimersRef);
   };
 
   const handleAddDice = (template?: Partial<DiceData>) => {
@@ -461,13 +479,15 @@ function App() {
           <Dice
             key={dice.id}
             dice={dice}
-            isRolling={isRolling}
+            isRolling={isRolling && (rollingId === null || rollingId === dice.id)}
             isRevealed={revealedDiceId === dice.id}
             onReveal={() => setRevealedDiceId(dice.id)}
             onToggleHold={toggleHold}
             onRemove={removeDice}
             onOpenSettings={setEditingDiceId}
             onClone={handleAddDice}
+            onRollOne={isRolling ? undefined : handleRollOne}
+            rollingAlone={rollingId === dice.id}
             rpgMode={rpgMode}
           />
         ))}
@@ -564,6 +584,8 @@ function App() {
         onChangeTargetHighlight={setTargetHighlight}
         telemetryEnabled={telemetryState}
         onToggleTelemetry={handleToggleTelemetry}
+        diceScale={diceScale}
+        onChangeDiceScale={setDiceScale}
       />
 
       <SaveDialog 

@@ -1,7 +1,23 @@
 import React from 'react';
 import styles from './SidebarMenu.module.css';
-import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Download, ChevronUp, ChevronDown, Share2, Palette, Pin, ToggleLeft, ToggleRight, BarChart2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Download, Share2, Palette, Pin, ToggleLeft, ToggleRight, BarChart2 } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+
+// Material 3 "emphasized" easing for the menu icon turning into a close icon
+const ICON_EASE = [0.2, 0, 0, 1] as const;
+
+/** Three-line menu icon that turns into a close X when the menu is open. */
+const MenuIcon: React.FC<{ open: boolean }> = ({ open }) => {
+  const reduce = useReducedMotion();
+  const transition = { duration: reduce ? 0 : 0.3, ease: ICON_EASE };
+  return (
+    <svg width={28} height={28} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden="true">
+      <motion.line initial={false} animate={open ? { x1: 6, y1: 6, x2: 18, y2: 18 } : { x1: 4, y1: 6, x2: 20, y2: 6 }} transition={transition} />
+      <motion.line initial={false} x1={4} y1={12} x2={20} y2={12} animate={{ opacity: open ? 0 : 1 }} transition={transition} />
+      <motion.line initial={false} animate={open ? { x1: 6, y1: 18, x2: 18, y2: 6 } : { x1: 4, y1: 18, x2: 20, y2: 18 }} transition={transition} />
+    </svg>
+  );
+};
 
 interface SidebarMenuProps {
   isOpen: boolean;
@@ -28,12 +44,12 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
   return (
     <>
       <div className={styles.toggleContainer}>
-        <button className={`md-icon-button ${styles.toggleBtn}`} onClick={onToggle}
+        <button className={`md-icon-button ${styles.toggleBtn} ${isOpen ? styles.toggleBtnOpen : ''}`} onClick={onToggle}
           title="Menu"
           aria-label={isOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={isOpen}
         >
-          {isOpen ? <ChevronDown size={28} /> : <ChevronUp size={28} />}
+          <MenuIcon open={isOpen} />
         </button>
       </div>
 

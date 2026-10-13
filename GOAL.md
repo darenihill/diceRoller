@@ -25,6 +25,23 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   share link is copied. Done when the event fires in a test and the prompt
   shows once after a share at 390 px and 1280 px (Daren 2026-10-09: no ads;
   hopes the app covers its own costs, which is about the domain).
+- Roll just one die (Daren 2026-10-12, Build): "Tapping a die already shows
+  small buttons for settings, copy and remove. A fourth button would roll only
+  that die. The single roll goes in the roll log as its own entry, and the big
+  total stays as it was." Done when a unit test shows only that die changes and
+  the log entry is marked single, and at 390 px the button rolls one die while
+  the Roll button's total stays put. Built locally 2026-10-12.
+- Symbols that score a number (Daren 2026-10-12, Build): "A face with a symbol
+  or word counts as zero today. Each face would get an optional Counts as
+  number, so a gold star can count as 6 in totals and target highlights. Old
+  share links and backups keep working unchanged." No preset named after a
+  trademarked game. Done when unit tests show a star counting 6 in the total,
+  log and target, and old face strings read as before. Built locally 2026-10-12.
+- A menu button that reads as a menu (Daren 2026-10-12: "I like the idea of an
+  updated menu icon. Animate as m3 between menu and close. I don't like the redo
+  of the actual menu items."). The up-arrow becomes a three-line icon that turns
+  into a close X when the menu opens; menu items unchanged. Done when the icon
+  animates both ways at 390 px with screenshots. Built locally 2026-10-13.
 - Dice size, step 1: add a stored dice-size preference (default 1.0, range
   0.6 to 1.6) applied as a multiplier on top of `calculateGridDimensions()`,
   clamped so dice never overflow the screen. Done when a unit test shows the

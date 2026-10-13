@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import type { DiceData } from '../types';
 import { Modal } from './Modal';
-import { COLORS, FACE_BG_DELIMITER, FACE_ICON_PREFIX, parseFaceContent, getContrastColor } from '../utils/diceUtils';
+import { COLORS, FACE_ICON_PREFIX, parseFaceContent, buildFace, faceNumericValue, getContrastColor } from '../utils/diceUtils';
 import { X, Plus, Minus, Star, Check, Copy, Trash2, Palette } from 'lucide-react';
 import { ALL_ICONS, COMMON_ICONS } from '../utils/iconUtils';
 import styles from './DiceSettingsModal.module.css';
@@ -64,7 +64,17 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     const newFaces = [...dice.customFaces];
     const faceStr = newFaces[index];
     const parsed = parseFaceContent(faceStr);
-    newFaces[index] = `${parsed.content}${FACE_BG_DELIMITER}${color}`;
+    newFaces[index] = buildFace(parsed.content, color, parsed.value);
+    onUpdate(dice.id, { customFaces: newFaces });
+  };
+
+  /** Sets or clears the number a face counts as in totals; blank clears it */
+  const updateCustomFaceValue = (index: number, raw: string) => {
+    const newFaces = [...dice.customFaces];
+    const parsed = parseFaceContent(newFaces[index], '');
+    const n = parseInt(raw, 10);
+    const value = raw.trim() === '' || isNaN(n) ? undefined : Math.max(-9999, Math.min(9999, n));
+    newFaces[index] = buildFace(parsed.content, parsed.bgColor || undefined, value);
     onUpdate(dice.id, { customFaces: newFaces });
   };
 
@@ -139,20 +149,6 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               <button 
                 type="button"
                 className="md-button md-button-surface md-button-compact"
-                onClick={() => onUpdate(dice.id, { faces: 2, customFaces: [":icon:Sun:bg:#FFD700", ":icon:Moon:bg:#0056D2"] })}
-              >
-                🪙 Coin Flip
-              </button>
-              <button 
-                type="button"
-                className="md-button md-button-surface md-button-compact"
-                onClick={() => onUpdate(dice.id, { faces: 3, customFaces: [":icon:Mountain:bg:#757575", ":icon:FileText:bg:#E9EAEC", ":icon:Scissors:bg:#E32227"] })}
-              >
-                ✂️ Rock Paper Scissors
-              </button>
-              <button 
-                type="button"
-                className="md-button md-button-surface md-button-compact"
                 onClick={() => onUpdate(dice.id, { faces: 3, customFaces: ["YES:bg:#2E7D32", "NO:bg:#D32F2F", "MAYBE:bg:#FFD700"] })}
               >
                 ❓ Decision Maker
@@ -167,6 +163,11 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
             </div>
           </div>
           
+          {dice.customFaces.length > 0 && (
+            <p className={styles.sublabel} style={{ margin: '0 0 6px' }}>
+              The number box sets what a face counts as in totals, e.g. a star as 6.
+            </p>
+          )}
           <div className={styles.facesGrid}>
             {dice.customFaces.length === 0 && <span className={styles.emptyText}>No custom faces added</span>}
             {dice.customFaces.map((f, i) => {
@@ -183,6 +184,16 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                         : content}
                     </div>
                     <div className={styles.faceActions}>
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        value={parsed.value ?? ''}
+                        placeholder={String(faceNumericValue(f))}
+                        onChange={(e) => updateCustomFaceValue(i, e.target.value)}
+                        className={styles.faceValueInput}
+                        aria-label={`Face ${i + 1} counts as`}
+                        title="Counts as this number in totals"
+                      />
                       <button 
                         onClick={(e) => openPicker(e, { type: 'custom', index: i })}
                         className={styles.faceColorBtn}

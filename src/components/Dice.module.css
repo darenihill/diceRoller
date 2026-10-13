@@ -136,6 +136,25 @@
   pointer-events: auto;
 }
 
+.rollOneBtn {
+  bottom: calc(var(--dice-size) * -0.04);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.rollOneBtn:hover {
+  transform: translateX(-50%) scale(1.1);
+}
+
+.dice:hover .rollOneBtn,
+.dice:focus-within .rollOneBtn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .removeBtn {
   top: calc(var(--dice-size) * -0.04);
   left: calc(var(--dice-size) * -0.04);
@@ -154,7 +173,8 @@
   .dice.revealed .unlockIcon,
   .dice.revealed .settingsBtn,
   .dice.revealed .removeBtn,
-  .dice.revealed .cloneBtn {
+  .dice.revealed .cloneBtn,
+  .dice.revealed .rollOneBtn {
     opacity: 1;
     pointer-events: auto;
   }

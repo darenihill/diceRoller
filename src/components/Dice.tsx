@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import type { DiceData } from '../types';
 import styles from './Dice.module.css';
-import { Lock, Unlock, Settings, X, Copy } from 'lucide-react';
+import { Lock, Unlock, Settings, X, Copy, Dices } from 'lucide-react';
 import { motion, useAnimationControls } from 'framer-motion';
 import { ALL_ICONS } from '../utils/iconUtils';
 import { parseFaceContent, FACE_ICON_PREFIX, getContrastColor } from '../utils/diceUtils';
@@ -17,11 +17,14 @@ interface DiceProps {
   onRemove: (id: string) => void;
   onOpenSettings: (id: string) => void;
   onClone?: (template: Partial<DiceData>) => void;
+  onRollOne?: (id: string) => void;
+  /** This die is rolling on its own, so it animates even when held */
+  rollingAlone?: boolean;
   rpgMode?: boolean;
 }
 
 const DiceComponent: React.FC<DiceProps> = ({ 
-  dice, isRolling, isRevealed, onReveal, onToggleHold, onRemove, onOpenSettings, onClone, rpgMode 
+  dice, isRolling, isRevealed, onReveal, onToggleHold, onRemove, onOpenSettings, onClone, onRollOne, rollingAlone, rpgMode 
 }) => {
   const diceRef = useRef<HTMLDivElement>(null);
 
@@ -48,8 +51,10 @@ const DiceComponent: React.FC<DiceProps> = ({
     };
   }, []);
 
+  const rollingNow = isRolling && (!dice.held || !!rollingAlone);
+
   useEffect(() => {
-    if (!isRolling || dice.held) return;
+    if (!rollingNow) return;
 
     let tickCount = 0;
 
@@ -82,10 +87,10 @@ const DiceComponent: React.FC<DiceProps> = ({
       setTempValue(null);
       setTempFaceIndex(null);
     };
-  }, [isRolling, dice.held, dice.faces, dice.customFaces, dice.targetValue, dice.targetFaceIndex]);
+  }, [rollingNow, dice.faces, dice.customFaces, dice.targetValue, dice.targetFaceIndex]);
 
   const getDisplayText = () => {
-    if (isRolling && !dice.held) {
+    if (rollingNow) {
       if (dice.customFaces.length > 0 && tempFaceIndex !== null) {
         return dice.customFaces[tempFaceIndex];
       } else if (tempValue !== null) {
@@ -160,7 +165,7 @@ const DiceComponent: React.FC<DiceProps> = ({
   return (
     <motion.div
       ref={diceRef}
-      className={`${styles.dice} ${shapeClass ? styles.shaped : ''} ${isRolling && !dice.held ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''} ${extraClass}`}
+      className={`${styles.dice} ${shapeClass ? styles.shaped : ''} ${rollingNow ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''} ${extraClass}`}
       data-dice-id={dice.id}
       role="button"
       tabIndex={0}
@@ -263,6 +268,18 @@ const DiceComponent: React.FC<DiceProps> = ({
           title="Clone Die"
         >
           <Copy size={20} strokeWidth={2.5} color="currentColor" />
+        </button>
+      )}
+
+      {/* Roll This Die (Bottom-Centre) */}
+      {onRollOne && (
+        <button 
+          className={`${styles.actionBtn} ${styles.rollOneBtn}`} 
+          onClick={(e) => { e.stopPropagation(); onRollOne(dice.id); }}
+          title="Roll This Die"
+          aria-label="Roll this die"
+        >
+          <Dices size={20} strokeWidth={2.5} color="currentColor" />
         </button>
       )}
 

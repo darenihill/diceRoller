@@ -6,6 +6,9 @@ import {
 
 export const FACE_BG_DELIMITER = ':bg:';
 export const FACE_ICON_PREFIX = ':icon:';
+/** Optional suffix giving a symbol or word face a number to count as, e.g. ':icon:Star:bg:#FFD700:val:6' */
+export const FACE_VALUE_DELIMITER = ':val:';
+const FACE_VALUE_RE = /:val:(-?\d{1,4})$/;
 
 export function getRandomNumber(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -18,17 +21,38 @@ export function generateId(): string {
 export interface ParsedFace {
   content: string;
   bgColor: string;
+  /** The number this face counts as, when one was set */
+  value?: number;
 }
 
 export function parseFaceContent(faceStr: string, defaultBg: string = 'transparent'): ParsedFace {
   if (!faceStr) {
     return { content: '', bgColor: defaultBg };
   }
-  const parts = faceStr.split(FACE_BG_DELIMITER);
+  const valueMatch = faceStr.match(FACE_VALUE_RE);
+  const rest = valueMatch ? faceStr.slice(0, valueMatch.index) : faceStr;
+  const parts = rest.split(FACE_BG_DELIMITER);
   return {
     content: parts[0],
-    bgColor: parts[1] || defaultBg
+    bgColor: parts[1] || defaultBg,
+    ...(valueMatch ? { value: Number(valueMatch[1]) } : {})
   };
+}
+
+/** Builds a face string; leaves out the parts that aren't set. */
+export function buildFace(content: string, bgColor?: string, value?: number): string {
+  const bg = bgColor && bgColor !== 'transparent' ? `${FACE_BG_DELIMITER}${bgColor}` : '';
+  const val = value !== undefined && Number.isInteger(value) ? `${FACE_VALUE_DELIMITER}${value}` : '';
+  return `${content}${bg}${val}`;
+}
+
+/** What a face adds to a total: its Counts as number, else its number text, else 0. */
+export function faceNumericValue(faceStr: string): number {
+  const parsed = parseFaceContent(faceStr);
+  if (parsed.value !== undefined) return parsed.value;
+  if (parsed.content.startsWith(FACE_ICON_PREFIX)) return 0;
+  const num = parseInt(parsed.content);
+  return isNaN(num) ? 0 : num;
 }
 
 /** Parse a hex color string and return its perceived brightness (0-255). */
@@ -76,7 +100,12 @@ export function sanitizeDiceList(input: unknown): DiceData[] {
       ? d.customFaces
           .slice(0, MAX_CUSTOM_FACES)
           .filter((f): f is string => typeof f === 'string')
-          .map(f => f.slice(0, MAX_FACE_TEXT_LENGTH))
+          .map(f => {
+            // Trim the face text but keep a Counts as suffix intact
+            const m = f.match(FACE_VALUE_RE);
+            const base = m ? f.slice(0, m.index) : f;
+            return base.slice(0, MAX_FACE_TEXT_LENGTH) + (m ? m[0] : '');
+          })
       : [];
 
     const numberValue = Number.isFinite(Number(d.numberValue)) ? Number(d.numberValue) : 1;
@@ -159,4 +188,38 @@ export function calculateGridDimensions(
   }
 
   return { optimalSize, optimalColumns, dynamicGap };
+}
+
+export const DICE_SCALE_MIN = 0.6;
+export const DICE_SCALE_MAX = 1.6;
+export const DICE_SCALE_DEFAULT = 1;
+
+/** Reads a stored or imported dice-size value, falling back to the default. */
+export function sanitizeDiceScale(value: unknown): number {
+  const n = typeof value === 'string' ? parseFloat(value) : value;
+  if (typeof n !== 'number' || !Number.isFinite(n)) return DICE_SCALE_DEFAULT;
+  return Math.min(DICE_SCALE_MAX, Math.max(DICE_SCALE_MIN, n));
+}
+
+/**
+ * Applies the owner-set dice size on top of the fitted layout. At 1 the fitted
+ * layout is returned unchanged. Otherwise columns are re-fitted to the width, so
+ * bigger dice wrap onto more rows (the dice area scrolls) and smaller dice can
+ * sit more to a row. A die is never wider or taller than the visible area.
+ */
+export function scaleGridDimensions(
+  base: GridDimensions,
+  diceCount: number,
+  containerWidth: number,
+  containerHeight: number,
+  scale: number
+): GridDimensions {
+  if (scale === DICE_SCALE_DEFAULT || base.optimalSize === 0) return base;
+  const GAP_RATIO = 0.10;
+  const safeWidth = Math.max(0, containerWidth - 36);
+  const safeHeight = Math.max(0, containerHeight - 36);
+  const size = Math.max(1, Math.floor(Math.min(base.optimalSize * scale, safeWidth, safeHeight, 480 * scale)));
+  const fit = Math.floor((safeWidth + size * GAP_RATIO) / (size * (1 + GAP_RATIO)));
+  const columns = Math.min(diceCount, Math.max(1, fit));
+  return { optimalSize: size, optimalColumns: columns, dynamicGap: Math.floor(size * GAP_RATIO) };
 }
