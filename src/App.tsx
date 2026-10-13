@@ -40,7 +40,8 @@ function App() {
   const containerRef = useRef<HTMLDivElement>(null);
   // A search landing page opens with its own dice; null on the home page
   const [landing] = useState(readLandingStart);
-  const [landingAbout] = useState(() => (landing ? readLandingAbout() : null));
+  // The page's own writing, shown in the About dialog: a landing page's, or the home page's
+  const [landingAbout] = useState(readLandingAbout);
   
   // Roll history persists across reloads, but the roll button should read "Roll"
   // on every fresh load and only show a total once a roll happens this session.
@@ -546,7 +547,7 @@ function App() {
       />
 
       {landingAbout && (
-        <Modal isOpen={modalOpen === 'about'} onClose={() => setModalOpen(null)} title={landing?.heading ?? 'About'}>
+        <Modal isOpen={modalOpen === 'about'} onClose={() => setModalOpen(null)} title={landing?.heading ?? 'Custom Dice Roller'}>
           {/* The landing page's own static writing, copied from its HTML */}
           <div className="landing-about" dangerouslySetInnerHTML={{ __html: landingAbout }} />
         </Modal>

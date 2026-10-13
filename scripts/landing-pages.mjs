@@ -49,7 +49,7 @@ export function renderPage(template, page) {
     '</article>',
     '<noscript><p class="landing-article">This app needs JavaScript enabled to roll dice.</p></noscript>',
   ].join('\n    ');
-  html = html.replace(/<noscript>[\s\S]*?<\/noscript>/, () => article);
+  html = replaceOnce(html, html.slice(html.indexOf('<!-- about:start -->'), html.indexOf('<!-- about:end -->') + '<!-- about:end -->'.length), article);
   return html;
 }
 

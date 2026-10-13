@@ -82,29 +82,19 @@
   </head>
   <body>
     <div id="root"></div>
-
-    <!-- Genuine content for anyone (or anything) without JavaScript. The app is
-         interactive by nature and renders almost no text, so without this a
-         non-rendering crawler sees an empty page. -->
-    <noscript>
-      <h1>Custom Dice Roller</h1>
-      <p>
-        A free online dice roller for board games and tabletop RPGs. Build a die with
-        any number of faces, put your own text, icons or colours on each face, and roll
-        as many as you need at once. Nothing to install and no account to create.
-      </p>
-      <p>
-        Turn on RPG Mode for polyhedral dice — d4, d6, d8, d10, d12 and d20 — with
-        advantage and disadvantage rolls, roll modifiers, and natural 20 and natural 1
-        highlighting. Hold dice between rolls, save your sets, and share one with a link.
-      </p>
-      <p>
-        Ready-made sets are included for Dungeons &amp; Dragons, Call of Cthulhu, Catan,
-        Cities &amp; Knights, Risk, Warhammer 40,000, Blades in the Dark, King of Tokyo,
-        Zombie Dice, Fate and Fudge, Farkle, Tenzi, Left Center Right and more.
-      </p>
-      <p>This app needs JavaScript enabled to roll dice.</p>
-    </noscript>
+    <!-- about:start -->
+    <!-- The home page's writing. It ships in the HTML for search engines and
+         screen readers, and the app shows it in its About dialog; each landing
+         page replaces this block with its own (scripts/landing-pages.mjs). -->
+    <article class="landing-article">
+      <h2 class="landing-title">Custom Dice Roller</h2>
+      <p>A free online dice roller for board games and tabletop RPGs. Build a die with any number of faces, put your own text, icons or colours on each face, and roll as many as you need at once. Nothing to install and no account to create.</p>
+      <p>Turn on RPG Mode for polyhedral dice (d4, d6, d8, d10, d12 and d20) with advantage and disadvantage, roll modifiers, and natural 20 and natural 1 highlighting. Hold dice between rolls, save your sets, and share one with a link.</p>
+      <p>Ready-made sets are in Games: Dungeons &amp; Dragons, Call of Cthulhu, Catan, Cities &amp; Knights, Risk, Warhammer 40,000, Blades in the Dark, King of Tokyo, Zombie Dice, Fate and Fudge, Farkle, Tenzi, Left Center Right and more.</p>
+      <nav class="landing-more" aria-label="More dice rollers">Open one ready to roll: <a href="/dnd-dice-roller/">D&amp;D dice roller</a> · <a href="/d20-roller/">d20 roller</a> · <a href="/catan-dice-roller/">Catan dice roller</a> · <a href="/classroom-dice-roller/">Classroom dice roller</a></nav>
+    </article>
+    <noscript><p class="landing-article">This app needs JavaScript enabled to roll dice.</p></noscript>
+    <!-- about:end -->
 
     <script type="module" src="/src/main.tsx"></script>
     <script>

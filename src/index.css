@@ -209,10 +209,10 @@ button {
   transform-origin: center;
 }
 
-/* Search landing pages (landing/pages.mjs). The writing ships in the page
-   HTML for search engines; the app shows it in its About dialog instead of
-   below the dice, so the page never scrolls. */
-body.landing > .landing-article {
+/* The home page and each search landing page (landing/pages.mjs). The writing
+   ships in the page HTML for search engines; the app shows it in its About
+   dialog instead of below the dice, so the page never scrolls. */
+body > .landing-article {
   display: none;
 }
 
