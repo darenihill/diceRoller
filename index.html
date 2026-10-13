@@ -83,6 +83,17 @@
   <body>
     <div id="root"></div>
 
+    <!-- home-about: shown in the app's About dialog on the home page; the landing
+         pages script strips it, and src/test/landingPages.test.ts keeps the links
+         in step with landing/pages.mjs. -->
+    <article class="landing-article">
+      <h2 class="landing-title">Custom Dice Roller</h2>
+      <p>Build any die you like: pick the number of faces, then put your own words, icons or colours on each one. Roll as many as you need, hold the ones you want to keep, and save or share a set with a link. It is free and needs no account.</p>
+      <p>Or start from a ready-made roller:</p>
+      <nav class="landing-more" aria-label="More dice rollers"><a href="/dnd-dice-roller/">D&amp;D dice roller</a> · <a href="/d20-roller/">d20 roller</a> · <a href="/catan-dice-roller/">Catan dice roller</a> · <a href="/classroom-dice-roller/">Classroom dice roller</a></nav>
+    </article>
+    <!-- /home-about -->
+
     <!-- Genuine content for anyone (or anything) without JavaScript. The app is
          interactive by nature and renders almost no text, so without this a
          non-rendering crawler sees an empty page. -->

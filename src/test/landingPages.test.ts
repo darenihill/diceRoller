@@ -43,6 +43,11 @@ describe('landing pages', () => {
     }
   });
 
+  it('the home page About links to every landing page, and landing pages drop it', () => {
+    for (const page of landingPages) expect(template).toContain(`<a href="/${page.slug}/">`);
+    for (const page of landingPages) expect(renderPage(template, page)).not.toContain('home-about');
+  });
+
   it('a page without a start, or with an unreadable one, falls back to the usual dice', () => {
     expect(parseLandingStart(undefined)).toBeNull();
     expect(parseLandingStart('{not json')).toBeNull();

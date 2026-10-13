@@ -31,6 +31,8 @@ export function renderPage(template, page) {
   html = html.replaceAll(`content="${DEFAULT_DESCRIPTION}"`, `content="${description}"`);
   html = replaceOnce(html, `<meta property="og:url" content="${SITE}/" />`, `<meta property="og:url" content="${url}" />`);
   html = replaceOnce(html, `<link rel="canonical" href="${SITE}/" />`, `<link rel="canonical" href="${url}" />`);
+  html = html.replace(/\n\s*<!-- home-about:[\s\S]*?<!-- \/home-about -->/, '');
+  if (html.includes('home-about')) throw new Error('landing-pages: could not strip the home page About');
   html = replaceOnce(html, '<body>', '<body class="landing">');
   const start = escapeAttr(JSON.stringify({ heading: page.heading, ...page.start }));
   html = replaceOnce(html, '<div id="root"></div>', `<div id="root" data-start="${start}"></div>`);

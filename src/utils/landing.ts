@@ -38,7 +38,8 @@ export function readLandingStart(): LandingStart | null {
 }
 
 // The page's writing ships in the HTML (for search engines) but is shown in
-// the About dialog rather than below the dice. Returns it without its heading,
+// the About dialog rather than below the dice (the home page has one too).
+// Returns it without its heading,
 // which the dialog title already shows.
 export function readLandingAbout(): string | null {
   const article = document.querySelector('.landing-article');
