@@ -139,20 +139,6 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               <button 
                 type="button"
                 className="md-button md-button-surface md-button-compact"
-                onClick={() => onUpdate(dice.id, { faces: 2, customFaces: [":icon:Sun:bg:#FFD700", ":icon:Moon:bg:#0056D2"] })}
-              >
-                🪙 Coin Flip
-              </button>
-              <button 
-                type="button"
-                className="md-button md-button-surface md-button-compact"
-                onClick={() => onUpdate(dice.id, { faces: 3, customFaces: [":icon:Mountain:bg:#757575", ":icon:FileText:bg:#E9EAEC", ":icon:Scissors:bg:#E32227"] })}
-              >
-                ✂️ Rock Paper Scissors
-              </button>
-              <button 
-                type="button"
-                className="md-button md-button-surface md-button-compact"
                 onClick={() => onUpdate(dice.id, { faces: 3, customFaces: ["YES:bg:#2E7D32", "NO:bg:#D32F2F", "MAYBE:bg:#FFD700"] })}
               >
                 ❓ Decision Maker
