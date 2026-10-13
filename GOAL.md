@@ -37,6 +37,11 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   share links and backups keep working unchanged." No preset named after a
   trademarked game. Done when unit tests show a star counting 6 in the total,
   log and target, and old face strings read as before. Built locally 2026-10-12.
+- A menu button that reads as a menu (Daren 2026-10-12: "I like the idea of an
+  updated menu icon. Animate as m3 between menu and close. I don't like the redo
+  of the actual menu items."). The up-arrow becomes a three-line icon that turns
+  into a close X when the menu opens; menu items unchanged. Done when the icon
+  animates both ways at 390 px with screenshots. Built locally 2026-10-13.
 - Dice size, step 1: add a stored dice-size preference (default 1.0, range
   0.6 to 1.6) applied as a multiplier on top of `calculateGridDimensions()`,
   clamped so dice never overflow the screen. Done when a unit test shows the

@@ -140,3 +140,10 @@
     font-size: 12px;
   }
 }
+
+/* Open: the button takes the accent container colour while its icon shows close */
+.toggleBtn.toggleBtnOpen,
+.toggleBtn.toggleBtnOpen:hover {
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
