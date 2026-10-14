@@ -40,7 +40,7 @@ function App() {
   const containerRef = useRef<HTMLDivElement>(null);
   // A search landing page opens with its own dice; null on the home page
   const [landing] = useState(readLandingStart);
-  const [landingAbout] = useState(() => (landing ? readLandingAbout() : null));
+  const [landingAbout] = useState(readLandingAbout);
   
   // Roll history persists across reloads, but the roll button should read "Roll"
   // on every fresh load and only show a total once a roll happens this session.
