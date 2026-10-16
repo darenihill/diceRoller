@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseFaceContent, buildFace, faceNumericValue, sanitizeDiceList, withoutFaceImages } from '../utils/diceUtils';
+import { parseFaceContent, buildFace, faceNumericValue, sanitizeDiceList, withoutFaceImages, distinctFaceColors, colourEveryFace, isNumberedFaces } from '../utils/diceUtils';
 import { sanitizeFaceImages, addFaceImage, importFaceImages, getFaceImages, usedFaceImages, resetFaceImageCache, MAX_FACE_IMAGE_CHARS, MAX_FACE_IMAGES } from '../utils/faceImages';
 
 describe('faces that count as a number', () => {
@@ -105,5 +105,40 @@ describe('letting go of pictures nothing uses', () => {
     const kept = getFaceImages();
     expect(Object.keys(kept)).toHaveLength(MAX_FACE_IMAGES);
     expect(kept.old1).toBeUndefined();
+  });
+});
+
+describe('colour every face differently', () => {
+  it('gives n faces n different colours', () => {
+    for (const n of [1, 6, 12, 20, 100]) {
+      const colours = distinctFaceColors(n);
+      expect(colours).toHaveLength(n);
+      expect(new Set(colours).size).toBe(n);
+      colours.forEach(c => expect(c).toMatch(/^#[0-9A-F]{6}$/));
+    }
+  });
+
+  it('turns a plain d6 into six coloured numbered faces', () => {
+    const faces = colourEveryFace(6, []);
+    expect(faces.map(f => parseFaceContent(f).content)).toEqual(['1', '2', '3', '4', '5', '6']);
+    expect(faces.map(f => faceNumericValue(f))).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(new Set(faces.map(f => parseFaceContent(f).bgColor)).size).toBe(6);
+  });
+
+  it('keeps each face text, picture and number when recolouring', () => {
+    const [a, b] = colourEveryFace(2, ['Gold:img:abc123:bg:#000000:val:6', ':icon:Star']);
+    expect(parseFaceContent(a)).toMatchObject({ content: 'Gold', image: 'abc123', value: 6 });
+    expect(parseFaceContent(a).bgColor).not.toBe('#000000');
+    expect(parseFaceContent(b).content).toBe(':icon:Star');
+  });
+});
+
+describe('numbered faces in colour', () => {
+  it('still count as the plain die they came from', () => {
+    expect(isNumberedFaces(colourEveryFace(20, []))).toBe(true);
+    expect(isNumberedFaces(['1', '2', 'Gold'])).toBe(false);
+    expect(isNumberedFaces(['00', '10'])).toBe(false);
+    expect(isNumberedFaces(['1:val:5', '2'])).toBe(false);
+    expect(isNumberedFaces([])).toBe(false);
   });
 });

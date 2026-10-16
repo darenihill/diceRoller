@@ -128,19 +128,80 @@
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* The face the colour row will paint */
+.faceCardSelected {
+  border-color: var(--md-sys-color-primary);
+  box-shadow: 0 0 0 1px var(--md-sys-color-primary);
+}
+
+/* Each face shown in its own colour; tap it to pick it for the colour row */
+.faceTile {
+  display: flex;
+  align-items: center;
+  min-width: 44px;
+  max-width: 55%;
+  min-height: 40px;
+  padding: 4px 10px;
+  border-radius: var(--shape-small);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.faceTileText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.faceColourRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px -10px 12px;
+  padding: 10px;
+  /* Stays in view while scrolling a long list of faces */
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  background-color: var(--md-sys-color-surface);
+  border-radius: var(--shape-medium);
+  box-shadow: var(--elevation-2);
+}
+
+.faceSwatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.faceSwatch,
+.faceSwatchCustom {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: var(--elevation-1);
+}
+
+.faceSwatchCustom {
+  position: relative;
+  background: conic-gradient(#E32227, #FBFB3C, #228B22, #0000FF, #B24BF3, #E32227);
+  color: #FFFFFF;
+}
+
 .faceCardRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.faceContent {
-  display: flex;
-  align-items: center;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--md-sys-color-on-surface);
-}
 
 /* Small preview of a face's picture, beside the text shown where it's missing */
 .faceThumb {
@@ -184,18 +245,6 @@
   gap: 4px;
 }
 
-.faceColorBtn {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: var(--md-sys-color-on-surface);
-  cursor: pointer;
-  padding: 0;
-}
 
 .faceRemoveBtn {
   color: var(--md-sys-color-error);

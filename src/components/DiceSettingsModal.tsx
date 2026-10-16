@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { DiceData } from '../types';
 import { Modal } from './Modal';
-import { COLORS, FACE_ICON_PREFIX, parseFaceContent, buildFace, faceNumericValue, getContrastColor } from '../utils/diceUtils';
-import { X, Plus, Minus, Star, Check, Copy, Trash2, Palette, ImagePlus, ImageOff } from 'lucide-react';
+import { COLORS, COLOR_NAMES, FACE_ICON_PREFIX, parseFaceContent, buildFace, faceNumericValue, getContrastColor, colourEveryFace } from '../utils/diceUtils';
+import { X, Plus, Minus, Star, Check, Copy, Trash2, Palette, ImagePlus, ImageOff, Rainbow, Ban } from 'lucide-react';
 import { addFaceImage, useFaceImages, shrinkImage } from '../utils/faceImages';
 import { ALL_ICONS, COMMON_ICONS } from '../utils/iconUtils';
 import styles from './DiceSettingsModal.module.css';
@@ -25,6 +25,10 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   const [customInput, setCustomInput] = useState('');
   const [showAllIcons, setShowAllIcons] = useState(false);
   const [activeColorPicker, setActiveColorPicker] = useState<{ type: 'base' | 'custom'; index?: number; top: number } | null>(null);
+  /** The face the colour row paints: tap a face, then tap a colour */
+  const [selectedFace, setSelectedFace] = useState(0);
+  const activeFace = Math.min(selectedFace, Math.max(0, dice.customFaces.length - 1));
+  const activeFaceColour = parseFaceContent(dice.customFaces[activeFace] ?? '').bgColor;
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   /** Which face the next chosen picture goes on; 'new' adds a picture face */
@@ -132,6 +136,16 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     onUpdate(dice.id, { customFaces: newFaces });
   };
 
+  /** Every face its own colour; a plain numbered die becomes faces 1..n first */
+  const colourAllFaces = () => {
+    const customFaces = colourEveryFace(dice.faces, dice.customFaces);
+    // A plain die keeps showing the number it last rolled
+    const keepShown = dice.customFaces.length === 0
+      ? { currentFaceIndex: Math.min(Math.max(dice.numberValue, 1), customFaces.length) - 1 }
+      : {};
+    onUpdate(dice.id, { customFaces, ...keepShown });
+  };
+
   const handleColorSelect = (color: string) => {
     if (!activeColorPicker) return;
     if (activeColorPicker.type === 'base') {
@@ -234,16 +248,24 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               const content = parsed.content;
               const bgColor = parsed.bgColor;
               const picture = parsed.image ? images[parsed.image] : undefined;
+              const tileColor = bgColor !== 'transparent' ? bgColor : dice.color;
               
               return (
-                <div key={i} className={styles.faceCard}>
+                <div key={i} className={`${styles.faceCard} ${i === activeFace ? styles.faceCardSelected : ''}`}>
                   <div className={styles.faceCardRow}>
-                    <div className={styles.faceContent}>
+                    <button
+                      type="button"
+                      className={styles.faceTile}
+                      style={{ backgroundColor: tileColor, color: getContrastColor(tileColor) }}
+                      onClick={() => setSelectedFace(i)}
+                      aria-pressed={i === activeFace}
+                      aria-label={`Face ${i + 1}: ${content.startsWith(FACE_ICON_PREFIX) ? content.replace(FACE_ICON_PREFIX, '') : content}${picture ? ', picture' : ''}`}
+                    >
                       {picture && <img src={picture} alt="" className={styles.faceThumb} />}
                       {content.startsWith(FACE_ICON_PREFIX) 
                         ? React.createElement(ALL_ICONS.find(icon => icon.name === content.replace(FACE_ICON_PREFIX, ''))?.icon || Star, { size: 20, strokeWidth: 2.5 }) 
-                        : content}
-                    </div>
+                        : <span className={styles.faceTileText}>{content}</span>}
+                    </button>
                     <div className={styles.faceActions}>
                       <input
                         type="number"
@@ -255,14 +277,6 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                         aria-label={`Face ${i + 1} counts as`}
                         title="Counts as this number in totals"
                       />
-                      <button 
-                        onClick={(e) => openPicker(e, { type: 'custom', index: i })}
-                        className={styles.faceColorBtn}
-                        style={{ backgroundColor: bgColor !== 'transparent' ? bgColor : 'rgba(255,255,255,0.08)' }}
-                        title="Edit Color"
-                      >
-                        <Palette size={14} strokeWidth={2.5} />
-                      </button>
                       {parsed.image ? (
                         <button
                           onClick={() => removePicture(i)}
@@ -291,6 +305,57 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               );
             })}
           </div>
+
+          {dice.customFaces.length > 0 && (
+            <div className={styles.faceColourRow} role="group" aria-label={`Colour for face ${activeFace + 1}`}>
+              <span className={styles.sublabel}>Colour for face {activeFace + 1}</span>
+              <div className={styles.faceSwatches}>
+                <button
+                  type="button"
+                  className={styles.faceSwatch}
+                  style={{ backgroundColor: dice.color, color: getContrastColor(dice.color) }}
+                  onClick={() => updateCustomFaceColor(activeFace, 'transparent')}
+                  aria-pressed={activeFaceColour === 'transparent'}
+                  aria-label="Same as the die"
+                  title="Same as the die"
+                >
+                  <Ban size={14} strokeWidth={2.5} />
+                </button>
+                {COLORS.map(c => {
+                  const current = activeFaceColour.toUpperCase() === c.toUpperCase();
+                  return (
+                    <button
+                      key={c}
+                      type="button"
+                      className={styles.faceSwatch}
+                      style={{ backgroundColor: c, outline: current ? '3px solid var(--md-sys-color-primary)' : undefined }}
+                      onClick={() => updateCustomFaceColor(activeFace, c)}
+                      aria-label={COLOR_NAMES[c] ?? c}
+                      aria-pressed={current}
+                    />
+                  );
+                })}
+                <label className={styles.faceSwatchCustom} title="Any colour">
+                  <Plus size={14} strokeWidth={2.5} />
+                  <input
+                    type="color"
+                    value={/^#[0-9a-fA-F]{6}$/.test(activeFaceColour) ? activeFaceColour : (/^#[0-9a-fA-F]{6}$/.test(dice.color) ? dice.color : '#808080')}
+                    onChange={(e) => updateCustomFaceColor(activeFace, e.target.value)}
+                    className={styles.hiddenInput}
+                    aria-label="Any colour"
+                  />
+                </label>
+              </div>
+            </div>
+          )}
+          <button
+            type="button"
+            className={`md-button md-button-surface md-button-compact ${styles.addPictureBtn}`}
+            onClick={colourAllFaces}
+            disabled={dice.customFaces.length === 0 && dice.faces > 100}
+          >
+            <Rainbow size={18} strokeWidth={2.5} /> Colour every face differently
+          </button>
 
           <div className={styles.addFaceRow}>
             <input 

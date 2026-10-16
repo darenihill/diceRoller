@@ -5,6 +5,21 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- Easier face colours (Daren 2026-10-16, Build): "Die settings would show
+  all faces as coloured tiles in a row. Tap a face, then tap a colour, and you
+  are done, with no hidden palette icon. A one-tap 'Colour every face
+  differently' covers the 'roll for a colour' use people wrote about." Built
+  2026-10-16 in three small steps, each with its done-check:
+  1. Each face shows as a tile in its own colour; tapping one picks it, and a
+     colour row (kept in view while scrolling) paints it. The per-face palette
+     button is gone. Done when face 3 turns black in two taps at 390 px and
+     1280 px.
+  2. "Colour every face differently" gives every face its own colour, turning
+     a plain numbered die into faces 1 to n first. Done when unit tests show n
+     different colours for 1 to 100 faces and a d6 keeps its numbers.
+  3. Help text says how. Done when the Help dialog names both.
+  Built and checked locally on top of pictures on faces; pushing waits on
+  Daren's OK (public repo).
 - Pictures on dice faces (Daren 2026-10-16, Build): "In a die's settings you
   could pick a picture for any face, shrunk small so it fits on the device.
   Pictures stay on your device and go into backups, but not into share links,

@@ -164,6 +164,13 @@ function isSafeColor(value: unknown): value is string {
   return typeof value === 'string' && (value === 'transparent' || /^#[0-9a-fA-F]{3,8}$/.test(value));
 }
 
+/** Spoken names for the swatches, for screen readers. */
+export const COLOR_NAMES: Record<string, string> = {
+  "#E9EAEC": "White", "#C0C0C0": "Gray", "#000000": "Black", "#E32227": "Red",
+  "#0000FF": "Blue", "#FBFB3C": "Yellow", "#228B22": "Green", "#B24BF3": "Purple",
+  "#F28500": "Orange", "#FF69B4": "Pink", "#AA5518": "Brown"
+};
+
 export const COLORS = [
   "#E9EAEC", // white
   "#C0C0C0", // gray
@@ -177,6 +184,69 @@ export const COLORS = [
   "#FF69B4", // pink
   "#AA5518"  // brown
 ];
+
+/** Colours for "Colour every face differently", picked to be easy to tell apart. */
+export const DISTINCT_FACE_COLORS = [
+  "#E32227", // red
+  "#0000FF", // blue
+  "#FBFB3C", // yellow
+  "#228B22", // green
+  "#F28500", // orange
+  "#B24BF3", // purple
+  "#FF69B4", // pink
+  "#AA5518", // brown
+  "#00B3B3", // teal
+  "#000000", // black
+  "#E9EAEC", // white
+  "#C0C0C0"  // gray
+];
+
+/** n colours, all different: the list above first, then evenly spread hues. */
+export function distinctFaceColors(n: number): string[] {
+  const out = DISTINCT_FACE_COLORS.slice(0, Math.max(0, n));
+  for (let i = out.length; i < n; i++) {
+    const hue = Math.round((i * 137.508) % 360);
+    out.push(hslToHex(hue, 70, i % 2 ? 40 : 60));
+  }
+  return out;
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+  const a = (s / 100) * Math.min(l / 100, 1 - l / 100);
+  const f = (k: number) => {
+    const t = (k + h / 30) % 12;
+    const c = l / 100 - a * Math.max(-1, Math.min(t - 3, 9 - t, 1));
+    return Math.round(c * 255).toString(16).padStart(2, '0');
+  };
+  return `#${f(0)}${f(8)}${f(4)}`.toUpperCase();
+}
+
+/**
+ * True when the faces are just the numbers 1..n in order (whatever their
+ * colours or pictures), as "Colour every face differently" makes from a plain
+ * die. Such a die still rolls and groups like the plain die it came from.
+ */
+export function isNumberedFaces(customFaces: string[]): boolean {
+  return customFaces.length > 0 && customFaces.every((f, i) => {
+    const p = parseFaceContent(f);
+    return p.content === String(i + 1) && p.value === undefined;
+  });
+}
+
+/**
+ * Gives every face its own colour, keeping each face's text, picture and
+ * number. A plain numbered die becomes custom faces 1..n first.
+ */
+export function colourEveryFace(faces: number, customFaces: string[]): string[] {
+  const list = customFaces.length > 0
+    ? customFaces
+    : Array.from({ length: Math.min(faces, MAX_CUSTOM_FACES) }, (_, i) => String(i + 1));
+  const colours = distinctFaceColors(list.length);
+  return list.map((f, i) => {
+    const p = parseFaceContent(f, '');
+    return buildFace(p.content, colours[i], p.value, p.image);
+  });
+}
 
 export interface GridDimensions {
   optimalSize: number;

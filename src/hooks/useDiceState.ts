@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { DiceData } from '../types';
-import { generateId, parseFaceContent, faceNumericValue, FACE_ICON_PREFIX } from '../utils/diceUtils';
+import { generateId, parseFaceContent, faceNumericValue, FACE_ICON_PREFIX, isNumberedFaces } from '../utils/diceUtils';
 import { MAX_DICE_LIMIT, MAX_HISTORY_LENGTH, ROLL_DURATION_MS, TOAST_DURATION_MS } from '../utils/constants';
 
 export interface RollHistoryItem {
@@ -170,10 +170,11 @@ export const useDiceState = () => {
     if (onlyId === undefined && rpgMode && rollAdvantage !== 'normal' && processedList.length > 1) {
       // Group PLAIN dice by face count (e.g. 2d20s, 4d6s). Custom-faced dice are excluded:
       // a percentile pair (tens + units) is two different dice that both report faces=10,
-      // and grouping them would silently drop one half of every d100 roll.
+      // and grouping them would silently drop one half of every d100 roll. A die
+      // whose faces are just 1..n in colour still counts as plain.
       const faceGroups: Record<number, { index: number; val: number }[]> = {};
       processedList.forEach((d, i) => {
-        if (d.customFaces.length > 0) return;
+        if (d.customFaces.length > 0 && !isNumberedFaces(d.customFaces)) return;
         if (!faceGroups[d.faces]) {
           faceGroups[d.faces] = [];
         }
