@@ -15,7 +15,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
           <li><strong>Add / Roll Dice:</strong> Use the <code>+</code> button at the bottom to add dice, and the main button to roll all unheld dice.</li>
           <li><strong>Hold individual dice:</strong> Simply click/tap any die to hold or release it. Held dice stay locked across rolls.</li>
           <li><strong>Lock All:</strong> Toggle the Lock icon in the action bar to instantly hold or release all dice at once.</li>
-          <li><strong>Custom Faces:</strong> Click the gear icon on a die to open settings. You can add custom text, special icons, and pick custom background colors for each face.</li>
+          <li><strong>Custom Faces:</strong> Click the gear icon on a die to open settings. You can add custom text, special icons, pictures, and pick custom background colors for each face. Pictures stay on your device and go into backups; share links show the face's text instead.</li>
           <li><strong>Games & Presets:</strong> Quickly load predefined configurations like <em>Cities & Knights</em> or <em>That's Pretty Clever</em>, or save and load your own custom games!</li>
           <li><strong>RPG Mode:</strong> Toggle under Tools to unlock polyhedral dice shapes, a roll modifier, and Advantage / Disadvantage. Advantage keeps the highest (Disadvantage the lowest) among identical plain dice — custom-faced dice like percentile pairs always count normally.</li>
           <li><strong>Target Highlight:</strong> Set target totals under Tools &gt; Customize (e.g. <code>7, 11</code>) and get a 🎯 celebration whenever a roll hits one.</li>

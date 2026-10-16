@@ -1,8 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import type { DiceData } from '../types';
 import { Modal } from './Modal';
 import { COLORS, FACE_ICON_PREFIX, parseFaceContent, buildFace, faceNumericValue, getContrastColor } from '../utils/diceUtils';
-import { X, Plus, Minus, Star, Check, Copy, Trash2, Palette } from 'lucide-react';
+import { X, Plus, Minus, Star, Check, Copy, Trash2, Palette, ImagePlus, ImageOff } from 'lucide-react';
+import { addFaceImage, useFaceImages, shrinkImage } from '../utils/faceImages';
 import { ALL_ICONS, COMMON_ICONS } from '../utils/iconUtils';
 import styles from './DiceSettingsModal.module.css';
 
@@ -16,13 +17,23 @@ interface DiceSettingsModalProps {
   onUpdate: (id: string, updates: Partial<DiceData>) => void;
   onRemove: (id: string) => void;
   onClone: (template: Partial<DiceData>) => void;
+  /** Every die on screen, so pictures still in use are never let go */
+  allDice: DiceData[];
 }
 
-export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOpen, onClose, onUpdate, onRemove, onClone }) => {
+export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOpen, onClose, onUpdate, onRemove, onClone, allDice }) => {
   const [customInput, setCustomInput] = useState('');
   const [showAllIcons, setShowAllIcons] = useState(false);
   const [activeColorPicker, setActiveColorPicker] = useState<{ type: 'base' | 'custom'; index?: number; top: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  /** Which face the next chosen picture goes on; 'new' adds a picture face */
+  const pictureTarget = useRef<number | 'new'>('new');
+  const [pictureError, setPictureError] = useState('');
+  const images = useFaceImages();
+  // The faces as they are now, for edits that finish after a picture is shrunk
+  const latestDice = useRef(dice);
+  useEffect(() => { latestDice.current = dice; }, [dice]);
 
   /**
    * Anchor the popover just below whichever swatch opened it. Previously the
@@ -64,7 +75,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     const newFaces = [...dice.customFaces];
     const faceStr = newFaces[index];
     const parsed = parseFaceContent(faceStr);
-    newFaces[index] = buildFace(parsed.content, color, parsed.value);
+    newFaces[index] = buildFace(parsed.content, color, parsed.value, parsed.image);
     onUpdate(dice.id, { customFaces: newFaces });
   };
 
@@ -74,7 +85,50 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     const parsed = parseFaceContent(newFaces[index], '');
     const n = parseInt(raw, 10);
     const value = raw.trim() === '' || isNaN(n) ? undefined : Math.max(-9999, Math.min(9999, n));
-    newFaces[index] = buildFace(parsed.content, parsed.bgColor || undefined, value);
+    newFaces[index] = buildFace(parsed.content, parsed.bgColor || undefined, value, parsed.image);
+    onUpdate(dice.id, { customFaces: newFaces });
+  };
+
+  const choosePicture = (target: number | 'new') => {
+    pictureTarget.current = target;
+    setPictureError('');
+    fileInputRef.current?.click();
+  };
+
+  /** Shrinks the chosen picture, keeps it on this device and puts it on the face */
+  const handlePictureFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    let id: string | null;
+    try {
+      id = addFaceImage(await shrinkImage(file), allDice);
+    } catch {
+      setPictureError("That file couldn't be read as a picture.");
+      return;
+    }
+    if (!id) {
+      setPictureError('This device has no room for more pictures.');
+      return;
+    }
+    const target = pictureTarget.current;
+    const current = latestDice.current;
+    if (target === 'new') {
+      // The face's number is what shows where the picture can't (a share link)
+      const n = current.customFaces.length + 1;
+      onUpdate(current.id, { customFaces: [...current.customFaces, buildFace(String(n), undefined, undefined, id)] });
+    } else if (target < current.customFaces.length) {
+      const newFaces = [...current.customFaces];
+      const parsed = parseFaceContent(newFaces[target], '');
+      newFaces[target] = buildFace(parsed.content, parsed.bgColor || undefined, parsed.value, id);
+      onUpdate(current.id, { customFaces: newFaces });
+    }
+  };
+
+  const removePicture = (index: number) => {
+    const newFaces = [...dice.customFaces];
+    const parsed = parseFaceContent(newFaces[index], '');
+    newFaces[index] = buildFace(parsed.content, parsed.bgColor || undefined, parsed.value);
     onUpdate(dice.id, { customFaces: newFaces });
   };
 
@@ -168,17 +222,24 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               The number box sets what a face counts as in totals, e.g. a star as 6.
             </p>
           )}
+          {dice.customFaces.some(f => parseFaceContent(f).image) && (
+            <p className={styles.sublabel} style={{ margin: '0 0 6px' }}>
+              Pictures stay on this device and go into backups. Share links show the face's text instead.
+            </p>
+          )}
           <div className={styles.facesGrid}>
             {dice.customFaces.length === 0 && <span className={styles.emptyText}>No custom faces added</span>}
             {dice.customFaces.map((f, i) => {
               const parsed = parseFaceContent(f);
               const content = parsed.content;
               const bgColor = parsed.bgColor;
+              const picture = parsed.image ? images[parsed.image] : undefined;
               
               return (
                 <div key={i} className={styles.faceCard}>
                   <div className={styles.faceCardRow}>
                     <div className={styles.faceContent}>
+                      {picture && <img src={picture} alt="" className={styles.faceThumb} />}
                       {content.startsWith(FACE_ICON_PREFIX) 
                         ? React.createElement(ALL_ICONS.find(icon => icon.name === content.replace(FACE_ICON_PREFIX, ''))?.icon || Star, { size: 20, strokeWidth: 2.5 }) 
                         : content}
@@ -202,7 +263,26 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                       >
                         <Palette size={14} strokeWidth={2.5} />
                       </button>
-                      <button onClick={() => removeCustomFace(i)} className={styles.faceRemoveBtn}>
+                      {parsed.image ? (
+                        <button
+                          onClick={() => removePicture(i)}
+                          className={styles.facePictureBtn}
+                          title="Remove picture"
+                          aria-label={`Remove picture from face ${i + 1}`}
+                        >
+                          <ImageOff size={16} strokeWidth={2.5} />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => choosePicture(i)}
+                          className={styles.facePictureBtn}
+                          title="Choose picture"
+                          aria-label={`Choose picture for face ${i + 1}`}
+                        >
+                          <ImagePlus size={16} strokeWidth={2.5} />
+                        </button>
+                      )}
+                      <button onClick={() => removeCustomFace(i)} className={styles.faceRemoveBtn} aria-label={`Remove face ${i + 1}`}>
                         <X size={18} strokeWidth={2.5} />
                       </button>
                     </div>
@@ -226,6 +306,24 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               <Plus size={20} strokeWidth={2.5} />
             </button>
           </div>
+
+          <button
+            type="button"
+            className={`md-button md-button-surface md-button-compact ${styles.addPictureBtn}`}
+            onClick={() => choosePicture('new')}
+          >
+            <ImagePlus size={18} strokeWidth={2.5} /> Add a picture face
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif"
+            onChange={handlePictureFile}
+            className={styles.hiddenInput}
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+          {pictureError && <p className={styles.pictureError} role="alert">{pictureError}</p>}
 
           <label className={styles.sublabel}>Or add an icon:</label>
           <div className={styles.iconGrid} style={{ maxHeight: showAllIcons ? '150px' : 'auto', overflowY: showAllIcons ? 'auto' : 'visible' }}>

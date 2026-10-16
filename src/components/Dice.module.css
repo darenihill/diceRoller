@@ -54,6 +54,21 @@
   transition: background-color 0.2s;
 }
 
+/* A picture chosen for a face, kept on this device */
+.faceImage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 76%;
+  height: 76%;
+  object-fit: cover;
+  border-radius: var(--shape-medium);
+  pointer-events: none;
+  user-select: none;
+  z-index: 2;
+}
+
 .number {
   margin: 0;
   font-weight: 500;

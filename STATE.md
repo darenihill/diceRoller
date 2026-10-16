@@ -1,4 +1,4 @@
-Next: held - dice size, roll-one-die, counts-as faces and the menu icon built and checked locally on top of pull request 9; pushing needs Daren's OK (public repo) after he merges pull request 9.
+Next: held - pictures on dice faces built and checked locally; pushing needs Daren's OK (public repo).
 
 # State
 

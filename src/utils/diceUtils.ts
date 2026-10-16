@@ -9,6 +9,16 @@ export const FACE_ICON_PREFIX = ':icon:';
 /** Optional suffix giving a symbol or word face a number to count as, e.g. ':icon:Star:bg:#FFD700:val:6' */
 export const FACE_VALUE_DELIMITER = ':val:';
 const FACE_VALUE_RE = /:val:(-?\d{1,4})$/;
+/**
+ * Optional marker naming a picture kept on this device, e.g. '3:img:k2x9a1:bg:#FFD700'.
+ * The picture itself lives in local storage (utils/faceImages.ts), never in the
+ * face string, so share links stay short; the face's text shows wherever the
+ * picture is missing.
+ */
+export const FACE_IMAGE_DELIMITER = ':img:';
+const FACE_IMAGE_RE = /:img:([a-z0-9]{1,16})$/;
+/** Trailing parts a face may carry after its text: picture, colour, Counts as. */
+const FACE_SUFFIX_RE = /(?::img:[a-z0-9]{1,16})?(?::bg:#[0-9a-fA-F]{3,8}|:bg:transparent)?(?::val:-?\d{1,4})?$/;
 
 export function getRandomNumber(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -23,6 +33,8 @@ export interface ParsedFace {
   bgColor: string;
   /** The number this face counts as, when one was set */
   value?: number;
+  /** Id of a picture kept on this device, when one was chosen */
+  image?: string;
 }
 
 export function parseFaceContent(faceStr: string, defaultBg: string = 'transparent'): ParsedFace {
@@ -32,18 +44,37 @@ export function parseFaceContent(faceStr: string, defaultBg: string = 'transpare
   const valueMatch = faceStr.match(FACE_VALUE_RE);
   const rest = valueMatch ? faceStr.slice(0, valueMatch.index) : faceStr;
   const parts = rest.split(FACE_BG_DELIMITER);
+  const imageMatch = parts[0].match(FACE_IMAGE_RE);
   return {
-    content: parts[0],
+    content: imageMatch ? parts[0].slice(0, imageMatch.index) : parts[0],
     bgColor: parts[1] || defaultBg,
-    ...(valueMatch ? { value: Number(valueMatch[1]) } : {})
+    ...(valueMatch ? { value: Number(valueMatch[1]) } : {}),
+    ...(imageMatch ? { image: imageMatch[1] } : {})
   };
 }
 
 /** Builds a face string; leaves out the parts that aren't set. */
-export function buildFace(content: string, bgColor?: string, value?: number): string {
+export function buildFace(content: string, bgColor?: string, value?: number, image?: string): string {
+  const img = image && /^[a-z0-9]{1,16}$/.test(image) ? `${FACE_IMAGE_DELIMITER}${image}` : '';
   const bg = bgColor && bgColor !== 'transparent' ? `${FACE_BG_DELIMITER}${bgColor}` : '';
   const val = value !== undefined && Number.isInteger(value) ? `${FACE_VALUE_DELIMITER}${value}` : '';
-  return `${content}${bg}${val}`;
+  return `${content}${img}${bg}${val}`;
+}
+
+/**
+ * The dice as a share link carries them: pictures stay on this device, so
+ * each picture face travels as its text, colour and number only.
+ */
+export function withoutFaceImages(dice: DiceData[]): DiceData[] {
+  return dice.map(d => d.customFaces.some(f => f.includes(FACE_IMAGE_DELIMITER))
+    ? {
+        ...d,
+        customFaces: d.customFaces.map(f => {
+          const p = parseFaceContent(f, '');
+          return p.image ? buildFace(p.content, p.bgColor || undefined, p.value) : f;
+        })
+      }
+    : d);
 }
 
 /** What a face adds to a total: its Counts as number, else its number text, else 0. */
@@ -101,10 +132,11 @@ export function sanitizeDiceList(input: unknown): DiceData[] {
           .slice(0, MAX_CUSTOM_FACES)
           .filter((f): f is string => typeof f === 'string')
           .map(f => {
-            // Trim the face text but keep a Counts as suffix intact
-            const m = f.match(FACE_VALUE_RE);
-            const base = m ? f.slice(0, m.index) : f;
-            return base.slice(0, MAX_FACE_TEXT_LENGTH) + (m ? m[0] : '');
+            // Trim the face text but keep its picture, colour and Counts as parts intact
+            const m = f.match(FACE_SUFFIX_RE);
+            const suffix = m ? m[0] : '';
+            const base = f.slice(0, f.length - suffix.length);
+            return base.slice(0, MAX_FACE_TEXT_LENGTH) + suffix;
           })
       : [];
 

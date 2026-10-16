@@ -142,6 +142,42 @@
   color: var(--md-sys-color-on-surface);
 }
 
+/* Small preview of a face's picture, beside the text shown where it's missing */
+.faceThumb {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: var(--shape-small);
+  margin-right: 8px;
+}
+
+.facePictureBtn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--md-sys-color-on-surface);
+  cursor: pointer;
+  padding: 0;
+}
+
+.addPictureBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+
+.pictureError {
+  color: var(--md-sys-color-error);
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+
 .faceActions {
   display: flex;
   align-items: center;

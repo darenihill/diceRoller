@@ -7,7 +7,8 @@ import { Dice } from './components/Dice';
 import { ActionBar } from './components/ActionBar';
 import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
-import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList } from './utils/diceUtils';
+import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages } from './utils/diceUtils';
+import { usedFaceImages, importFaceImages } from './utils/faceImages';
 import { playRollSequence } from './utils/soundEffects';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { MAX_HISTORY_LENGTH } from './utils/constants';
@@ -323,7 +324,8 @@ function App() {
   };
 
   const handleShare = () => {
-    const json = JSON.stringify(diceList);
+    // Pictures stay on this device; the link carries each picture face's text
+    const json = JSON.stringify(withoutFaceImages(diceList));
     const compressed = LZString.compressToEncodedURIComponent(json);
     // A named set travels with the link, so the person opening it sees the game's name
     const nameParam = setName ? `&name=${encodeURIComponent(setName)}` : '';
@@ -353,7 +355,9 @@ function App() {
         rollHistory: JSON.parse(localStorage.getItem('rollHistory') || '[]'),
         theme: localStorage.getItem('appTheme') || 'theme-dark',
         soundEnabled: localStorage.getItem('soundEnabled') === 'true',
-        diceScale: sanitizeDiceScale(localStorage.getItem('diceScale'))
+        diceScale: sanitizeDiceScale(localStorage.getItem('diceScale')),
+        // Only pictures a face still names, on screen or in a saved set
+        faceImages: usedFaceImages(diceList)
       };
       const json = JSON.stringify(data, null, 2);
       const blob = new Blob([json], { type: 'application/json' });
@@ -413,6 +417,12 @@ function App() {
           }
           // Older backups have no dice size; they import at the default
           localStorage.setItem('diceScale', String(sanitizeDiceScale(data.diceScale)));
+          // Pictures on faces; older backups have none
+          if (data.faceImages && !importFaceImages(data.faceImages)) {
+            showToast('Imported, but some pictures did not fit on this device. Reloading...');
+            setTimeout(() => window.location.reload(), 1500);
+            return;
+          }
           
           trackEvent('backup_imported');
           showToast('Imported backup successfully! Reloading...');
@@ -633,6 +643,7 @@ function App() {
           onUpdate={updateDice}
           onRemove={removeDice}
           onClone={handleAddDice}
+          allDice={diceList}
         />
       )}
     </div>

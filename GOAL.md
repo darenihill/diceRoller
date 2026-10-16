@@ -5,6 +5,22 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- Pictures on dice faces (Daren 2026-10-16, Build): "In a die's settings you
+  could pick a picture for any face, shrunk small so it fits on the device.
+  Pictures stay on your device and go into backups, but not into share links,
+  so links stay short. A shared die with a picture shows that face's text
+  instead." Built 2026-10-16 in four small steps, each with its done-check:
+  1. Face format: an optional `:img:<id>` marker beside `:bg:` and `:val:`.
+     Done when unit tests read, build and trim faces with it.
+  2. Choose picture on each face and "Add a picture face" in Dice settings;
+     pictures shrink to 128 px and live in local storage. Done when a picture
+     shows on the die at 390 px and 1280 px.
+  3. A picture face still scores its number. Done when a picture face with
+     Counts as 6 adds 6 to the total in the browser.
+  4. Backups carry pictures; share links leave them out and show the face's
+     text. Done when a backup restores the pictures on a fresh browser and a
+     shared link opens with text faces.
+  Built and checked locally; pushing waits on Daren's OK (public repo).
 - Name the app and the loaded game on screen. The top of the screen shows only
   dice and icons, so someone opening a shared link cannot tell which app they
   are in, and after loading Catan nothing on screen says Catan. A slim top line
