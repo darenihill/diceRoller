@@ -5,6 +5,9 @@ import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
 import { DICE_SCALE_DEFAULT, DICE_SCALE_MAX, DICE_SCALE_MIN } from '../../utils/diceUtils';
 
+/** The selected theme gets the same ring as a focused die: the theme's accent, never gold. */
+const SELECTED_OUTLINE = '3px solid var(--md-sys-color-primary)';
+
 interface CustomizeModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -41,7 +44,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <button 
             className={`md-card ${styles.setCard}`} 
-            style={{ margin: 0, padding: '16px 8px', backgroundColor: '#1E1E1E', color: '#FFF', border: theme === 'theme-dark' ? '2px solid var(--md-sys-color-primary)' : 'none' }}
+            style={{ margin: 0, padding: '16px 8px', backgroundColor: '#1E1E1E', color: '#FFF', outline: theme === 'theme-dark' ? SELECTED_OUTLINE : 'none', outlineOffset: 2 }}
             onClick={() => onSelectTheme('theme-dark')}
             aria-pressed={theme === 'theme-dark'}
           >
@@ -49,7 +52,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           </button>
           <button 
             className={`md-card ${styles.setCard}`} 
-            style={{ margin: 0, padding: '16px 8px', backgroundColor: '#F0F0F0', color: '#000', border: theme === 'theme-light' ? '2px solid var(--md-sys-color-primary)' : 'none' }}
+            style={{ margin: 0, padding: '16px 8px', backgroundColor: '#F0F0F0', color: '#000', outline: theme === 'theme-light' ? SELECTED_OUTLINE : 'none', outlineOffset: 2 }}
             onClick={() => onSelectTheme('theme-light')}
             aria-pressed={theme === 'theme-light'}
           >
@@ -57,7 +60,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           </button>
           <button 
             className={`md-card ${styles.setCard}`} 
-            style={{ margin: 0, padding: '16px 8px', backgroundColor: '#1B4D3E', color: '#FFF', border: theme === 'theme-felt' ? '2px solid #FFD700' : 'none' }}
+            style={{ margin: 0, padding: '16px 8px', backgroundColor: '#1B4D3E', color: '#FFF', outline: theme === 'theme-felt' ? SELECTED_OUTLINE : 'none', outlineOffset: 2 }}
             onClick={() => onSelectTheme('theme-felt')}
             aria-pressed={theme === 'theme-felt'}
           >
@@ -65,7 +68,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           </button>
           <button 
             className={`md-card ${styles.setCard}`} 
-            style={{ margin: 0, padding: '16px 8px', backgroundColor: '#090B10', color: '#DFE0FF', border: theme === 'theme-midnight' ? '2px solid #8E99F3' : 'none' }}
+            style={{ margin: 0, padding: '16px 8px', backgroundColor: '#090B10', color: '#DFE0FF', outline: theme === 'theme-midnight' ? SELECTED_OUTLINE : 'none', outlineOffset: 2 }}
             onClick={() => onSelectTheme('theme-midnight')}
             aria-pressed={theme === 'theme-midnight'}
           >

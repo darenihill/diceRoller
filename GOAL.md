@@ -5,6 +5,52 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- One highlight colour per meaning (Daren 2026-10-17, Build): "Every selected
+  or focused thing (a theme card, a face, a colour swatch, the focused die)
+  would use the theme's own accent colour, the same one the Roll button uses.
+  Gold would only ever mean a held die, a target hit or a natural 20." Built
+  2026-10-17 in four small steps, each with its done-check:
+  1. Selected theme cards all use the theme's accent, not gold or lavender.
+     Done when every theme card, picked, shows the same 3 px accent ring.
+  2. Gold kept only for held dice, target hits and natural 20s. Casino Felt's
+     accent becomes ivory, since its accent was gold. Done when a unit test
+     shows no theme accent equals the gold token.
+  3. The hold lock and Hold All use the shared gold colour. Done when no
+     component names gold by hex (unit test).
+  4. Selected faces and swatches match the focused die outline. Done when a
+     picked face and swatch show the same 3 px accent ring at 390 px and
+     1280 px.
+  ~~Done 2026-10-17~~ (Daren OK'd the push 2026-10-17).
+- Easier face colours (Daren 2026-10-16, Build): "Die settings would show
+  all faces as coloured tiles in a row. Tap a face, then tap a colour, and you
+  are done, with no hidden palette icon. A one-tap 'Colour every face
+  differently' covers the 'roll for a colour' use people wrote about." Built
+  2026-10-16 in three small steps, each with its done-check:
+  1. Each face shows as a tile in its own colour; tapping one picks it, and a
+     colour row (kept in view while scrolling) paints it. The per-face palette
+     button is gone. Done when face 3 turns black in two taps at 390 px and
+     1280 px.
+  2. "Colour every face differently" gives every face its own colour, turning
+     a plain numbered die into faces 1 to n first. Done when unit tests show n
+     different colours for 1 to 100 faces and a d6 keeps its numbers.
+  3. Help text says how. Done when the Help dialog names both.
+  ~~Done 2026-10-17~~ (Daren OK'd the push 2026-10-17).
+- Pictures on dice faces (Daren 2026-10-16, Build): "In a die's settings you
+  could pick a picture for any face, shrunk small so it fits on the device.
+  Pictures stay on your device and go into backups, but not into share links,
+  so links stay short. A shared die with a picture shows that face's text
+  instead." Built 2026-10-16 in four small steps, each with its done-check:
+  1. Face format: an optional `:img:<id>` marker beside `:bg:` and `:val:`.
+     Done when unit tests read, build and trim faces with it.
+  2. Choose picture on each face and "Add a picture face" in Dice settings;
+     pictures shrink to 128 px and live in local storage. Done when a picture
+     shows on the die at 390 px and 1280 px.
+  3. A picture face still scores its number. Done when a picture face with
+     Counts as 6 adds 6 to the total in the browser.
+  4. Backups carry pictures; share links leave them out and show the face's
+     text. Done when a backup restores the pictures on a fresh browser and a
+     shared link opens with text faces.
+  ~~Done 2026-10-17~~ (Daren OK'd the push 2026-10-17).
 - Name the app and the loaded game on screen. The top of the screen shows only
   dice and icons, so someone opening a shared link cannot tell which app they
   are in, and after loading Catan nothing on screen says Catan. A slim top line

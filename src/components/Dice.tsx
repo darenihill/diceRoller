@@ -5,6 +5,7 @@ import { Lock, Unlock, Settings, X, Copy, Dices } from 'lucide-react';
 import { motion, useAnimationControls } from 'framer-motion';
 import { ALL_ICONS } from '../utils/iconUtils';
 import { parseFaceContent, FACE_ICON_PREFIX, getContrastColor } from '../utils/diceUtils';
+import { useFaceImage } from '../utils/faceImages';
 import { MAX_SHAPED_FACE_LENGTH } from '../utils/constants';
 import { PolyhedralWireframe } from './PolyhedralWireframe';
 
@@ -40,7 +41,7 @@ const DiceComponent: React.FC<DiceProps> = ({
     if (!lockMountedRef.current) return;
     lockControls.start({
       rotate: [0, -45, 10, 0],
-      color: dice.held ? '#FFD700' : '#FFFFFF',
+      color: dice.held ? 'var(--color-gold)' : '#FFFFFF',
       transition: { duration: 0.5, ease: 'easeInOut' }
     });
   }, [dice.held, lockControls]);
@@ -107,6 +108,8 @@ const DiceComponent: React.FC<DiceProps> = ({
   const parsed = parseFaceContent(displayText, dice.color);
   const backgroundColor = parsed.bgColor;
   const faceContent = parsed.content;
+  // A picture kept on this device; where it's missing (a shared link) the face's text shows
+  const faceImage = useFaceImage(parsed.image);
 
   const textColor = getContrastColor(backgroundColor);
 
@@ -140,7 +143,7 @@ const DiceComponent: React.FC<DiceProps> = ({
     dice.customFaces.length > 0 &&
     dice.customFaces.every(f => {
       const content = parseFaceContent(f).content;
-      return !content.startsWith(FACE_ICON_PREFIX) && content.trim().length <= MAX_SHAPED_FACE_LENGTH;
+      return !content.startsWith(FACE_ICON_PREFIX) && !parseFaceContent(f).image && content.trim().length <= MAX_SHAPED_FACE_LENGTH;
     });
 
   // Determine polyhedral RPG shape when rpgMode is active and faces match d4, d6, d8, d10, d12, d20
@@ -197,9 +200,13 @@ const DiceComponent: React.FC<DiceProps> = ({
         )}
       </div>
 
-      <div className={styles.number} style={{ fontSize: fontScale, color: textColor, zIndex: 2 }}>
-        {renderFace(faceContent)}
-      </div>
+      {faceImage ? (
+        <img src={faceImage} alt="" className={styles.faceImage} draggable={false} />
+      ) : (
+        <div className={styles.number} style={{ fontSize: fontScale, color: textColor, zIndex: 2 }}>
+          {renderFace(faceContent)}
+        </div>
+      )}
 
       {dice.dropped && (
         <div className={styles.droppedBadge}>
@@ -231,7 +238,7 @@ const DiceComponent: React.FC<DiceProps> = ({
       <motion.div
         initial={{ rotate: 0 }}
         animate={lockControls}
-        style={{ color: dice.held ? '#FFD700' : '#FFFFFF' }}
+        style={{ color: dice.held ? 'var(--color-gold)' : '#FFFFFF' }}
         className={`${styles.actionBtn} ${dice.held ? styles.holdIcon : styles.unlockIcon}`}
       >
         <div style={{ position: 'relative', width: 20, height: 20 }}>

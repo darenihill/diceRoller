@@ -23,6 +23,7 @@
   --shape-large: 16px;
 
   /* Accent & Highlight Design Tokens */
+  /* Gold means one thing on every theme: a held die, a target hit or a natural 20. */
   --color-gold: #FFD700;
   --color-crit-red: #D32F2F;
   --color-success: #2E7D32;
@@ -55,10 +56,12 @@ body.theme-felt {
   --md-sys-color-surface-hover: #1A5A48;
   --md-sys-color-on-background: #FFFFFF;
   --md-sys-color-on-surface: #FFFFFF;
-  --md-sys-color-primary: #FFD700;
-  --md-sys-color-on-primary: #000000;
-  --md-sys-color-primary-container: #FFD700;
-  --md-sys-color-on-primary-container: #000000;
+  /* Ivory, not gold: on every theme gold means only a held die, a target hit
+     or a natural 20. */
+  --md-sys-color-primary: #EFE6D2;
+  --md-sys-color-on-primary: #13382D;
+  --md-sys-color-primary-container: #EFE6D2;
+  --md-sys-color-on-primary-container: #13382D;
 }
 
 body.theme-midnight {
