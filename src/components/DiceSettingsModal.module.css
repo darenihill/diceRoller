@@ -131,7 +131,6 @@
 /* The face the colour row will paint */
 .faceCardSelected {
   border-color: var(--md-sys-color-primary);
-  box-shadow: 0 0 0 1px var(--md-sys-color-primary);
 }
 
 /* Each face shown in its own colour; tap it to pick it for the colour row */
@@ -188,6 +187,14 @@
   padding: 0;
   cursor: pointer;
   box-shadow: var(--elevation-1);
+}
+
+/* A picked face or swatch gets the same ring as a focused die: the theme's
+   accent. Gold is kept for held dice, target hits and natural 20s. */
+.faceTile[aria-pressed='true'],
+.faceSwatch[aria-pressed='true'] {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
 }
 
 .faceSwatchCustom {

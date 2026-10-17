@@ -5,6 +5,23 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- One highlight colour per meaning (Daren 2026-10-17, Build): "Every selected
+  or focused thing (a theme card, a face, a colour swatch, the focused die)
+  would use the theme's own accent colour, the same one the Roll button uses.
+  Gold would only ever mean a held die, a target hit or a natural 20." Built
+  2026-10-17 in four small steps, each with its done-check:
+  1. Selected theme cards all use the theme's accent, not gold or lavender.
+     Done when every theme card, picked, shows the same 3 px accent ring.
+  2. Gold kept only for held dice, target hits and natural 20s. Casino Felt's
+     accent becomes ivory, since its accent was gold. Done when a unit test
+     shows no theme accent equals the gold token.
+  3. The hold lock and Hold All use the shared gold colour. Done when no
+     component names gold by hex (unit test).
+  4. Selected faces and swatches match the focused die outline. Done when a
+     picked face and swatch show the same 3 px accent ring at 390 px and
+     1280 px.
+  Built and checked locally on top of easier face colours; pushing waits on
+  Daren's OK (public repo).
 - Easier face colours (Daren 2026-10-16, Build): "Die settings would show
   all faces as coloured tiles in a row. Tap a face, then tap a colour, and you
   are done, with no hidden palette icon. A one-tap 'Colour every face

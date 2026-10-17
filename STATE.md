@@ -1,4 +1,4 @@
-Next: held - pictures on faces and easier face colours built and checked locally; pushing needs Daren's OK (public repo).
+Next: held - pictures on faces, easier face colours and one highlight colour per meaning built and checked locally; pushing needs Daren's OK (public repo).
 
 # State
 

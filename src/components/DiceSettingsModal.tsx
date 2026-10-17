@@ -328,7 +328,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                       key={c}
                       type="button"
                       className={styles.faceSwatch}
-                      style={{ backgroundColor: c, outline: current ? '3px solid var(--md-sys-color-primary)' : undefined }}
+                      style={{ backgroundColor: c }}
                       onClick={() => updateCustomFaceColor(activeFace, c)}
                       aria-label={COLOR_NAMES[c] ?? c}
                       aria-pressed={current}
