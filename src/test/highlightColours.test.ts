@@ -16,14 +16,15 @@ function files(dir: string): string[] {
 describe('highlight colours', () => {
   it('no theme uses gold as its accent', () => {
     expect(gold).toBe('#FFD700');
-    const accents = [...css.matchAll(/--md-sys-color-primary:\s*(#[0-9A-Fa-f]{6})/g)].map(m => m[1].toUpperCase());
-    expect(accents.length).toBe(4);
+    const accents = [...css.matchAll(/--md-sys-color-primary(?:-container)?:\s*(#[0-9A-Fa-f]{6})/g)].map(m => m[1].toUpperCase());
+    expect(accents.length).toBe(8);
     expect(accents).not.toContain(gold);
   });
 
   it('components name gold and accents by token, not by hex', () => {
     const offenders = files(join(root, 'components'))
-      .filter(f => /'#FFD700'|solid #FFD700|solid #8E99F3/i.test(readFileSync(f, 'utf8')));
+      // Face colours people pick (':bg:#FFD700') are colours, not highlights.
+      .filter(f => /#FFD700|solid #8E99F3/i.test(readFileSync(f, 'utf8').replace(/:bg:#FFD700/gi, '')));
     expect(offenders).toEqual([]);
   });
 });

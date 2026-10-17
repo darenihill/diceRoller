@@ -192,7 +192,8 @@
 /* A picked face or swatch gets the same ring as a focused die: the theme's
    accent. Gold is kept for held dice, target hits and natural 20s. */
 .faceTile[aria-pressed='true'],
-.faceSwatch[aria-pressed='true'] {
+.faceSwatch[aria-pressed='true'],
+.colorDot[aria-pressed='true'] {
   outline: 3px solid var(--md-sys-color-primary);
   outline-offset: 2px;
 }

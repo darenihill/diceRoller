@@ -445,8 +445,10 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                   <button 
                     key={c}
                     className={styles.colorDot}
-                    style={{ backgroundColor: c, border: c === dice.color ? '3px solid var(--md-sys-color-primary)' : 'none' }}
+                    style={{ backgroundColor: c, border: 'none' }}
                     onClick={() => handleColorSelect(c)}
+                    aria-label={COLOR_NAMES[c] ?? c}
+                    aria-pressed={c.toUpperCase() === dice.color.toUpperCase()}
                   />
                 ))}
                 <label className={styles.colorDotCustom}>
