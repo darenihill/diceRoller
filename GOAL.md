@@ -20,8 +20,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   4. Selected faces and swatches match the focused die outline. Done when a
      picked face and swatch show the same 3 px accent ring at 390 px and
      1280 px.
-  Built and checked locally on top of easier face colours; pushing waits on
-  Daren's OK (public repo).
+  ~~Done 2026-10-17~~ (Daren OK'd the push 2026-10-17).
 - Easier face colours (Daren 2026-10-16, Build): "Die settings would show
   all faces as coloured tiles in a row. Tap a face, then tap a colour, and you
   are done, with no hidden palette icon. A one-tap 'Colour every face
@@ -35,8 +34,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      a plain numbered die into faces 1 to n first. Done when unit tests show n
      different colours for 1 to 100 faces and a d6 keeps its numbers.
   3. Help text says how. Done when the Help dialog names both.
-  Built and checked locally on top of pictures on faces; pushing waits on
-  Daren's OK (public repo).
+  ~~Done 2026-10-17~~ (Daren OK'd the push 2026-10-17).
 - Pictures on dice faces (Daren 2026-10-16, Build): "In a die's settings you
   could pick a picture for any face, shrunk small so it fits on the device.
   Pictures stay on your device and go into backups, but not into share links,
@@ -52,7 +50,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   4. Backups carry pictures; share links leave them out and show the face's
      text. Done when a backup restores the pictures on a fresh browser and a
      shared link opens with text faces.
-  Built and checked locally; pushing waits on Daren's OK (public repo).
+  ~~Done 2026-10-17~~ (Daren OK'd the push 2026-10-17).
 - Name the app and the loaded game on screen. The top of the screen shows only
   dice and icons, so someone opening a shared link cannot tell which app they
   are in, and after loading Catan nothing on screen says Catan. A slim top line
