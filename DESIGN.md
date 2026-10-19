@@ -60,6 +60,8 @@ their state with `aria-pressed`. Dialogs trap focus and close on Esc.
   layout (flex/grid gaps) in modals. Biggest pockets: `DiceSettingsModal.tsx`,
   `HistoryModal.tsx`, `HelpModal.tsx`.
 - No spacing scale or named type styles; font sizes are raw px in CSS modules.
+- 2026-10-19: text colors in Dice Settings and the Dropped badge moved from
+  raw white/grey to on-surface and on-error tokens (reviews/2026-10-19-ui-components.md).
 
 ## 11. Verification
 
