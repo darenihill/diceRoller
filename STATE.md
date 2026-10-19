@@ -1,4 +1,4 @@
-Next: pictures on faces, easier face colours and one highlight colour per meaning pushed (Daren OK'd 2026-10-17); waiting on his merge tap.
+Next: standard-components polish pass done (light-theme text colours); pull request waits on a second read, then Daren's tap to merge since a merge publishes.
 
 # State
 
