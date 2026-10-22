@@ -1,4 +1,4 @@
-Next: standard-components polish pass done (light-theme text colours); pull request waits on a second read, then Daren's tap to merge since a merge publishes.
+Next: 2026-10-22 four-lens review (stories, cognitive walk, Kano, trunk test) in progress; walking the app at 390 px.
 
 # State
 
