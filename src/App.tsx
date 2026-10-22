@@ -15,7 +15,7 @@ import { MAX_HISTORY_LENGTH } from './utils/constants';
 import { dicePresets } from './utils/presets';
 import { currentSetName, diceSignature, readShareLink, type LoadedSet } from './utils/setName';
 import { readLandingStart, readLandingAbout } from './utils/landing';
-import { Info } from 'lucide-react';
+import { Info, Plus, Dice6 } from 'lucide-react';
 import { Modal } from './components/Modal';
 import type { DiceData } from './types';
 
@@ -502,6 +502,21 @@ function App() {
           />
         ))}
       </div>
+
+      {/* With no dice, the middle of the screen says what to do next */}
+      {diceList.length === 0 && (
+        <div className={styles.emptyState}>
+          <p className={styles.emptyTitle}>No dice yet</p>
+          <div className={styles.emptyActions}>
+            <button className="md-button md-button-filled" onClick={() => handleAddDice()}>
+              <Plus size={18} aria-hidden="true" /> Add die
+            </button>
+            <button className="md-button md-button-surface" onClick={() => setModalOpen('sets')}>
+              <Dice6 size={18} aria-hidden="true" /> Games
+            </button>
+          </div>
+        </div>
+      )}
 
       <SidebarMenu
         isOpen={menuOpen}

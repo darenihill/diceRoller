@@ -5,6 +5,14 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-10-22~~ Empty screen offers next step (Daren 2026-10-22, Build):
+  "When there are no dice, the middle of the screen would show a short line and
+  two buttons: Add die (same as +) and Games (opens Games & Saves). It
+  disappears as soon as a die is added."
+  1. ~~Done 2026-10-22~~ With no dice, "No dice yet" with Add die and Games shows
+     in the middle; it goes once a die is added. Done when a unit test clears the
+     dice, finds both buttons, adds a die and finds the line gone.
+
 - One highlight colour per meaning (Daren 2026-10-17, Build): "Every selected
   or focused thing (a theme card, a face, a colour swatch, the focused die)
   would use the theme's own accent colour, the same one the Roll button uses.
