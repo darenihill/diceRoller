@@ -517,7 +517,6 @@ function App() {
         onSave={handleSave}
         onShare={handleShare}
         onSetDefault={handleSetDefault}
-        onLoad={() => setModalOpen('sets')}
         rpgMode={rpgMode}
         onToggleRpgMode={toggleRpgMode}
       />

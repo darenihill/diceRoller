@@ -5,6 +5,16 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-10-22~~ Your saves first in Games (Daren 2026-10-22, Build): "Games
+  & Saves would list Your Saves first, since a returning player usually wants
+  their own set. The menu would keep one Games entry instead of Games plus
+  Load, which open the same thing. Presets stay as they are underneath."
+  1. ~~Done 2026-10-22~~ Games dialog shows Your Saves above Presets when there
+     are saves, and starts with Presets when there are none. Done when a unit
+     test checks the heading order both ways.
+  2. ~~Done 2026-10-22~~ The menu drops Load; Games does the same job. Done when
+     a unit test finds Games and no Load in the menu.
+
 - One highlight colour per meaning (Daren 2026-10-17, Build): "Every selected
   or focused thing (a theme card, a face, a colour swatch, the focused die)
   would use the theme's own accent colour, the same one the Roll button uses.
