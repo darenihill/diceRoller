@@ -1,4 +1,4 @@
-Next: standard-components polish pass done (light-theme text colours); pull request waits on a second read, then Daren's tap to merge since a merge publishes.
+Next: goal check (jobs to be done, HEART, working backwards) in progress; write-ups go in reviews/2026-10-22-goal-*.md.
 
 # State
 
