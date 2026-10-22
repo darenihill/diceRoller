@@ -5,6 +5,67 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-10-22~~ Your saves first in Games (Daren 2026-10-22, Build): "Games
+  & Saves would list Your Saves first, since a returning player usually wants
+  their own set. The menu would keep one Games entry instead of Games plus
+  Load, which open the same thing. Presets stay as they are underneath."
+  1. ~~Done 2026-10-22~~ Games dialog shows Your Saves above Presets when there
+     are saves, and starts with Presets when there are none. Done when a unit
+     test checks the heading order both ways.
+  2. ~~Done 2026-10-22~~ The menu drops Load; Games does the same job. Done when
+     a unit test finds Games and no Load in the menu.
+- ~~Done 2026-10-22~~ Shake to roll (Daren 2026-10-22, Build): "A Shake to roll
+  switch in Customize, off by default. When on, shaking the phone rolls the
+  dice exactly like the Roll button. On iPhone the browser asks once for motion
+  access, which is why it starts off."
+  1. ~~Done 2026-10-22~~ A Shake to roll switch in Customize, off by default and
+     remembered. Done when a unit test finds it off and a tap reaches its handler.
+  2. ~~Done 2026-10-22~~ A firm shake rolls once, like the Roll button, and only
+     from the main screen. Done when unit tests show small moves are ignored and
+     one shake gives one roll.
+  3. ~~Done 2026-10-22~~ Turning it on asks iPhone for motion access once; if it
+     is turned down, the switch stays off with a short message. Done when a
+     unit test covers granted, turned down and no sensor.
+- ~~Done 2026-10-22~~ Undo after removing (Daren 2026-10-22, Build): "Every
+  remove would say what it did and offer Undo for 5 seconds, using the app's
+  existing message bar. This covers the X on a die, the bin on a saved game and
+  Clear All. Clear All could then skip its confirm, since Undo brings
+  everything back."
+  1. ~~Done 2026-10-22~~ The X on a die shows "Removed d6" with Undo for five
+     seconds; Undo puts the die back in its place. Done when a unit test puts a
+     removed die back where it was and the offer closes after five seconds.
+  2. ~~Done 2026-10-22~~ Deleting a saved game shows Undo, which brings the save
+     back. Done when a unit test restores a deleted save.
+  3. ~~Done 2026-10-22~~ Clear All skips its confirm and offers Undo, which
+     brings every die back. Done when a unit test restores all dice after Clear
+     All.
+- ~~Done 2026-10-22~~ Safer saving (Daren 2026-10-22, Build): "Save Game would
+  remember what you typed until you save or clear it. If a save with that name
+  exists, the dialog says so and offers Keep both (adds '(2)') or Replace it."
+  1. ~~Done 2026-10-22~~ The typed name comes back after tapping away, and clears
+     once saved. Done when a phone-size browser check types a name, cancels,
+     reopens and finds it, then finds it empty after saving.
+  2. ~~Done 2026-10-22~~ A taken name shows a note with Keep both and Replace it,
+     and Enter never overwrites. Done when unit tests cover the note, both
+     buttons, Enter, and the "(2)" naming.
+- ~~Done 2026-10-22~~ Empty screen offers next step (Daren 2026-10-22, Build):
+  "When there are no dice, the middle of the screen would show a short line and
+  two buttons: Add die (same as +) and Games (opens Games & Saves). It
+  disappears as soon as a die is added."
+  1. ~~Done 2026-10-22~~ With no dice, "No dice yet" with Add die and Games shows
+     in the middle; it goes once a die is added. Done when a unit test clears the
+     dice, finds both buttons, adds a die and finds the line gone.
+- ~~Done 2026-10-22~~ Check target numbers as you type (Daren 2026-10-22,
+  Build): "While you type in Target Highlight, any part that isn't a whole
+  number gets a gentle note under the box, and the box edge turns the theme's
+  error colour. Nothing is blocked or changed: the numbers that do read still
+  celebrate as today. The note goes away as soon as every part is a number."
+  1. ~~Done 2026-10-22~~ A part that isn't a whole number turns the box edge to
+     the error colour and shows one line naming it and what still counts. Done
+     when unit tests cover the note, its wording and the box's invalid mark.
+  2. ~~Done 2026-10-22~~ Rolls celebrate exactly as before. Done when a unit test
+     shows the note counts what a roll counts, and the roll code is unchanged.
+
 - One highlight colour per meaning (Daren 2026-10-17, Build): "Every selected
   or focused thing (a theme card, a face, a colour swatch, the focused die)
   would use the theme's own accent colour, the same one the Roll button uses.

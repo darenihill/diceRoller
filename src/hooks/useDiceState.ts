@@ -118,6 +118,21 @@ export const useDiceState = () => {
     setDiceList([]);
   }, []);
 
+  /** Puts a removed die back where it was (used by Undo). */
+  const insertDiceAt = useCallback((die: DiceData, index: number) => {
+    setDiceList(prev => {
+      if (prev.some(d => d.id === die.id)) return prev;
+      const next = [...prev];
+      next.splice(Math.min(Math.max(index, 0), next.length), 0, die);
+      return next;
+    });
+  }, []);
+
+  /** Brings back a whole set of dice (used by Undo after Clear All). */
+  const restoreDice = useCallback((list: DiceData[]) => {
+    setDiceList(list);
+  }, []);
+
   const rollDice = useCallback((onComplete?: (summary: RollSummary) => void, onlyId?: string) => {
     // With no dice there is nothing to roll; a modifier alone used to log a phantom total
     if (diceList.length === 0) return;
@@ -324,6 +339,8 @@ export const useDiceState = () => {
     rollDice,
     clearHistory,
     toast,
-    showToast
+    showToast,
+    insertDiceAt,
+    restoreDice
   };
 };

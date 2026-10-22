@@ -1,4 +1,4 @@
-Next: four-lens review, forms polish and goal check pushed with Daren's OK (2026-10-22); landing.
+Next: six Daren-approved changes (saves first, shake to roll, undo, safer saving, empty screen, target check) in one pull request (2026-10-22); landing.
 
 # State
 

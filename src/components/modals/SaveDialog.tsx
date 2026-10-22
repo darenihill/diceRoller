@@ -7,7 +7,9 @@ interface SaveDialogProps {
   onClose: () => void;
   saveName: string;
   onChangeSaveName: (val: string) => void;
-  onSave: () => void;
+  /** Names of saves already on this device. */
+  existingNames: string[];
+  onSave: (mode: 'new' | 'keepBoth' | 'replace') => void;
 }
 
 export const SaveDialog: React.FC<SaveDialogProps> = ({
@@ -15,8 +17,12 @@ export const SaveDialog: React.FC<SaveDialogProps> = ({
   onClose,
   saveName,
   onChangeSaveName,
+  existingNames,
   onSave,
 }) => {
+  const trimmed = saveName.trim();
+  const taken = trimmed !== '' && existingNames.includes(trimmed);
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Save Game">
       <div className={modalStyles.formGroup}>
@@ -30,11 +36,24 @@ export const SaveDialog: React.FC<SaveDialogProps> = ({
           value={saveName} 
           onChange={(e) => onChangeSaveName(e.target.value)}
           className={modalStyles.formInput}
-          onKeyDown={(e) => e.key === 'Enter' && saveName.trim() && onSave()}
+          aria-describedby={taken ? 'save-name-taken' : undefined}
+          onKeyDown={(e) => e.key === 'Enter' && trimmed && !taken && onSave('new')}
         />
+        {taken && (
+          <p id="save-name-taken" className={modalStyles.formLabel} role="status" style={{ margin: 0 }}>
+            You already have a save called “{trimmed}”.
+          </p>
+        )}
         <div className={modalStyles.buttonRow}>
           <button className="md-button md-button-surface" onClick={onClose}>Cancel</button>
-          <button className="md-button md-button-filled" onClick={onSave} disabled={!saveName.trim()}>Save</button>
+          {taken ? (
+            <>
+              <button className="md-button md-button-surface" onClick={() => onSave('keepBoth')}>Keep both</button>
+              <button className="md-button md-button-filled" onClick={() => onSave('replace')}>Replace it</button>
+            </>
+          ) : (
+            <button className="md-button md-button-filled" onClick={() => onSave('new')} disabled={!trimmed}>Save</button>
+          )}
         </div>
       </div>
     </Modal>

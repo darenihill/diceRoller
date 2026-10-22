@@ -1,8 +1,9 @@
 import React from 'react';
 import { Modal } from '../Modal';
-import { Volume2, VolumeX, BarChart2 } from 'lucide-react';
+import { Volume2, VolumeX, BarChart2, Smartphone } from 'lucide-react';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
+import { targetNote } from '../../utils/targets';
 import { DICE_SCALE_DEFAULT, DICE_SCALE_MAX, DICE_SCALE_MIN } from '../../utils/diceUtils';
 
 /** The selected theme gets the same ring as a focused die: the theme's accent, never gold. */
@@ -21,6 +22,8 @@ interface CustomizeModalProps {
   onToggleTelemetry: () => void;
   diceScale: number;
   onChangeDiceScale: (scale: number) => void;
+  shakeEnabled: boolean;
+  onToggleShake: () => void;
 }
 
 export const CustomizeModal: React.FC<CustomizeModalProps> = ({
@@ -36,7 +39,10 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
   onToggleTelemetry,
   diceScale,
   onChangeDiceScale,
+  shakeEnabled,
+  onToggleShake,
 }) => {
+  const note = targetNote(targetHighlight);
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Customize App">
       <div className={modalStyles.formGroup}>
@@ -122,24 +128,48 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
             </button>
           </div>
 
-          {/* Target Total Highlight */}
+          {/* Shake to Roll Toggle: off by default because iPhone asks for motion access */}
           <div className={modalStyles.toggleRow}>
             <div className={modalStyles.toggleLabelCol}>
-              <span className={modalStyles.toggleTitle}>Target Highlight</span>
-              <span className={modalStyles.toggleDesc}>Celebrate when the roll total hits these numbers (comma-separated, e.g. 7, 11)</span>
+              <span className={modalStyles.toggleTitle}>Shake to Roll</span>
+              <span className={modalStyles.toggleDesc}>Shake your phone to roll, just like the Roll button</span>
             </div>
-            <input
-              type="text"
-              value={targetHighlight}
-              onChange={(e) => onChangeTargetHighlight(e.target.value)}
-              placeholder="e.g. 7, 11"
-              autoComplete="off"
-              enterKeyHint="done"
-              onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-              className={modalStyles.formInput}
-              style={{ width: 110, textAlign: 'center' }}
-              aria-label="Target totals to highlight, comma-separated"
-            />
+            <button
+              className="md-icon-button"
+              onClick={onToggleShake}
+              title={shakeEnabled ? "Turn off shake to roll" : "Turn on shake to roll"}
+              aria-label="Shake to roll"
+              aria-pressed={shakeEnabled}
+            >
+              <Smartphone size={20} />
+            </button>
+          </div>
+
+          {/* Target Total Highlight: a gentle note names any part that isn't a whole number */}
+          <div>
+            <div className={modalStyles.toggleRow}>
+              <div className={modalStyles.toggleLabelCol}>
+                <span className={modalStyles.toggleTitle}>Target Highlight</span>
+                <span className={modalStyles.toggleDesc}>Celebrate when the roll total hits these numbers (comma-separated, e.g. 7, 11)</span>
+              </div>
+              <input
+                type="text"
+                value={targetHighlight}
+                onChange={(e) => onChangeTargetHighlight(e.target.value)}
+                placeholder="e.g. 7, 11"
+                autoComplete="off"
+                enterKeyHint="done"
+                onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+                className={`${modalStyles.formInput} ${note ? modalStyles.formInputInvalid : ''}`}
+                style={{ width: 110, textAlign: 'center' }}
+                aria-label="Target totals to highlight, comma-separated"
+                aria-invalid={note ? true : undefined}
+                aria-describedby={note ? 'target-note' : undefined}
+              />
+            </div>
+            {note && (
+              <p id="target-note" className={modalStyles.fieldNote} role="status">{note}</p>
+            )}
           </div>
 
           {/* Usage Telemetry Privacy Toggle */}

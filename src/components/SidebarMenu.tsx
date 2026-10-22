@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './SidebarMenu.module.css';
-import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Download, Share2, Palette, Pin, ToggleLeft, ToggleRight, BarChart2 } from 'lucide-react';
+import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Share2, Palette, Pin, ToggleLeft, ToggleRight, BarChart2 } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 // Material 3 "emphasized" easing for the menu icon turning into a close icon
@@ -33,13 +33,12 @@ interface SidebarMenuProps {
   onSave: () => void;
   onShare: () => void;
   onSetDefault: () => void;
-  onLoad: () => void;
   rpgMode: boolean;
   onToggleRpgMode: () => void;
 }
 
 export const SidebarMenu: React.FC<SidebarMenuProps> = ({
-  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onStats, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, onLoad, rpgMode, onToggleRpgMode
+  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onStats, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, rpgMode, onToggleRpgMode
 }) => {
   return (
     <>
@@ -80,7 +79,6 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
                 <div className={styles.menuColumnHeader}>Saves</div>
                 <button className={styles.menuItem} onClick={onSets}><Dice6 size={18} /> <span>Games</span></button>
                 <button className={styles.menuItem} onClick={onSave}><Save size={18} /> <span>Save</span></button>
-                <button className={styles.menuItem} onClick={onLoad}><Download size={18} /> <span>Load</span></button>
                 <button className={styles.menuItem} onClick={onSetDefault} title="Pin as startup default"><Pin size={18} /> <span>Set Default</span></button>
               </div>
 

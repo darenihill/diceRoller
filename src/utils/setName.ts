@@ -59,3 +59,12 @@ export function readShareLink(hash: string): { dice: DiceData[]; name: string | 
     return { dice: [], name };
   }
 }
+
+/** "Catan" taken? Gives "Catan (2)", or the next free number after it. */
+export function nextFreeSaveName(name: string, taken: Iterable<string>): string {
+  const names = new Set(taken);
+  const base = name.trim().replace(/\s\(\d+\)$/, '');
+  let n = 2;
+  while (names.has(`${base} (${n})`)) n++;
+  return `${base} (${n})`;
+}

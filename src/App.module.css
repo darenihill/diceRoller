@@ -123,6 +123,34 @@
   pointer-events: none;
 }
 
+/* The Undo offer can be tapped, unlike a plain message */
+.undoToast {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 6px 8px 6px 20px;
+  pointer-events: auto;
+}
+
+.undoButton {
+  min-height: 44px;
+  min-width: 64px;
+  padding: 0 12px;
+  border: none;
+  border-radius: var(--shape-large);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.undoButton:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
 @keyframes slideDown {
   from { opacity: 0; transform: translate(-50%, -20px); }
   to { opacity: 1; transform: translate(-50%, 0); }
@@ -152,6 +180,41 @@
   :global(body.rpg-mode) .diceContainer {
     padding-bottom: 270px !important;
   }
+}
+
+/* Shown only with no dice; the layer lets taps through except on its buttons */
+.emptyState {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 16px;
+  pointer-events: none;
+}
+
+.emptyTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.emptyActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.emptyActions > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
 }
 
 .topLine {

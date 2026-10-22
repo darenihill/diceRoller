@@ -13,9 +13,9 @@ import { playRollSequence } from './utils/soundEffects';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { MAX_HISTORY_LENGTH } from './utils/constants';
 import { dicePresets } from './utils/presets';
-import { currentSetName, diceSignature, readShareLink, type LoadedSet } from './utils/setName';
+import { currentSetName, diceSignature, readShareLink, nextFreeSaveName, type LoadedSet } from './utils/setName';
 import { readLandingStart, readLandingAbout } from './utils/landing';
-import { Info } from 'lucide-react';
+import { Info, Plus, Dice6 } from 'lucide-react';
 import { Modal } from './components/Modal';
 import type { DiceData } from './types';
 
@@ -24,8 +24,9 @@ import { HelpModal } from './components/modals/HelpModal';
 import { HistoryModal } from './components/modals/HistoryModal';
 import { SetsModal } from './components/modals/SetsModal';
 import { CustomizeModal } from './components/modals/CustomizeModal';
+import { createShakeDetector, requestMotionPermission, sampleFromEvent } from './utils/shake';
 import { SaveDialog } from './components/modals/SaveDialog';
-import { ConfirmDialog } from './components/modals/ConfirmDialog';
+import { useUndo, dieLabel } from './hooks/useUndo';
 import { ShareModal } from './components/modals/ShareModal';
 import { StatsModal } from './components/modals/StatsModal';
 
@@ -35,8 +36,9 @@ function App() {
     rpgMode, toggleRpgMode, rollAdvantage, setRollAdvantage,
     targetHighlight, setTargetHighlight,
     addDice, removeDice, updateDice, toggleHold, toggleHoldAll,
-    clearAllDice, rollDice, clearHistory, toast, showToast
+    clearAllDice, rollDice, clearHistory, toast, showToast, insertDiceAt, restoreDice
   } = useDiceState();
+  const { offer: undoOffer, offerUndo, runUndo } = useUndo();
 
   const containerRef = useRef<HTMLDivElement>(null);
   // A search landing page opens with its own dice; null on the home page
@@ -49,7 +51,6 @@ function App() {
 
   const [savePromptOpen, setSavePromptOpen] = useState(false);
   const [saveName, setSaveName] = useState('');
-  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [shareFallbackUrl, setShareFallbackUrl] = useState<string | null>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
@@ -93,6 +94,11 @@ function App() {
   useEffect(() => {
     localStorage.setItem('soundEnabled', String(soundEnabled));
   }, [soundEnabled]);
+
+  const [shakeEnabled, setShakeEnabled] = useState(() => localStorage.getItem('shakeToRoll') === 'true');
+  useEffect(() => {
+    localStorage.setItem('shakeToRoll', String(shakeEnabled));
+  }, [shakeEnabled]);
 
   const [telemetryState, setTelemetryState] = useState(() => localStorage.getItem('telemetryEnabled') !== 'false');
 
@@ -265,20 +271,27 @@ function App() {
     '--dice-gap': `${dynamicGap}px`
   } as React.CSSProperties;
 
+  // The typed name stays until it is saved or cleared, so tapping away loses nothing
   const handleSave = () => {
-    setSaveName('');
     setSavePromptOpen(true);
     setMenuOpen(false);
   };
 
-  const executeSave = () => {
-    if (saveName.trim()) {
-      saveConfig(saveName.trim(), diceList);
-      // The save's name is the user's own text, so only the dice count goes to analytics
-      trackEvent('preset_saved', { diceCount: diceList.length });
-      showToast('Saved!');
-      setSavePromptOpen(false);
-    }
+  const userSaveNames = Object.keys(savedConfigs).filter(n => n !== 'systemAutosave');
+
+  const executeSave = (mode: 'new' | 'keepBoth' | 'replace') => {
+    const typed = saveName.trim();
+    if (!typed) return;
+    // A taken name is never overwritten without "Replace it"
+    const name = mode === 'keepBoth' || (mode === 'new' && userSaveNames.includes(typed))
+      ? nextFreeSaveName(typed, userSaveNames)
+      : typed;
+    saveConfig(name, diceList);
+    // The save's name is the user's own text, so only the dice count goes to analytics
+    trackEvent('preset_saved', { diceCount: diceList.length });
+    showToast(name === typed ? (mode === 'replace' ? `Replaced ${name}` : 'Saved!') : `Saved as ${name}`);
+    setSaveName('');
+    setSavePromptOpen(false);
   };
 
   const handleLoadSet = (config: Partial<DiceData>[], setName?: string) => {
@@ -303,12 +316,11 @@ function App() {
     setMenuOpen(false);
   };
 
+  // Clear All needs no confirm: Undo brings every die back for five seconds
   const handleDeleteAll = () => {
-    setConfirmDeleteOpen(true);
     setMenuOpen(false);
-  };
-
-  const executeDeleteAll = () => {
+    if (diceList.length === 0) return;
+    const removed = diceList;
     clearAllDice();
     try {
       const stored = localStorage.getItem('diceConfigs');
@@ -320,7 +332,21 @@ function App() {
     } catch (e) {
       console.error(e);
     }
-    setConfirmDeleteOpen(false);
+    offerUndo(`Cleared ${removed.length} ${removed.length === 1 ? 'die' : 'dice'}`, () => restoreDice(removed));
+  };
+
+  const handleRemoveDie = (id: string) => {
+    const index = diceList.findIndex(d => d.id === id);
+    if (index < 0) return;
+    const die = diceList[index];
+    removeDice(id);
+    offerUndo(`Removed ${dieLabel(die)}`, () => insertDiceAt(die, index));
+  };
+
+  const handleDeleteSave = (name: string) => {
+    const saved = savedConfigs[name];
+    deleteConfig(name);
+    if (saved) offerUndo(`Deleted ${name}`, () => saveConfig(name, saved.config));
   };
 
   const handleShare = () => {
@@ -461,6 +487,62 @@ function App() {
     setTelemetryEnabled(nextState);
   };
 
+  const handleRoll = () => {
+    const hasUnheldDice = diceList.some(d => !d.held);
+    rollDice(({ total, diceCount }) => {
+      // Fires when the roll resolves, so the actual total reaches analytics
+      setHasRolledThisSession(true);
+      if (diceCount > 0) {
+        trackEvent('roll_dice', { diceCount, sum: total, modifier, rpgMode, rollAdvantage });
+      }
+    });
+
+    if (hasUnheldDice && diceList.length > 0 && soundEnabled) {
+      playRollSequence(soundTimersRef);
+    }
+  };
+
+  // Shake to roll: the latest roll handler, read by the motion listener
+  const handleRollRef = useRef(handleRoll);
+  const modalOpenRef = useRef(modalOpen);
+  useEffect(() => {
+    handleRollRef.current = handleRoll;
+    modalOpenRef.current = modalOpen;
+  });
+
+  useEffect(() => {
+    if (!shakeEnabled || typeof window === 'undefined' || !('DeviceMotionEvent' in window)) return;
+    const isShake = createShakeDetector();
+    const onMotion = (e: DeviceMotionEvent) => {
+      const sample = sampleFromEvent(e);
+      // A shake rolls only from the main screen, never under an open dialog
+      if (sample && isShake(sample) && !modalOpenRef.current) {
+        handleRollRef.current();
+        trackEvent('shake_roll');
+      }
+    };
+    window.addEventListener('devicemotion', onMotion);
+    return () => window.removeEventListener('devicemotion', onMotion);
+  }, [shakeEnabled]);
+
+  const handleToggleShake = async () => {
+    if (shakeEnabled) {
+      setShakeEnabled(false);
+      trackEvent('shake_toggled', { enabled: false });
+      return;
+    }
+    const permission = await requestMotionPermission();
+    if (permission === 'granted') {
+      setShakeEnabled(true);
+      trackEvent('shake_toggled', { enabled: true });
+      showToast('Shake to roll is on. Shake your phone to roll.');
+    } else if (permission === 'denied') {
+      showToast('Motion access was turned down, so shake to roll stays off.');
+    } else {
+      showToast("This device can't sense shaking, so shake to roll stays off.");
+    }
+  };
+
   return (
     <div className={styles.app} style={{ paddingBottom: '120px' }}>
       {/* The UI is all dice and icons, so the document had no heading at all —
@@ -493,7 +575,7 @@ function App() {
             isRevealed={revealedDiceId === dice.id}
             onReveal={() => setRevealedDiceId(dice.id)}
             onToggleHold={toggleHold}
-            onRemove={removeDice}
+            onRemove={handleRemoveDie}
             onOpenSettings={setEditingDiceId}
             onClone={handleAddDice}
             onRollOne={isRolling ? undefined : handleRollOne}
@@ -502,6 +584,21 @@ function App() {
           />
         ))}
       </div>
+
+      {/* With no dice, the middle of the screen says what to do next */}
+      {diceList.length === 0 && (
+        <div className={styles.emptyState}>
+          <p className={styles.emptyTitle}>No dice yet</p>
+          <div className={styles.emptyActions}>
+            <button className="md-button md-button-filled" onClick={() => handleAddDice()}>
+              <Plus size={18} aria-hidden="true" /> Add die
+            </button>
+            <button className="md-button md-button-surface" onClick={() => setModalOpen('sets')}>
+              <Dice6 size={18} aria-hidden="true" /> Games
+            </button>
+          </div>
+        </div>
+      )}
 
       <SidebarMenu
         isOpen={menuOpen}
@@ -517,27 +614,13 @@ function App() {
         onSave={handleSave}
         onShare={handleShare}
         onSetDefault={handleSetDefault}
-        onLoad={() => setModalOpen('sets')}
         rpgMode={rpgMode}
         onToggleRpgMode={toggleRpgMode}
       />
 
       <ActionBar
         onAdd={handleAddDice}
-        onRoll={() => {
-          const hasUnheldDice = diceList.some(d => !d.held);
-          rollDice(({ total, diceCount }) => {
-            // Fires when the roll resolves, so the actual total reaches analytics
-            setHasRolledThisSession(true);
-            if (diceCount > 0) {
-              trackEvent('roll_dice', { diceCount, sum: total, modifier, rpgMode, rollAdvantage });
-            }
-          });
-
-          if (hasUnheldDice && diceList.length > 0 && soundEnabled) {
-            playRollSequence(soundTimersRef);
-          }
-        }}
+        onRoll={handleRoll}
         onHoldAll={toggleHoldAll}
         allHeld={allHeld}
         totalVisible={totalVisible}
@@ -574,7 +657,7 @@ function App() {
         onClose={() => setModalOpen(null)} 
         savedConfigs={savedConfigs}
         onLoadSet={handleLoadSet}
-        onDeleteConfig={deleteConfig}
+        onDeleteConfig={handleDeleteSave}
         onExportBackup={handleExportData}
         onImportBackup={handleImportData}
       />
@@ -596,6 +679,8 @@ function App() {
         onToggleTelemetry={handleToggleTelemetry}
         diceScale={diceScale}
         onChangeDiceScale={setDiceScale}
+        shakeEnabled={shakeEnabled}
+        onToggleShake={handleToggleShake}
       />
 
       <SaveDialog 
@@ -603,13 +688,8 @@ function App() {
         onClose={() => setSavePromptOpen(false)} 
         saveName={saveName}
         onChangeSaveName={setSaveName}
+        existingNames={userSaveNames}
         onSave={executeSave}
-      />
-
-      <ConfirmDialog 
-        isOpen={confirmDeleteOpen} 
-        onClose={() => setConfirmDeleteOpen(false)} 
-        onConfirm={executeDeleteAll}
       />
 
       <ShareModal
@@ -623,7 +703,12 @@ function App() {
       />
 
       {/* Toast Notification */}
-      {toast && (
+      {undoOffer ? (
+        <div className={`${styles.toast} ${styles.undoToast}`} role="status">
+          <span>{undoOffer.message}</span>
+          <button className={styles.undoButton} onClick={runUndo}>Undo</button>
+        </div>
+      ) : toast && (
         <div className={styles.toast}>
           {toast}
         </div>
@@ -641,7 +726,7 @@ function App() {
           isOpen={!!editingDiceId}
           onClose={() => setEditingDiceId(null)}
           onUpdate={updateDice}
-          onRemove={removeDice}
+          onRemove={handleRemoveDie}
           onClone={handleAddDice}
           allDice={diceList}
         />
