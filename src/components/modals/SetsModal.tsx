@@ -48,8 +48,8 @@ export const SetsModal: React.FC<SetsModalProps> = ({
                   <button className={styles.saveCardBtn} onClick={() => onLoadSet(config.config, config.name)}>
                     {config.name}
                   </button>
-                  <button className="md-icon-button" onClick={(e) => { e.stopPropagation(); onDeleteConfig(config.name); }}>
-                    <Trash2 size={16} color="var(--md-sys-color-error)" />
+                  <button className="md-icon-button" onClick={(e) => { e.stopPropagation(); onDeleteConfig(config.name); }} aria-label={`Delete ${config.name}`} title={`Delete ${config.name}`}>
+                    <Trash2 size={16} color="var(--md-sys-color-error)" aria-hidden="true" />
                   </button>
                 </div>
               ))}

@@ -20,9 +20,12 @@ export const SaveDialog: React.FC<SaveDialogProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Save Game">
       <div className={modalStyles.formGroup}>
-        <label className={modalStyles.formLabel}>Enter a name for this game:</label>
+        <label className={modalStyles.formLabel} htmlFor="save-game-name">Enter a name for this game:</label>
         <input 
+          id="save-game-name"
           autoFocus
+          autoComplete="off"
+          enterKeyHint="done"
           type="text" 
           value={saveName} 
           onChange={(e) => onChangeSaveName(e.target.value)}
@@ -31,7 +34,7 @@ export const SaveDialog: React.FC<SaveDialogProps> = ({
         />
         <div className={modalStyles.buttonRow}>
           <button className="md-button md-button-surface" onClick={onClose}>Cancel</button>
-          <button className="md-button md-button-primary" onClick={onSave} disabled={!saveName.trim()}>Save</button>
+          <button className="md-button md-button-filled" onClick={onSave} disabled={!saveName.trim()}>Save</button>
         </div>
       </div>
     </Modal>
