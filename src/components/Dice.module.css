@@ -100,6 +100,13 @@
   transform: scale(1.1);
 }
 
+.holdIcon,
+.unlockIcon {
+  border: none;
+  cursor: pointer;
+  font: inherit;
+}
+
 .holdIcon {
   top: calc(var(--dice-size) * -0.04);
   right: calc(var(--dice-size) * -0.04);
@@ -184,7 +191,32 @@
   pointer-events: auto;
 }
 
+/* Faint "Tap again to hold" cue, only where taps (not hover) select a die */
+.holdHint {
+  display: none;
+}
+
 @media (hover: none) {
+  .holdHint {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: var(--shape-large, 16px);
+    background-color: var(--md-sys-color-surface-variant);
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0.85;
+    pointer-events: none;
+  }
+
   .dice.revealed .unlockIcon,
   .dice.revealed .settingsBtn,
   .dice.revealed .removeBtn,

@@ -1,4 +1,4 @@
-Next: six Daren-approved changes (saves first, shake to roll, undo, safer saving, empty screen, target check) in one pull request (2026-10-22); landing.
+Next: Tap again to hold built on its branch (2026-10-22); waits on Daren's tap to push, since a Dice Roller merge publishes the site.
 
 # State
 

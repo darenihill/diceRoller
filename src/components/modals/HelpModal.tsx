@@ -13,7 +13,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
         <p>Welcome to <strong>Dice Roller</strong>! Here is how to use the available features:</p>
         <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <li><strong>Add / Roll Dice:</strong> Use the <code>+</code> button at the bottom to add dice, and the main button to roll all unheld dice.</li>
-          <li><strong>Hold individual dice:</strong> Simply click/tap any die to hold or release it. Held dice stay locked across rolls.</li>
+          <li><strong>Hold individual dice:</strong> On a phone, tap a die to select it, then tap it again to hold or release it (a mouse click holds at once). Held dice stay locked across rolls.</li>
           <li><strong>Lock All:</strong> Toggle the Lock icon in the action bar to instantly hold or release all dice at once.</li>
           <li><strong>Custom Faces:</strong> Click the gear icon on a die to open settings. You can add custom text, special icons and pictures. Tap a face, then tap a colour to colour it, or tap "Colour every face differently" for a die that rolls a colour. Pictures stay on your device and go into backups; share links show the face's text instead.</li>
           <li><strong>Games & Presets:</strong> Quickly load predefined configurations like <em>Cities & Knights</em> or <em>That's Pretty Clever</em>, or save and load your own custom games!</li>

@@ -5,6 +5,21 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-10-22~~ Tapping a die doesn't hold it (Daren 2026-10-22, Build):
+  "The first tap on a die would show its small buttons without holding it, and
+  a faint lock with the words 'Tap again to hold' would appear in the middle of
+  the die. A second tap holds it: the lock turns gold, as today. After someone
+  has held a die this way three times the words drop and only the faint lock
+  shows, so regular players aren't nagged. The corner lock button keeps working
+  too."
+  1. ~~Done 2026-10-22~~ On a phone the first tap selects the die and shows
+     "Tap again to hold"; a second tap holds. A mouse click still holds at once.
+     Done when a unit test and a phone-emulated browser tap check both pass.
+  2. ~~Done 2026-10-22~~ The words drop after three tap-holds; the faint lock
+     stays. Done when a unit test counts three holds.
+  3. ~~Done 2026-10-22~~ The corner lock is a real button that holds or releases,
+     and Help says to tap twice. Done when a unit test taps the corner lock.
+
 - ~~Done 2026-10-22~~ Your saves first in Games (Daren 2026-10-22, Build): "Games
   & Saves would list Your Saves first, since a returning player usually wants
   their own set. The menu would keep one Games entry instead of Games plus
