@@ -128,6 +128,23 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
             </button>
           </div>
 
+          {/* Shake to Roll Toggle: off by default because iPhone asks for motion access */}
+          <div className={modalStyles.toggleRow}>
+            <div className={modalStyles.toggleLabelCol}>
+              <span className={modalStyles.toggleTitle}>Shake to Roll</span>
+              <span className={modalStyles.toggleDesc}>Shake your phone to roll, just like the Roll button</span>
+            </div>
+            <button
+              className="md-icon-button"
+              onClick={onToggleShake}
+              title={shakeEnabled ? "Turn off shake to roll" : "Turn on shake to roll"}
+              aria-label="Shake to roll"
+              aria-pressed={shakeEnabled}
+            >
+              <Smartphone size={20} />
+            </button>
+          </div>
+
           {/* Target Total Highlight: a gentle note names any part that isn't a whole number */}
           <div>
             <div className={modalStyles.toggleRow}>
