@@ -5,6 +5,18 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
+  Build): "The big number stays the real total, and the math sits beside it in
+  brackets: 9 (7+2), so the dice and the modifier are both visible and nobody
+  adds the +2 twice. A minus modifier reads 5 (7−2). Before any roll the button
+  keeps 'Roll +2' as today."
+  1. ~~Done 2026-10-22~~ After a roll with a modifier the Roll button reads
+     9 (7+2), or 5 (7−2) for a minus; before a roll it still reads Roll +2.
+     Done when unit tests cover both signs and a browser roll shows the brackets.
+  2. ~~Done 2026-10-22~~ The math uses the modifier the roll counted, not one
+     changed afterwards, and screen readers hear "Rolled 9: 7 plus 2". Done when
+     a unit test rolls with +2 and reads the stored modifier and spoken text.
+
 - ~~Done 2026-10-22~~ Tapping a die doesn't hold it (Daren 2026-10-22, Build):
   "The first tap on a die would show its small buttons without holding it, and
   a faint lock with the words 'Tap again to hold' would appear in the middle of

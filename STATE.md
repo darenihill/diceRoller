@@ -1,4 +1,4 @@
-Next: Tap again to hold built on its branch (2026-10-22); waits on Daren's tap to push, since a Dice Roller merge publishes the site.
+Next: total with its math (9 (7+2)) built on its branch (2026-10-22); waits on Daren's tap to push, since a Dice Roller merge publishes the site.
 
 # State
 
