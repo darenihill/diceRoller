@@ -1,4 +1,4 @@
-Next: Your saves first in Games built on its branch (2026-10-22); waits on Daren's tap to push, since a Dice Roller merge publishes the site.
+Next: Shake to roll built on its branch (2026-10-22); waits on Daren's tap to push, since a Dice Roller merge publishes the site.
 
 # State
 

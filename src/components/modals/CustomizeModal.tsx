@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from '../Modal';
-import { Volume2, VolumeX, BarChart2 } from 'lucide-react';
+import { Volume2, VolumeX, BarChart2, Smartphone } from 'lucide-react';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
 import { DICE_SCALE_DEFAULT, DICE_SCALE_MAX, DICE_SCALE_MIN } from '../../utils/diceUtils';
@@ -21,6 +21,8 @@ interface CustomizeModalProps {
   onToggleTelemetry: () => void;
   diceScale: number;
   onChangeDiceScale: (scale: number) => void;
+  shakeEnabled: boolean;
+  onToggleShake: () => void;
 }
 
 export const CustomizeModal: React.FC<CustomizeModalProps> = ({
@@ -36,6 +38,8 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
   onToggleTelemetry,
   diceScale,
   onChangeDiceScale,
+  shakeEnabled,
+  onToggleShake,
 }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Customize App">
@@ -119,6 +123,23 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
               aria-pressed={soundEnabled}
             >
               {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+            </button>
+          </div>
+
+          {/* Shake to Roll Toggle: off by default because iPhone asks for motion access */}
+          <div className={modalStyles.toggleRow}>
+            <div className={modalStyles.toggleLabelCol}>
+              <span className={modalStyles.toggleTitle}>Shake to Roll</span>
+              <span className={modalStyles.toggleDesc}>Shake your phone to roll, just like the Roll button</span>
+            </div>
+            <button
+              className="md-icon-button"
+              onClick={onToggleShake}
+              title={shakeEnabled ? "Turn off shake to roll" : "Turn on shake to roll"}
+              aria-label="Shake to roll"
+              aria-pressed={shakeEnabled}
+            >
+              <Smartphone size={20} />
             </button>
           </div>
 
