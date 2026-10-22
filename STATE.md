@@ -1,4 +1,4 @@
-Next: standard-components polish pass done (light-theme text colours); pull request waits on a second read, then Daren's tap to merge since a merge publishes.
+Next: forms and input polish pass (2026-10-22) in progress: keyboard types, labels and the faces count field.
 
 # State
 
