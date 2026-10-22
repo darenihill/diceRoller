@@ -8,6 +8,7 @@ import { parseFaceContent, FACE_ICON_PREFIX, getContrastColor } from '../utils/d
 import { useFaceImage } from '../utils/faceImages';
 import { MAX_SHAPED_FACE_LENGTH } from '../utils/constants';
 import { PolyhedralWireframe } from './PolyhedralWireframe';
+import { holdHintShowsWords, recordTapHold } from '../utils/holdHint';
 
 interface DiceProps {
   dice: DiceData;
@@ -28,6 +29,11 @@ const DiceComponent: React.FC<DiceProps> = ({
   dice, isRolling, isRevealed, onReveal, onToggleHold, onRemove, onOpenSettings, onClone, onRollOne, rollingAlone, rpgMode 
 }) => {
   const diceRef = useRef<HTMLDivElement>(null);
+  // On touch, the first tap only selects the die (shows its buttons); a tap on an
+  // already-selected die holds or releases it. A mouse click holds at once, as before,
+  // since hovering already shows the buttons.
+  const pointerTypeRef = useRef<string>('mouse');
+  const wasRevealedRef = useRef(false);
 
   const [tempValue, setTempValue] = useState<number | null>(null);
   const [tempFaceIndex, setTempFaceIndex] = useState<number | null>(null);
@@ -53,6 +59,7 @@ const DiceComponent: React.FC<DiceProps> = ({
   }, []);
 
   const rollingNow = isRolling && (!dice.held || !!rollingAlone);
+  const showHoldWords = holdHintShowsWords();
 
   useEffect(() => {
     if (!rollingNow) return;
@@ -173,9 +180,20 @@ const DiceComponent: React.FC<DiceProps> = ({
       role="button"
       tabIndex={0}
       aria-label={`${dice.name || `d${dice.faces}`} showing ${faceContent.startsWith(FACE_ICON_PREFIX) ? faceContent.replace(FACE_ICON_PREFIX, '') : faceContent}${dice.held ? ', held' : ''}. Press to ${dice.held ? 'release' : 'hold'}.`}
+      onPointerDown={(e) => {
+        pointerTypeRef.current = e.pointerType || 'mouse';
+        wasRevealedRef.current = isRevealed;
+        onReveal();
+      }}
       onClick={(e) => {
         if ((e.target as HTMLElement).closest('button')) return;
         onReveal();
+        if (pointerTypeRef.current === 'mouse') {
+          onToggleHold(dice.id);
+          return;
+        }
+        if (!wasRevealedRef.current) return;
+        if (!dice.held) recordTapHold();
         onToggleHold(dice.id);
       }}
       onKeyDown={(e) => {
@@ -186,7 +204,6 @@ const DiceComponent: React.FC<DiceProps> = ({
           onToggleHold(dice.id);
         }
       }}
-      onTouchStart={() => onReveal()}
       layout
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
@@ -235,11 +252,15 @@ const DiceComponent: React.FC<DiceProps> = ({
         </div>
       )}
 
-      <motion.div
+      <motion.button
+        type="button"
         initial={{ rotate: 0 }}
         animate={lockControls}
         style={{ color: dice.held ? 'var(--color-gold)' : '#FFFFFF' }}
         className={`${styles.actionBtn} ${dice.held ? styles.holdIcon : styles.unlockIcon}`}
+        onClick={(e) => { e.stopPropagation(); onToggleHold(dice.id); }}
+        aria-label={dice.held ? 'Release die' : 'Hold die'}
+        title={dice.held ? 'Release die' : 'Hold die'}
       >
         <div style={{ position: 'relative', width: 20, height: 20 }}>
           <motion.div 
@@ -257,7 +278,15 @@ const DiceComponent: React.FC<DiceProps> = ({
             <Unlock size={20} strokeWidth={2.5} color="currentColor" />
           </motion.div>
         </div>
-      </motion.div>
+      </motion.button>
+
+      {/* The first tap on a phone selects the die; this says what a second tap does */}
+      {isRevealed && !dice.held && !rollingNow && (
+        <div className={styles.holdHint} aria-hidden="true">
+          <Lock size={18} strokeWidth={2.5} />
+          {showHoldWords && <span>Tap again to hold</span>}
+        </div>
+      )}
 
       {/* Settings Button (Bottom-Right) */}
       <button className={`${styles.actionBtn} ${styles.settingsBtn}`} onClick={(e) => {
