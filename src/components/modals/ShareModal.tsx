@@ -20,7 +20,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ url, onClose }) => {
           onClick={(e) => (e.target as HTMLInputElement).select()}
         />
         <div className={modalStyles.buttonRow}>
-          <button className="md-button md-button-primary" onClick={onClose}>Done</button>
+          <button className="md-button md-button-filled" onClick={onClose}>Done</button>
         </div>
       </div>
     </Modal>

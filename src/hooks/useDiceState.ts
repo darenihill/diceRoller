@@ -119,6 +119,8 @@ export const useDiceState = () => {
   }, []);
 
   const rollDice = useCallback((onComplete?: (summary: RollSummary) => void, onlyId?: string) => {
+    // With no dice there is nothing to roll; a modifier alone used to log a phantom total
+    if (diceList.length === 0) return;
     setIsRolling(true);
     setRollingId(onlyId ?? null);
     

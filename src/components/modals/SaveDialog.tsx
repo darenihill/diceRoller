@@ -31,7 +31,7 @@ export const SaveDialog: React.FC<SaveDialogProps> = ({
         />
         <div className={modalStyles.buttonRow}>
           <button className="md-button md-button-surface" onClick={onClose}>Cancel</button>
-          <button className="md-button md-button-primary" onClick={onSave} disabled={!saveName.trim()}>Save</button>
+          <button className="md-button md-button-filled" onClick={onSave} disabled={!saveName.trim()}>Save</button>
         </div>
       </div>
     </Modal>

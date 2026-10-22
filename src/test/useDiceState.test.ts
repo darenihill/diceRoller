@@ -322,4 +322,18 @@ describe('rollDice for one die', () => {
     act(() => vi.advanceTimersByTime(ROLL_DURATION_MS));
     expect(result.current.rollHistory[0].single).toBeUndefined();
   });
+
+  it('does nothing when there are no dice, even with a modifier', () => {
+    const { result } = renderHook(() => useDiceState());
+    act(() => {
+      if (!result.current.rpgMode) result.current.toggleRpgMode();
+      result.current.setModifier(2);
+    });
+    const onComplete = vi.fn();
+    act(() => result.current.rollDice(onComplete));
+    act(() => vi.advanceTimersByTime(ROLL_DURATION_MS));
+    expect(result.current.rollHistory).toHaveLength(0);
+    expect(result.current.isRolling).toBe(false);
+    expect(onComplete).not.toHaveBeenCalled();
+  });
 });
