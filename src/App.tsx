@@ -13,7 +13,7 @@ import { playRollSequence } from './utils/soundEffects';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { MAX_HISTORY_LENGTH } from './utils/constants';
 import { dicePresets } from './utils/presets';
-import { currentSetName, diceSignature, readShareLink, type LoadedSet } from './utils/setName';
+import { currentSetName, diceSignature, readShareLink, nextFreeSaveName, type LoadedSet } from './utils/setName';
 import { readLandingStart, readLandingAbout } from './utils/landing';
 import { Info } from 'lucide-react';
 import { Modal } from './components/Modal';
@@ -265,20 +265,27 @@ function App() {
     '--dice-gap': `${dynamicGap}px`
   } as React.CSSProperties;
 
+  // The typed name stays until it is saved or cleared, so tapping away loses nothing
   const handleSave = () => {
-    setSaveName('');
     setSavePromptOpen(true);
     setMenuOpen(false);
   };
 
-  const executeSave = () => {
-    if (saveName.trim()) {
-      saveConfig(saveName.trim(), diceList);
-      // The save's name is the user's own text, so only the dice count goes to analytics
-      trackEvent('preset_saved', { diceCount: diceList.length });
-      showToast('Saved!');
-      setSavePromptOpen(false);
-    }
+  const userSaveNames = Object.keys(savedConfigs).filter(n => n !== 'systemAutosave');
+
+  const executeSave = (mode: 'new' | 'keepBoth' | 'replace') => {
+    const typed = saveName.trim();
+    if (!typed) return;
+    // A taken name is never overwritten without "Replace it"
+    const name = mode === 'keepBoth' || (mode === 'new' && userSaveNames.includes(typed))
+      ? nextFreeSaveName(typed, userSaveNames)
+      : typed;
+    saveConfig(name, diceList);
+    // The save's name is the user's own text, so only the dice count goes to analytics
+    trackEvent('preset_saved', { diceCount: diceList.length });
+    showToast(name === typed ? (mode === 'replace' ? `Replaced ${name}` : 'Saved!') : `Saved as ${name}`);
+    setSaveName('');
+    setSavePromptOpen(false);
   };
 
   const handleLoadSet = (config: Partial<DiceData>[], setName?: string) => {
@@ -603,6 +610,7 @@ function App() {
         onClose={() => setSavePromptOpen(false)} 
         saveName={saveName}
         onChangeSaveName={setSaveName}
+        existingNames={userSaveNames}
         onSave={executeSave}
       />
 

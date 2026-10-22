@@ -47,9 +47,15 @@
 
 .buttonRow {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 8px;
   margin-top: 8px;
+}
+
+/* Two-word button labels stay on one line; the row wraps instead */
+.buttonRow > button {
+  white-space: nowrap;
 }
 
 .toggleRow {

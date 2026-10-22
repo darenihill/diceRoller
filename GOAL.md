@@ -5,6 +5,16 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-10-22~~ Safer saving (Daren 2026-10-22, Build): "Save Game would
+  remember what you typed until you save or clear it. If a save with that name
+  exists, the dialog says so and offers Keep both (adds '(2)') or Replace it."
+  1. ~~Done 2026-10-22~~ The typed name comes back after tapping away, and clears
+     once saved. Done when a phone-size browser check types a name, cancels,
+     reopens and finds it, then finds it empty after saving.
+  2. ~~Done 2026-10-22~~ A taken name shows a note with Keep both and Replace it,
+     and Enter never overwrites. Done when unit tests cover the note, both
+     buttons, Enter, and the "(2)" naming.
+
 - One highlight colour per meaning (Daren 2026-10-17, Build): "Every selected
   or focused thing (a theme card, a face, a colour swatch, the focused die)
   would use the theme's own accent colour, the same one the Roll button uses.

@@ -1,4 +1,4 @@
-Next: four-lens review, forms polish and goal check pushed with Daren's OK (2026-10-22); landing.
+Next: Safer saving built on its branch (2026-10-22); waits on Daren's tap to push, since a Dice Roller merge publishes the site.
 
 # State
 
