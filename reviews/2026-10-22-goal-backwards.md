@@ -9,7 +9,7 @@ sentences. Does it describe the current goal, or a different one?
 
 > **Dice Roller: the dice your game actually needs, free in your browser.**
 > Open customdiceroller.com and roll in one tap, or load Catan, D&D, Zombie
-> Dice and nine more games with their dice already set up. Make dice that
+> Dice and other games with their dice already set up. Make dice that
 > don't exist anywhere else: your own words, colours and pictures on any
 > face, symbols that score points, any number of sides. Mistakes are easy to
 > take back, your saved games come first, and a phone's back button behaves
