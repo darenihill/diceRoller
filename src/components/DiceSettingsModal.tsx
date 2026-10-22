@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useId } from 'react';
 import type { DiceData } from '../types';
 import { Modal } from './Modal';
 import { COLORS, COLOR_NAMES, FACE_ICON_PREFIX, parseFaceContent, buildFace, faceNumericValue, getContrastColor, colourEveryFace } from '../utils/diceUtils';
@@ -23,6 +23,9 @@ interface DiceSettingsModalProps {
 
 export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOpen, onClose, onUpdate, onRemove, onClone, allDice }) => {
   const [customInput, setCustomInput] = useState('');
+  // What is typed in the faces box; null shows the die's count. Lets the box be cleared and retyped.
+  const [facesDraft, setFacesDraft] = useState<string | null>(null);
+  const fieldId = useId();
   const [showAllIcons, setShowAllIcons] = useState(false);
   const [activeColorPicker, setActiveColorPicker] = useState<{ type: 'base' | 'custom'; index?: number; top: number } | null>(null);
   /** The face the colour row paints: tap a face, then tap a colour */
@@ -164,9 +167,13 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
         <div className={styles.sectionCard}>
           <h3 className={styles.sectionTitle}>General Settings</h3>
           <div style={{ marginBottom: 16 }}>
-            <label className={styles.label}>Name (Optional)</label>
+            <label className={styles.label} htmlFor={`${fieldId}-name`}>Name (Optional)</label>
             <input 
+              id={`${fieldId}-name`}
               type="text" 
+              autoComplete="off"
+              enterKeyHint="done"
+              onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
               value={dice.name || ''} 
               onChange={(e) => onUpdate(dice.id, { name: e.target.value })}
               placeholder="e.g. Player 1"
@@ -188,15 +195,22 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
             </div>
 
             <div>
-              <label className={styles.label}>Standard Faces</label>
+              <label className={styles.label} htmlFor={`${fieldId}-faces`}>Standard Faces</label>
               <div className={styles.stepperRow}>
                 <button className={styles.stepperBtn} onClick={() => setFaces(dice.faces - 1)} title="Decrease faces">
                   <Minus size={18} strokeWidth={2.5} />
                 </button>
                 <input 
+                  id={`${fieldId}-faces`}
                   type="number" 
-                  value={dice.faces} 
-                  onChange={(e) => setFaces(parseInt(e.target.value))}
+                  inputMode="numeric"
+                  enterKeyHint="done"
+                  min={1}
+                  value={facesDraft ?? dice.faces} 
+                  onFocus={(e) => e.currentTarget.select()}
+                  onChange={(e) => { setFacesDraft(e.target.value); setFaces(parseInt(e.target.value, 10)); }}
+                  onBlur={() => setFacesDraft(null)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
                   className={styles.stepperInput}
                 />
                 <button className={styles.stepperBtn} onClick={() => setFaces(dice.faces + 1)} title="Increase faces">
@@ -270,6 +284,8 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                       <input
                         type="number"
                         inputMode="numeric"
+                        enterKeyHint="done"
+                        onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
                         value={parsed.value ?? ''}
                         placeholder={String(faceNumericValue(f))}
                         onChange={(e) => updateCustomFaceValue(i, e.target.value)}
@@ -364,10 +380,12 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               onChange={(e) => setCustomInput(e.target.value)}
               onKeyDown={(e) => { if(e.key === 'Enter') addCustomFace(customInput); }}
               placeholder="Add custom text"
+              aria-label="Custom face text"
+              autoComplete="off"
               className={styles.inputField}
               style={{ flex: 1, minWidth: 0 }}
             />
-            <button className={`md-button md-button-filled ${styles.addFaceBtn}`} onClick={() => addCustomFace(customInput)}>
+            <button className={`md-button md-button-filled ${styles.addFaceBtn}`} onClick={() => addCustomFace(customInput)} aria-label="Add face" title="Add face">
               <Plus size={20} strokeWidth={2.5} />
             </button>
           </div>
