@@ -55,6 +55,16 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   1. ~~Done 2026-10-22~~ With no dice, "No dice yet" with Add die and Games shows
      in the middle; it goes once a die is added. Done when a unit test clears the
      dice, finds both buttons, adds a die and finds the line gone.
+- ~~Done 2026-10-22~~ Check target numbers as you type (Daren 2026-10-22,
+  Build): "While you type in Target Highlight, any part that isn't a whole
+  number gets a gentle note under the box, and the box edge turns the theme's
+  error colour. Nothing is blocked or changed: the numbers that do read still
+  celebrate as today. The note goes away as soon as every part is a number."
+  1. ~~Done 2026-10-22~~ A part that isn't a whole number turns the box edge to
+     the error colour and shows one line naming it and what still counts. Done
+     when unit tests cover the note, its wording and the box's invalid mark.
+  2. ~~Done 2026-10-22~~ Rolls celebrate exactly as before. Done when a unit test
+     shows the note counts what a roll counts, and the roll code is unchanged.
 
 - One highlight colour per meaning (Daren 2026-10-17, Build): "Every selected
   or focused thing (a theme card, a face, a colour swatch, the focused die)

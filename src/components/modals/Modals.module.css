@@ -45,6 +45,19 @@
   font-size: 14px;
 }
 
+.formInputInvalid,
+.formInputInvalid:focus {
+  border-color: var(--md-sys-color-error);
+}
+
+.fieldNote {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--md-sys-color-on-surface-variant);
+  text-align: right;
+}
+
 .buttonRow {
   display: flex;
   flex-wrap: wrap;
