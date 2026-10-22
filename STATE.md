@@ -1,4 +1,4 @@
-Next: Safer saving built on its branch (2026-10-22); waits on Daren's tap to push, since a Dice Roller merge publishes the site.
+Next: Empty screen next step built on its branch (2026-10-22); waits on Daren's tap to push, since a Dice Roller merge publishes the site.
 
 # State
 
