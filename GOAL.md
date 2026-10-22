@@ -64,6 +64,11 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   Each opens the app with its dice loaded and has 150-300 words below the
   dice. Built locally 2026-10-09; next, check Search Console queries to tune
   the titles.
+- Fixes from the 2026-10-22 four-lens review (reviews/2026-10-22-stories.md):
+  the Save Game and Share Link buttons show as filled buttons; the bin on a
+  saved game is named for screen readers; rolling with no dice logs nothing.
+  Done when a unit test shows an empty roll leaves history empty and the Save
+  button has a fill at 390 px. ~~Done 2026-10-22~~
 - The phone's back gesture closes the open dialog or menu first, instead of
   leaving the app (trunk test, reviews/2026-10-07-trunk-test.md, finding 4).
 - Donations cover the domain: count Donate taps (a donate_clicked event, no
