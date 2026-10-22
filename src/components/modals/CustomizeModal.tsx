@@ -133,6 +133,9 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
               value={targetHighlight}
               onChange={(e) => onChangeTargetHighlight(e.target.value)}
               placeholder="e.g. 7, 11"
+              autoComplete="off"
+              enterKeyHint="done"
+              onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
               className={modalStyles.formInput}
               style={{ width: 110, textAlign: 'center' }}
               aria-label="Target totals to highlight, comma-separated"
