@@ -26,7 +26,7 @@ import { SetsModal } from './components/modals/SetsModal';
 import { CustomizeModal } from './components/modals/CustomizeModal';
 import { createShakeDetector, requestMotionPermission, sampleFromEvent } from './utils/shake';
 import { SaveDialog } from './components/modals/SaveDialog';
-import { ConfirmDialog } from './components/modals/ConfirmDialog';
+import { useUndo, dieLabel } from './hooks/useUndo';
 import { ShareModal } from './components/modals/ShareModal';
 import { StatsModal } from './components/modals/StatsModal';
 
@@ -36,8 +36,9 @@ function App() {
     rpgMode, toggleRpgMode, rollAdvantage, setRollAdvantage,
     targetHighlight, setTargetHighlight,
     addDice, removeDice, updateDice, toggleHold, toggleHoldAll,
-    clearAllDice, rollDice, clearHistory, toast, showToast
+    clearAllDice, rollDice, clearHistory, toast, showToast, insertDiceAt, restoreDice
   } = useDiceState();
+  const { offer: undoOffer, offerUndo, runUndo } = useUndo();
 
   const containerRef = useRef<HTMLDivElement>(null);
   // A search landing page opens with its own dice; null on the home page
@@ -50,7 +51,6 @@ function App() {
 
   const [savePromptOpen, setSavePromptOpen] = useState(false);
   const [saveName, setSaveName] = useState('');
-  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [shareFallbackUrl, setShareFallbackUrl] = useState<string | null>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
@@ -309,12 +309,11 @@ function App() {
     setMenuOpen(false);
   };
 
+  // Clear All needs no confirm: Undo brings every die back for five seconds
   const handleDeleteAll = () => {
-    setConfirmDeleteOpen(true);
     setMenuOpen(false);
-  };
-
-  const executeDeleteAll = () => {
+    if (diceList.length === 0) return;
+    const removed = diceList;
     clearAllDice();
     try {
       const stored = localStorage.getItem('diceConfigs');
@@ -326,7 +325,21 @@ function App() {
     } catch (e) {
       console.error(e);
     }
-    setConfirmDeleteOpen(false);
+    offerUndo(`Cleared ${removed.length} ${removed.length === 1 ? 'die' : 'dice'}`, () => restoreDice(removed));
+  };
+
+  const handleRemoveDie = (id: string) => {
+    const index = diceList.findIndex(d => d.id === id);
+    if (index < 0) return;
+    const die = diceList[index];
+    removeDice(id);
+    offerUndo(`Removed ${dieLabel(die)}`, () => insertDiceAt(die, index));
+  };
+
+  const handleDeleteSave = (name: string) => {
+    const saved = savedConfigs[name];
+    deleteConfig(name);
+    if (saved) offerUndo(`Deleted ${name}`, () => saveConfig(name, saved.config));
   };
 
   const handleShare = () => {
@@ -555,7 +568,7 @@ function App() {
             isRevealed={revealedDiceId === dice.id}
             onReveal={() => setRevealedDiceId(dice.id)}
             onToggleHold={toggleHold}
-            onRemove={removeDice}
+            onRemove={handleRemoveDie}
             onOpenSettings={setEditingDiceId}
             onClone={handleAddDice}
             onRollOne={isRolling ? undefined : handleRollOne}
@@ -622,7 +635,7 @@ function App() {
         onClose={() => setModalOpen(null)} 
         savedConfigs={savedConfigs}
         onLoadSet={handleLoadSet}
-        onDeleteConfig={deleteConfig}
+        onDeleteConfig={handleDeleteSave}
         onExportBackup={handleExportData}
         onImportBackup={handleImportData}
       />
@@ -656,12 +669,6 @@ function App() {
         onSave={executeSave}
       />
 
-      <ConfirmDialog 
-        isOpen={confirmDeleteOpen} 
-        onClose={() => setConfirmDeleteOpen(false)} 
-        onConfirm={executeDeleteAll}
-      />
-
       <ShareModal
         url={shareFallbackUrl}
         onClose={() => setShareFallbackUrl(null)}
@@ -673,7 +680,12 @@ function App() {
       />
 
       {/* Toast Notification */}
-      {toast && (
+      {undoOffer ? (
+        <div className={`${styles.toast} ${styles.undoToast}`} role="status">
+          <span>{undoOffer.message}</span>
+          <button className={styles.undoButton} onClick={runUndo}>Undo</button>
+        </div>
+      ) : toast && (
         <div className={styles.toast}>
           {toast}
         </div>
@@ -691,7 +703,7 @@ function App() {
           isOpen={!!editingDiceId}
           onClose={() => setEditingDiceId(null)}
           onUpdate={updateDice}
-          onRemove={removeDice}
+          onRemove={handleRemoveDie}
           onClone={handleAddDice}
           allDice={diceList}
         />

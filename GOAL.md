@@ -26,6 +26,19 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   3. ~~Done 2026-10-22~~ Turning it on asks iPhone for motion access once; if it
      is turned down, the switch stays off with a short message. Done when a
      unit test covers granted, turned down and no sensor.
+- ~~Done 2026-10-22~~ Undo after removing (Daren 2026-10-22, Build): "Every
+  remove would say what it did and offer Undo for 5 seconds, using the app's
+  existing message bar. This covers the X on a die, the bin on a saved game and
+  Clear All. Clear All could then skip its confirm, since Undo brings
+  everything back."
+  1. ~~Done 2026-10-22~~ The X on a die shows "Removed d6" with Undo for five
+     seconds; Undo puts the die back in its place. Done when a unit test puts a
+     removed die back where it was and the offer closes after five seconds.
+  2. ~~Done 2026-10-22~~ Deleting a saved game shows Undo, which brings the save
+     back. Done when a unit test restores a deleted save.
+  3. ~~Done 2026-10-22~~ Clear All skips its confirm and offers Undo, which
+     brings every die back. Done when a unit test restores all dice after Clear
+     All.
 
 - One highlight colour per meaning (Daren 2026-10-17, Build): "Every selected
   or focused thing (a theme card, a face, a colour swatch, the focused die)
