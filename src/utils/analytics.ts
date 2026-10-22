@@ -117,6 +117,8 @@ export type AnalyticsEventName =
   | 'share_link_copied'
   | 'theme_changed'
   | 'sound_toggled'
+  | 'shake_toggled'
+  | 'shake_roll'
   | 'modifier_toggled';
 
 /** Primary event logger */

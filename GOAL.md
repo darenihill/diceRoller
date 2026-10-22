@@ -5,6 +5,19 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-10-22~~ Shake to roll (Daren 2026-10-22, Build): "A Shake to roll
+  switch in Customize, off by default. When on, shaking the phone rolls the
+  dice exactly like the Roll button. On iPhone the browser asks once for motion
+  access, which is why it starts off."
+  1. ~~Done 2026-10-22~~ A Shake to roll switch in Customize, off by default and
+     remembered. Done when a unit test finds it off and a tap reaches its handler.
+  2. ~~Done 2026-10-22~~ A firm shake rolls once, like the Roll button, and only
+     from the main screen. Done when unit tests show small moves are ignored and
+     one shake gives one roll.
+  3. ~~Done 2026-10-22~~ Turning it on asks iPhone for motion access once; if it
+     is turned down, the switch stays off with a short message. Done when a
+     unit test covers granted, turned down and no sensor.
+
 - One highlight colour per meaning (Daren 2026-10-17, Build): "Every selected
   or focused thing (a theme card, a face, a colour swatch, the focused die)
   would use the theme's own accent colour, the same one the Roll button uses.

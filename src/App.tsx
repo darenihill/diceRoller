@@ -24,6 +24,7 @@ import { HelpModal } from './components/modals/HelpModal';
 import { HistoryModal } from './components/modals/HistoryModal';
 import { SetsModal } from './components/modals/SetsModal';
 import { CustomizeModal } from './components/modals/CustomizeModal';
+import { createShakeDetector, requestMotionPermission, sampleFromEvent } from './utils/shake';
 import { SaveDialog } from './components/modals/SaveDialog';
 import { ConfirmDialog } from './components/modals/ConfirmDialog';
 import { ShareModal } from './components/modals/ShareModal';
@@ -93,6 +94,11 @@ function App() {
   useEffect(() => {
     localStorage.setItem('soundEnabled', String(soundEnabled));
   }, [soundEnabled]);
+
+  const [shakeEnabled, setShakeEnabled] = useState(() => localStorage.getItem('shakeToRoll') === 'true');
+  useEffect(() => {
+    localStorage.setItem('shakeToRoll', String(shakeEnabled));
+  }, [shakeEnabled]);
 
   const [telemetryState, setTelemetryState] = useState(() => localStorage.getItem('telemetryEnabled') !== 'false');
 
@@ -461,6 +467,62 @@ function App() {
     setTelemetryEnabled(nextState);
   };
 
+  const handleRoll = () => {
+    const hasUnheldDice = diceList.some(d => !d.held);
+    rollDice(({ total, diceCount }) => {
+      // Fires when the roll resolves, so the actual total reaches analytics
+      setHasRolledThisSession(true);
+      if (diceCount > 0) {
+        trackEvent('roll_dice', { diceCount, sum: total, modifier, rpgMode, rollAdvantage });
+      }
+    });
+
+    if (hasUnheldDice && diceList.length > 0 && soundEnabled) {
+      playRollSequence(soundTimersRef);
+    }
+  };
+
+  // Shake to roll: the latest roll handler, read by the motion listener
+  const handleRollRef = useRef(handleRoll);
+  const modalOpenRef = useRef(modalOpen);
+  useEffect(() => {
+    handleRollRef.current = handleRoll;
+    modalOpenRef.current = modalOpen;
+  });
+
+  useEffect(() => {
+    if (!shakeEnabled || typeof window === 'undefined' || !('DeviceMotionEvent' in window)) return;
+    const isShake = createShakeDetector();
+    const onMotion = (e: DeviceMotionEvent) => {
+      const sample = sampleFromEvent(e);
+      // A shake rolls only from the main screen, never under an open dialog
+      if (sample && isShake(sample) && !modalOpenRef.current) {
+        handleRollRef.current();
+        trackEvent('shake_roll');
+      }
+    };
+    window.addEventListener('devicemotion', onMotion);
+    return () => window.removeEventListener('devicemotion', onMotion);
+  }, [shakeEnabled]);
+
+  const handleToggleShake = async () => {
+    if (shakeEnabled) {
+      setShakeEnabled(false);
+      trackEvent('shake_toggled', { enabled: false });
+      return;
+    }
+    const permission = await requestMotionPermission();
+    if (permission === 'granted') {
+      setShakeEnabled(true);
+      trackEvent('shake_toggled', { enabled: true });
+      showToast('Shake to roll is on. Shake your phone to roll.');
+    } else if (permission === 'denied') {
+      showToast('Motion access was turned down, so shake to roll stays off.');
+    } else {
+      showToast("This device can't sense shaking, so shake to roll stays off.");
+    }
+  };
+
   return (
     <div className={styles.app} style={{ paddingBottom: '120px' }}>
       {/* The UI is all dice and icons, so the document had no heading at all —
@@ -524,20 +586,7 @@ function App() {
 
       <ActionBar
         onAdd={handleAddDice}
-        onRoll={() => {
-          const hasUnheldDice = diceList.some(d => !d.held);
-          rollDice(({ total, diceCount }) => {
-            // Fires when the roll resolves, so the actual total reaches analytics
-            setHasRolledThisSession(true);
-            if (diceCount > 0) {
-              trackEvent('roll_dice', { diceCount, sum: total, modifier, rpgMode, rollAdvantage });
-            }
-          });
-
-          if (hasUnheldDice && diceList.length > 0 && soundEnabled) {
-            playRollSequence(soundTimersRef);
-          }
-        }}
+        onRoll={handleRoll}
         onHoldAll={toggleHoldAll}
         allHeld={allHeld}
         totalVisible={totalVisible}
@@ -596,6 +645,8 @@ function App() {
         onToggleTelemetry={handleToggleTelemetry}
         diceScale={diceScale}
         onChangeDiceScale={setDiceScale}
+        shakeEnabled={shakeEnabled}
+        onToggleShake={handleToggleShake}
       />
 
       <SaveDialog 
