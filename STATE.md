@@ -1,4 +1,4 @@
-Next: Type a roll like 2d6+3 (2026-10-23): parser, RPG-mode box, typed text in history.
+Next: Type a roll like 2d6+3 built (2026-10-23), waiting on Daren to approve publishing.
 
 # State
 
