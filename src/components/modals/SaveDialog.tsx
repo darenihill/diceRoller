@@ -37,7 +37,12 @@ export const SaveDialog: React.FC<SaveDialogProps> = ({
           onChange={(e) => onChangeSaveName(e.target.value)}
           className={modalStyles.formInput}
           aria-describedby={taken ? 'save-name-taken' : undefined}
-          onKeyDown={(e) => e.key === 'Enter' && trimmed && !taken && onSave('new')}
+          onKeyDown={(e) => {
+            if (e.key !== 'Enter') return;
+            // A taken name needs a choice, so Done just puts the keyboard away to show the buttons
+            if (taken) e.currentTarget.blur();
+            else if (trimmed) onSave('new');
+          }}
         />
         {taken && (
           <p id="save-name-taken" className={modalStyles.formLabel} role="status" style={{ margin: 0 }}>
