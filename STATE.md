@@ -1,4 +1,4 @@
-Next: Tap again to hold built on its branch (2026-10-22); waits on Daren's tap to push, since a Dice Roller merge publishes the site.
+Next: Idea choices recorded in DECISIONS.md (2026-10-23); waits on Daren's tap to push, since a Dice Roller merge publishes the site.
 
 # State
 
