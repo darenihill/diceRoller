@@ -10,8 +10,9 @@ building, 2 skipped; Goals tab: goal line set, no suggestions).
 
 1. **Yesterday's friction is gone, so the job reads cleaner.** The jobs
    answer and today's walks agree: the moments that tripped players at the
-   table were fixed in pull requests 17 and 18. What's left (back button,
-   the "9 (7+2)" total waiting on its card) is on-goal polish.
+   table were fixed in pull requests 17 and 18, and the "9 (7+2)" total
+   landed in pull request 19. What's left (the back button) is on-goal
+   polish.
 2. **New ideas split along the job's two tables.** Notation and count-hits
    serve RPG players; big result and totals by colour serve board-game
    tables. Both are in the goal line, so the open ideas confirm it.
