@@ -1,4 +1,4 @@
-Next: four-lens re-walk after the new features written up (2026-10-23); waits on Daren's tap to push, since a Dice Roller merge publishes the site.
+Next: four-lens re-walk landing (2026-10-23); total with its math landed in pull request 19.
 
 # State
 

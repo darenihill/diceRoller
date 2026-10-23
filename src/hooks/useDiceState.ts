@@ -10,6 +10,8 @@ export interface RollHistoryItem {
   isTargetHit?: boolean;
   /** One die rolled on its own; kept out of the main total and the frequency chart */
   single?: boolean;
+  /** The RPG modifier already counted in total, so the button can show its math */
+  modifier?: number;
 }
 
 export interface RollSummary {
@@ -290,7 +292,8 @@ export const useDiceState = () => {
         total: finalTotal,
         details,
         isTargetHit,
-        ...(onlyId !== undefined ? { single: true } : {})
+        ...(onlyId !== undefined ? { single: true } : {}),
+        ...(activeModifier !== 0 ? { modifier: activeModifier } : {})
       }, ...h].slice(0, MAX_HISTORY_LENGTH));
       setIsRolling(false);
       setRollingId(null);
