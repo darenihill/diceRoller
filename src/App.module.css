@@ -131,11 +131,19 @@
   padding: 6px 8px 6px 20px;
   pointer-events: auto;
   white-space: nowrap; /* "Cleared 2 dice" stays on one line beside Undo */
+  max-width: calc(100vw - 32px); /* a long save or die name never pushes Undo off screen */
+}
+
+.undoToast > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .undoButton {
   min-height: 44px;
   min-width: 64px;
+  flex-shrink: 0;
   padding: 0 12px;
   border: none;
   border-radius: var(--shape-large);
