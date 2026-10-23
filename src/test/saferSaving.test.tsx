@@ -30,6 +30,15 @@ describe('Save Game when the name is taken', () => {
     fireEvent.keyDown(screen.getByLabelText(/name for this game/), { key: 'Enter' });
     expect(onSave).not.toHaveBeenCalled();
   });
+
+  it('Done on a taken name puts the keyboard away so the choices show', () => {
+    render(<SaveDialog {...base} saveName="Catan" existingNames={['Catan']} onSave={() => {}} />);
+    const input = screen.getByLabelText(/name for this game/);
+    input.focus();
+    expect(input).toHaveFocus();
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(input).not.toHaveFocus();
+  });
 });
 
 describe('Keep both names', () => {
