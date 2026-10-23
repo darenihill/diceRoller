@@ -27,6 +27,7 @@ import { CustomizeModal } from './components/modals/CustomizeModal';
 import { createShakeDetector, requestMotionPermission, sampleFromEvent } from './utils/shake';
 import { SaveDialog } from './components/modals/SaveDialog';
 import { useUndo, dieLabel } from './hooks/useUndo';
+import { spokenTotal } from './utils/totalMath';
 import { ShareModal } from './components/modals/ShareModal';
 import { StatsModal } from './components/modals/StatsModal';
 
@@ -254,6 +255,7 @@ function App() {
   // A die rolled on its own never replaces the big total
   const lastMainRoll = rollHistory.find(r => !r.single);
   const lastTotal = totalVisible && lastMainRoll ? lastMainRoll.total : 0;
+  const lastModifier = totalVisible && lastMainRoll ? lastMainRoll.modifier ?? 0 : 0;
   const setName = currentSetName(diceList, loadedSet);
 
   // Dice Size & Grid layout calculations
@@ -625,6 +627,7 @@ function App() {
         allHeld={allHeld}
         totalVisible={totalVisible}
         lastTotal={lastTotal}
+        lastModifier={lastModifier}
         modifier={modifier}
         onChangeModifier={setModifier}
         rpgMode={rpgMode}
@@ -716,7 +719,7 @@ function App() {
 
       {/* Screen-reader announcement of roll results */}
       <div aria-live="polite" className={styles.srOnly}>
-        {totalVisible && !isRolling ? `Rolled ${lastTotal}` : ''}
+        {totalVisible && !isRolling ? spokenTotal(lastTotal, lastModifier) : ''}
       </div>
 
       {/* Dice Settings Modal */}
