@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { totalMath } from '../utils/totalMath';
 import styles from './ActionBar.module.css';
 import { Plus, Minus, Dice5, Lock, Unlock, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence, useAnimationControls } from 'framer-motion';
@@ -13,6 +14,8 @@ interface ActionBarProps {
   allHeld: boolean;
   totalVisible: boolean;
   lastTotal: number;
+  /** The modifier counted in lastTotal (0 when none) */
+  lastModifier?: number;
   modifier: number;
   onChangeModifier: (val: number) => void;
   rpgMode: boolean;
@@ -33,7 +36,7 @@ const DND_GRID_DICE = [
 const D20_OPTION = { label: 'D20', faces: 20, name: 'd20', color: '#384050' };
 
 export const ActionBar: React.FC<ActionBarProps> = ({ 
-  onAdd, onRoll, onHoldAll, allHeld, totalVisible, lastTotal, modifier, onChangeModifier,
+  onAdd, onRoll, onHoldAll, allHeld, totalVisible, lastTotal, lastModifier = 0, modifier, onChangeModifier,
   rpgMode, rollAdvantage, onChangeRollAdvantage
 }) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -216,8 +219,9 @@ export const ActionBar: React.FC<ActionBarProps> = ({
           {totalVisible ? (
             <span className={styles.rollBtnLabel} style={{ fontSize: totalFontSize }}>
               {lastTotal}
-              {rpgMode && modifier !== 0 && (
-                <span className={styles.rollBtnModSuffix}>{`${modifier > 0 ? '+' : ''}${modifier}`}</span>
+              {/* The total already counts the modifier, so show its math, not "+2" to add again */}
+              {lastModifier !== 0 && (
+                <span className={styles.rollBtnModSuffix}>{totalMath(lastTotal, lastModifier)}</span>
               )}
             </span>
           ) : (
