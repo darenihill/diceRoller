@@ -1,4 +1,4 @@
-Next: total with its math (9 (7+2)) built on its branch (2026-10-22); waits on Daren's tap to push, since a Dice Roller merge publishes the site.
+Next: idea choices recorded in DECISIONS.md (2026-10-23), landing; total with its math landed in pull request 19.
 
 # State
 
