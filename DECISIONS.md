@@ -16,3 +16,4 @@ Daren's picks on suggested ideas for this app, from the Desk, oldest first: the 
 - 2026-10-17 · Skip · Share button on the main screen
 - 2026-10-22 · Build · Say the total includes the modifier
 - 2026-10-22 · Build · Tapping a die doesn't hold it
+- 2026-10-23 · Watch · Totals by colour: "Let's watch for it"
