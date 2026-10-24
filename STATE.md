@@ -1,4 +1,4 @@
-Next: four-lens re-walk landing (2026-10-23); total with its math (pull request 19) and DECISIONS.md (pull request 21) landed.
+Next: four-lens review (stories, on the go, code health, build vs adopt) in progress, 2026-10-24.
 
 # State
 
