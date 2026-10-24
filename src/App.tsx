@@ -110,6 +110,8 @@ function App() {
   }, [tableView]);
   // The roll whose big view was tapped away; the next roll shows big again
   const [tableDismissedId, setTableDismissedId] = useState<string | null>(null);
+  // The dice a roll was made with; adding, removing or loading dice hides the big view
+  const [tableRolledIds, setTableRolledIds] = useState('');
 
   const [telemetryState, setTelemetryState] = useState(() => localStorage.getItem('telemetryEnabled') !== 'false');
 
@@ -268,7 +270,8 @@ function App() {
   const lastModifier = totalVisible && lastMainRoll ? lastMainRoll.modifier ?? 0 : 0;
   const setName = currentSetName(diceList, loadedSet);
   const showTable = tableView && totalVisible && !isRolling && !!lastMainRoll
-    && lastMainRoll.id !== tableDismissedId && diceList.length > 0;
+    && lastMainRoll.id !== tableDismissedId && diceList.length > 0
+    && diceList.map(d => d.id).join() === tableRolledIds;
   const tiles = showTable ? tableTiles(diceList) : [];
 
   // Dice Size & Grid layout calculations
@@ -504,6 +507,7 @@ function App() {
 
   const handleRoll = () => {
     const hasUnheldDice = diceList.some(d => !d.held);
+    setTableRolledIds(diceList.map(d => d.id).join());
     rollDice(({ total, diceCount }) => {
       // Fires when the roll resolves, so the actual total reaches analytics
       setHasRolledThisSession(true);

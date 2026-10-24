@@ -93,6 +93,15 @@ describe('Table view switch and big total', () => {
     expect(screen.getByTestId('table-view')).toBeInTheDocument();
   });
 
+  it('goes back to the dice when a die is added after the roll, so the math never disagrees', () => {
+    localStorage.setItem('tableView', 'true');
+    render(<App />);
+    roll();
+    expect(screen.getByTestId('table-view')).toBeInTheDocument();
+    fireEvent.click(screen.getByTitle('Add Dice'));
+    expect(screen.queryByTestId('table-view')).toBeNull();
+  });
+
   it('keeps the dice view when it is off', () => {
     render(<App />);
     roll();
