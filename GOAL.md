@@ -5,22 +5,22 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- Show the result big for the table (Daren 2026-10-23, Build, picked "Table
+- ~~Done 2026-10-24~~ Show the result big for the table (Daren 2026-10-23, Build, picked "Table
   view switch in the menu"): "The Roll button stays a roll button. A Table
   view switch in the menu; while it is on, each roll shows the total huge in
   the dice area, its math under it, the dice as small tiles and an upside-down
   copy at the top. The Roll button below keeps rolling, and tapping the big
   number shows the dice again. Flipped 6 and 9 are underlined."
-  1. A Table view switch in the menu, off by default and remembered. Done when
+  1. ~~Done 2026-10-24~~ A Table view switch in the menu, off by default and remembered. Done when
      a unit test finds it off, taps it on and finds it on after a reload.
-  2. While it is on, a roll shows the total huge in the dice area with its
+  2. ~~Done 2026-10-24~~ While it is on, a roll shows the total huge in the dice area with its
      math under it, the dice as small tiles, and an upside-down copy at the
      top; the Roll button keeps rolling. Done when a unit test rolls with it
      on and finds the big total, the math and the flipped copy, and a
      phone-size browser check shows it.
-  3. Tapping the big number shows the dice again, and the next roll shows it
+  3. ~~Done 2026-10-24~~ Tapping the big number shows the dice again, and the next roll shows it
      big once more. Done when a unit test taps the number and finds the dice.
-  4. A 6 or a 9 shown on its own (big total or small tile) is underlined, so
+  4. ~~Done 2026-10-24~~ A 6 or a 9 shown on its own (big total or small tile) is underlined, so
      the flipped copy reads right. Done when a unit test finds 6 and 9
      underlined and 8 not.
 

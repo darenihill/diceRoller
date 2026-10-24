@@ -30,6 +30,8 @@ import { useUndo, dieLabel } from './hooks/useUndo';
 import { spokenTotal } from './utils/totalMath';
 import { ShareModal } from './components/modals/ShareModal';
 import { StatsModal } from './components/modals/StatsModal';
+import { TableView } from './components/TableView';
+import { tableTiles, tableMath } from './utils/tableView';
 
 function App() {
   const {
@@ -100,6 +102,14 @@ function App() {
   useEffect(() => {
     localStorage.setItem('shakeToRoll', String(shakeEnabled));
   }, [shakeEnabled]);
+
+  // Table view: each roll shows its total big for everyone at the table
+  const [tableView, setTableView] = useState(() => localStorage.getItem('tableView') === 'true');
+  useEffect(() => {
+    localStorage.setItem('tableView', String(tableView));
+  }, [tableView]);
+  // The roll whose big view was tapped away; the next roll shows big again
+  const [tableDismissedId, setTableDismissedId] = useState<string | null>(null);
 
   const [telemetryState, setTelemetryState] = useState(() => localStorage.getItem('telemetryEnabled') !== 'false');
 
@@ -257,6 +267,9 @@ function App() {
   const lastTotal = totalVisible && lastMainRoll ? lastMainRoll.total : 0;
   const lastModifier = totalVisible && lastMainRoll ? lastMainRoll.modifier ?? 0 : 0;
   const setName = currentSetName(diceList, loadedSet);
+  const showTable = tableView && totalVisible && !isRolling && !!lastMainRoll
+    && lastMainRoll.id !== tableDismissedId && diceList.length > 0;
+  const tiles = showTable ? tableTiles(diceList) : [];
 
   // Dice Size & Grid layout calculations
   const { optimalSize, optimalColumns, dynamicGap } = scaleGridDimensions(
@@ -568,7 +581,16 @@ function App() {
         )}
       </header>
 
-      <div ref={containerRef} className={styles.diceContainer} style={diceStyles}>
+      {showTable && lastMainRoll && (
+        <TableView
+          total={lastTotal}
+          math={tableMath(tiles, lastModifier)}
+          tiles={tiles}
+          onShowDice={() => setTableDismissedId(lastMainRoll.id)}
+        />
+      )}
+
+      <div ref={containerRef} className={`${styles.diceContainer} ${showTable ? styles.diceHidden : ''}`} style={diceStyles}>
         {diceList.map((dice) => (
           <Dice
             key={dice.id}
@@ -618,6 +640,12 @@ function App() {
         onSetDefault={handleSetDefault}
         rpgMode={rpgMode}
         onToggleRpgMode={toggleRpgMode}
+        tableView={tableView}
+        onToggleTableView={() => {
+          const next = !tableView;
+          setTableView(next);
+          trackEvent('table_view_toggled', { enabled: next });
+        }}
       />
 
       <ActionBar

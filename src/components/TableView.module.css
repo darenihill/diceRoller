@@ -1,0 +1,117 @@
+/* Fills the dice area; the Roll button below stays where it always is */
+.tableView {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  overflow-y: auto;
+  text-align: center;
+  color: var(--md-sys-color-on-surface);
+}
+
+/* The copy for the people across the table, turned to face them */
+.flipped {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: rotate(180deg);
+  opacity: 0.85;
+  margin-bottom: 8px;
+}
+
+.flippedTotal {
+  font-size: clamp(56px, 14vh, 140px);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.bigTotal {
+  font-size: clamp(96px, 26vh, 260px);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--md-sys-color-primary);
+  background: none;
+  border: none;
+  border-radius: var(--shape-large);
+  padding: 0 16px;
+  min-width: 48px;
+  min-height: 48px;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+
+.bigTotal:focus-visible {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 4px;
+}
+
+.math {
+  margin: 0;
+  font-size: clamp(18px, 3.2vh, 28px);
+  color: var(--md-sys-color-on-surface-variant);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Underlined like 6 and 9 on real dice, so the flipped copy reads right */
+.underlined {
+  text-decoration: underline;
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.08em;
+}
+
+.tiles {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-width: 560px;
+}
+
+.tile {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--shape-small);
+  background-color: var(--md-sys-color-surface-variant);
+  font-size: 18px;
+  font-weight: 600;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tileHeld {
+  box-shadow: inset 0 0 0 2px var(--color-gold);
+}
+
+.tileDropped {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+
+.hint {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+@media (max-width: 768px) {
+  .tableView {
+    padding-bottom: 96px;
+  }
+
+  :global(body.rpg-mode) .tableView {
+    padding-bottom: 270px;
+  }
+}

@@ -35,10 +35,12 @@ interface SidebarMenuProps {
   onSetDefault: () => void;
   rpgMode: boolean;
   onToggleRpgMode: () => void;
+  tableView: boolean;
+  onToggleTableView: () => void;
 }
 
 export const SidebarMenu: React.FC<SidebarMenuProps> = ({
-  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onStats, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, rpgMode, onToggleRpgMode
+  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onStats, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, rpgMode, onToggleRpgMode, tableView, onToggleTableView
 }) => {
   return (
     <>
@@ -90,6 +92,11 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
                 <button className={styles.menuItem} onClick={onToggleRpgMode} title="Toggle RPG Mode (Advantage & Modifiers)">
                   {rpgMode ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
                   <span>RPG Mode</span>
+                </button>
+                <button className={styles.menuItem} onClick={onToggleTableView} aria-pressed={tableView}
+                  title="Show each roll's total big for the whole table">
+                  {tableView ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
+                  <span>Table view</span>
                 </button>
               </div>
 

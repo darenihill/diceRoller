@@ -119,6 +119,7 @@ export type AnalyticsEventName =
   | 'sound_toggled'
   | 'shake_toggled'
   | 'shake_roll'
+  | 'table_view_toggled'
   | 'modifier_toggled';
 
 /** Primary event logger */
