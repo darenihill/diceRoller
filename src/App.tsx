@@ -505,11 +505,14 @@ function App() {
   };
 
   // Shake to roll: the latest roll handler, read by the motion listener
+  // Every dialog, sheet or menu counts, not only the named modals: Dice
+  // settings, Save and the share fallback have their own open state.
+  const overlayOpen = modalOpen !== null || menuOpen || savePromptOpen || editingDiceId !== null || shareFallbackUrl !== null;
   const handleRollRef = useRef(handleRoll);
-  const modalOpenRef = useRef(modalOpen);
+  const overlayOpenRef = useRef(overlayOpen);
   useEffect(() => {
     handleRollRef.current = handleRoll;
-    modalOpenRef.current = modalOpen;
+    overlayOpenRef.current = overlayOpen;
   });
 
   useEffect(() => {
@@ -517,8 +520,8 @@ function App() {
     const isShake = createShakeDetector();
     const onMotion = (e: DeviceMotionEvent) => {
       const sample = sampleFromEvent(e);
-      // A shake rolls only from the main screen, never under an open dialog
-      if (sample && isShake(sample) && !modalOpenRef.current) {
+      // A shake rolls only from the main screen, never under an open dialog or menu
+      if (sample && isShake(sample) && !overlayOpenRef.current) {
         handleRollRef.current();
         trackEvent('shake_roll');
       }
@@ -712,7 +715,8 @@ function App() {
           <button className={styles.undoButton} onClick={runUndo}>Undo</button>
         </div>
       ) : toast && (
-        <div className={styles.toast}>
+        // role="status" so a screen reader hears "Saved!" and the rest, as it does the Undo offer
+        <div className={styles.toast} role="status">
           {toast}
         </div>
       )}

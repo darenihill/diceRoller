@@ -93,6 +93,19 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   2. ~~Done 2026-10-22~~ Rolls celebrate exactly as before. Done when a unit test
      shows the note counts what a roll counts, and the roll code is unchanged.
 
+- ~~Done 2026-10-24~~ Fixes from the 2026-10-24 on-the-go review
+  (reviews/2026-10-24-stories.md): the light theme's Clear All is readable
+  (it showed the dark theme's pale pink at 1.3:1), shake to roll waits while
+  any dialog or the menu is open, and plain messages are spoken to screen
+  readers. Done when a theme contrast test covers every theme and unit tests
+  shake under Save and Dice settings without a roll.
+- Code health: move the remembered settings and the backup out of App.tsx
+  (reviews/2026-10-24-code-health.md). One shared remembered-setting piece
+  with the storage guard in one place, and a backup module with a round-trip
+  test. Nothing on screen changes. Done when App.tsx has no direct storage
+  calls for settings, a backup exported and imported in a test comes back
+  the same, and a full storage shows a message instead of a blank screen.
+
 - One highlight colour per meaning (Daren 2026-10-17, Build): "Every selected
   or focused thing (a theme card, a face, a colour swatch, the focused die)
   would use the theme's own accent colour, the same one the Roll button uses.
