@@ -28,5 +28,5 @@ Added to GOAL.md Next items.
 
 ## Fixes built
 
-- One `overlayOpen` flag for shake (see stories). Tests: 148 → 153 passing,
-  plus a 28-case theme contrast guard.
+- One `overlayOpen` flag for shake (see stories). Tests: 115 → 148 passing
+  (5 new behaviour tests and a 28-case theme contrast guard).
