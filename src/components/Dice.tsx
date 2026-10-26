@@ -41,7 +41,7 @@ const DiceComponent: React.FC<DiceProps> = ({
     if (!lockMountedRef.current) return;
     lockControls.start({
       rotate: [0, -45, 10, 0],
-      color: dice.held ? 'var(--color-gold)' : '#FFFFFF',
+      color: dice.held ? 'var(--color-gold-ink)' : 'var(--md-sys-color-on-surface)',
       transition: { duration: 0.5, ease: 'easeInOut' }
     });
   }, [dice.held, lockControls]);
@@ -238,7 +238,7 @@ const DiceComponent: React.FC<DiceProps> = ({
       <motion.div
         initial={{ rotate: 0 }}
         animate={lockControls}
-        style={{ color: dice.held ? 'var(--color-gold)' : '#FFFFFF' }}
+        style={{ color: dice.held ? 'var(--color-gold-ink)' : 'var(--md-sys-color-on-surface)' }}
         className={`${styles.actionBtn} ${dice.held ? styles.holdIcon : styles.unlockIcon}`}
       >
         <div style={{ position: 'relative', width: 20, height: 20 }}>

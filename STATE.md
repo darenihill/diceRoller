@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: contrast and dark mode fixes (polish-ui-contrast-11) are built; pull request waits for Daren's Merge tap (Dice Roller is public).
 
 # State
 
