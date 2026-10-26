@@ -112,6 +112,9 @@ const DiceComponent: React.FC<DiceProps> = ({
   const faceImage = useFaceImage(parsed.image);
 
   const textColor = getContrastColor(backgroundColor);
+  // Names the die in every button around it, so a screen reader hears "Remove Red", not five "Remove Die"
+  const dieName = dice.name || `d${dice.faces}`;
+  const spokenFace = faceContent.startsWith(FACE_ICON_PREFIX) ? faceContent.replace(FACE_ICON_PREFIX, '') : faceContent;
 
   let longestFace = 1;
   if (dice.customFaces.length > 0) {
@@ -170,21 +173,15 @@ const DiceComponent: React.FC<DiceProps> = ({
       ref={diceRef}
       className={`${styles.dice} ${shapeClass ? styles.shaped : ''} ${rollingNow ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''} ${extraClass}`}
       data-dice-id={dice.id}
-      role="button"
-      tabIndex={0}
-      aria-label={`${dice.name || `d${dice.faces}`} showing ${faceContent.startsWith(FACE_ICON_PREFIX) ? faceContent.replace(FACE_ICON_PREFIX, '') : faceContent}${dice.held ? ', held' : ''}. Press to ${dice.held ? 'release' : 'hold'}.`}
+      // A group, not a button: a button's inner buttons are hidden from screen
+      // readers, so settings, copy, roll-one and remove couldn't be reached.
+      // Holding moves to its own (visually hidden) button below.
+      role="group"
+      aria-label={`${dieName} showing ${spokenFace}${dice.held ? ', held' : ''}`}
       onClick={(e) => {
         if ((e.target as HTMLElement).closest('button')) return;
         onReveal();
         onToggleHold(dice.id);
-      }}
-      onKeyDown={(e) => {
-        if (e.target !== e.currentTarget) return;
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onReveal();
-          onToggleHold(dice.id);
-        }
       }}
       onTouchStart={() => onReveal()}
       layout
@@ -192,6 +189,14 @@ const DiceComponent: React.FC<DiceProps> = ({
       animate={{ scale: 1 }}
       exit={{ scale: 0 }}
     >
+      {/* Keyboard and screen-reader way to hold; a tap on the die does the same */}
+      <button
+        className={styles.holdBtn}
+        aria-pressed={!!dice.held}
+        aria-label={`Hold ${dieName}`}
+        onClick={() => { onReveal(); onToggleHold(dice.id); }}
+      />
+
       {/* Background shape container so clip-path does NOT clip action buttons */}
       <div className={`${styles.diceShapeBg} ${shapeClass}`} style={{ backgroundColor }}>
         {/* 3D Wireframe Facet Lines Overlay - placed INSIDE diceShapeBg to match silhouette bounds perfectly */}
@@ -263,7 +268,7 @@ const DiceComponent: React.FC<DiceProps> = ({
       <button className={`${styles.actionBtn} ${styles.settingsBtn}`} onClick={(e) => {
         e.stopPropagation();
         onOpenSettings(dice.id);
-      }} title="Dice Settings">
+      }} title="Dice Settings" aria-label={`Settings for ${dieName}`}>
         <Settings size={20} strokeWidth={2.5} color="currentColor" />
       </button>
 
@@ -273,6 +278,7 @@ const DiceComponent: React.FC<DiceProps> = ({
           className={`${styles.actionBtn} ${styles.cloneBtn}`} 
           onClick={(e) => { e.stopPropagation(); onClone(dice); }}
           title="Clone Die"
+          aria-label={`Copy ${dieName}`}
         >
           <Copy size={20} strokeWidth={2.5} color="currentColor" />
         </button>
@@ -284,7 +290,7 @@ const DiceComponent: React.FC<DiceProps> = ({
           className={`${styles.actionBtn} ${styles.rollOneBtn}`} 
           onClick={(e) => { e.stopPropagation(); onRollOne(dice.id); }}
           title="Roll This Die"
-          aria-label="Roll this die"
+          aria-label={`Roll only ${dieName}`}
         >
           <Dices size={20} strokeWidth={2.5} color="currentColor" />
         </button>
@@ -295,6 +301,7 @@ const DiceComponent: React.FC<DiceProps> = ({
         className={`${styles.actionBtn} ${styles.removeBtn}`} 
         onClick={(e) => { e.stopPropagation(); onRemove(dice.id); }}
         title="Remove Die"
+        aria-label={`Remove ${dieName}`}
       >
         <X size={20} strokeWidth={2.5} color="currentColor" />
       </button>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import styles from './SidebarMenu.module.css';
 import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Share2, Palette, Pin, ToggleLeft, ToggleRight, BarChart2 } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
@@ -40,10 +40,24 @@ interface SidebarMenuProps {
 export const SidebarMenu: React.FC<SidebarMenuProps> = ({
   isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onStats, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, rpgMode, onToggleRpgMode
 }) => {
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  // Escape closes the menu, as it does every dialog, and focus goes back to the menu button
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      // A dialog opened from the menu takes Escape first
+      if (e.key !== 'Escape' || document.querySelector('[aria-modal="true"]')) return;
+      onToggle();
+      toggleRef.current?.focus();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isOpen, onToggle]);
+
   return (
     <>
       <div className={styles.toggleContainer}>
-        <button className={`md-icon-button ${styles.toggleBtn} ${isOpen ? styles.toggleBtnOpen : ''}`} onClick={onToggle}
+        <button ref={toggleRef} className={`md-icon-button ${styles.toggleBtn} ${isOpen ? styles.toggleBtnOpen : ''}`} onClick={onToggle}
           title="Menu"
           aria-label={isOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={isOpen}
@@ -87,7 +101,7 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
                 <button className={styles.menuItem} onClick={onHistory}><History size={18} /> <span>History</span></button>
                 <button className={styles.menuItem} onClick={onStats}><BarChart2 size={18} /> <span>Usage Stats</span></button>
                 <button className={styles.menuItem} onClick={onCustomize}><Palette size={18} /> <span>Customize</span></button>
-                <button className={styles.menuItem} onClick={onToggleRpgMode} title="Toggle RPG Mode (Advantage & Modifiers)">
+                <button className={styles.menuItem} onClick={onToggleRpgMode} title="Toggle RPG Mode (Advantage & Modifiers)" aria-pressed={rpgMode}>
                   {rpgMode ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
                   <span>RPG Mode</span>
                 </button>

@@ -147,3 +147,28 @@
   background-color: var(--md-sys-color-primary-container);
   color: var(--md-sys-color-on-primary-container);
 }
+
+/* Matches the smaller bottom row on narrow screens (ActionBar.module.css) */
+@media (max-width: 379px) {
+  .toggleContainer {
+    bottom: 86px;
+    left: 16px;
+  }
+
+  .toggleBtn {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+@media (max-width: 299px) {
+  .toggleContainer {
+    bottom: 72px;
+    left: 12px;
+  }
+
+  .toggleBtn {
+    width: 52px;
+    height: 52px;
+  }
+}

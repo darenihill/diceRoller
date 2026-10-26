@@ -253,3 +253,12 @@ body > .landing-article {
   margin-top: 20px;
   font-size: 14px;
 }
+
+/* High contrast (Windows) removes button fills, so round and pill buttons
+   lost their shape and read as loose icons. Draw their edge instead. */
+@media (forced-colors: active) {
+  .md-button,
+  .md-icon-button {
+    border: 2px solid ButtonText;
+  }
+}
