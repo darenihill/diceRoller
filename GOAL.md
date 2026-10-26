@@ -31,6 +31,9 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      stays. Done when a unit test counts three holds.
   3. ~~Done 2026-10-22~~ The corner lock is a real button that holds or releases,
      and Help says to tap twice. Done when a unit test taps the corner lock.
+  Rolled back 2026-10-26 (Daren: "can we also roll back the change to have the
+  double press to hold in the middle of the dice. I don't love how it looks").
+  One tap holds a die again, as before 2026-10-22.
 
 - ~~Done 2026-10-22~~ Your saves first in Games (Daren 2026-10-22, Build): "Games
   & Saves would list Your Saves first, since a returning player usually wants
