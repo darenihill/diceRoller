@@ -1,4 +1,4 @@
-Next: four-lens re-walk landing (2026-10-23); total with its math (pull request 19) and DECISIONS.md (pull request 21) landed.
+Next: Rolled back tap-twice-to-hold at Daren's ask (2026-10-26); Type a roll (pull request 27) and Idea choices (pull request 28) landing.
 
 # State
 
