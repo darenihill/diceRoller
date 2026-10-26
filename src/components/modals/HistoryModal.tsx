@@ -77,7 +77,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
             </div>
             {rollHistory.map((roll, i) => (
               <div key={roll.id} className={styles.historyItem} style={{ borderLeft: roll.isTargetHit ? '4px solid var(--color-gold)' : 'none' }}>
-                <div className={styles.historyIndex}>Roll {rollHistory.length - i}{roll.single ? ' · one die' : ''}</div>
+                <div className={styles.historyIndex}>Roll {rollHistory.length - i}{roll.single ? ' · one die' : ''}{roll.typed ? ` · ${roll.typed}` : ''}</div>
                 <div className={styles.historyDetails}>{roll.details.join(', ')}</div>
                 <div className={styles.historyTotal}>
                   Total: {roll.total}

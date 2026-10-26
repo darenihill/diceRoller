@@ -1,4 +1,4 @@
-Next: Idea choices refreshed from the Desk (2026-10-23), waiting on Daren to approve publishing.
+Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
 
 # State
 
