@@ -1,4 +1,4 @@
-Next: four-lens review (stories, on the go, code health, build vs adopt) open as a pull request, 2026-10-24.
+Next: four-lens review fixes (pull request 26) brought up to date with main after Type a roll (27), Idea choices (28) and the tap-twice rollback (29) landed, 2026-10-26.
 
 # State
 

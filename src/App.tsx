@@ -5,6 +5,8 @@ import { useDiceState } from './hooks/useDiceState';
 import { useStorage } from './hooks/useStorage';
 import { Dice } from './components/Dice';
 import { ActionBar } from './components/ActionBar';
+import { TypeRollBox } from './components/TypeRollBox';
+import { TYPED_DIE_COLOR, type TypedRoll } from './utils/rollNotation';
 import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages } from './utils/diceUtils';
@@ -468,6 +470,36 @@ function App() {
     reader.readAsText(file);
   };
 
+  // A typed roll swaps in its own dice, modifier and advantage and rolls them;
+  // Undo puts back the dice and settings that were out before
+  const handleTypedRoll = (roll: TypedRoll) => {
+    const before = { dice: diceList, modifier, advantage: rollAdvantage };
+    const dice = roll.groups.flatMap(g => Array.from({ length: g.count }, () => ({
+      id: generateId(),
+      numberValue: 1,
+      faces: g.faces,
+      currentFaceIndex: 0,
+      name: `d${g.faces}`,
+      customFaces: [],
+      color: TYPED_DIE_COLOR,
+      held: false
+    })));
+    setModifier(roll.modifier);
+    setRollAdvantage(roll.advantage);
+    rollDice(({ total, diceCount }) => {
+      setHasRolledThisSession(true);
+      trackEvent('roll_dice', { diceCount, sum: total, modifier: roll.modifier, rpgMode, rollAdvantage: roll.advantage, typed: true });
+    }, undefined, { text: roll.text, dice, modifier: roll.modifier, advantage: roll.advantage });
+    if (soundEnabled) playRollSequence(soundTimersRef);
+    if (before.dice.length > 0) {
+      offerUndo(`Rolled ${roll.text}`, () => {
+        restoreDice(before.dice);
+        setModifier(before.modifier);
+        setRollAdvantage(before.advantage);
+      });
+    }
+  };
+
   const handleRollOne = (id: string) => {
     rollDice(() => trackEvent('roll_one_die'), id);
     if (soundEnabled) playRollSequence(soundTimersRef);
@@ -570,6 +602,8 @@ function App() {
           </button>
         )}
       </header>
+
+      {rpgMode && <TypeRollBox onRoll={handleTypedRoll} disabled={isRolling} />}
 
       <div ref={containerRef} className={styles.diceContainer} style={diceStyles}>
         {diceList.map((dice) => (
@@ -710,13 +744,13 @@ function App() {
 
       {/* Toast Notification */}
       {undoOffer ? (
-        <div className={`${styles.toast} ${styles.undoToast}`} role="status">
+        <div className={`${styles.toast} ${styles.undoToast} ${rpgMode ? styles.toastBelowBox : ''}`} role="status">
           <span>{undoOffer.message}</span>
           <button className={styles.undoButton} onClick={runUndo}>Undo</button>
         </div>
       ) : toast && (
         // role="status" so a screen reader hears "Saved!" and the rest, as it does the Undo offer
-        <div className={styles.toast} role="status">
+        <div className={`${styles.toast} ${rpgMode ? styles.toastBelowBox : ''}`} role="status">
           {toast}
         </div>
       )}

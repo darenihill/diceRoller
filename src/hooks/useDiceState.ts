@@ -12,6 +12,8 @@ export interface RollHistoryItem {
   single?: boolean;
   /** The RPG modifier already counted in total, so the button can show its math */
   modifier?: number;
+  /** What was typed in the "Type a roll" box, e.g. "2d6+3" */
+  typed?: string;
 }
 
 export interface RollSummary {
@@ -21,6 +23,14 @@ export interface RollSummary {
 }
 
 export type RollAdvantageMode = 'normal' | 'advantage' | 'disadvantage';
+
+/** A roll typed in the box: the dice to put out, then roll straight away */
+export interface TypedRollSetup {
+  text: string;
+  dice: DiceData[];
+  modifier: number;
+  advantage: RollAdvantageMode;
+}
 
 const loadStoredHistory = (): RollHistoryItem[] => {
   try {
@@ -138,9 +148,14 @@ export const useDiceState = () => {
     setDiceList(list);
   }, []);
 
-  const rollDice = useCallback((onComplete?: (summary: RollSummary) => void, onlyId?: string) => {
+  const rollDice = useCallback((onComplete?: (summary: RollSummary) => void, onlyId?: string, typed?: TypedRollSetup) => {
+    // A typed roll brings its own dice, modifier and advantage, so it rolls
+    // what was typed now rather than waiting a render for the state to catch up
+    const list = typed?.dice ?? diceList;
+    const rollModifier = typed ? typed.modifier : modifier;
+    const advantageMode = typed ? typed.advantage : rollAdvantage;
     // With no dice there is nothing to roll; a modifier alone used to log a phantom total
-    if (diceList.length === 0) return;
+    if (list.length === 0) return;
     setIsRolling(true);
     setRollingId(onlyId ?? null);
     
@@ -148,7 +163,7 @@ export const useDiceState = () => {
     const details: string[] = [];
     
     // 1. Pre-calculate final targets immediately at 0ms
-    const rawTargetList = diceList.map(d => {
+    const rawTargetList = list.map(d => {
       // Held dice keep their value, except the one die asked to roll on its own;
       // every other die keeps its value during that single roll
       const keep = onlyId !== undefined ? d.id !== onlyId : d.held;
@@ -189,7 +204,7 @@ export const useDiceState = () => {
 
     // Handle Advantage / Disadvantage drop logic if rollAdvantage is active across any matching dice pool
     const processedList = [...rawTargetList];
-    if (onlyId === undefined && rpgMode && rollAdvantage !== 'normal' && processedList.length > 1) {
+    if (onlyId === undefined && rpgMode && advantageMode !== 'normal' && processedList.length > 1) {
       // Group PLAIN dice by face count (e.g. 2d20s, 4d6s). Custom-faced dice are excluded:
       // a percentile pair (tens + units) is two different dice that both report faces=10,
       // and grouping them would silently drop one half of every d100 roll. A die
@@ -205,7 +220,7 @@ export const useDiceState = () => {
 
       Object.values(faceGroups).forEach(group => {
         if (group.length >= 2) {
-          if (rollAdvantage === 'advantage') {
+          if (advantageMode === 'advantage') {
             // Keep highest, drop lower ones
             const maxVal = Math.max(...group.map(x => x.val));
             let kept = false;
@@ -216,7 +231,7 @@ export const useDiceState = () => {
                 processedList[item.index].dropped = true;
               }
             });
-          } else if (rollAdvantage === 'disadvantage') {
+          } else if (advantageMode === 'disadvantage') {
             // Keep lowest, drop higher ones
             const minVal = Math.min(...group.map(x => x.val));
             let kept = false;
@@ -261,7 +276,7 @@ export const useDiceState = () => {
       details.push(`${label}: ${shown}${dropSuffix}`);
     });
 
-    const activeModifier = rpgMode && onlyId === undefined ? modifier : 0;
+    const activeModifier = rpgMode && onlyId === undefined ? rollModifier : 0;
     const finalTotal = rollTotal + activeModifier;
     if (rpgMode && activeModifier !== 0) {
       details.push(`Modifier: ${activeModifier > 0 ? '+' : ''}${activeModifier}`);
@@ -296,7 +311,8 @@ export const useDiceState = () => {
         details,
         isTargetHit,
         ...(onlyId !== undefined ? { single: true } : {}),
-        ...(activeModifier !== 0 ? { modifier: activeModifier } : {})
+        ...(activeModifier !== 0 ? { modifier: activeModifier } : {}),
+        ...(typed && onlyId === undefined ? { typed: typed.text } : {})
       }, ...h].slice(0, MAX_HISTORY_LENGTH));
       setIsRolling(false);
       setRollingId(null);
@@ -307,7 +323,7 @@ export const useDiceState = () => {
 
       onComplete?.({
         total: finalTotal,
-        diceCount: onlyId !== undefined ? 1 : diceList.filter(d => !d.held).length,
+        diceCount: onlyId !== undefined ? 1 : list.filter(d => !d.held).length,
         isTargetHit
       });
     }, ROLL_DURATION_MS);
