@@ -5,7 +5,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- Save a typed roll as a button you tap to roll (Daren 2026-10-23, Build):
+- ~~Done 2026-10-26~~ Save a typed roll as a button you tap to roll (Daren 2026-10-23, Build):
   "After typing a roll, Save this roll asks for a short name and adds a button
   under the box. Buttons are kept on this phone and go into backups. They only
   show in RPG mode, next to the box they come from."

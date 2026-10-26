@@ -6,6 +6,7 @@ import { useStorage } from './hooks/useStorage';
 import { Dice } from './components/Dice';
 import { ActionBar } from './components/ActionBar';
 import { TypeRollBox } from './components/TypeRollBox';
+import { loadSavedRolls, sanitizeSavedRolls, withSavedRoll, SAVED_ROLLS_KEY, MAX_SAVED_ROLLS, type SavedRoll } from './utils/savedRolls';
 import { TYPED_DIE_COLOR, type TypedRoll } from './utils/rollNotation';
 import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
@@ -102,6 +103,12 @@ function App() {
   useEffect(() => {
     localStorage.setItem('shakeToRoll', String(shakeEnabled));
   }, [shakeEnabled]);
+
+  // Typed rolls kept as buttons under the Type a roll box, on this device and in backups
+  const [savedRolls, setSavedRolls] = useState<SavedRoll[]>(loadSavedRolls);
+  useEffect(() => {
+    localStorage.setItem(SAVED_ROLLS_KEY, JSON.stringify(savedRolls));
+  }, [savedRolls]);
 
   const [telemetryState, setTelemetryState] = useState(() => localStorage.getItem('telemetryEnabled') !== 'false');
 
@@ -386,6 +393,7 @@ function App() {
         theme: localStorage.getItem('appTheme') || 'theme-dark',
         soundEnabled: localStorage.getItem('soundEnabled') === 'true',
         diceScale: sanitizeDiceScale(localStorage.getItem('diceScale')),
+        savedRolls: loadSavedRolls(),
         // Only pictures a face still names, on screen or in a saved set
         faceImages: usedFaceImages(diceList)
       };
@@ -445,6 +453,11 @@ function App() {
           if (data.soundEnabled !== undefined) {
             localStorage.setItem('soundEnabled', String(data.soundEnabled));
           }
+          // Older backups have no saved rolls; they keep the ones on this device
+          if (Array.isArray(data.savedRolls)) {
+            const merged = sanitizeSavedRolls(data.savedRolls).reduce(withSavedRoll, loadSavedRolls());
+            localStorage.setItem(SAVED_ROLLS_KEY, JSON.stringify(merged));
+          }
           // Older backups have no dice size; they import at the default
           localStorage.setItem('diceScale', String(sanitizeDiceScale(data.diceScale)));
           // Pictures on faces; older backups have none
@@ -498,6 +511,30 @@ function App() {
         setRollAdvantage(before.advantage);
       });
     }
+  };
+
+  const handleSaveRoll = (roll: SavedRoll) => {
+    // A full list never drops an older roll to make room
+    if (savedRolls.length >= MAX_SAVED_ROLLS && !savedRolls.some(r => r.name === roll.name)) {
+      showToast(`You can keep ${MAX_SAVED_ROLLS} saved rolls. Remove one to add another.`);
+      return;
+    }
+    setSavedRolls(list => withSavedRoll(list, roll));
+    showToast(`Saved ${roll.name}`);
+  };
+
+  // Removing a saved roll offers Undo, which puts it back in its place
+  const handleRemoveSavedRoll = (name: string) => {
+    const index = savedRolls.findIndex(r => r.name === name);
+    if (index < 0) return;
+    const removed = savedRolls[index];
+    setSavedRolls(list => list.filter(r => r.name !== name));
+    offerUndo(`Removed ${name}`, () => setSavedRolls(list => {
+      if (list.some(r => r.name === removed.name)) return list;
+      const next = [...list];
+      next.splice(Math.min(index, next.length), 0, removed);
+      return next;
+    }));
   };
 
   const handleRollOne = (id: string) => {
@@ -600,7 +637,15 @@ function App() {
         )}
       </header>
 
-      {rpgMode && <TypeRollBox onRoll={handleTypedRoll} disabled={isRolling} />}
+      {rpgMode && (
+        <TypeRollBox
+          onRoll={handleTypedRoll}
+          disabled={isRolling}
+          savedRolls={savedRolls}
+          onSaveRoll={handleSaveRoll}
+          onRemoveSavedRoll={handleRemoveSavedRoll}
+        />
+      )}
 
       <div ref={containerRef} className={styles.diceContainer} style={diceStyles}>
         {diceList.map((dice) => (

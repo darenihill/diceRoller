@@ -1,4 +1,4 @@
-Next: building saved roll buttons under the Type a roll box (Daren picked Build 2026-10-23).
+Next: saved roll buttons are built and wait for Daren's Merge tap (Dice Roller is public).
 
 # State
 
