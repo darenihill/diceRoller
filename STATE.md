@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: four-lens review fixes (pull request 26) brought up to date with main after Type a roll (27), Idea choices (28) and the tap-twice rollback (29) landed, 2026-10-26.
 
 # State
 
@@ -8,4 +8,5 @@ Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull reque
 - 2026-10-22: forms and input polish (Dispatch-Item custom-dice-roller/polish-ui-forms-1).
 - 2026-10-23: four-lens re-walk after the new features; all 2026-10-22 must-haves closed (Dispatch-Item custom-dice-roller/lens-stories+cognitive-walk+kano+trunk-test-1).
 - 2026-10-22: goal check, jobs + HEART + working backwards (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-1). Goal stays.
+- 2026-10-24: four-lens review: stories, on the go, code health, build vs adopt; four fixes built, five Desk cards (Dispatch-Item custom-dice-roller/lens-stories+one-hand-outside+code-health+dependencies-10).
 - 2026-10-23: goal check again after the seven builds (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-1). Goal stays.
