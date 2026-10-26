@@ -1,4 +1,4 @@
-Next: Rolled back tap-twice-to-hold at Daren's ask (2026-10-26); Type a roll (pull request 27) and Idea choices (pull request 28) landing.
+Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
 
 # State
 
