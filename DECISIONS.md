@@ -33,3 +33,6 @@ Daren's picks on suggested ideas for this app, from the Desk, oldest first: the 
 - 2026-10-25 · Build · The Roll button's old total fades once you change the dice
 - 2026-10-25 · Build · Undo bar and messages move to the bottom, just above the Roll button
 - 2026-10-25 · Build · Your +2 and Advantage stay set when you come back to the app
+- 2026-10-26 · Build · Luck Meter adds a fair-dice mark to each bar, so you can tell luck from normal
+- 2026-10-26 · Build · Roll animation: with Reduce motion on, dice stay still and the number fades in
+- 2026-10-26 · Watch · Target odds: Target Highlight shows your chance of rolling each number
