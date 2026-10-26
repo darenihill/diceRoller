@@ -1,5 +1,6 @@
 import React from 'react';
-import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
+import { act } from '@testing-library/react';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import fs from 'fs';
 import path from 'path';
@@ -72,5 +73,19 @@ describe('Bottom buttons on narrow screens', () => {
     expect(css).toMatch(/@media \(max-width: 379px\)[\s\S]*width: 60px[\s\S]*min-width: 136px/);
     expect(menuCss).toMatch(/@media \(max-width: 379px\)[\s\S]*width: 60px/);
     expect(16 + 60).toBeLessThan(320 - 16 - (60 + 10 + 136));
+  });
+});
+
+describe('Roll while the dice tumble', () => {
+  it('a second tap during the roll does not start a second roll', () => {
+    vi.useFakeTimers();
+    render(<App />);
+    const roll = screen.getByRole('button', { name: /^Roll dice/ });
+    fireEvent.click(roll);
+    fireEvent.click(roll);
+    act(() => { vi.advanceTimersByTime(3000); });
+    const history = JSON.parse(localStorage.getItem('rollHistory') || '[]');
+    expect(history).toHaveLength(1);
+    vi.useRealTimers();
   });
 });

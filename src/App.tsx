@@ -522,6 +522,9 @@ function App() {
   };
 
   const handleRoll = () => {
+    // A second tap while the dice tumble used to start a second roll: two
+    // History entries, and the first total shown over the second roll's dice
+    if (isRolling) return;
     const hasUnheldDice = diceList.some(d => !d.held);
     rollDice(({ total, diceCount }) => {
       // Fires when the roll resolves, so the actual total reaches analytics
