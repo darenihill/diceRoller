@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: building saved roll buttons under the Type a roll box (Daren picked Build 2026-10-23).
 
 # State
 
