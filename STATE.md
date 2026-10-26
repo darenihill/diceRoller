@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: saved roll buttons are built and wait for Daren's Merge tap (Dice Roller is public).
 
 # State
 
