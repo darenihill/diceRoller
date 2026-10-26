@@ -29,9 +29,24 @@
   outline: none;
 }
 
-.dice:focus-visible {
+.dice:focus-visible,
+.dice:has(.holdBtn:focus-visible) {
   outline: 3px solid var(--md-sys-color-primary);
   outline-offset: 3px;
+}
+
+/* The die's hold button: there for the keyboard and screen readers, drawn by
+   the die itself (the ring above shows when it has focus). */
+.holdBtn {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* A polyhedral die is not a rounded square, so the card shadow would halo the
@@ -278,4 +293,17 @@
 .shapeD20 {
   clip-path: polygon(50% 2%, 94% 26%, 94% 74%, 50% 98%, 6% 74%, 6% 26%);
   border-radius: 0 !important;
+}
+
+/* High contrast (Windows) drops background colours, which left each die as a
+   bare number and its small buttons as loose icons. Give them back an edge. */
+@media (forced-colors: active) {
+  .dice,
+  .actionBtn {
+    border: 2px solid CanvasText;
+  }
+
+  .holdIcon {
+    border-color: Highlight;
+  }
 }

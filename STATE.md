@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: review 20 (stories, access, speed, heuristics) written and its fixes built; pull request open, waits for Daren's tap (public app).
 
 # State
 
@@ -9,3 +9,4 @@ Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull reque
 - 2026-10-23: four-lens re-walk after the new features; all 2026-10-22 must-haves closed (Dispatch-Item custom-dice-roller/lens-stories+cognitive-walk+kano+trunk-test-1).
 - 2026-10-22: goal check, jobs + HEART + working backwards (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-1). Goal stays.
 - 2026-10-23: goal check again after the seven builds (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-1). Goal stays.
+- 2026-10-26: four-lens review: stories, access, speed, heuristics; screen-reader and narrow-screen fixes (Dispatch-Item custom-dice-roller/lens-stories+access+speed+heuristics-20).
