@@ -1,4 +1,4 @@
-Next: four-lens re-walk landing (2026-10-23); total with its math (pull request 19) and DECISIONS.md (pull request 21) landed.
+Next: Type a roll like 2d6+3 built (2026-10-23), waiting on Daren to approve publishing.
 
 # State
 
