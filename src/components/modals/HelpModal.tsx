@@ -13,12 +13,13 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
         <p>Welcome to <strong>Dice Roller</strong>! Here is how to use the available features:</p>
         <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <li><strong>Add / Roll Dice:</strong> Use the <code>+</code> button at the bottom to add dice, and the main button to roll all unheld dice.</li>
-          <li><strong>Hold individual dice:</strong> On a phone, tap a die to select it, then tap it again to hold or release it (a mouse click holds at once). Held dice stay locked across rolls.</li>
+          <li><strong>Hold individual dice:</strong> Simply click/tap any die to hold or release it. Held dice stay locked across rolls.</li>
           <li><strong>Lock All:</strong> Toggle the Lock icon in the action bar to instantly hold or release all dice at once.</li>
           <li><strong>Custom Faces:</strong> Click the gear icon on a die to open settings. You can add custom text, special icons and pictures. Tap a face, then tap a colour to colour it, or tap "Colour every face differently" for a die that rolls a colour. Pictures stay on your device and go into backups; share links show the face's text instead.</li>
           <li><strong>Games & Presets:</strong> Quickly load predefined configurations like <em>Cities & Knights</em> or <em>That's Pretty Clever</em>, or save and load your own custom games!</li>
           <li><strong>RPG Mode:</strong> Toggle under Tools to unlock polyhedral dice shapes, a roll modifier, and Advantage / Disadvantage. Advantage keeps the highest (Disadvantage the lowest) among identical plain dice — custom-faced dice like percentile pairs always count normally.</li>
           <li><strong>Table view:</strong> Turn it on under Tools to show each roll's total huge, with its math, the dice as small tiles and an upside-down copy for the people across the table. Tap the big number to see the dice again; the next roll shows big once more. 6 and 9 are underlined so they read the right way up.</li>
+          <li><strong>Type a roll:</strong> In RPG Mode, type a roll in the box at the top, like <code>2d6+3</code>, <code>d20 adv</code> or <code>1d8+2d6</code>, and tap Roll. It puts out those dice with that modifier and rolls them; Undo brings back the dice you had.</li>
           <li><strong>Target Highlight:</strong> Set target totals under Tools &gt; Customize (e.g. <code>7, 11</code>) and get a 🎯 celebration whenever a roll hits one.</li>
           <li><strong>Usage Stats:</strong> Track total rolls, highest and average roll, and your most-played games under Tools &gt; Usage Stats. Everything is stored on your device only.</li>
           <li><strong>Colorblind Friendly:</strong> Automatic contrast coloring ensures text and icons are perfectly readable against any background color.</li>

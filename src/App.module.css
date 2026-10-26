@@ -123,6 +123,11 @@
   pointer-events: none;
 }
 
+/* In RPG mode the Type a roll box sits where the toast would, so keep it in view */
+.toastBelowBox {
+  top: 132px;
+}
+
 /* The Undo offer can be tapped, unlike a plain message */
 .undoToast {
   display: flex;
@@ -185,9 +190,11 @@
   /* RPG mode stacks its controls above the bottom edge; reserve that space so the
      dice grid never sizes itself underneath them. Since the controls rotate to two
      rows here: 2 rows of FABs (152) + gap (10) + roll button (72) + the bar's own
-     24px offset. */
+     24px offset = 258. The app already keeps 120px clear at the bottom, so the grid
+     adds the other 138 plus its usual 16. Reserving all 258 again left a d20 6px
+     tall on a small phone once the Type a roll box took its row. */
   :global(body.rpg-mode) .diceContainer {
-    padding-bottom: 270px !important;
+    padding-bottom: 154px !important;
   }
 }
 
