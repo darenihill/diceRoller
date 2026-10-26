@@ -160,6 +160,15 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   saved game is named for screen readers; rolling with no dice logs nothing.
   Done when a unit test shows an empty roll leaves history empty and the Save
   button has a fill at 390 px. ~~Done 2026-10-22~~
+- Fixes from the 2026-10-26 review (reviews/2026-10-26-access.md):
+  screen readers reach each die's buttons, states are spoken, Escape closes
+  the menu, the bottom buttons stop overlapping below 380 px wide, and high
+  contrast draws edges. Done when unit tests find each die's named buttons
+  and Escape closing the menu, and a 320 px browser check shows no overlap.
+  ~~Done 2026-10-26~~
+- At 200% zoom (about 195 px wide) the bottom buttons still overlap: give
+  them one row that fits, for example the menu and Hold All side by side
+  above Add and Roll. Done when a 195 px browser check shows no overlap.
 - The phone's back gesture closes the open dialog or menu first, instead of
   leaving the app (trunk test, reviews/2026-10-07-trunk-test.md, finding 4).
 - Donations cover the domain: count Donate taps (a donate_clicked event, no
