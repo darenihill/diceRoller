@@ -295,3 +295,8 @@
     justify-content: center;
   }
 }
+
+/* Table view shows the big total in this space; the grid stays mounted so its size is kept */
+.diceHidden {
+  display: none;
+}
