@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: forms polish third pass written up (Changed: no), now covering the Type a roll box that landed in pull request 27.
 
 # State
 
@@ -9,3 +9,4 @@ Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull reque
 - 2026-10-23: four-lens re-walk after the new features; all 2026-10-22 must-haves closed (Dispatch-Item custom-dice-roller/lens-stories+cognitive-walk+kano+trunk-test-1).
 - 2026-10-22: goal check, jobs + HEART + working backwards (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-1). Goal stays.
 - 2026-10-23: goal check again after the seven builds (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-1). Goal stays.
+- 2026-10-24: forms and input, third pass, nothing to change (Dispatch-Item custom-dice-roller/polish-ui-forms-1).
