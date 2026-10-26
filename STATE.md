@@ -1,4 +1,4 @@
-Next: forms polish third pass written up (Changed: no).
+Next: forms polish third pass written up (Changed: no), now covering the Type a roll box that landed in pull request 27.
 
 # State
 

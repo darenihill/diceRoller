@@ -31,6 +31,9 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      stays. Done when a unit test counts three holds.
   3. ~~Done 2026-10-22~~ The corner lock is a real button that holds or releases,
      and Help says to tap twice. Done when a unit test taps the corner lock.
+  Rolled back 2026-10-26 (Daren: "can we also roll back the change to have the
+  double press to hold in the middle of the dice. I don't love how it looks").
+  One tap holds a die again, as before 2026-10-22.
 
 - ~~Done 2026-10-22~~ Your saves first in Games (Daren 2026-10-22, Build): "Games
   & Saves would list Your Saves first, since a returning player usually wants
@@ -191,3 +194,16 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 - Dice size, step 3: include the size in backup export and import. Done when
   a round-trip test keeps the value and an old backup without it imports at
   the default.
+- ~~Done 2026-10-23~~ Type a roll like 2d6+3 (Daren 2026-10-23, Build, Way A): "Everyday rolls:
+  2d6+3, d20 adv, 1d8+2d6." In RPG mode a "Type a roll" box sits above the
+  dice; typing fills in the dice, the modifier and advantage the app already
+  has, then rolls.
+  1. ~~Done 2026-10-23~~ A parser reads NdX, d20, plus or minus a number, mixed dice (1d8+2d6) and
+     adv/dis, and gives a short plain note for anything it can't read. Done
+     when unit tests cover each form, the limits and a typo.
+  2. ~~Done 2026-10-23~~ The box appears in RPG mode only; Roll sets the dice, modifier and
+     advantage, then rolls once. Done when a component test types 2d6+3 and
+     sees two d6, +3 and one roll, and a 390 px browser check shows the box
+     clear of the dice and the Roll button.
+  3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
+     reads the typed text on the history entry.
