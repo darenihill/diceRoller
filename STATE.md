@@ -1,4 +1,4 @@
-Next: contrast and dark mode check (polish-ui-contrast-11), measuring light and dark screens.
+Next: contrast and dark mode fixes (polish-ui-contrast-11) are built; pull request waits for Daren's Merge tap (Dice Roller is public).
 
 # State
 

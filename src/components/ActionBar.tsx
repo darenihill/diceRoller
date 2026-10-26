@@ -51,7 +51,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
     if (!mountedRef.current) return;
     lockControls.start({
       rotate: [0, -45, 10, 0],
-      color: allHeld ? 'var(--color-gold)' : 'var(--md-sys-color-on-surface)',
+      color: allHeld ? 'var(--color-gold-ink)' : 'var(--md-sys-color-on-surface)',
       transition: { duration: 0.5, ease: 'easeInOut' }
     });
   }, [allHeld, lockControls]);
@@ -94,7 +94,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
         title="Toggle Hold All"
         initial={{ rotate: 0 }}
         animate={lockControls}
-        style={{ color: allHeld ? 'var(--color-gold)' : undefined }}
+        style={{ color: allHeld ? 'var(--color-gold-ink)' : undefined }}
       >
         {allHeld ? <Unlock size={24} strokeWidth={2.5} /> : <Lock size={24} strokeWidth={2.5} />}
       </motion.button>
