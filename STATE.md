@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: building Space or R to roll on a computer (Daren picked Build 2026-10-27).
 
 # State
 
