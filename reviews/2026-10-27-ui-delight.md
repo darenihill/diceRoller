@@ -23,8 +23,11 @@ the dialogs, by touch and by keyboard. Compared one flow at a time:
 ## Fixes built
 
 - Every button shows a 2 px primary-colour ring when reached by keyboard
-  (`button:focus-visible`), matching the ring the dice already had. Taps still
+  (`button:focus-visible`), like the ring the dice already had. Taps still
   show no ring. A test guards it.
+- The theme cards in Customize set `outline: none` inline on the unselected
+  cards, which beat the new rule; they now leave it unset, so Tab shows the
+  ring there too. The selected card keeps its own ring.
 
 ## Design tweaks built
 
