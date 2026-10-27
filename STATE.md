@@ -1,4 +1,4 @@
-Next: review pass fixes built (double-tap zoom, offline fallback, backup download); writing up and filing Focus ideas.
+Next: review pass (stories, on the go, code health, build vs adopt) written up; three ideas going to the Focus tab.
 
 # State
 
