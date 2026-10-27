@@ -6,10 +6,10 @@ Question: what one small detail would make the app feel finished?
 
 Checked at 390 px on master: the dice screen, the bottom bar, the menu and
 the dialogs, by touch and by keyboard. Compared one flow at a time:
-- Keyboard focus against Material 3's focus indicator guidance (Google's apps
-  draw a primary-colour ring on the focused control).
-- The browser bar against apps that tint it to their theme (Google Keep,
-  Twitter/X on the web).
+- Keyboard focus against Material 3's focus indicator guidance (a visible
+  ring on the focused control).
+- The browser bar against web apps that set `theme-color` to their current
+  theme.
 - Button press feedback against Material 3's pressed state.
 
 ## Found
