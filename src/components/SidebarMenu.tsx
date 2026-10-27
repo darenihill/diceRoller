@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './SidebarMenu.module.css';
+import { useBackToClose } from '../hooks/useBackToClose';
 import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Share2, Palette, Pin, ToggleLeft, ToggleRight, BarChart2 } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
@@ -40,6 +41,8 @@ interface SidebarMenuProps {
 export const SidebarMenu: React.FC<SidebarMenuProps> = ({
   isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onStats, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, rpgMode, onToggleRpgMode
 }) => {
+  // Phone Back closes the menu instead of leaving the app
+  useBackToClose(isOpen, onToggle);
   return (
     <>
       <div className={styles.toggleContainer}>

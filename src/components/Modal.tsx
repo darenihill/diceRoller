@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import styles from './Modal.module.css';
+import { useBackToClose } from '../hooks/useBackToClose';
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), textarea, input:not([disabled]), select, [tabindex]:not([tabindex="-1"])';
@@ -15,6 +16,8 @@ interface ModalProps {
 
 export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
   const panelRef = useRef<HTMLDivElement>(null);
+  // Phone Back closes the dialog instead of leaving the app
+  useBackToClose(isOpen, onClose);
 
   // Close on Escape, and keep Tab inside the dialog while it is open
   useEffect(() => {
