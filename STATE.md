@@ -1,4 +1,4 @@
-Next: small touches polish pass (polish-ui-delight-5), screenshots before.
+Next: small touches pass built a keyboard focus ring; pull request waits for Daren's Merge tap.
 
 # State
 

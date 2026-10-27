@@ -5,6 +5,10 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-10-27~~ Keyboard focus ring on every button (small touches
+  pass, reviews/2026-10-27-ui-delight.md). Done when a unit test finds the
+  button focus-visible ring in index.css.
+
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
   Build): "The big number stays the real total, and the math sits beside it in
   brackets: 9 (7+2), so the dice and the modifier are both visible and nobody
