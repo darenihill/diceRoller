@@ -28,6 +28,8 @@ import { SetsModal } from './components/modals/SetsModal';
 import { CustomizeModal } from './components/modals/CustomizeModal';
 import { createShakeDetector, requestMotionPermission, sampleFromEvent } from './utils/shake';
 import { SaveDialog } from './components/modals/SaveDialog';
+import { InstallModal } from './components/modals/InstallModal';
+import { useInstallApp } from './hooks/useInstallApp';
 import { useUndo, dieLabel } from './hooks/useUndo';
 import { spokenTotal } from './utils/totalMath';
 import { ShareModal } from './components/modals/ShareModal';
@@ -115,7 +117,15 @@ function App() {
   }, []);
 
   // Modals state
-  const [modalOpen, setModalOpen] = useState<'help' | 'history' | 'sets' | 'customize' | 'stats' | 'about' | null>(null);
+  const [modalOpen, setModalOpen] = useState<'help' | 'history' | 'sets' | 'customize' | 'stats' | 'about' | 'install' | null>(null);
+  const { installed, install } = useInstallApp();
+
+  // Install app: the browser's own install box, or the how-to where there is none
+  const handleInstall = async () => {
+    trackEvent('install_clicked');
+    setMenuOpen(false);
+    if (!(await install())) setModalOpen('install');
+  };
 
   useEffect(() => {
     document.body.classList.remove('theme-dark', 'theme-light', 'theme-felt', 'theme-midnight');
@@ -652,6 +662,7 @@ function App() {
         onSetDefault={handleSetDefault}
         rpgMode={rpgMode}
         onToggleRpgMode={toggleRpgMode}
+        onInstall={installed ? undefined : handleInstall}
       />
 
       <ActionBar
@@ -674,6 +685,8 @@ function App() {
         isOpen={modalOpen === 'help'} 
         onClose={() => setModalOpen(null)} 
       />
+
+      <InstallModal isOpen={modalOpen === 'install'} onClose={() => setModalOpen(null)} />
 
       {landingAbout && (
         <Modal isOpen={modalOpen === 'about'} onClose={() => setModalOpen(null)} title={landing?.heading ?? 'About'}>

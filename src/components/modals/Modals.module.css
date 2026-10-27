@@ -218,3 +218,31 @@
   min-width: 0;
   accent-color: var(--md-sys-color-primary);
 }
+
+/* Install how-to: two numbered steps with the Safari icons beside them */
+.installLead {
+  margin: 0 0 8px;
+  color: var(--md-sys-color-on-surface);
+}
+
+.installSteps {
+  margin: 0 0 16px;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--md-sys-color-on-surface);
+}
+
+.installSteps li > svg {
+  vertical-align: -4px;
+  margin-right: 8px;
+  color: var(--md-sys-color-primary);
+}
+
+.installNote {
+  margin: 0 0 16px;
+  font-size: 13px;
+  opacity: 0.8;
+  color: var(--md-sys-color-on-surface);
+}

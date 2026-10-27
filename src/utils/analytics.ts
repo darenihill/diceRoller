@@ -119,7 +119,8 @@ export type AnalyticsEventName =
   | 'sound_toggled'
   | 'shake_toggled'
   | 'shake_roll'
-  | 'modifier_toggled';
+  | 'modifier_toggled'
+  | 'install_clicked';
 
 /** Primary event logger */
 export function trackEvent(eventName: AnalyticsEventName, payload: Record<string, unknown> = {}): void {
