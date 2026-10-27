@@ -5,6 +5,12 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-10-27~~ On-the-go fixes from the 2026-10-27 review
+  (reviews/2026-10-27-one-hand-outside.md): quick repeat taps on buttons and
+  dice never zoom the page; the service worker always answers offline; the
+  backup download link is released after the download starts. Done when a
+  unit test finds touch-action on buttons and dice and the offline fallback.
+
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
   Build): "The big number stays the real total, and the math sits beside it in
   brackets: 9 (7+2), so the dice and the modifier are both visible and nobody

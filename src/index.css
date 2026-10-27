@@ -98,6 +98,8 @@ button {
   background: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  /* Quick repeat taps (wet or gloved hands) roll again instead of zooming the page */
+  touch-action: manipulation;
   outline: none;
 }
 

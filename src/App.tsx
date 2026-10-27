@@ -396,7 +396,8 @@ function App() {
       link.href = url;
       link.download = `diceroller_backup.json`;
       link.click();
-      URL.revokeObjectURL(url);
+      // Revoking in the same tick can cancel the download in Safari and Firefox
+      setTimeout(() => URL.revokeObjectURL(url), 0);
       trackEvent('backup_exported');
       showToast('Exported backup successfully!');
     } catch (e) {
