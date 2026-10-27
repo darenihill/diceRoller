@@ -5,18 +5,18 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- Install app tile in the menu puts Dice Roller on your home screen (Daren
+- ~~Done 2026-10-27~~ Install app tile in the menu puts Dice Roller on your home screen (Daren
   2026-10-27, Build): "Menu: Install app tile in the empty spot; iPhone: a
   two-step how-to sheet; Usage: an install_clicked count, no personal data."
   Built with the browser's own install prompt; no new package. No pop-up
   appears on its own.
-  1. An Install app tile sits in the menu's empty spot after RPG Mode and
+  1. ~~Done 2026-10-27~~ An Install app tile sits in the menu's empty spot after RPG Mode and
      opens the browser's install box where it has one. Done when a unit test
      taps it and the saved install prompt is shown.
-  2. Where there is no install box (iPhone Safari), the tile opens a short
+  2. ~~Done 2026-10-27~~ Where there is no install box (iPhone Safari), the tile opens a short
      how-to: Share, then Add to Home Screen. Done when a unit test taps it
      with no prompt and sees both steps.
-  3. The tile hides once the app runs from the home screen, and a tap counts
+  3. ~~Done 2026-10-27~~ The tile hides once the app runs from the home screen, and a tap counts
      install_clicked with no personal data. Done when unit tests check both.
 
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,

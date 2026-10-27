@@ -1,4 +1,4 @@
-Next: building the Install app tile in the menu (Daren picked Build 2026-10-27).
+Next: Install app tile built; pull request waits for Daren's Merge tap (public app).
 
 # State
 
