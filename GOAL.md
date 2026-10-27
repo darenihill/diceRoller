@@ -5,6 +5,19 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-10-27~~ Phone Back closes the open dialog instead of leaving Dice
+  Roller (Daren 2026-10-27, Build): "Phone Back in a dialog or the menu:
+  closes it; Back with nothing open: leaves as today."
+  1. ~~Done 2026-10-27~~ Back closes Help, Games, History, Usage Stats,
+     Customize, Share, Save and Dice Settings (one shared dialog). Done when a
+     unit test presses Back with Help open and the dialog closes in the app.
+  2. ~~Done 2026-10-27~~ Back closes the menu, and with the menu open behind
+     a dialog, Back closes the dialog first, then the menu. Done when a unit
+     test does both.
+  3. ~~Done 2026-10-27~~ Closing with the X, Escape or a tap outside takes the
+     extra Back step off, so Back with nothing open leaves as before. Done
+     when a unit test closes with the X and the history step is gone.
+
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
   Build): "The big number stays the real total, and the math sits beside it in
   brackets: 9 (7+2), so the dice and the modifier are both visible and nobody
@@ -160,8 +173,9 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   saved game is named for screen readers; rolling with no dice logs nothing.
   Done when a unit test shows an empty roll leaves history empty and the Save
   button has a fill at 390 px. ~~Done 2026-10-22~~
-- The phone's back gesture closes the open dialog or menu first, instead of
+- ~~Done 2026-10-27~~ The phone's back gesture closes the open dialog or menu first, instead of
   leaving the app (trunk test, reviews/2026-10-07-trunk-test.md, finding 4).
+  Built by "Phone Back closes the open dialog" above.
 - Donations cover the domain: count Donate taps (a donate_clicked event, no
   personal data) and offer the Donate link at a good moment, such as after a
   share link is copied. Done when the event fires in a test and the prompt
