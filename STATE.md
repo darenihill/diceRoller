@@ -1,4 +1,4 @@
-Next: building Space or R to roll on a computer (Daren picked Build 2026-10-27).
+Next: Space or R to roll built; pull request waits for Daren's Merge tap (public app).
 
 # State
 

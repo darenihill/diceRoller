@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import LZString from 'lz-string';
 import styles from './App.module.css';
 import { useDiceState } from './hooks/useDiceState';
+import { useRollKeys } from './hooks/useRollKeys';
 import { useStorage } from './hooks/useStorage';
 import { Dice } from './components/Dice';
 import { ActionBar } from './components/ActionBar';
@@ -535,6 +536,9 @@ function App() {
       playRollSequence(soundTimersRef);
     }
   };
+
+  // Space or R rolls on a computer, only from the main screen
+  useRollKeys(handleRoll, menuOpen || modalOpen !== null);
 
   // Shake to roll: the latest roll handler, read by the motion listener
   const handleRollRef = useRef(handleRoll);

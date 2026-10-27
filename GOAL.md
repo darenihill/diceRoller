@@ -5,16 +5,16 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- Press Space or R to roll on a computer (Daren 2026-10-27, Build): "Space
+- ~~Done 2026-10-27~~ Press Space or R to roll on a computer (Daren 2026-10-27, Build): "Space
   or R: rolls the dice on a computer; Help: lists the two keys." It is ignored
   while you type, while a window or the menu is open, and when another button
   such as a die is selected, so it never rolls by surprise.
-  1. Space or R rolls the dice from the main screen. Done when a unit test
+  1. ~~Done 2026-10-27~~ Space or R rolls the dice from the main screen. Done when a unit test
      presses each key and sees a roll.
-  2. The keys do nothing while typing in a box, with a window or the menu
+  2. ~~Done 2026-10-27~~ The keys do nothing while typing in a box, with a window or the menu
      open, or with a die or other button selected. Done when unit tests check
      each case.
-  3. Help lists the two keys. Done when a unit test opens Help and finds them.
+  3. ~~Done 2026-10-27~~ Help lists the two keys. Done when a unit test opens Help and finds them.
 
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
   Build): "The big number stays the real total, and the math sits beside it in
