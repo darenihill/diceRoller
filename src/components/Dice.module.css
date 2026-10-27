@@ -1,5 +1,6 @@
 .dice {
   display: flex;
+  touch-action: manipulation;
   flex-direction: column;
   align-items: center;
   justify-content: center;
