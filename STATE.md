@@ -1,4 +1,4 @@
-Next: review pass (stories, on the go, code health, build vs adopt) written up; three ideas going to the Focus tab.
+Next: review pass done; three ideas on the Focus tab (Back closes dialogs, storage-full message, secure random rolls); pull request waits for Daren's Merge tap.
 
 # State
 
