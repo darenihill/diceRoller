@@ -5,6 +5,8 @@ import { COLORS, COLOR_NAMES, FACE_ICON_PREFIX, parseFaceContent, buildFace, fac
 import { X, Plus, Minus, Star, Check, Copy, Trash2, Palette, ImagePlus, ImageOff, Rainbow, Ban } from 'lucide-react';
 import { addFaceImage, useFaceImages, shrinkImage } from '../utils/faceImages';
 import { ALL_ICONS, COMMON_ICONS } from '../utils/iconUtils';
+import { MAX_CUSTOM_FACES } from '../utils/constants';
+import { splitFaceList, pastedListForBox } from '../utils/faceList';
 import styles from './DiceSettingsModal.module.css';
 
 /** Approximate rendered height of the colour popover, used to clamp its position. */
@@ -37,6 +39,8 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   /** Which face the next chosen picture goes on; 'new' adds a picture face */
   const pictureTarget = useRef<number | 'new'>('new');
   const [pictureError, setPictureError] = useState('');
+  /** After a list is added: what to say, and the faces to put back on Undo */
+  const [listNote, setListNote] = useState<{ text: string; before: string[]; canUndo: boolean } | null>(null);
   const images = useFaceImages();
   // The faces as they are now, for edits that finish after a picture is shrunk
   const latestDice = useRef(dice);
@@ -66,10 +70,46 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     if (num > 0) onUpdate(dice.id, { faces: num, customFaces: [] });
   };
 
-  const addCustomFace = (face: string) => {
-    if (!face.trim()) return;
-    onUpdate(dice.id, { customFaces: [...dice.customFaces, face.trim()] });
+  const addCustomFace = (text: string) => {
+    const faces = splitFaceList(text);
+    if (faces.length === 0) return;
+    const before = dice.customFaces;
+    const room = Math.max(0, MAX_CUSTOM_FACES - before.length);
+    const added = faces.slice(0, room);
+    const leftOut = faces.length - added.length;
+    if (added.length > 0) onUpdate(dice.id, { customFaces: [...before, ...added] });
     setCustomInput('');
+    if (faces.length > 1 || leftOut > 0) {
+      const addedText = `Added ${added.length} face${added.length === 1 ? '' : 's'}`;
+      setListNote({
+        text: leftOut > 0
+          ? `${addedText}; ${leftOut} left out, a die holds ${MAX_CUSTOM_FACES}.`
+          : `${addedText}.`,
+        before,
+        canUndo: added.length > 0,
+      });
+    } else {
+      setListNote(null);
+    }
+  };
+
+  const undoList = () => {
+    if (!listNote) return;
+    onUpdate(dice.id, { customFaces: listNote.before });
+    setListNote(null);
+  };
+
+  // A pasted list keeps its lines: they show as commas, which + splits on
+  const handleListPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pasted = e.clipboardData.getData('text');
+    if (!/[\r\n]/.test(pasted)) return;
+    e.preventDefault();
+    const input = e.currentTarget;
+    const start = input.selectionStart ?? customInput.length;
+    const end = input.selectionEnd ?? customInput.length;
+    const head = customInput.slice(0, start).replace(/[,\s]*$/, '');
+    const tail = customInput.slice(end).replace(/^[,\s]*/, '');
+    setCustomInput([head, pastedListForBox(pasted), tail].filter(Boolean).join(', '));
   };
 
   const removeCustomFace = (index: number) => {
@@ -379,6 +419,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               value={customInput}
               onChange={(e) => setCustomInput(e.target.value)}
               onKeyDown={(e) => { if(e.key === 'Enter') addCustomFace(customInput); }}
+              onPaste={handleListPaste}
               placeholder="Add custom text"
               aria-label="Custom face text"
               autoComplete="off"
@@ -389,6 +430,14 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               <Plus size={20} strokeWidth={2.5} />
             </button>
           </div>
+          {listNote && (
+            <p className={styles.listNote} role="status">
+              <span>{listNote.text}</span>
+              {listNote.canUndo && (
+                <button type="button" className={styles.listUndo} onClick={undoList}>Undo</button>
+              )}
+            </p>
+          )}
 
           <button
             type="button"
