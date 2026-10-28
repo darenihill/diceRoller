@@ -5,6 +5,16 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- Dice rolls use the browser's secure randomness, with no visible change
+  (Daren 2026-10-27, Build): "Roll results: same look, secure randomness
+  underneath; Help: one line on how the dice are rolled." No new package.
+  1. Every roll result and spinning face comes from one shared helper using
+     the browser's secure random numbers. Done when a unit test sees the
+     helper read crypto.getRandomValues and no roll code calls Math.random.
+  2. Every face still comes up evenly. Done when a unit test draws many d6
+     and d20 results and each face lands within a fair range.
+  3. Help says how the dice are rolled. Done when a unit test finds the line.
+
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
   Build): "The big number stays the real total, and the math sits beside it in
   brackets: 9 (7+2), so the dice and the modifier are both visible and nobody
