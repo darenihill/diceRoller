@@ -1,4 +1,4 @@
-Next: building tap Roll during the tumble to land the dice at once, with a private try link first (Daren picked Build 2026-10-27).
+Next: tumble tap built; try link https://claude.ai/artifact/UWwTWwBh6U5RxmYWXSLPUt waits for Daren to say it feels right, then his Merge tap (public app).
 
 # State
 
