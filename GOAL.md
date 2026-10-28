@@ -5,6 +5,16 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-10-28~~ The menu closes when you open Help, Games, History, Usage Stats or
+  Customize (Daren 2026-10-27, Build): "Menu: closes when you pick Help,
+  Games, History, Usage Stats or Customize; Closing those windows: lands on
+  the dice, not the menu." RPG Mode stays a switch in the menu; Feedback and
+  Donate still open a new tab.
+  1. ~~Done 2026-10-28~~ Each of the five closes the menu as its window opens. Done when a unit
+     test opens each one and the menu is closed.
+  2. ~~Done 2026-10-28~~ Closing that window lands on the dice. Done when a unit test closes
+     Help and sees neither the window nor the menu.
+
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
   Build): "The big number stays the real total, and the math sits beside it in
   brackets: 9 (7+2), so the dice and the modifier are both visible and nobody
