@@ -9,7 +9,7 @@ import { TypeRollBox } from './components/TypeRollBox';
 import { TYPED_DIE_COLOR, type TypedRoll } from './utils/rollNotation';
 import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
-import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages } from './utils/diceUtils';
+import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages, parseFaceContent } from './utils/diceUtils';
 import { usedFaceImages, importFaceImages } from './utils/faceImages';
 import { playRollSequence } from './utils/soundEffects';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
@@ -39,7 +39,7 @@ function App() {
     rpgMode, toggleRpgMode, rollAdvantage, setRollAdvantage,
     targetHighlight, setTargetHighlight,
     addDice, removeDice, updateDice, toggleHold, toggleHoldAll,
-    clearAllDice, rollDice, clearHistory, toast, showToast, insertDiceAt, restoreDice
+    clearAllDice, rollDice, clearHistory, restoreHistory, toast, showToast, insertDiceAt, restoreDice
   } = useDiceState();
   const { offer: undoOffer, offerUndo, runUndo } = useUndo();
 
@@ -351,6 +351,30 @@ function App() {
     const saved = savedConfigs[name];
     deleteConfig(name);
     if (saved) offerUndo(`Deleted ${name}`, () => saveConfig(name, saved.config));
+  };
+
+  // The faces count, a template or a face's X can drop custom faces; Undo puts them back
+  const handleUpdateDie = (id: string, updates: Partial<DiceData>) => {
+    const die = diceList.find(d => d.id === id);
+    if (die && updates.customFaces) {
+      const kept = new Set(updates.customFaces.map(f => parseFaceContent(f).content));
+      const lost = die.customFaces.filter(f => !kept.has(parseFaceContent(f).content));
+      if (lost.length > 0) {
+        const before = { faces: die.faces, customFaces: die.customFaces, currentFaceIndex: die.currentFaceIndex };
+        offerUndo(
+          lost.length === 1 ? `Removed face ${parseFaceContent(lost[0]).content}` : `Replaced ${lost.length} faces`,
+          () => updateDice(id, before),
+        );
+      }
+    }
+    updateDice(id, updates);
+  };
+
+  const handleClearHistory = () => {
+    const before = rollHistory;
+    if (before.length === 0) return;
+    clearHistory();
+    offerUndo(`Cleared ${before.length} ${before.length === 1 ? 'roll' : 'rolls'}`, () => restoreHistory(before));
   };
 
   const handleShare = () => {
@@ -686,7 +710,7 @@ function App() {
         isOpen={modalOpen === 'history'} 
         onClose={() => setModalOpen(null)} 
         rollHistory={rollHistory}
-        onClearHistory={clearHistory}
+        onClearHistory={handleClearHistory}
       />
 
       <SetsModal 
@@ -762,7 +786,7 @@ function App() {
           dice={diceList.find(d => d.id === editingDiceId)!}
           isOpen={!!editingDiceId}
           onClose={() => setEditingDiceId(null)}
-          onUpdate={updateDice}
+          onUpdate={handleUpdateDie}
           onRemove={handleRemoveDie}
           onClone={handleAddDice}
           allDice={diceList}

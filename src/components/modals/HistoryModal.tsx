@@ -38,7 +38,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Roll History & Frequency">
       {rollHistory.length === 0 ? (
-        <p style={{ color: 'var(--md-sys-color-on-surface-variant)', textAlign: 'center', padding: '16px 0' }}>No History Recorded Yet</p>
+        <p style={{ color: 'var(--md-sys-color-on-surface-variant)', textAlign: 'center', padding: '16px 0' }}>No rolls yet. Each roll shows here.</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {/* Session Frequency Histogram */}

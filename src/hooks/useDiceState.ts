@@ -335,6 +335,9 @@ export const useDiceState = () => {
     }
   }, []);
 
+  // Undo for Clear History; the history save effect writes it back to storage
+  const restoreHistory = useCallback((list: RollHistoryItem[]) => setRollHistory(list), []);
+
   return {
     diceList,
     setDiceList,
@@ -357,6 +360,7 @@ export const useDiceState = () => {
     clearAllDice,
     rollDice,
     clearHistory,
+    restoreHistory,
     toast,
     showToast,
     insertDiceAt,

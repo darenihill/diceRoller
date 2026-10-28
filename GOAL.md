@@ -5,6 +5,32 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- Deep review fixes (review 2026-10-28: stories, on the go, code health,
+  build vs adopt; reviews/2026-10-28-combined.md).
+  1. ~~Done 2026-10-28~~ Changes in a die's settings that drop custom faces
+     (the faces count, a template, a face's X) offer Undo, and Clear History
+     offers "Cleared N rolls · Undo" (standard 2). Done when unit tests undo
+     each one.
+  2. ~~Done 2026-10-28~~ Outdoors fixes: the Add D&D die card opens on screen,
+     the first visit no longer waits on the font server, the app opens offline
+     after one visit, hint text is readable in sun, and the dialog close X,
+     Clear All, the dice size − and + and Dice settings' Done are thumb-sized
+     and in view (standards 9, 10, 20). Done when the browser check measures
+     each, and unit tests cover the size buttons.
+  3. A word typed in Add custom text survives closing Dice settings
+     (standard 1). Build after pull request 46 lands, since both edit that box.
+     Done when a unit test closes and reopens settings and finds the word.
+  4. Opening a share link or a search page offers Undo back to your own dice
+     (standards 1 and 2). Build after pull request 41 lands. Done when a unit
+     test opens a share link over saved dice and undoes it.
+  5. Clear All also clears the saved autosave in memory, so cleared dice can't
+     come back on the next save. Build after pull request 41. Done when a unit
+     test clears, saves another game, reloads and finds no dice.
+  6. Code tidy with no visible change: one keep-highest/lowest block, the roll
+     uses targets.ts, first-run dice from sanitizeDiceList, drop unused
+     DEFAULT_DEV_PORT. Build after pull requests 39 and 41. Done when the
+     tests pass unchanged.
+
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
   Build): "The big number stays the real total, and the math sits beside it in
   brackets: 9 (7+2), so the dice and the modifier are both visible and nobody

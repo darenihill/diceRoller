@@ -1,4 +1,4 @@
-Next: Deep review 2026-10-28 (stories, on the go, code health, build vs adopt) in progress.
+Next: Deep review 2026-10-28: fixes 1-2 built; write-ups and Desk ideas next; fixes 3-6 wait on pull requests 39, 41 and 46.
 
 # State
 
