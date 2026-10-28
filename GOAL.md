@@ -5,6 +5,15 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-10-28~~ Screen stays on while Dice Roller is open, so no unlock between turns
+  (Daren 2026-10-28, Build): "Screen stays awake while Dice Roller is on
+  screen." Uses the browser's Screen Wake Lock; it lets go when you leave.
+  1. ~~Done 2026-10-28~~ While Dice Roller is on screen the app asks the browser to keep the
+     screen awake, and asks again when you come back to it. Done when a unit
+     test sees the request on open and again after the page is shown again.
+  2. ~~Done 2026-10-28~~ Browsers without a wake lock, or that refuse it, carry on as today with
+     no error. Done when unit tests cover a missing and a refused wake lock.
+
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
   Build): "The big number stays the real total, and the math sits beside it in
   brackets: 9 (7+2), so the dice and the modifier are both visible and nobody
