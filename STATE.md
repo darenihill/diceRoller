@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: faces counter label names the custom faces it replaces (building, 2026-10-28).
 
 # State
 

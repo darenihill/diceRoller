@@ -207,3 +207,9 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+- The faces counter warns that it will replace your custom faces (Daren
+  2026-10-28, Build): "Dice settings: the faces counter's label names the
+  custom faces it would replace; No new control or behaviour". Wording only.
+  1. When a die has custom faces, the Standard Faces label adds "Replaces your
+     N custom faces". Done when a component test reads it (and the singular),
+     a plain die shows no note, and a 390 px check shows it wrapping cleanly.
