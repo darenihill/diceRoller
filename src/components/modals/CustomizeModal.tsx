@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from '../Modal';
-import { Volume2, VolumeX, BarChart2, Smartphone } from 'lucide-react';
+import { Volume2, VolumeX, BarChart2, Smartphone, Vibrate, VibrateOff } from 'lucide-react';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
 import { targetNote } from '../../utils/targets';
@@ -24,6 +24,10 @@ interface CustomizeModalProps {
   onChangeDiceScale: (scale: number) => void;
   shakeEnabled: boolean;
   onToggleShake: () => void;
+  /** Buzz when dice land: shown only after its private link was opened */
+  buzzShown?: boolean;
+  buzzEnabled?: boolean;
+  onToggleBuzz?: () => void;
 }
 
 export const CustomizeModal: React.FC<CustomizeModalProps> = ({
@@ -41,6 +45,9 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
   onChangeDiceScale,
   shakeEnabled,
   onToggleShake,
+  buzzShown = false,
+  buzzEnabled = false,
+  onToggleBuzz,
 }) => {
   const note = targetNote(targetHighlight);
   return (
@@ -144,6 +151,25 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
               <Smartphone size={20} />
             </button>
           </div>
+
+          {/* Buzz when dice land: hidden until its private link is opened (trial) */}
+          {buzzShown && onToggleBuzz && (
+            <div className={modalStyles.toggleRow}>
+              <div className={modalStyles.toggleLabelCol}>
+                <span className={modalStyles.toggleTitle}>Buzz When Dice Land</span>
+                <span className={modalStyles.toggleDesc}>One short buzz when the dice land, even with sound off (Android)</span>
+              </div>
+              <button
+                className="md-icon-button"
+                onClick={onToggleBuzz}
+                title={buzzEnabled ? "Turn off buzz when dice land" : "Turn on buzz when dice land"}
+                aria-label="Buzz when dice land"
+                aria-pressed={buzzEnabled}
+              >
+                {buzzEnabled ? <Vibrate size={20} /> : <VibrateOff size={20} />}
+              </button>
+            </div>
+          )}
 
           {/* Target Total Highlight: a gentle note names any part that isn't a whole number */}
           <div>
