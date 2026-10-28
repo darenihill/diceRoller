@@ -5,6 +5,17 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-10-28~~ Paste a list into Add custom text and every line becomes a face
+  (Daren 2026-10-28, Build): "Dice settings: Add custom text takes a pasted
+  list." His note: "This should also take a comma separated list on a single
+  line."
+  1. ~~Done 2026-10-28~~ A pasted list of lines, or names with commas between them, becomes
+     one face each when you tap + (blank pieces skipped), added after the faces
+     already there. Done when unit tests cover a pasted list and a comma list.
+  2. ~~Done 2026-10-28~~ A note says how many faces went in, with Undo, and a die stops at
+     100 faces with a note on any left out. Done when unit tests cover Undo
+     and the 100 limit.
+
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
   Build): "The big number stays the real total, and the math sits beside it in
   brackets: 9 (7+2), so the dice and the modifier are both visible and nobody
