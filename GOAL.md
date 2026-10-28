@@ -207,3 +207,8 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+- ~~Done 2026-10-28~~ Usage Stats puts two numbers per row on a phone (Daren 2026-10-28, Build):
+  "Usage Stats number cards: two per row on phones".
+  1. ~~Done 2026-10-28~~ Phones (up to 600 px) get two columns; wider screens keep today's grid.
+     Done when a CSS test reads the rule and a browser check shows two per
+     row at 360 and 390 px with no sideways scroll.
