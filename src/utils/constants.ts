@@ -15,3 +15,6 @@ export const ROLL_TICK_INTERVAL_MS = 200;
 export const ROLL_DURATION_MS = 800;
 export const TOAST_DURATION_MS = 3000;
 export const DEFAULT_DEV_PORT = 4500; // block 4500 per aiprojects/PORTS.md
+
+/** Dice smaller than this (px) show a tapped die's buttons in one strip above the bottom bar */
+export const COMPACT_DIE_SIZE = 150;

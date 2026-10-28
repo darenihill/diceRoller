@@ -279,3 +279,9 @@
   clip-path: polygon(50% 2%, 94% 26%, 94% 74%, 50% 98%, 6% 74%, 6% 26%);
   border-radius: 0 !important;
 }
+
+/* Many small dice: the tapped die is outlined; its buttons sit in the strip above the bottom bar */
+.dice.outlined {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 3px;
+}
