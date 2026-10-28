@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: Deep review 2026-10-28: fixes 1-2 built; write-ups and Desk ideas next; fixes 3-6 wait on pull requests 39, 41 and 46.
 
 # State
 
