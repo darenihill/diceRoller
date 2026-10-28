@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: tumble tap built; try link https://claude.ai/artifact/UWwTWwBh6U5RxmYWXSLPUt waits for Daren to say it feels right, then his Merge tap (public app).
 
 # State
 

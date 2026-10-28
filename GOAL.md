@@ -5,6 +5,20 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-10-28~~ Tapping Roll while the dice tumble lands them at once (Daren 2026-10-27,
+  Build, way "Try it first on a private link"): "Second tap during the
+  tumble: lands the dice at once, same result; History: one entry per roll,
+  even after a double tap; Try link: a private preview to feel it on your
+  phone before it goes public." It reaches the public site only after Daren
+  says it feels right.
+  1. ~~Done 2026-10-28~~ A second tap on Roll during the tumble lands the dice at once with the
+     result already picked, and History gets one entry. Done when a unit test
+     double-taps Roll and sees one History entry with the first roll's total.
+  2. ~~Done 2026-10-28~~ Without a second tap, a roll looks and lasts as today. Done when a unit
+     test sees the roll finish only after the usual tumble time.
+  3. ~~Done 2026-10-28~~ A private try link only Daren can open runs this build. Done when the
+     link opens the app in a browser and a double tap lands the dice.
+
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
   Build): "The big number stays the real total, and the math sits beside it in
   brackets: 9 (7+2), so the dice and the modifier are both visible and nobody

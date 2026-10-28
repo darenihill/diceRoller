@@ -11,7 +11,7 @@ import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages } from './utils/diceUtils';
 import { usedFaceImages, importFaceImages } from './utils/faceImages';
-import { playRollSequence } from './utils/soundEffects';
+import { playRollSequence, playLandNow } from './utils/soundEffects';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { MAX_HISTORY_LENGTH } from './utils/constants';
 import { dicePresets } from './utils/presets';
@@ -523,7 +523,7 @@ function App() {
 
   const handleRoll = () => {
     const hasUnheldDice = diceList.some(d => !d.held);
-    rollDice(({ total, diceCount }) => {
+    const outcome = rollDice(({ total, diceCount }) => {
       // Fires when the roll resolves, so the actual total reaches analytics
       setHasRolledThisSession(true);
       if (diceCount > 0) {
@@ -531,7 +531,10 @@ function App() {
       }
     });
 
-    if (hasUnheldDice && diceList.length > 0 && soundEnabled) {
+    // A tap during the tumble only lands the dice: the thud plays now, the rattle doesn't start again
+    if (outcome === 'landed') {
+      if (soundEnabled) playLandNow(soundTimersRef);
+    } else if (outcome === 'rolled' && hasUnheldDice && diceList.length > 0 && soundEnabled) {
       playRollSequence(soundTimersRef);
     }
   };
