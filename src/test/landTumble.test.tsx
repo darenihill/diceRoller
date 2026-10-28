@@ -47,15 +47,21 @@ describe('Tapping Roll while the dice tumble', () => {
   });
 
   it('keeps the result picked when the roll started', () => {
-    const random = vi.spyOn(Math, 'random');
-    random.mockReturnValue(0.99); // the roll picks 6 and 6
+    // Feed both random sources, so this holds with everyday or secure randomness
+    let next = 0.99; // the roll picks 6 and 6
+    const random = vi.spyOn(Math, 'random').mockImplementation(() => next);
+    const secure = vi.spyOn(globalThis.crypto, 'getRandomValues').mockImplementation(<T extends ArrayBufferView | null>(arr: T) => {
+      (arr as unknown as Uint32Array)[0] = Math.floor(next * 2 ** 32);
+      return arr;
+    });
     render(<App />);
     tapRoll();
-    random.mockReturnValue(0); // a second roll would pick 1 and 1
+    next = 0; // a second roll would pick 1 and 1
     wait(100);
     tapRoll();
     expect(history()[0].total).toBe(12);
     random.mockRestore();
+    secure.mockRestore();
   });
 
   it('without a second tap, the roll lasts the usual tumble', () => {
