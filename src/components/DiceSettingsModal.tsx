@@ -195,7 +195,14 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
             </div>
 
             <div>
-              <label className={styles.label} htmlFor={`${fieldId}-faces`}>Standard Faces</label>
+              <label className={styles.label} htmlFor={`${fieldId}-faces`}>
+                Standard Faces
+                {dice.customFaces.length > 0 && (
+                  <span className={styles.labelNote}>
+                    Replaces your {dice.customFaces.length} custom {dice.customFaces.length === 1 ? 'face' : 'faces'}
+                  </span>
+                )}
+              </label>
               <div className={styles.stepperRow}>
                 <button className={styles.stepperBtn} onClick={() => setFaces(dice.faces - 1)} title="Decrease faces">
                   <Minus size={18} strokeWidth={2.5} />

@@ -27,6 +27,14 @@
   opacity: 0.8;
 }
 
+/* Second line under a label, e.g. what the faces counter would replace */
+.labelNote {
+  display: block;
+  font-size: 12px;
+  margin-top: 2px;
+  overflow-wrap: anywhere;
+}
+
 .sublabel {
   font-size: 12px;
   color: var(--md-sys-color-on-surface);
