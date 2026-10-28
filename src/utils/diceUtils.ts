@@ -1,4 +1,5 @@
 import type { DiceData } from '../types';
+import { randomBelow } from './fairRandom';
 import {
   MAX_DICE_LIMIT, MIN_FACES, MAX_FACES, MAX_CUSTOM_FACES,
   MAX_FACE_TEXT_LENGTH, MAX_NAME_LENGTH
@@ -21,7 +22,7 @@ const FACE_IMAGE_RE = /:img:([a-z0-9]{1,16})$/;
 const FACE_SUFFIX_RE = /(?::img:[a-z0-9]{1,16})?(?::bg:#[0-9a-fA-F]{3,8}|:bg:transparent)?(?::val:-?\d{1,4})?$/;
 
 export function getRandomNumber(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  return randomBelow(max - min + 1) + min;
 }
 
 export function generateId(): string {

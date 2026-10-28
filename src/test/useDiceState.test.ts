@@ -107,6 +107,11 @@ describe('rollDice (Roll Resolution, Advantage & Modifier Logic)', () => {
     vi.useFakeTimers();
     randQueue = [];
     vi.spyOn(Math, 'random').mockImplementation(() => (randQueue.length ? randQueue.shift()! : 0.5));
+    // Rolls draw from the browser's secure random numbers: feed them the same queue
+    vi.spyOn(globalThis.crypto, 'getRandomValues').mockImplementation(<T extends ArrayBufferView | null>(arr: T) => {
+      (arr as unknown as Uint32Array)[0] = Math.floor(Math.random() * 2 ** 32);
+      return arr;
+    });
   });
 
   afterEach(() => {
@@ -248,6 +253,11 @@ describe('rollDice for one die', () => {
     vi.useFakeTimers();
     randQueue = [];
     vi.spyOn(Math, 'random').mockImplementation(() => (randQueue.length ? randQueue.shift()! : 0.5));
+    // Rolls draw from the browser's secure random numbers: feed them the same queue
+    vi.spyOn(globalThis.crypto, 'getRandomValues').mockImplementation(<T extends ArrayBufferView | null>(arr: T) => {
+      (arr as unknown as Uint32Array)[0] = Math.floor(Math.random() * 2 ** 32);
+      return arr;
+    });
   });
 
   afterEach(() => {
