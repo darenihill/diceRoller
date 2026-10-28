@@ -1,4 +1,4 @@
-Next: building secure randomness for rolls (Daren picked Build 2026-10-27).
+Next: secure randomness built; pull request waits for Daren's Merge tap (public app).
 
 # State
 

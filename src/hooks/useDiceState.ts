@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { DiceData } from '../types';
 import { generateId, parseFaceContent, faceNumericValue, FACE_ICON_PREFIX, isNumberedFaces } from '../utils/diceUtils';
 import { MAX_DICE_LIMIT, MAX_HISTORY_LENGTH, ROLL_DURATION_MS, TOAST_DURATION_MS } from '../utils/constants';
+import { randomBelow } from '../utils/fairRandom';
 
 export interface RollHistoryItem {
   id: string;
@@ -179,10 +180,10 @@ export const useDiceState = () => {
         };
       }
 
-      let val = Math.floor(Math.random() * d.faces) + 1;
+      let val = randomBelow(d.faces) + 1;
       let idx = 0;
       if (d.customFaces.length > 0) {
-        idx = Math.floor(Math.random() * d.customFaces.length);
+        idx = randomBelow(d.customFaces.length);
       }
       
       if (d.customFaces.length > 0) {
