@@ -1,4 +1,4 @@
-Next: colour panel pins only after a face tap (building, 2026-10-28).
+Next: colour panel pins only after a face tap, built (2026-10-28); pull request waits for Daren's Merge tap.
 
 # State
 
