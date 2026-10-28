@@ -314,10 +314,15 @@ function App() {
     setMenuOpen(false);
   };
 
+  // Set Default can be undone for five seconds: Undo puts back the startup dice it replaced (or none)
   const handleSetDefault = () => {
+    const previous = localStorage.getItem('defaultDiceSet');
     localStorage.setItem('defaultDiceSet', JSON.stringify(diceList));
-    showToast('Saved as default! It will automatically load on open.');
     setMenuOpen(false);
+    offerUndo('Startup dice set', () => {
+      if (previous === null) localStorage.removeItem('defaultDiceSet');
+      else localStorage.setItem('defaultDiceSet', previous);
+    });
   };
 
   // Clear All needs no confirm: Undo brings every die back for five seconds

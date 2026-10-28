@@ -1,4 +1,4 @@
-Next: building Undo after Set Default (app standard 2).
+Next: Undo after Set Default built; pull request waits for Daren's Merge tap (public app).
 
 # State
 

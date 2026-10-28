@@ -5,13 +5,13 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- Undo after Set Default (standard 2, Undo, per the hub's app standards):
+- ~~Done 2026-10-28~~ Undo after Set Default (standard 2, Undo, per the hub's app standards):
   "Set Default shows 'Startup dice set · Undo' for 5 seconds, using the same
   Undo bar as removing a die, and Undo brings back the previous startup dice
   (or none)."
-  1. Set Default shows "Startup dice set" with Undo. Done when a unit test
+  1. ~~Done 2026-10-28~~ Set Default shows "Startup dice set" with Undo. Done when a unit test
      taps Set Default and sees the bar.
-  2. Undo brings back the previous startup dice, or none if there were none.
+  2. ~~Done 2026-10-28~~ Undo brings back the previous startup dice, or none if there were none.
      Done when unit tests check both.
 
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
