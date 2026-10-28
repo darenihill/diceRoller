@@ -314,6 +314,12 @@ function App() {
     setMenuOpen(false);
   };
 
+  // A window picked from the menu closes the menu, as Save and Share do, so closing it lands on the dice
+  const openFromMenu = (which: 'help' | 'history' | 'stats' | 'sets' | 'customize') => {
+    setMenuOpen(false);
+    setModalOpen(which);
+  };
+
   const handleSetDefault = () => {
     localStorage.setItem('defaultDiceSet', JSON.stringify(diceList));
     showToast('Saved as default! It will automatically load on open.');
@@ -641,11 +647,11 @@ function App() {
         onToggle={() => setMenuOpen(!menuOpen)}
         onDonate={() => window.open('https://www.buymeacoffee.com/darenihill', '_blank')}
         onIdeas={() => window.open('https://forms.gle/wqYaKsEZ5FQwizuMA', '_blank')}
-        onHelp={() => setModalOpen('help')}
-        onHistory={() => setModalOpen('history')}
-        onStats={() => setModalOpen('stats')}
-        onSets={() => setModalOpen('sets')}
-        onCustomize={() => setModalOpen('customize')}
+        onHelp={() => openFromMenu('help')}
+        onHistory={() => openFromMenu('history')}
+        onStats={() => openFromMenu('stats')}
+        onSets={() => openFromMenu('sets')}
+        onCustomize={() => openFromMenu('customize')}
         onDeleteAll={handleDeleteAll}
         onSave={handleSave}
         onShare={handleShare}
