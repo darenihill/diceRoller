@@ -30,6 +30,10 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      uses targets.ts, first-run dice from sanitizeDiceList, drop unused
      DEFAULT_DEV_PORT. Build after pull requests 39 and 41. Done when the
      tests pass unchanged.
+  7. With a pinned default, opening the app offers Undo back to last time's
+     dice, read before they're overwritten (standards 1 and 2; same pattern as
+     step 4). Build after pull request 41. Done when a unit test pins a
+     default, changes the dice, reopens and undoes back to them.
 
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
   Build): "The big number stays the real total, and the math sits beside it in
