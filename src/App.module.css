@@ -20,15 +20,6 @@
   padding: 16px;
 }
 
-.helpList {
-  padding-left: 20px;
-  line-height: 1.6;
-}
-
-.helpList li {
-  margin-bottom: 12px;
-}
-
 .historyList {
   display: flex;
   flex-direction: column;
@@ -51,18 +42,13 @@
 }
 
 .historyDetails {
-  font-family: monospace;
   font-size: 14px;
+  font-variant-numeric: tabular-nums;
 }
 
 .historyTotal {
   font-weight: 700;
   text-align: right;
-}
-
-.setsContainer h3 {
-  margin-top: 0;
-  margin-bottom: 16px;
 }
 
 .setsGrid {
@@ -213,8 +199,8 @@
 
 .emptyTitle {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 400;
   color: var(--md-sys-color-on-surface-variant);
 }
 
@@ -238,7 +224,7 @@
   align-items: center;
   gap: 12px;
   min-height: 32px;
-  padding: 0 16px;
+  padding: 0;
   flex-shrink: 0;
 }
 

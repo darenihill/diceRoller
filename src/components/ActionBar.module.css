@@ -76,8 +76,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 500;
   border-radius: 50%;
   transition: opacity 0.2s, background-color 0.2s, color 0.2s, transform 0.2s;
 }
@@ -169,8 +169,8 @@
   border: 1px solid var(--md-sys-color-primary);
   border-radius: var(--shape-small);
   padding: 12px 8px;
-  font-size: 15px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;

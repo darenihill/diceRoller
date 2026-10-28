@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: Type and spacing Set A built (polish 2026-10-28); Sets B and C wait on pull requests 44 and 47.
 
 # State
 

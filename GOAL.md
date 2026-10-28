@@ -5,6 +5,21 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- Type and spacing even across screens (polish review 2026-10-28,
+  reviews/2026-10-28-ui-type-spacing.md).
+  1. ~~Done 2026-10-28~~ Set A: the three missing colour tokens are defined, so
+     secondary text and section dividers show; the main screen's left edge
+     lines up at 24 px; off-scale text sizes are fixed; one gap rhythm around
+     section headings. Done when the app's tests pass and the browser check
+     shows the dividers and the aligned edge.
+  2. Set B: section headings look the same in every dialog, and row titles,
+     descriptions, notes and menu labels sit on one text scale. Build after
+     pull request 44 lands. Done when a browser check finds only scale sizes.
+  3. Set C: Dice settings gaps move onto the 8 px grid. Build after pull
+     request 47 lands. Done when the browser check measures 8, 16 or 24 px.
+  4. With no dice, the Roll button no longer shows the last total. Done when a
+     unit test clears all dice and finds no number on Roll.
+
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
   Build): "The big number stays the real total, and the math sits beside it in
   brackets: 9 (7+2), so the dice and the modifier are both visible and nobody

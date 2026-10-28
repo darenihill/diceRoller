@@ -14,6 +14,21 @@
   border-top: none;
 }
 
+/* A section heading with an action beside it (Roll Log + Clear History) */
+.sectionHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+  padding-top: 16px;
+}
+
+/* In a column that already spaces its sections, a heading that starts its
+   section needs no top margin of its own (Usage Stats) */
+.sectionHeader:first-child {
+  margin-top: 0;
+}
+
 .formGroup {
   display: flex;
   flex-direction: column;
