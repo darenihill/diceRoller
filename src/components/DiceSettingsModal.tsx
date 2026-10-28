@@ -40,7 +40,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   const pictureTarget = useRef<number | 'new'>('new');
   const [pictureError, setPictureError] = useState('');
   /** After a list is added: what to say, and the faces to put back on Undo */
-  const [listNote, setListNote] = useState<{ text: string; before: string[]; canUndo: boolean } | null>(null);
+  const [listNote, setListNote] = useState<{ text: string; before: string[]; after: string[]; canUndo: boolean } | null>(null);
   const images = useFaceImages();
   // The faces as they are now, for edits that finish after a picture is shrunk
   const latestDice = useRef(dice);
@@ -77,7 +77,8 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     const room = Math.max(0, MAX_CUSTOM_FACES - before.length);
     const added = faces.slice(0, room);
     const leftOut = faces.length - added.length;
-    if (added.length > 0) onUpdate(dice.id, { customFaces: [...before, ...added] });
+    const after = added.length > 0 ? [...before, ...added] : before;
+    if (added.length > 0) onUpdate(dice.id, { customFaces: after });
     setCustomInput('');
     if (faces.length > 1 || leftOut > 0) {
       const addedText = `Added ${added.length} face${added.length === 1 ? '' : 's'}`;
@@ -86,6 +87,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
           ? `${addedText}; ${leftOut} left out, a die holds ${MAX_CUSTOM_FACES}.`
           : `${addedText}.`,
         before,
+        after,
         canUndo: added.length > 0,
       });
     } else {
@@ -430,7 +432,8 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               <Plus size={20} strokeWidth={2.5} />
             </button>
           </div>
-          {listNote && (
+          {/* Any later edit to the faces retires the note, so Undo never wipes that edit */}
+          {listNote && listNote.after === dice.customFaces && (
             <p className={styles.listNote} role="status">
               <span>{listNote.text}</span>
               {listNote.canUndo && (

@@ -69,6 +69,15 @@ describe('Add custom text takes a list', () => {
     expect(screen.queryByRole('status')).toBeNull();
   });
 
+  it('Undo after a later edit does not wipe that edit', () => {
+    render(<Harness faces={['Old']} />);
+    paste('A\nB');
+    add();
+    fireEvent.click(screen.getByRole('button', { name: 'Remove face 1' }));
+    expect(latest.customFaces).toEqual(['A', 'B']);
+    expect(screen.queryByRole('button', { name: 'Undo' })).toBeNull();
+  });
+
   it('stops at 100 faces and says how many were left out', () => {
     const ninetyEight = Array.from({ length: 98 }, (_, i) => `F${i + 1}`);
     render(<Harness faces={ninetyEight} />);
