@@ -133,6 +133,9 @@ function App() {
     document.body.classList.toggle('rpg-mode', rpgMode);
   }, [rpgMode]);
 
+  // Each tap in the die's button strip restarts the timer below, so it doesn't close mid-use
+  const [stripTouch, setStripTouch] = useState(0);
+
   // Auto-deselect active die on mobile after 5 seconds
   useEffect(() => {
     if (!revealedDiceId) return;
@@ -155,7 +158,7 @@ function App() {
       clearTimeout(timer);
       document.removeEventListener('pointerdown', handleOutsideClick);
     };
-  }, [revealedDiceId]);
+  }, [revealedDiceId, stripTouch]);
 
   // Load shared config from URL, default set, or autosave on mount & record session telemetry
   useEffect(() => {
@@ -636,6 +639,7 @@ function App() {
           onClone={handleAddDice}
           onOpenSettings={setEditingDiceId}
           onRemove={handleRemoveDie}
+          onInteract={() => setStripTouch(n => n + 1)}
         />
       )}
 

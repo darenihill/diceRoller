@@ -22,6 +22,12 @@
   bottom: calc(270px + env(safe-area-inset-bottom, 0px));
 }
 
+/* The tapped die sits where the strip would go, so the strip opens at the top instead */
+.strip.top {
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  bottom: auto;
+}
+
 .heading {
   font-size: 14px;
   font-weight: 600;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { Lock, Unlock, Settings, X, Copy, Dices } from 'lucide-react';
 import type { DiceData } from '../types';
 import { parseFaceContent, FACE_ICON_PREFIX } from '../utils/diceUtils';
@@ -12,6 +12,8 @@ interface DieActionStripProps {
   onClone: (template: Partial<DiceData>) => void;
   onOpenSettings: (id: string) => void;
   onRemove: (id: string) => void;
+  /** Any tap in the strip, so it stays open while in use */
+  onInteract?: () => void;
 }
 
 /** What the die shows, in words, for the strip's heading */
@@ -29,11 +31,25 @@ const showing = (die: DiceData): string => {
  * thumb-sized buttons above the bottom bar (owner, 2026-10-28), instead of
  * crowding round the die.
  */
-export const DieActionStrip: React.FC<DieActionStripProps> = ({ die, rpgMode, onRollOne, onToggleHold, onClone, onOpenSettings, onRemove }) => {
+export const DieActionStrip: React.FC<DieActionStripProps> = ({ die, rpgMode, onRollOne, onToggleHold, onClone, onOpenSettings, onRemove, onInteract }) => {
   const name = die.name || `d${die.faces}`;
+  const ref = useRef<HTMLDivElement>(null);
+  // If the strip would cover the tapped die, it moves to the top of the screen
+  const [atTop, setAtTop] = useState(false);
+  useLayoutEffect(() => {
+    const strip = ref.current;
+    const dieEl = document.querySelector(`[data-dice-id="${CSS.escape(die.id)}"]`);
+    if (!strip || !dieEl) return;
+    const below = strip.classList.contains(styles.top) ? null : strip.getBoundingClientRect();
+    const d = dieEl.getBoundingClientRect();
+    const bottomTop = below ? below.top : window.innerHeight - strip.offsetHeight - (rpgMode ? 270 : 108);
+    setAtTop(d.bottom > bottomTop);
+  }, [die.id, rpgMode]);
   return (
     <div
-      className={`${styles.strip} ${rpgMode ? styles.rpg : ''}`}
+      ref={ref}
+      onPointerDownCapture={onInteract}
+      className={`${styles.strip} ${rpgMode ? styles.rpg : ''} ${atTop ? styles.top : ''}`}
       role="group"
       aria-label={`Actions for ${name}`}
       data-die-actions={die.id}
