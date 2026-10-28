@@ -1,4 +1,4 @@
-const CACHE_NAME = 'diceroller-v2';
+const CACHE_NAME = 'diceroller-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -11,7 +11,14 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+      return cache.addAll(ASSETS_TO_CACHE).then(() =>
+        // The app's own script and styles have hashed names, so read them off
+        // the page: without them a first-visit-then-offline open is blank.
+        fetch('/index.html').then((r) => r.text()).then((html) => {
+          const built = [...new Set(html.match(/\/assets\/[\w.-]+\.(?:js|css)/g) || [])];
+          return cache.addAll(built);
+        })
+      );
     }).then(() => self.skipWaiting())
   );
 });
@@ -71,7 +78,9 @@ self.addEventListener('fetch', (e) => {
 
   e.respondWith(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.match(e.request).then((cachedResponse) => {
+      // ignoreVary: hashed files never change, and a server that adds "Vary: Origin"
+      // would otherwise hide the copy saved at install from the page's module request
+      return cache.match(e.request, { ignoreVary: true }).then((cachedResponse) => {
         const fetchPromise = fetch(e.request).then((networkResponse) => {
           if (networkResponse.status === 200) {
             cache.put(e.request, networkResponse.clone());

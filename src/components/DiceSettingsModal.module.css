@@ -318,6 +318,12 @@
   display: flex;
   gap: 8px;
   margin-top: 8px;
+  /* Done stays on screen while the faces scroll (standard 20.2) */
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  padding: 8px 0;
+  background-color: var(--md-sys-color-surface);
 }
 
 .footerBtnRemove,
