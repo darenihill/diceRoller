@@ -11,7 +11,7 @@ import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages } from './utils/diceUtils';
 import { usedFaceImages, importFaceImages } from './utils/faceImages';
-import { playRollSequence } from './utils/soundEffects';
+import { playRollSequence, playLandNow } from './utils/soundEffects';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { MAX_HISTORY_LENGTH } from './utils/constants';
 import { dicePresets } from './utils/presets';
@@ -531,7 +531,10 @@ function App() {
       }
     });
 
-    if (hasUnheldDice && diceList.length > 0 && soundEnabled) {
+    // A tap during the tumble only lands the dice: the thud plays now, the rattle doesn't start again
+    if (isRolling) {
+      playLandNow(soundTimersRef);
+    } else if (hasUnheldDice && diceList.length > 0 && soundEnabled) {
       playRollSequence(soundTimersRef);
     }
   };

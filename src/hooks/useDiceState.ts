@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { DiceData } from '../types';
 import { generateId, parseFaceContent, faceNumericValue, FACE_ICON_PREFIX, isNumberedFaces } from '../utils/diceUtils';
 import { MAX_DICE_LIMIT, MAX_HISTORY_LENGTH, ROLL_DURATION_MS, TOAST_DURATION_MS } from '../utils/constants';
@@ -145,6 +145,9 @@ export const useDiceState = () => {
     setDiceList(list);
   }, []);
 
+  // The roll that is tumbling now: its timer and the step that lands it
+  const tumbleRef = useRef<{ timer: ReturnType<typeof setTimeout>; land: () => void } | null>(null);
+
   const rollDice = useCallback((onComplete?: (summary: RollSummary) => void, onlyId?: string, typed?: TypedRollSetup) => {
     // A typed roll brings its own dice, modifier and advantage, so it rolls
     // what was typed now rather than waiting a render for the state to catch up
@@ -153,6 +156,13 @@ export const useDiceState = () => {
     const advantageMode = typed ? typed.advantage : rollAdvantage;
     // With no dice there is nothing to roll; a modifier alone used to log a phantom total
     if (list.length === 0) return;
+    // A second tap during the tumble lands the dice at once. The result was
+    // picked when the roll started, so it stays the same and History gets one entry
+    if (tumbleRef.current) {
+      clearTimeout(tumbleRef.current.timer);
+      tumbleRef.current.land();
+      return;
+    }
     setIsRolling(true);
     setRollingId(onlyId ?? null);
     
@@ -290,8 +300,9 @@ export const useDiceState = () => {
 
     setDiceList(processedList);
 
-    // 2. Set timeout to finalize and reveal history
-    setTimeout(() => {
+    // 2. Land the dice and reveal history once the tumble ends
+    const land = () => {
+      tumbleRef.current = null;
       setDiceList(prev => prev.map(d => {
         return {
           ...d,
@@ -323,7 +334,8 @@ export const useDiceState = () => {
         diceCount: onlyId !== undefined ? 1 : list.filter(d => !d.held).length,
         isTargetHit
       });
-    }, ROLL_DURATION_MS);
+    };
+    tumbleRef.current = { timer: setTimeout(land, ROLL_DURATION_MS), land };
   }, [diceList, modifier, rpgMode, rollAdvantage, targetHighlight, showToast]);
 
   const clearHistory = useCallback(() => {

@@ -104,3 +104,11 @@ export const playRollSequence = (soundTimersRef: React.MutableRefObject<number[]
 
   soundTimersRef.current = [t1, t2, t3, t4];
 };
+
+/** Lands a tumbling roll early: drops the rattles still to come and plays the thud now. */
+export const playLandNow = (soundTimersRef: React.MutableRefObject<number[]>) => {
+  if (soundTimersRef.current.length === 0) return;
+  soundTimersRef.current.forEach(id => clearTimeout(id));
+  soundTimersRef.current = [];
+  playThudSound();
+};
