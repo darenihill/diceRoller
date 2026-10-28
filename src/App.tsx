@@ -9,11 +9,12 @@ import { TypeRollBox } from './components/TypeRollBox';
 import { TYPED_DIE_COLOR, type TypedRoll } from './utils/rollNotation';
 import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
+import { DieActionStrip } from './components/DieActionStrip';
 import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages } from './utils/diceUtils';
 import { usedFaceImages, importFaceImages } from './utils/faceImages';
 import { playRollSequence } from './utils/soundEffects';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
-import { MAX_HISTORY_LENGTH } from './utils/constants';
+import { MAX_HISTORY_LENGTH, COMPACT_DIE_SIZE } from './utils/constants';
 import { dicePresets } from './utils/presets';
 import { currentSetName, diceSignature, readShareLink, nextFreeSaveName, type LoadedSet } from './utils/setName';
 import { readLandingStart, readLandingAbout } from './utils/landing';
@@ -142,7 +143,7 @@ function App() {
 
     const handleOutsideClick = (e: PointerEvent) => {
       const target = e.target as HTMLElement;
-      if (target.closest('[data-dice-id]')) {
+      if (target.closest('[data-dice-id], [data-die-actions]')) {
         return;
       }
       setRevealedDiceId(null);
@@ -268,6 +269,10 @@ function App() {
     containerSize.height,
     diceScale
   );
+
+  // Below this size the buttons round a tapped die get too small, so they move to one strip (owner, 2026-10-28)
+  const compactDieActions = diceList.length > 0 && optimalSize < COMPACT_DIE_SIZE;
+  const revealedDie = compactDieActions ? diceList.find(d => d.id === revealedDiceId) : undefined;
 
   const diceStyles = {
     '--dice-size': `${optimalSize}px`,
@@ -617,9 +622,22 @@ function App() {
             onRollOne={isRolling ? undefined : handleRollOne}
             rollingAlone={rollingId === dice.id}
             rpgMode={rpgMode}
+            compactActions={compactDieActions}
           />
         ))}
       </div>
+
+      {revealedDie && (
+        <DieActionStrip
+          die={revealedDie}
+          rpgMode={rpgMode}
+          onRollOne={isRolling ? undefined : handleRollOne}
+          onToggleHold={toggleHold}
+          onClone={handleAddDice}
+          onOpenSettings={setEditingDiceId}
+          onRemove={handleRemoveDie}
+        />
+      )}
 
       {/* With no dice, the middle of the screen says what to do next */}
       {diceList.length === 0 && (

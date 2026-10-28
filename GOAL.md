@@ -207,3 +207,13 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+- ~~Done 2026-10-28~~ Buttons around a tapped die stay thumb-sized with six dice out (Daren
+  2026-10-28, Build): "Tapped die with many dice out: a blue outline instead
+  of buttons round it; Above the bottom bar: a strip with the die's name and
+  five 48 px buttons; Two or three dice: no change".
+  1. ~~Done 2026-10-28~~ Dice under 150 px: tapping one outlines it and shows a strip above the
+     bottom bar (above the RPG stack in RPG Mode) with Roll one, Hold or
+     Release, Clone, Settings and Remove. Done when component tests run each
+     action and show the round buttons dropped only when compact, and a
+     browser check at 360 and 390 px (normal and RPG) shows 48 px buttons
+     clear of the bottom bar, with two dice unchanged.

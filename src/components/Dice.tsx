@@ -22,10 +22,12 @@ interface DiceProps {
   /** This die is rolling on its own, so it animates even when held */
   rollingAlone?: boolean;
   rpgMode?: boolean;
+  /** Many small dice: the buttons move to the strip above the bottom bar, and the tapped die gets an outline */
+  compactActions?: boolean;
 }
 
 const DiceComponent: React.FC<DiceProps> = ({ 
-  dice, isRolling, isRevealed, onReveal, onToggleHold, onRemove, onOpenSettings, onClone, onRollOne, rollingAlone, rpgMode 
+  dice, isRolling, isRevealed, onReveal, onToggleHold, onRemove, onOpenSettings, onClone, onRollOne, rollingAlone, rpgMode, compactActions 
 }) => {
   const diceRef = useRef<HTMLDivElement>(null);
 
@@ -168,7 +170,7 @@ const DiceComponent: React.FC<DiceProps> = ({
   return (
     <motion.div
       ref={diceRef}
-      className={`${styles.dice} ${shapeClass ? styles.shaped : ''} ${rollingNow ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''} ${extraClass}`}
+      className={`${styles.dice} ${shapeClass ? styles.shaped : ''} ${rollingNow ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''} ${compactActions && isRevealed ? styles.outlined : ''} ${extraClass}`}
       data-dice-id={dice.id}
       role="button"
       tabIndex={0}
@@ -259,6 +261,7 @@ const DiceComponent: React.FC<DiceProps> = ({
         </div>
       </motion.div>
 
+      {!compactActions && (<>
       {/* Settings Button (Bottom-Right) */}
       <button className={`${styles.actionBtn} ${styles.settingsBtn}`} onClick={(e) => {
         e.stopPropagation();
@@ -298,6 +301,7 @@ const DiceComponent: React.FC<DiceProps> = ({
       >
         <X size={20} strokeWidth={2.5} color="currentColor" />
       </button>
+      </>)}
     </motion.div>
   );
 };
