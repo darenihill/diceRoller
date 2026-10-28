@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: Usage Stats two per row on phones built (2026-10-28); pull request waits for Daren's Merge tap.
 
 # State
 

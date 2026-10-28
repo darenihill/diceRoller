@@ -99,6 +99,13 @@
   gap: 12px;
 }
 
+/* Phones: two numbers per row, so Usage Stats needs less scrolling */
+@media (max-width: 600px) {
+  .metricsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .metricCard {
   background-color: var(--md-sys-color-surface-variant);
   padding: 16px 12px;
@@ -119,6 +126,7 @@
 }
 
 .metricLabel {
+  overflow-wrap: anywhere;
   font-size: 12px;
   font-weight: 500;
   color: var(--md-sys-color-on-surface-variant);
