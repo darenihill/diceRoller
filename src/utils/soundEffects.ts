@@ -1,3 +1,4 @@
+import { buzzLanding } from './buzz';
 import { ROLL_TICK_INTERVAL_MS, ROLL_DURATION_MS } from './constants';
 
 let audioCtx: AudioContext | null = null;
@@ -75,10 +76,8 @@ export const playThudSound = () => {
     oscThud.start(now);
     oscThud.stop(now + 0.09);
 
-    // Trigger mobile haptic vibration on landing impact
-    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-      navigator.vibrate([15, 30, 15]);
-    }
+    // Buzz on landing impact, as before, while sound is on
+    buzzLanding();
   } catch (e) {
     console.error("Failed to play synthesized thud sound:", e);
   }
@@ -103,4 +102,13 @@ export const playRollSequence = (soundTimersRef: React.MutableRefObject<number[]
   const t4 = window.setTimeout(() => playThudSound(), ROLL_DURATION_MS);
 
   soundTimersRef.current = [t1, t2, t3, t4];
+};
+
+/**
+ * Sound off but Buzz when dice land on: one buzz when the dice land, timed
+ * like the thud. Clears any pending sound or buzz from an earlier roll.
+ */
+export const scheduleLandingBuzz = (soundTimersRef: React.MutableRefObject<number[]>) => {
+  soundTimersRef.current.forEach(id => clearTimeout(id));
+  soundTimersRef.current = [window.setTimeout(() => buzzLanding(), ROLL_DURATION_MS)];
 };

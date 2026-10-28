@@ -207,3 +207,13 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+- ~~Done 2026-10-28~~ Buzz when dice land, even with sound off, as a hidden trial (Daren 2026-10-28,
+  Build, way "Hidden switch on the live site"): "The buzz ships switched off
+  for everyone; A link only you have turns it on for your phone; You try it
+  anywhere, then it's turned on for all or removed".
+  1. ~~Done 2026-10-28~~ Opening the app with the private link turns the buzz on for that phone and
+     shows a Buzz When Dice Land switch in Customize; without the link nothing
+     changes. With sound off and the switch on, one short buzz when the dice
+     land; sound on works as today. The backup keeps both settings. Done when
+     tests show no buzz without the link, the link turning it on and clearing
+     itself, one buzz at landing, and the switch hidden until the link.
