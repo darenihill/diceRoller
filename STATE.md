@@ -1,4 +1,4 @@
-Next: building the storage-full message with Export backup (Daren picked Build 2026-10-27).
+Next: storage-full message built; pull request waits for Daren's Merge tap (public app).
 
 # State
 

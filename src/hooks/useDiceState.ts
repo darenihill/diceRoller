@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { DiceData } from '../types';
 import { generateId, parseFaceContent, faceNumericValue, FACE_ICON_PREFIX, isNumberedFaces } from '../utils/diceUtils';
 import { MAX_DICE_LIMIT, MAX_HISTORY_LENGTH, ROLL_DURATION_MS, TOAST_DURATION_MS } from '../utils/constants';
+import { saveItem } from '../utils/safeStorage';
 
 export interface RollHistoryItem {
   id: string;
@@ -51,11 +52,7 @@ export const useDiceState = () => {
 
   // Persist roll history (capped) so it survives reloads and is included in backups
   useEffect(() => {
-    try {
-      localStorage.setItem('rollHistory', JSON.stringify(rollHistory.slice(0, MAX_HISTORY_LENGTH)));
-    } catch (e) {
-      console.error('Failed to save roll history', e);
-    }
+    saveItem('rollHistory', JSON.stringify(rollHistory.slice(0, MAX_HISTORY_LENGTH)));
   }, [rollHistory]);
   const [isRolling, setIsRolling] = useState(false);
   // The die rolling on its own, or null when the whole set rolls
@@ -74,7 +71,7 @@ export const useDiceState = () => {
   const toggleRpgMode = useCallback(() => {
     setRpgMode(prev => {
       const next = !prev;
-      localStorage.setItem('rpgMode', String(next));
+      saveItem('rpgMode', String(next));
       if (!next) {
         setRollAdvantage('normal');
       }
@@ -84,7 +81,7 @@ export const useDiceState = () => {
 
   const setTargetHighlight = useCallback((val: string) => {
     setTargetHighlightState(val);
-    localStorage.setItem('targetHighlight', val);
+    saveItem('targetHighlight', val);
   }, []);
 
   const addDice = useCallback((template?: Partial<DiceData>) => {
