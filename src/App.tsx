@@ -32,8 +32,11 @@ import { useUndo, dieLabel } from './hooks/useUndo';
 import { spokenTotal } from './utils/totalMath';
 import { ShareModal } from './components/modals/ShareModal';
 import { StatsModal } from './components/modals/StatsModal';
+import { useWakeLock } from './hooks/useWakeLock';
 
 function App() {
+  // A phone on the game table stays awake between turns
+  useWakeLock();
   const {
     diceList, setDiceList, rollHistory, isRolling, rollingId, modifier, setModifier,
     rpgMode, toggleRpgMode, rollAdvantage, setRollAdvantage,

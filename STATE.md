@@ -1,4 +1,4 @@
-Next: Screen stays on while open (build owner 2026-10-28): wake lock hook and tests.
+Next: Screen stays on while open built (build owner 2026-10-28); pull request waits for Daren's Merge tap.
 
 # State
 
