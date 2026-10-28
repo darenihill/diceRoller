@@ -13,6 +13,10 @@
   --md-sys-color-on-primary-container: #C2E7FF;
   --md-sys-color-error: #F2B8B5;
   --md-sys-color-on-error: #601410;
+  /* Secondary text and dividers: used across the dialogs, never defined until now */
+  --md-sys-color-on-surface-variant: #C4C7C5;
+  --md-sys-color-outline: #8E918F;
+  --md-sys-color-outline-variant: #444746;
   
   --elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.30);
   --elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.30);
@@ -47,6 +51,9 @@ body.theme-light {
   --md-sys-color-on-primary: #FFFFFF;
   --md-sys-color-primary-container: #D7E3FF;
   --md-sys-color-on-primary-container: #001B3F;
+  --md-sys-color-on-surface-variant: #444746;
+  --md-sys-color-outline: #747775;
+  --md-sys-color-outline-variant: #C4C7C5;
 }
 
 body.theme-felt {
@@ -62,6 +69,9 @@ body.theme-felt {
   --md-sys-color-on-primary: #13382D;
   --md-sys-color-primary-container: #EFE6D2;
   --md-sys-color-on-primary-container: #13382D;
+  --md-sys-color-on-surface-variant: #D3E4DC;
+  --md-sys-color-outline: #8FA89E;
+  --md-sys-color-outline-variant: #2F5A4C;
 }
 
 body.theme-midnight {
@@ -75,6 +85,9 @@ body.theme-midnight {
   --md-sys-color-on-primary: #0A114A;
   --md-sys-color-primary-container: #262D6E;
   --md-sys-color-on-primary-container: #DFE0FF;
+  --md-sys-color-on-surface-variant: #C5C6DD;
+  --md-sys-color-outline: #8E90A8;
+  --md-sys-color-outline-variant: #2E3450;
 }
 
 body {

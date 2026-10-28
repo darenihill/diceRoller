@@ -45,7 +45,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
   const note = targetNote(targetHighlight);
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Customize App">
-      <div className={modalStyles.formGroup}>
+      <div>
         <h3 className={modalStyles.sectionHeaderFirst}>Visual Themes</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <button 

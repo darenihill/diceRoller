@@ -1,4 +1,4 @@
-Next: Polish lens 2026-10-28 (type and spacing) in progress.
+Next: Type and spacing Set A built (polish 2026-10-28); Sets B and C wait on pull requests 44 and 47.
 
 # State
 

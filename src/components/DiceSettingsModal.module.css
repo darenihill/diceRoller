@@ -52,6 +52,8 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+  /* A label that wraps (Base Color) keeps its button level with the steppers */
+  align-items: end;
 }
 
 /* Color Swatch */

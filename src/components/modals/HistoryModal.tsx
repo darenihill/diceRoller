@@ -69,7 +69,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
           </div>
 
           <div className={styles.historyList}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className={modalStyles.sectionHeaderRow}>
               <h3 className={modalStyles.sectionHeaderFirst} style={{ margin: 0 }}>Roll Log ({rollHistory.length})</h3>
               <button className="md-button md-button-surface md-button-compact" onClick={onClearHistory}>
                 Clear History
