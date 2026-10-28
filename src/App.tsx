@@ -523,7 +523,7 @@ function App() {
 
   const handleRoll = () => {
     const hasUnheldDice = diceList.some(d => !d.held);
-    rollDice(({ total, diceCount }) => {
+    const outcome = rollDice(({ total, diceCount }) => {
       // Fires when the roll resolves, so the actual total reaches analytics
       setHasRolledThisSession(true);
       if (diceCount > 0) {
@@ -532,9 +532,9 @@ function App() {
     });
 
     // A tap during the tumble only lands the dice: the thud plays now, the rattle doesn't start again
-    if (isRolling) {
-      playLandNow(soundTimersRef);
-    } else if (hasUnheldDice && diceList.length > 0 && soundEnabled) {
+    if (outcome === 'landed') {
+      if (soundEnabled) playLandNow(soundTimersRef);
+    } else if (outcome === 'rolled' && hasUnheldDice && diceList.length > 0 && soundEnabled) {
       playRollSequence(soundTimersRef);
     }
   };

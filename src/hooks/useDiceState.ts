@@ -148,20 +148,21 @@ export const useDiceState = () => {
   // The roll that is tumbling now: its timer and the step that lands it
   const tumbleRef = useRef<{ timer: ReturnType<typeof setTimeout>; land: () => void } | null>(null);
 
-  const rollDice = useCallback((onComplete?: (summary: RollSummary) => void, onlyId?: string, typed?: TypedRollSetup) => {
+  /** Rolls the dice; returns 'landed' when the tap only landed a tumbling roll. */
+  const rollDice = useCallback((onComplete?: (summary: RollSummary) => void, onlyId?: string, typed?: TypedRollSetup): 'rolled' | 'landed' | 'none' => {
     // A typed roll brings its own dice, modifier and advantage, so it rolls
     // what was typed now rather than waiting a render for the state to catch up
     const list = typed?.dice ?? diceList;
     const rollModifier = typed ? typed.modifier : modifier;
     const advantageMode = typed ? typed.advantage : rollAdvantage;
     // With no dice there is nothing to roll; a modifier alone used to log a phantom total
-    if (list.length === 0) return;
+    if (list.length === 0) return 'none';
     // A second tap during the tumble lands the dice at once. The result was
     // picked when the roll started, so it stays the same and History gets one entry
     if (tumbleRef.current) {
       clearTimeout(tumbleRef.current.timer);
       tumbleRef.current.land();
-      return;
+      return 'landed';
     }
     setIsRolling(true);
     setRollingId(onlyId ?? null);
@@ -336,6 +337,7 @@ export const useDiceState = () => {
       });
     };
     tumbleRef.current = { timer: setTimeout(land, ROLL_DURATION_MS), land };
+    return 'rolled';
   }, [diceList, modifier, rpgMode, rollAdvantage, targetHighlight, showToast]);
 
   const clearHistory = useCallback(() => {

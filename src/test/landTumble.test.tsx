@@ -3,6 +3,13 @@ import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vite
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import App from '../App';
 import { ROLL_DURATION_MS } from '../utils/constants';
+import { playLandNow, playRollSequence } from '../utils/soundEffects';
+
+vi.mock('../utils/soundEffects', async (real) => ({
+  ...(await real<typeof import('../utils/soundEffects')>()),
+  playLandNow: vi.fn(),
+  playRollSequence: vi.fn(),
+}));
 
 beforeAll(() => {
   globalThis.ResizeObserver ??= class { observe() {} unobserve() {} disconnect() {} } as unknown as typeof ResizeObserver;
@@ -16,7 +23,7 @@ beforeEach(() => {
     { id: 'b', numberValue: 1, faces: 6, currentFaceIndex: 0, customFaces: [], color: '#00ff00', held: false }
   ] } }));
 });
-afterEach(() => { vi.useRealTimers(); localStorage.clear(); });
+afterEach(() => { vi.useRealTimers(); vi.clearAllMocks(); localStorage.clear(); });
 
 const history = () => JSON.parse(localStorage.getItem('rollHistory') ?? '[]') as { total: number }[];
 const tapRoll = () => fireEvent.click(screen.getByRole('button', { name: 'Roll dice' }));
@@ -68,5 +75,25 @@ describe('Tapping Roll while the dice tumble', () => {
     tapRoll();
     wait(ROLL_DURATION_MS + 50);
     expect(history()).toHaveLength(2);
+  });
+
+  it('with sound on, the thud plays at the second tap and the rattle does not start again', () => {
+    localStorage.setItem('soundEnabled', 'true');
+    render(<App />);
+    tapRoll();
+    wait(100);
+    tapRoll();
+    expect(playRollSequence).toHaveBeenCalledTimes(1);
+    expect(playLandNow).toHaveBeenCalledTimes(1);
+  });
+
+  it('with sound off, the second tap makes no sound', () => {
+    localStorage.setItem('soundEnabled', 'false');
+    render(<App />);
+    tapRoll();
+    wait(100);
+    tapRoll();
+    expect(playRollSequence).not.toHaveBeenCalled();
+    expect(playLandNow).not.toHaveBeenCalled();
   });
 });
