@@ -32,6 +32,7 @@ import { useUndo, dieLabel } from './hooks/useUndo';
 import { spokenTotal } from './utils/totalMath';
 import { ShareModal } from './components/modals/ShareModal';
 import { StatsModal } from './components/modals/StatsModal';
+import { saveItem, onSaveRefused } from './utils/safeStorage';
 
 function App() {
   const {
@@ -42,6 +43,10 @@ function App() {
     clearAllDice, rollDice, clearHistory, toast, showToast, insertDiceAt, restoreDice
   } = useDiceState();
   const { offer: undoOffer, offerUndo, runUndo } = useUndo();
+
+  // Storage full: a save was refused, so say so and offer a backup
+  const [storageFull, setStorageFull] = useState(false);
+  useEffect(() => onSaveRefused(() => setStorageFull(true)), []);
 
   const containerRef = useRef<HTMLDivElement>(null);
   // A search landing page opens with its own dice; null on the home page
@@ -91,16 +96,16 @@ function App() {
   const [diceScale, setDiceScale] = useState(() => sanitizeDiceScale(localStorage.getItem('diceScale')));
 
   useEffect(() => {
-    localStorage.setItem('diceScale', String(diceScale));
+    saveItem('diceScale', String(diceScale));
   }, [diceScale]);
 
   useEffect(() => {
-    localStorage.setItem('soundEnabled', String(soundEnabled));
+    saveItem('soundEnabled', String(soundEnabled));
   }, [soundEnabled]);
 
   const [shakeEnabled, setShakeEnabled] = useState(() => localStorage.getItem('shakeToRoll') === 'true');
   useEffect(() => {
-    localStorage.setItem('shakeToRoll', String(shakeEnabled));
+    saveItem('shakeToRoll', String(shakeEnabled));
   }, [shakeEnabled]);
 
   const [telemetryState, setTelemetryState] = useState(() => localStorage.getItem('telemetryEnabled') !== 'false');
@@ -120,7 +125,7 @@ function App() {
   useEffect(() => {
     document.body.classList.remove('theme-dark', 'theme-light', 'theme-felt', 'theme-midnight');
     document.body.classList.add(theme);
-    localStorage.setItem('appTheme', theme);
+    saveItem('appTheme', theme);
   }, [theme]);
 
   useEffect(() => {
@@ -315,8 +320,10 @@ function App() {
   };
 
   const handleSetDefault = () => {
-    localStorage.setItem('defaultDiceSet', JSON.stringify(diceList));
-    showToast('Saved as default! It will automatically load on open.');
+    // A refused save shows the storage-full message instead of a false "Saved"
+    if (saveItem('defaultDiceSet', JSON.stringify(diceList))) {
+      showToast('Saved as default! It will automatically load on open.');
+    }
     setMenuOpen(false);
   };
 
@@ -331,7 +338,7 @@ function App() {
       if (stored) {
         const parsed = JSON.parse(stored);
         delete parsed['systemAutosave'];
-        localStorage.setItem('diceConfigs', JSON.stringify(parsed));
+        saveItem('diceConfigs', JSON.stringify(parsed));
       }
     } catch (e) {
       console.error(e);
@@ -428,32 +435,36 @@ function App() {
           if (data.defaultSet) {
             data.defaultSet = sanitizeDiceList(data.defaultSet);
           }
+          // A backup that doesn't fit stops here: no reload, no false "Imported"
+          let fits = true;
+          const keep = (key: string, value: string) => { fits = saveItem(key, value) && fits; };
           if (data.configs) {
             const currentConfigs = JSON.parse(localStorage.getItem('diceConfigs') || '{}');
             const mergedConfigs = { ...currentConfigs, ...data.configs };
-            localStorage.setItem('diceConfigs', JSON.stringify(mergedConfigs));
+            keep('diceConfigs', JSON.stringify(mergedConfigs));
           }
           if (data.defaultSet) {
-            localStorage.setItem('defaultDiceSet', JSON.stringify(data.defaultSet));
+            keep('defaultDiceSet', JSON.stringify(data.defaultSet));
           }
           if (Array.isArray(data.rollHistory)) {
-            localStorage.setItem('rollHistory', JSON.stringify(data.rollHistory.slice(0, MAX_HISTORY_LENGTH)));
+            keep('rollHistory', JSON.stringify(data.rollHistory.slice(0, MAX_HISTORY_LENGTH)));
           }
           if (data.theme) {
-            localStorage.setItem('appTheme', data.theme);
+            keep('appTheme', data.theme);
           }
           if (data.soundEnabled !== undefined) {
-            localStorage.setItem('soundEnabled', String(data.soundEnabled));
+            keep('soundEnabled', String(data.soundEnabled));
           }
           // Older backups have no dice size; they import at the default
-          localStorage.setItem('diceScale', String(sanitizeDiceScale(data.diceScale)));
+          keep('diceScale', String(sanitizeDiceScale(data.diceScale)));
           // Pictures on faces; older backups have none
           if (data.faceImages && !importFaceImages(data.faceImages)) {
             showToast('Imported, but some pictures did not fit on this device. Reloading...');
             setTimeout(() => window.location.reload(), 1500);
             return;
           }
-          
+          if (!fits) return;
+
           trackEvent('backup_imported');
           showToast('Imported backup successfully! Reloading...');
           setTimeout(() => {
@@ -740,7 +751,13 @@ function App() {
       />
 
       {/* Toast Notification */}
-      {undoOffer ? (
+      {storageFull ? (
+        <div className={`${styles.toast} ${styles.undoToast} ${styles.storageToast} ${rpgMode ? styles.toastBelowBox : ''}`} role="alert">
+          <span>Storage is full, so your last change wasn't saved.</span>
+          <button className={styles.undoButton} onClick={() => { setStorageFull(false); handleExportData(); }}>Export backup</button>
+          <button className={styles.undoButton} onClick={() => setStorageFull(false)} aria-label="Close storage message" style={{ minWidth: 44 }}>✕</button>
+        </div>
+      ) : undoOffer ? (
         <div className={`${styles.toast} ${styles.undoToast} ${rpgMode ? styles.toastBelowBox : ''}`} role="status">
           <span>{undoOffer.message}</span>
           <button className={styles.undoButton} onClick={runUndo}>Undo</button>
