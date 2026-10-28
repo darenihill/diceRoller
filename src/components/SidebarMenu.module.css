@@ -28,7 +28,8 @@
   bottom: 104px;
   left: 24px;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  /* minmax(0, …): with bigger text the words wrap in their tile instead of pushing a column off screen */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   z-index: 120;
   padding: 16px;
@@ -44,7 +45,7 @@
   background-color: var(--md-sys-color-surface-variant);
   color: var(--md-sys-color-on-surface);
   border-radius: var(--shape-small);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   transition: background-color 0.2s, transform 0.1s;
   justify-content: flex-start;
@@ -73,7 +74,7 @@
 }
 
 .menuColumnHeader {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 600;
   opacity: 0.6;
   padding-left: 4px;
@@ -100,7 +101,7 @@
     left: 16px;
     right: 16px;
     width: auto;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 8px;
     z-index: 130;
     max-height: 55vh;
@@ -114,14 +115,17 @@
     align-items: center;
     aspect-ratio: 1;
     padding: 6px;
-    font-size: 10px;
+    font-size: 0.625rem;
     gap: 4px;
     text-align: center;
   }
   
   .menuItem span {
-    font-size: 9px;
+    font-size: 0.5625rem;
     line-height: 1.1;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    hyphens: auto;
   }
 
   /* The footer spans here too, but has to opt out of the square-tile styling
@@ -137,7 +141,7 @@
   }
 
   .menuFooterItem span {
-    font-size: 12px;
+    font-size: 0.75rem;
   }
 }
 

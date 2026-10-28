@@ -5,6 +5,17 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-10-28~~ Menu and settings words grow when you raise your browser's text size
+  (Daren 2026-10-27, Build): "Menu, settings and Help words: follow the
+  browser's text size; At the default size: no visible change." An iPhone's
+  own text size setting still won't reach the app without more work.
+  1. ~~Done 2026-10-28~~ Text in the menu, the dice settings, Help and the other windows is sized
+     from the browser's text size, not fixed. Done when a unit test finds no
+     fixed text sizes left in those styles.
+  2. ~~Done 2026-10-28~~ At the default text size nothing changes, and at 200% the words grow.
+     Done when a browser check measures the same sizes at the default and
+     double sizes at 200%.
+
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
   Build): "The big number stays the real total, and the math sits beside it in
   brackets: 9 (7+2), so the dice and the modifier are both visible and nobody
