@@ -41,7 +41,7 @@ describe('Storage full', () => {
     fireEvent.click(screen.getAllByRole('button', { name: /menu/i })[0]);
     fireEvent.click(screen.getByText('Set Default'));
     const message = screen.getByRole('alert');
-    expect(message).toHaveTextContent(/storage is full/);
+    expect(message).toHaveTextContent(/storage is full/i);
     fireEvent.click(screen.getByRole('button', { name: 'Export backup' }));
     expect(makeUrl).toHaveBeenCalled();
     expect(click).toHaveBeenCalled();
@@ -54,7 +54,7 @@ describe('Storage full', () => {
     fireEvent.click(screen.getAllByRole('button', { name: /menu/i })[0]);
     fireEvent.click(screen.getByText('Set Default'));
     expect(screen.queryByText(/Saved as default/)).toBeNull();
-    expect(screen.getByRole('alert')).toHaveTextContent(/storage is full/);
+    expect(screen.getByRole('alert')).toHaveTextContent(/storage is full/i);
   });
 
   it('the message can be closed', () => {
