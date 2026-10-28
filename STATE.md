@@ -1,4 +1,4 @@
-Next: faces counter label names the custom faces it replaces (building, 2026-10-28).
+Next: faces counter label built (2026-10-28); pull request waits for Daren's Merge tap.
 
 # State
 
