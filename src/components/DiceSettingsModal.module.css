@@ -320,10 +320,12 @@
   gap: 8px;
   margin-top: 8px;
   /* Done stays on screen while the faces scroll (standard 20.2) */
+  /* The dialog's 24px padding would leave a strip of faces showing under it */
   position: sticky;
-  bottom: 0;
+  bottom: -24px;
   z-index: 1;
-  padding: 8px 0;
+  padding: 8px 0 32px;
+  margin-bottom: -24px;
   background-color: var(--md-sys-color-surface);
 }
 

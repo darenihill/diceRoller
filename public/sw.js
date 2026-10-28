@@ -17,6 +17,8 @@ self.addEventListener('install', (e) => {
         fetch('/index.html').then((r) => r.text()).then((html) => {
           const built = [...new Set(html.match(/\/assets\/[\w.-]+\.(?:js|css)/g) || [])];
           return cache.addAll(built);
+        }).catch(() => {
+          // A failed fetch mid-deploy mustn't stop the worker installing
         })
       );
     }).then(() => self.skipWaiting())
