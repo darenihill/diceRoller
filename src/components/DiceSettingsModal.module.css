@@ -170,6 +170,11 @@
   box-shadow: var(--elevation-2);
 }
 
+/* Before a face is tapped the colour row sits in the list, so the faces show first */
+.faceColourRowLoose {
+  position: static;
+}
+
 .faceSwatches {
   display: flex;
   flex-wrap: wrap;
