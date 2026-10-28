@@ -30,6 +30,9 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   const [activeColorPicker, setActiveColorPicker] = useState<{ type: 'base' | 'custom'; index?: number; top: number } | null>(null);
   /** The face the colour row paints: tap a face, then tap a colour */
   const [selectedFace, setSelectedFace] = useState(0);
+  /** The colour row pins to the bottom only after a face is tapped, so the faces show first on open */
+  const [colourPinnedFor, setColourPinnedFor] = useState<string | null>(null);
+  const colourPinned = colourPinnedFor === dice.id;
   const activeFace = Math.min(selectedFace, Math.max(0, dice.customFaces.length - 1));
   const activeFaceColour = parseFaceContent(dice.customFaces[activeFace] ?? '').bgColor;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -271,7 +274,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                       type="button"
                       className={styles.faceTile}
                       style={{ backgroundColor: tileColor, color: getContrastColor(tileColor) }}
-                      onClick={() => setSelectedFace(i)}
+                      onClick={() => { setSelectedFace(i); setColourPinnedFor(dice.id); }}
                       aria-pressed={i === activeFace}
                       aria-label={`Face ${i + 1}: ${content.startsWith(FACE_ICON_PREFIX) ? content.replace(FACE_ICON_PREFIX, '') : content}${picture ? ', picture' : ''}`}
                     >
@@ -323,7 +326,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
           </div>
 
           {dice.customFaces.length > 0 && (
-            <div className={styles.faceColourRow} role="group" aria-label={`Colour for face ${activeFace + 1}`}>
+            <div className={`${styles.faceColourRow} ${colourPinned ? '' : styles.faceColourRowLoose}`} data-pinned={colourPinned} role="group" aria-label={`Colour for face ${activeFace + 1}`}>
               <span className={styles.sublabel}>Colour for face {activeFace + 1}</span>
               <div className={styles.faceSwatches}>
                 <button

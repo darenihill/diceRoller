@@ -207,3 +207,10 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+- ~~Done 2026-10-28~~ When you open a die's settings, its faces show first, not the colour panel
+  (Daren 2026-10-28, Build): "Dice settings: the colour panel pins only after
+  a face is tapped; No new control; colours and faces stay the same".
+  1. ~~Done 2026-10-28~~ The colour row sits in the list on open and pins to the bottom after a
+     face tap, keeping the two-tap colour flow. Done when a component test
+     shows unpinned on open and pinned after a tap, and a 390 px check shows
+     the faces first on open with no overlap after a tap.
