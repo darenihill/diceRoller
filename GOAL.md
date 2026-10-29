@@ -207,3 +207,12 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+
+- ~~Done 2026-10-29~~ On a weak signal the app opens in 3 seconds, not a blank
+  screen (Daren 2026-10-25, Build, "Add a 3 s limit to our own offline code"):
+  "The app waits up to 3 seconds for the network, then opens from your phone's
+  copy. The newer version loads next time."
+  1. ~~Done 2026-10-29~~ Opening the app waits at most 3 seconds for the network
+     when a saved copy exists, keeps saving the fresh page in the background,
+     and works as today on a good signal, offline, or with no saved copy. Done
+     when tests run the service worker for all five cases.
