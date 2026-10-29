@@ -279,3 +279,14 @@
   clip-path: polygon(50% 2%, 94% 26%, 94% 74%, 50% 98%, 6% 74%, 6% 26%);
   border-radius: 0 !important;
 }
+
+/* Reduce motion: the die stays still while rolling and the number fades
+   back in when it lands */
+.calmFace {
+  transition: opacity 0.35s ease-out;
+}
+
+.calmRolling {
+  opacity: 0.15;
+  transition: none;
+}
