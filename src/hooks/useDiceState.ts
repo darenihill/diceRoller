@@ -313,7 +313,7 @@ export const useDiceState = () => {
         ...(onlyId !== undefined ? { single: true } : {}),
         ...(activeModifier !== 0 ? { modifier: activeModifier } : {}),
         ...(typed && onlyId === undefined ? { typed: typed.text } : {}),
-        ...(onlyId === undefined ? { set: luckSet(list) } : {})
+        ...(onlyId === undefined ? { set: luckSet(list, rpgMode, rollModifier, advantageMode) } : {})
       }, ...h].slice(0, MAX_HISTORY_LENGTH));
       setIsRolling(false);
       setRollingId(null);

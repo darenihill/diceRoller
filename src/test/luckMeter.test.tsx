@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
 import { fairOdds, luckRows, furthestFromFair, luckSet } from '../utils/fairOdds';
+import { performance } from 'node:perf_hooks';
 import { HistoryModal } from '../components/modals/HistoryModal';
 import type { DiceData } from '../types';
 import type { RollHistoryItem } from '../hooks/useDiceState';
@@ -42,6 +43,38 @@ describe('fair-dice odds', () => {
     const odds = fairOdds([d], false, 0, 'normal');
     near(odds.get(1), 2 / 3);
     near(odds.get(5), 1 / 3);
+  });
+});
+
+describe('held dice and big tables', () => {
+  it('counts a held die at its value', () => {
+    const odds = fairOdds([{ ...die(6), held: true, numberValue: 6 }, die(6)], false, 0, 'normal');
+    expect([...odds.keys()].sort((a, b) => a - b)).toEqual([7, 8, 9, 10, 11, 12]);
+  });
+
+  it('lets a held d20 take part in Advantage', () => {
+    const odds = fairOdds([{ ...die(20), held: true, numberValue: 15 }, die(20)], true, 0, 'advantage');
+    near(odds.get(15), 15 / 20);
+    near(odds.get(20), 1 / 20);
+    expect(odds.has(3)).toBe(false);
+  });
+
+  it('skips the marks rather than stall on a huge table', () => {
+    const start = performance.now();
+    const odds = fairOdds(Array.from({ length: 20 }, () => die(1000)), false, 0, 'normal');
+    expect(odds.size).toBe(0);
+    expect(performance.now() - start).toBeLessThan(200);
+  });
+
+  it('still works out a big but fair-sized table', () => {
+    expect(fairOdds(Array.from({ length: 10 }, () => die(20)), false, 0, 'normal').size).toBe(191);
+  });
+
+  it('notices a change to held dice or RPG settings', () => {
+    const d = [die(6, 'a')];
+    expect(luckSet(d, true, 2, 'normal')).not.toBe(luckSet(d, true, 3, 'normal'));
+    expect(luckSet(d)).not.toBe(luckSet([{ ...d[0], held: true }]));
+    expect(luckSet(d, false, 2, 'advantage')).toBe(luckSet(d, false, 0, 'normal'));
   });
 });
 

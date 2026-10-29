@@ -34,12 +34,17 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   counted.forEach(item => counts.set(item.total, (counts.get(item.total) ?? 0) + 1));
 
   // Fair-dice marks: the count each total would get, on average, from fair
-  // dice like the ones on the table now
-  const rows = luckRows(counts, fairOdds(dice, rpgMode, modifier, rollAdvantage), counted.length);
+  // dice like the ones on the table now. Worked out only while History is
+  // open, and only again when the dice or settings change.
+  const odds = React.useMemo(
+    () => (isOpen ? fairOdds(dice, rpgMode, modifier, rollAdvantage) : new Map<number, number>()),
+    [isOpen, dice, rpgMode, modifier, rollAdvantage],
+  );
+  const rows = luckRows(counts, odds, counted.length);
   const scale = Math.max(1, ...rows.map(r => Math.max(r.count, r.fair)));
-  const showFair = dice.length > 0;
+  const showFair = odds.size > 0;
   const odd = showFair && counted.length >= 3 ? furthestFromFair(rows) : null;
-  const nowSet = luckSet(dice);
+  const nowSet = luckSet(dice, rpgMode, modifier, rollAdvantage);
   const diceChanged = showFair && counted.some(item => item.set !== undefined && item.set !== nowSet);
   const times = (n: number) => `${n} ${n === 1 ? 'time' : 'times'}`;
 
@@ -56,7 +61,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
               {showFair && (
                 <p className={modalStyles.freqNote}>
                   <span className={modalStyles.freqFairKey} aria-hidden="true" /> marks what fair dice would give
-                  {diceChanged ? ', using the dice on the table now (they changed since some of these rolls)' : ''}.
+                  {diceChanged ? ', using the dice and settings now (they changed since some of these rolls)' : ''}.
                 </p>
               )}
               {odd && (

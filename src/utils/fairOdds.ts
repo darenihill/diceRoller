@@ -12,9 +12,16 @@ import { faceNumericValue, isNumberedFaces } from './diceUtils';
 /** total -> chance (0..1) */
 export type Odds = Map<number, number>;
 
+/** A held die keeps its value, so it adds that value every time */
+function heldValue(d: DiceData): number {
+  return d.customFaces.length > 0 ? faceNumericValue(d.customFaces[d.currentFaceIndex ?? 0]) : d.numberValue;
+}
+
 function dieOdds(d: DiceData): Odds {
   const odds: Odds = new Map();
-  if (d.customFaces.length > 0) {
+  if (d.held) {
+    odds.set(heldValue(d), 1);
+  } else if (d.customFaces.length > 0) {
     const each = 1 / d.customFaces.length;
     for (const f of d.customFaces) {
       const v = faceNumericValue(f);
@@ -26,16 +33,29 @@ function dieOdds(d: DiceData): Odds {
   return odds;
 }
 
-/** Best (or worst) of k plain dN */
-function keptOdds(n: number, k: number, keepHighest: boolean): Odds {
-  const odds: Odds = new Map();
+/**
+ * Best (or worst) of k free dN, alongside any held dice in the same group
+ * (`kept` is the best held value with Advantage, the worst with Disadvantage).
+ */
+function keptOdds(n: number, k: number, keepHighest: boolean, kept?: number): Odds {
+  const free: Odds = new Map();
+  if (k === 0) {
+    free.set(kept ?? 0, 1);
+    return free;
+  }
   for (let v = 1; v <= n; v++) {
     const p = keepHighest
       ? (v / n) ** k - ((v - 1) / n) ** k
       : ((n - v + 1) / n) ** k - ((n - v) / n) ** k;
-    odds.set(v, p);
+    free.set(v, p);
   }
-  return odds;
+  if (kept === undefined) return free;
+  const out: Odds = new Map();
+  for (const [v, p] of free) {
+    const r = keepHighest ? Math.max(v, kept) : Math.min(v, kept);
+    out.set(r, (out.get(r) ?? 0) + p);
+  }
+  return out;
 }
 
 function add(a: Odds, b: Odds): Odds {
@@ -44,31 +64,53 @@ function add(a: Odds, b: Odds): Odds {
   return out;
 }
 
+/** Past this much work the marks are skipped, so a huge table never stalls the app */
+export const MAX_ODDS_WORK = 2_000_000;
+
 export function fairOdds(dice: DiceData[], rpgMode: boolean, modifier: number, advantage: RollAdvantageMode): Odds {
   if (dice.length === 0) return new Map();
   let parts: Odds[] = [];
   if (rpgMode && advantage !== 'normal' && dice.length > 1) {
     // Same grouping as a roll: plain dice (or 1..n numbered faces) by face count
-    const groups = new Map<number, number>();
+    const best = advantage === 'advantage';
+    const groups = new Map<number, { free: number; kept?: number }>();
     for (const d of dice) {
-      if (d.customFaces.length > 0 && !isNumberedFaces(d.customFaces)) parts.push(dieOdds(d));
-      else groups.set(d.faces, (groups.get(d.faces) ?? 0) + 1);
+      if (d.customFaces.length > 0 && !isNumberedFaces(d.customFaces)) { parts.push(dieOdds(d)); continue; }
+      const g = groups.get(d.faces) ?? { free: 0 };
+      if (d.held) {
+        const v = heldValue(d);
+        g.kept = g.kept === undefined ? v : best ? Math.max(g.kept, v) : Math.min(g.kept, v);
+      } else {
+        g.free += 1;
+      }
+      groups.set(d.faces, g);
     }
-    for (const [n, k] of groups) {
-      // A lone die keeps itself: best of one is just the die
-      parts.push(keptOdds(n, k, advantage === 'advantage'));
-    }
+    for (const [n, g] of groups) parts.push(keptOdds(n, g.free, best, g.kept));
   } else {
     parts = dice.map(dieOdds);
+  }
+  // Rough cost of the exact sums; too big and the marks are left off
+  let work = 0;
+  let span = 1;
+  for (const p of parts) {
+    work += span * p.size;
+    span += p.size;
+    if (work > MAX_ODDS_WORK) return new Map();
   }
   let total: Odds = new Map([[rpgMode ? modifier : 0, 1]]);
   for (const p of parts) total = add(total, p);
   return total;
 }
 
-/** Which dice a roll used, for telling when the dice changed between rolls */
-export function luckSet(dice: Pick<DiceData, 'faces' | 'customFaces'>[]): string {
-  return JSON.stringify(dice.map(d => [d.faces, d.customFaces]));
+/**
+ * What a roll used (the dice, which were held and at what, and the RPG
+ * settings), for telling when any of it changed between rolls
+ */
+export function luckSet(dice: DiceData[], rpgMode = false, modifier = 0, advantage: RollAdvantageMode = 'normal'): string {
+  return JSON.stringify([
+    dice.map(d => [d.faces, d.customFaces, d.held ? heldValue(d) : null]),
+    rpgMode ? [modifier, advantage] : null,
+  ]);
 }
 
 export interface LuckRow { total: number; count: number; fair: number }
