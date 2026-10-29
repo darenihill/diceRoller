@@ -15,7 +15,7 @@ export interface RollHistoryItem {
   modifier?: number;
   /** What was typed in the "Type a roll" box, e.g. "2d6+3" */
   typed?: string;
-  /** Which dice the roll used (faces only), so the Luck Meter can tell when they changed */
+  /** Which dice the roll used (faces, held values, RPG settings), so the Luck Meter can tell when they changed */
   set?: string;
 }
 
