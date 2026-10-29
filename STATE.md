@@ -1,4 +1,4 @@
-Next: building natural 20 confetti (Daren's Build pick, 2026-10-29); 28 pull requests wait on his Merge tap.
+Next: natural 20 confetti built (2026-10-29), waiting on Daren's Merge tap with 28 other Dice Roller pull requests.
 
 # State
 

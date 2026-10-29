@@ -12,6 +12,7 @@ import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages } from './utils/diceUtils';
 import { usedFaceImages, importFaceImages } from './utils/faceImages';
 import { playRollSequence } from './utils/soundEffects';
+import { celebrateNatural20 } from './utils/confetti';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { MAX_HISTORY_LENGTH } from './utils/constants';
 import { dicePresets } from './utils/presets';
@@ -486,8 +487,9 @@ function App() {
     })));
     setModifier(roll.modifier);
     setRollAdvantage(roll.advantage);
-    rollDice(({ total, diceCount }) => {
+    rollDice(({ total, diceCount, natural20Ids }) => {
       setHasRolledThisSession(true);
+      void celebrateNatural20(natural20Ids);
       trackEvent('roll_dice', { diceCount, sum: total, modifier: roll.modifier, rpgMode, rollAdvantage: roll.advantage, typed: true });
     }, undefined, { text: roll.text, dice, modifier: roll.modifier, advantage: roll.advantage });
     if (soundEnabled) playRollSequence(soundTimersRef);
@@ -501,7 +503,10 @@ function App() {
   };
 
   const handleRollOne = (id: string) => {
-    rollDice(() => trackEvent('roll_one_die'), id);
+    rollDice(({ natural20Ids }) => {
+      void celebrateNatural20(natural20Ids);
+      trackEvent('roll_one_die');
+    }, id);
     if (soundEnabled) playRollSequence(soundTimersRef);
   };
 
@@ -523,9 +528,10 @@ function App() {
 
   const handleRoll = () => {
     const hasUnheldDice = diceList.some(d => !d.held);
-    rollDice(({ total, diceCount }) => {
+    rollDice(({ total, diceCount, natural20Ids }) => {
       // Fires when the roll resolves, so the actual total reaches analytics
       setHasRolledThisSession(true);
+      void celebrateNatural20(natural20Ids);
       if (diceCount > 0) {
         trackEvent('roll_dice', { diceCount, sum: total, modifier, rpgMode, rollAdvantage });
       }
