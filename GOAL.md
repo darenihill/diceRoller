@@ -207,3 +207,14 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+
+- Natural 20 confetti (Daren 2026-10-28, Build): "A natural 20 sets off a
+  one-second confetti burst." In RPG Mode only; the gold glow stays; a natural
+  1 keeps its red glow only; a 20 on the die Disadvantage drops gets no
+  confetti; with Reduce motion on, glow only.
+  1. A natural 20 rolled in RPG Mode fires a short confetti burst from the die,
+     on a see-through layer that never blocks taps. Done when a unit test
+     rolls a 20 in RPG Mode and sees one burst, and a 390 px browser roll
+     shows the confetti over the die.
+  2. No burst outside RPG Mode, on a held 20, on a dropped 20 or with Reduce
+     motion on. Done when unit tests cover all four.
