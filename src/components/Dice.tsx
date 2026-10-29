@@ -114,16 +114,20 @@ const DiceComponent: React.FC<DiceProps> = ({
   const textColor = getContrastColor(backgroundColor);
 
   let longestFace = 1;
+  // Letters run wider than digits, so word faces ("YES", "MAYBE") get a little
+  // more room per character and stay on one line
+  let wordFaces = false;
   if (dice.customFaces.length > 0) {
     const textFaces = dice.customFaces.map(f => parseFaceContent(f).content).filter(f => !f.startsWith(FACE_ICON_PREFIX));
     if (textFaces.length > 0) {
       longestFace = Math.max(...textFaces.map(f => f.length));
+      wordFaces = textFaces.some(f => /[^\d\s.+-]/.test(f));
     }
   } else {
     longestFace = dice.numberValue.toString().length;
   }
   
-  const fontScale = `min(calc(var(--dice-size) * 0.7), calc(var(--dice-size) * 1.66 / ${longestFace || 1}))`;
+  const fontScale = `min(calc(var(--dice-size) * 0.7), calc(var(--dice-size) * ${wordFaces ? 1.3 : 1.66} / ${longestFace || 1}))`;
 
   const renderFace = (faceStr: string) => {
     if (!faceStr) return null;

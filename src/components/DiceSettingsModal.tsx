@@ -21,6 +21,9 @@ interface DiceSettingsModalProps {
   allDice: DiceData[];
 }
 
+// Adding, removing or replacing a die's faces releases its hold: the tap that opened these
+// settings also held it, and a held die with new faces would never roll.
+// Recolouring a face, its number or its picture keeps a deliberate hold.
 export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOpen, onClose, onUpdate, onRemove, onClone, allDice }) => {
   const [customInput, setCustomInput] = useState('');
   // What is typed in the faces box; null shows the die's count. Lets the box be cleared and retyped.
@@ -63,19 +66,19 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   };
 
   const setFaces = (num: number) => {
-    if (num > 0) onUpdate(dice.id, { faces: num, customFaces: [] });
+    if (num > 0) onUpdate(dice.id, { held: false, faces: num, customFaces: [] });
   };
 
   const addCustomFace = (face: string) => {
     if (!face.trim()) return;
-    onUpdate(dice.id, { customFaces: [...dice.customFaces, face.trim()] });
+    onUpdate(dice.id, { held: false, customFaces: [...dice.customFaces, face.trim()] });
     setCustomInput('');
   };
 
   const removeCustomFace = (index: number) => {
     const newFaces = [...dice.customFaces];
     newFaces.splice(index, 1);
-    onUpdate(dice.id, { customFaces: newFaces });
+    onUpdate(dice.id, { held: false, customFaces: newFaces });
   };
 
   const updateCustomFaceColor = (index: number, color: string) => {
@@ -123,7 +126,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     if (target === 'new') {
       // The face's number is what shows where the picture can't (a share link)
       const n = current.customFaces.length + 1;
-      onUpdate(current.id, { customFaces: [...current.customFaces, buildFace(String(n), undefined, undefined, id)] });
+      onUpdate(current.id, { held: false, customFaces: [...current.customFaces, buildFace(String(n), undefined, undefined, id)] });
     } else if (target < current.customFaces.length) {
       const newFaces = [...current.customFaces];
       const parsed = parseFaceContent(newFaces[target], '');
@@ -231,14 +234,14 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               <button 
                 type="button"
                 className="md-button md-button-surface md-button-compact"
-                onClick={() => onUpdate(dice.id, { faces: 3, customFaces: ["YES:bg:#2E7D32", "NO:bg:#D32F2F", "MAYBE:bg:#FFD700"] })}
+                onClick={() => onUpdate(dice.id, { held: false, faces: 3, customFaces: ["YES:bg:#2E7D32", "NO:bg:#D32F2F", "MAYBE:bg:#FFD700"] })}
               >
                 ❓ Decision Maker
               </button>
               <button 
                 type="button"
                 className="md-button md-button-surface md-button-compact"
-                onClick={() => onUpdate(dice.id, { faces: 4, customFaces: ["N:bg:#0056D2", "S:bg:#0056D2", "E:bg:#0056D2", "W:bg:#0056D2"] })}
+                onClick={() => onUpdate(dice.id, { held: false, faces: 4, customFaces: ["N:bg:#0056D2", "S:bg:#0056D2", "E:bg:#0056D2", "W:bg:#0056D2"] })}
               >
                 🧭 Compass
               </button>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { DiceData } from '../types';
-import { generateId, parseFaceContent, faceNumericValue, FACE_ICON_PREFIX, isNumberedFaces } from '../utils/diceUtils';
+import { generateId, parseFaceContent, faceNumericValue, FACE_ICON_PREFIX, isNumberedFaces, percentileBonus } from '../utils/diceUtils';
 import { MAX_DICE_LIMIT, MAX_HISTORY_LENGTH, ROLL_DURATION_MS, TOAST_DURATION_MS } from '../utils/constants';
 
 export interface RollHistoryItem {
@@ -272,6 +272,10 @@ export const useDiceState = () => {
       const dropSuffix = d.dropped ? ' (dropped)' : '';
       details.push(`${label}: ${shown}${dropSuffix}`);
     });
+
+    if (onlyId === undefined) {
+      rollTotal += percentileBonus(processedList.map(d => ({ ...d, value: d.targetValue ?? d.numberValue })));
+    }
 
     const activeModifier = rpgMode && onlyId === undefined ? rollModifier : 0;
     const finalTotal = rollTotal + activeModifier;

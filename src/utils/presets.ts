@@ -31,7 +31,7 @@ export const dicePresets = [
       { numberValue: 4, faces: 10, customFaces: [], color: "#384050", name: "d10" },
       { numberValue: 5, faces: 8, customFaces: [], color: "#384050", name: "d8" },
       { numberValue: 6, faces: 6, customFaces: [], color: "#384050", name: "d6" },
-      { numberValue: 7, faces: 4, customFaces: [], color: "#384050", name: "d4" }
+      { numberValue: 4, faces: 4, customFaces: [], color: "#384050", name: "d4" }
     ],
   },
   {
@@ -144,7 +144,7 @@ export const dicePresets = [
   {
     name: "Tenzi",
     dice: Array.from({ length: 10 }).map((_, i) => ({
-      numberValue: i + 1, faces: 6, customFaces: [], color: "#B24BF3", name: `Tenzi ${i + 1}`
+      numberValue: (i % 6) + 1, faces: 6, customFaces: [], color: "#B24BF3", name: `Tenzi ${i + 1}`
     }))
   }
 ];

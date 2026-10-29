@@ -207,3 +207,12 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+- Review fixes from the 29 October walk (user stories, build vs adopt, motion).
+  1. ~~Done 2026-10-29~~ An edited die rolls again (changing faces releases its
+     hold); word-only dice keep the button on Roll, not 0; word faces stay on one
+     line; percentile 00 + 0 reads 100; preset dice start on faces they can show.
+     Done when unit tests cover the percentile rule, word faces and presets, and
+     a 390 px walk shows the edited die unheld and MAYBE on one line.
+  2. ~~Done 2026-10-29~~ Standards: Roll with every die held says why; Games,
+     share links and the default on open offer Undo when they replace your dice.
+     Done when a 390 px walk shows each message and Undo brings the dice back.
