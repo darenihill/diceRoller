@@ -207,3 +207,12 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+- Luck Meter adds a fair-dice mark to each bar (Daren, Build 2026-10-26):
+  "Uses the same odds as the dice on screen, worked out in the app. Only
+  whole-set rolls count, as today. If the dice changed mid-session, the marks
+  follow the current dice and say so."
+  1. ~~Done 2026-10-29~~ Each Luck Meter bar carries a mark for what fair dice
+     would give, totals not rolled yet show as zero rows, and one line names
+     the total furthest from fair. Done when unit tests check the exact odds
+     (2d6, Advantage, the modifier, custom faces) and a 390 px browser check
+     shows the marks.

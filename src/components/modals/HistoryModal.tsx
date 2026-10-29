@@ -1,6 +1,8 @@
 import React from 'react';
 import { Modal } from '../Modal';
-import type { RollHistoryItem } from '../../hooks/useDiceState';
+import type { RollHistoryItem, RollAdvantageMode } from '../../hooks/useDiceState';
+import type { DiceData } from '../../types';
+import { fairOdds, luckRows, furthestFromFair, luckSet } from '../../utils/fairOdds';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
 
@@ -9,6 +11,11 @@ interface HistoryModalProps {
   onClose: () => void;
   rollHistory: RollHistoryItem[];
   onClearHistory: () => void;
+  /** The dice on the table now, for the fair-dice marks */
+  dice?: DiceData[];
+  rpgMode?: boolean;
+  modifier?: number;
+  rollAdvantage?: RollAdvantageMode;
 }
 
 export const HistoryModal: React.FC<HistoryModalProps> = ({
@@ -16,24 +23,30 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   onClose,
   rollHistory,
   onClearHistory,
+  dice = [],
+  rpgMode = false,
+  modifier = 0,
+  rollAdvantage = 'normal',
 }) => {
-  // Compute total roll frequency map for session histogram
-  const frequencyMap: Record<number, number> = {};
-  let maxFreq = 0;
-
   // The chart counts whole-set rolls only; a die rolled on its own stays in the log
-  rollHistory.forEach(item => {
-    if (item.single) return;
-    const total = item.total;
-    frequencyMap[total] = (frequencyMap[total] || 0) + 1;
-    if (frequencyMap[total] > maxFreq) {
-      maxFreq = frequencyMap[total];
-    }
-  });
+  const counted = rollHistory.filter(item => !item.single);
+  const counts = new Map<number, number>();
+  counted.forEach(item => counts.set(item.total, (counts.get(item.total) ?? 0) + 1));
 
-  const sortedTotals = Object.keys(frequencyMap)
-    .map(Number)
-    .sort((a, b) => a - b);
+  // Fair-dice marks: the count each total would get, on average, from fair
+  // dice like the ones on the table now. Worked out only while History is
+  // open, and only again when the dice or settings change.
+  const odds = React.useMemo(
+    () => (isOpen ? fairOdds(dice, rpgMode, modifier, rollAdvantage) : new Map<number, number>()),
+    [isOpen, dice, rpgMode, modifier, rollAdvantage],
+  );
+  const rows = luckRows(counts, odds, counted.length);
+  const scale = Math.max(1, ...rows.map(r => Math.max(r.count, r.fair)));
+  const showFair = odds.size > 0;
+  const odd = showFair && counted.length >= 3 ? furthestFromFair(rows) : null;
+  const nowSet = luckSet(dice, rpgMode, modifier, rollAdvantage);
+  const diceChanged = showFair && counted.some(item => item.set !== undefined && item.set !== nowSet);
+  const times = (n: number) => `${n} ${n === 1 ? 'time' : 'times'}`;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Roll History & Frequency">
@@ -45,26 +58,41 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
           <div>
             <h3 className={modalStyles.sectionHeaderFirst}>Roll Frequency ("Luck Meter")</h3>
             <div className={modalStyles.freqCard}>
-              {sortedTotals.map(tot => {
-                const count = frequencyMap[tot];
-                const pct = maxFreq > 0 ? (count / maxFreq) * 100 : 0;
-                return (
-                  <div key={tot} className={modalStyles.freqRow}>
-                    <span className={modalStyles.freqLabel}>
-                      Total {tot}:
-                    </span>
-                    <div className={modalStyles.freqBarContainer}>
-                      <div 
-                        className={modalStyles.freqBarFill}
-                        style={{ width: `${pct}%` }} 
+              {showFair && (
+                <p className={modalStyles.freqNote}>
+                  <span className={modalStyles.freqFairKey} aria-hidden="true" /> marks what fair dice would give
+                  {diceChanged ? ', using the dice and settings now (they changed since some of these rolls)' : ''}.
+                </p>
+              )}
+              {odd && (
+                <p className={modalStyles.freqNote} data-furthest={odd.total}>
+                  Furthest from fair: {odd.total} came up {times(odd.count)}; fair dice would give about {Math.round(odd.fair * 10) / 10}.
+                </p>
+              )}
+              {rows.map(row => (
+                <div key={row.total} className={modalStyles.freqRow}>
+                  <span className={modalStyles.freqLabel}>
+                    Total {row.total}:
+                  </span>
+                  <div className={modalStyles.freqBarContainer}>
+                    <div
+                      className={modalStyles.freqBarFill}
+                      style={{ width: `${(row.count / scale) * 100}%` }}
+                    />
+                    {showFair && row.fair > 0 && (
+                      <div
+                        className={modalStyles.freqFairMark}
+                        style={{ left: `${(row.fair / scale) * 100}%` }}
+                        data-fair={row.fair.toFixed(2)}
+                        title={`Fair dice: about ${Math.round(row.fair * 10) / 10}`}
                       />
-                    </div>
-                    <span className={modalStyles.freqCount}>
-                      {count}x
-                    </span>
+                    )}
                   </div>
-                );
-              })}
+                  <span className={modalStyles.freqCount}>
+                    {row.count}x
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
 
