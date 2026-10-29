@@ -9,7 +9,7 @@ import { TypeRollBox } from './components/TypeRollBox';
 import { TYPED_DIE_COLOR, type TypedRoll } from './utils/rollNotation';
 import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
-import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages } from './utils/diceUtils';
+import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages, faceScores } from './utils/diceUtils';
 import { usedFaceImages, importFaceImages } from './utils/faceImages';
 import { playRollSequence } from './utils/soundEffects';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
@@ -170,7 +170,13 @@ function App() {
       window.history.replaceState(null, '', window.location.pathname + window.location.search);
 
       if (shared.length > 0) {
+        // A link replaces the dice that were out; Undo brings them back
+        const autosaved = getSystemAutosave();
+        const mine = autosaved ? sanitizeDiceList(autosaved.config) : [];
         setDiceList(shared);
+        if (mine.length > 0 && diceSignature(mine) !== diceSignature(shared)) {
+          offerUndo('Opened shared dice', () => restoreDice(mine));
+        }
         return;
       }
       showToast("That share link couldn't be read — loading your usual dice instead.");
@@ -189,7 +195,14 @@ function App() {
       try {
         const parsed = sanitizeDiceList(JSON.parse(defaultSet));
         if (parsed.length > 0) {
+          // The default opens over the dice you had out last time, so say so
+          // and let Undo bring those back
+          const autosaved = getSystemAutosave();
+          const last = autosaved ? sanitizeDiceList(autosaved.config) : [];
           setDiceList(parsed);
+          if (last.length > 0 && diceSignature(last) !== diceSignature(parsed)) {
+            offerUndo('Opened your default dice', () => restoreDice(last));
+          }
           return;
         }
       } catch (e) {
@@ -253,7 +266,10 @@ function App() {
 
   // Derived state
   const allHeld = diceList.length > 0 && diceList.every(d => d.held);
-  const totalVisible = hasRolledThisSession && rollHistory.length > 0;
+  // Word-only dice (Yes/No, a compass) have no total, so the button keeps
+  // saying Roll rather than showing a 0 nobody rolled
+  const anyDieScores = diceList.some(d => d.customFaces.length === 0 || d.customFaces.some(faceScores));
+  const totalVisible = hasRolledThisSession && rollHistory.length > 0 && anyDieScores;
   // A die rolled on its own never replaces the big total
   const lastMainRoll = rollHistory.find(r => !r.single);
   const lastTotal = totalVisible && lastMainRoll ? lastMainRoll.total : 0;
@@ -300,6 +316,7 @@ function App() {
 
   const handleLoadSet = (config: Partial<DiceData>[], setName?: string) => {
     const loaded = sanitizeDiceList(config);
+    const before = diceList;
     setDiceList(loaded);
     setLoadedSet(setName ? { name: setName, signature: diceSignature(loaded) } : null);
     if (setName) {
@@ -307,9 +324,11 @@ function App() {
       if (dicePresets.some(p => p.name === setName)) {
         trackEvent('preset_loaded', { presetName: setName });
       }
-      // The main screen never names the set, so say which one just loaded
-      showToast(`Loaded ${setName}`);
     }
+    // Say which set just loaded; Undo puts back the dice that were out
+    const changed = before.length > 0 && diceSignature(before) !== diceSignature(loaded);
+    if (changed) offerUndo(setName ? `Loaded ${setName}` : 'Loaded dice', () => restoreDice(before));
+    else if (setName) showToast(`Loaded ${setName}`);
     setModalOpen(null);
     setMenuOpen(false);
   };
@@ -523,6 +542,12 @@ function App() {
 
   const handleRoll = () => {
     const hasUnheldDice = diceList.some(d => !d.held);
+    // Every die held: nothing would change, so say why instead of logging a
+    // repeat of the last roll
+    if (diceList.length > 0 && !hasUnheldDice) {
+      showToast('All dice are held. Tap a die to let it roll again.');
+      return;
+    }
     rollDice(({ total, diceCount }) => {
       // Fires when the roll resolves, so the actual total reaches analytics
       setHasRolledThisSession(true);

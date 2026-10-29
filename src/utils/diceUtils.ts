@@ -77,6 +77,14 @@ export function withoutFaceImages(dice: DiceData[]): DiceData[] {
     : d);
 }
 
+/** Whether a face adds anything to a total: a Counts as number or number text */
+export function faceScores(faceStr: string): boolean {
+  const parsed = parseFaceContent(faceStr);
+  if (parsed.value !== undefined) return true;
+  if (parsed.content.startsWith(FACE_ICON_PREFIX)) return false;
+  return !isNaN(parseInt(parsed.content));
+}
+
 /** What a face adds to a total: its Counts as number, else its number text, else 0. */
 export function faceNumericValue(faceStr: string): number {
   const parsed = parseFaceContent(faceStr);
@@ -324,4 +332,20 @@ export function scaleGridDimensions(
   const fit = Math.floor((safeWidth + size * GAP_RATIO) / (size * (1 + GAP_RATIO)));
   const columns = Math.min(diceCount, Math.max(1, fit));
   return { optimalSize: size, optimalColumns: columns, dynamicGap: Math.floor(size * GAP_RATIO) };
+}
+
+const TENS_FACES = ['00', '10', '20', '30', '40', '50', '60', '70', '80', '90'].join();
+const UNITS_FACES = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].join();
+const faceTexts = (d: Pick<DiceData, 'customFaces'>) => d.customFaces.map(f => parseFaceContent(f).content).join();
+
+/**
+ * Percentile dice read 00 + 0 as 100, not 0. Returns the 100 to add when the
+ * rolled set holds one tens die (00-90) and one units die (0-9) and both
+ * landed on zero.
+ */
+export function percentileBonus(dice: (Pick<DiceData, 'customFaces' | 'dropped'> & { value: number })[]): number {
+  const live = dice.filter(d => !d.dropped);
+  const tens = live.filter(d => faceTexts(d) === TENS_FACES);
+  const units = live.filter(d => faceTexts(d) === UNITS_FACES);
+  return tens.length === 1 && units.length === 1 && tens[0].value === 0 && units[0].value === 0 ? 100 : 0;
 }

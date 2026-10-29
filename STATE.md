@@ -1,4 +1,4 @@
-Next: review pass (user stories, build vs adopt, motion) in progress (2026-10-29).
+Next: review pass (stories, build vs adopt, motion) waiting on a merge tap (2026-10-29); 5 ideas on the Focus tab.
 
 # State
 
