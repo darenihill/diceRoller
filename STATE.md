@@ -1,4 +1,4 @@
-Next: storage-full message built; pull request waits for Daren's Merge tap (public app).
+Next: backup keeps all settings, waiting on a merge tap after the storage-full change (pull request 41) (2026-10-29).
 
 # State
 

@@ -23,3 +23,26 @@ export function onSaveRefused(listener: Listener): () => void {
   listeners.add(listener);
   return () => { listeners.delete(listener); };
 }
+
+/**
+ * Reads one saved value. A browser that blocks storage throws on any access;
+ * this returns null instead, so the app opens with its defaults rather than a
+ * blank screen.
+ */
+export function readItem(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch (e) {
+    console.error(`Could not read ${key}`, e);
+    return null;
+  }
+}
+
+/** Removes one saved value; a blocked browser is ignored. */
+export function removeItem(key: string): void {
+  try {
+    localStorage.removeItem(key);
+  } catch (e) {
+    console.error(`Could not remove ${key}`, e);
+  }
+}

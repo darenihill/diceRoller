@@ -10,10 +10,8 @@ import { TYPED_DIE_COLOR, type TypedRoll } from './utils/rollNotation';
 import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages } from './utils/diceUtils';
-import { usedFaceImages, importFaceImages } from './utils/faceImages';
 import { playRollSequence } from './utils/soundEffects';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
-import { MAX_HISTORY_LENGTH } from './utils/constants';
 import { dicePresets } from './utils/presets';
 import { currentSetName, diceSignature, readShareLink, nextFreeSaveName, type LoadedSet } from './utils/setName';
 import { readLandingStart, readLandingAbout } from './utils/landing';
@@ -32,7 +30,9 @@ import { useUndo, dieLabel } from './hooks/useUndo';
 import { spokenTotal } from './utils/totalMath';
 import { ShareModal } from './components/modals/ShareModal';
 import { StatsModal } from './components/modals/StatsModal';
-import { saveItem, onSaveRefused } from './utils/safeStorage';
+import { saveItem, readItem, onSaveRefused } from './utils/safeStorage';
+import { SAVED } from './utils/savedValues';
+import { buildBackup, restoreBackup } from './utils/backup';
 
 function App() {
   const {
@@ -90,25 +90,25 @@ function App() {
   });
   const [editingDiceId, setEditingDiceId] = useState<string | null>(null);
   const [revealedDiceId, setRevealedDiceId] = useState<string | null>(null);
-  const [theme, setTheme] = useState(() => localStorage.getItem('appTheme') || 'theme-dark');
+  const [theme, setTheme] = useState(() => readItem(SAVED.theme) || 'theme-dark');
   
-  const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('soundEnabled') === 'true');
-  const [diceScale, setDiceScale] = useState(() => sanitizeDiceScale(localStorage.getItem('diceScale')));
+  const [soundEnabled, setSoundEnabled] = useState(() => readItem(SAVED.sound) === 'true');
+  const [diceScale, setDiceScale] = useState(() => sanitizeDiceScale(readItem(SAVED.diceScale)));
 
   useEffect(() => {
-    saveItem('diceScale', String(diceScale));
+    saveItem(SAVED.diceScale, String(diceScale));
   }, [diceScale]);
 
   useEffect(() => {
-    saveItem('soundEnabled', String(soundEnabled));
+    saveItem(SAVED.sound, String(soundEnabled));
   }, [soundEnabled]);
 
-  const [shakeEnabled, setShakeEnabled] = useState(() => localStorage.getItem('shakeToRoll') === 'true');
+  const [shakeEnabled, setShakeEnabled] = useState(() => readItem(SAVED.shakeToRoll) === 'true');
   useEffect(() => {
-    saveItem('shakeToRoll', String(shakeEnabled));
+    saveItem(SAVED.shakeToRoll, String(shakeEnabled));
   }, [shakeEnabled]);
 
-  const [telemetryState, setTelemetryState] = useState(() => localStorage.getItem('telemetryEnabled') !== 'false');
+  const [telemetryState, setTelemetryState] = useState(() => readItem(SAVED.telemetry) !== 'false');
 
   const soundTimersRef = useRef<number[]>([]);
 
@@ -125,7 +125,7 @@ function App() {
   useEffect(() => {
     document.body.classList.remove('theme-dark', 'theme-light', 'theme-felt', 'theme-midnight');
     document.body.classList.add(theme);
-    saveItem('appTheme', theme);
+    saveItem(SAVED.theme, theme);
   }, [theme]);
 
   useEffect(() => {
@@ -189,7 +189,7 @@ function App() {
       return;
     }
 
-    const defaultSet = localStorage.getItem('defaultDiceSet');
+    const defaultSet = readItem(SAVED.defaultSet);
     if (defaultSet) {
       try {
         const parsed = sanitizeDiceList(JSON.parse(defaultSet));
@@ -321,7 +321,7 @@ function App() {
 
   const handleSetDefault = () => {
     // A refused save shows the storage-full message instead of a false "Saved"
-    if (saveItem('defaultDiceSet', JSON.stringify(diceList))) {
+    if (saveItem(SAVED.defaultSet, JSON.stringify(diceList))) {
       showToast('Saved as default! It will automatically load on open.');
     }
     setMenuOpen(false);
@@ -334,11 +334,11 @@ function App() {
     const removed = diceList;
     clearAllDice();
     try {
-      const stored = localStorage.getItem('diceConfigs');
+      const stored = readItem(SAVED.games);
       if (stored) {
         const parsed = JSON.parse(stored);
         delete parsed['systemAutosave'];
-        saveItem('diceConfigs', JSON.stringify(parsed));
+        saveItem(SAVED.games, JSON.stringify(parsed));
       }
     } catch (e) {
       console.error(e);
@@ -385,17 +385,7 @@ function App() {
 
   const handleExportData = () => {
     try {
-      const data = {
-        version: "1.0",
-        configs: JSON.parse(localStorage.getItem('diceConfigs') || '{}'),
-        defaultSet: JSON.parse(localStorage.getItem('defaultDiceSet') || '[]'),
-        rollHistory: JSON.parse(localStorage.getItem('rollHistory') || '[]'),
-        theme: localStorage.getItem('appTheme') || 'theme-dark',
-        soundEnabled: localStorage.getItem('soundEnabled') === 'true',
-        diceScale: sanitizeDiceScale(localStorage.getItem('diceScale')),
-        // Only pictures a face still names, on screen or in a saved set
-        faceImages: usedFaceImages(diceList)
-      };
+      const data = buildBackup(diceList);
       const json = JSON.stringify(data, null, 2);
       const blob = new Blob([json], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -419,60 +409,23 @@ function App() {
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        const data = JSON.parse(event.target?.result as string);
-        if (data && typeof data === 'object' && !Array.isArray(data)) {
-          // Sanitize every dice list inside the backup before it reaches storage
-          if (data.configs && typeof data.configs === 'object') {
-            for (const key of Object.keys(data.configs)) {
-              const entry = data.configs[key];
-              if (entry && typeof entry === 'object') {
-                entry.config = sanitizeDiceList(entry.config);
-              } else {
-                delete data.configs[key];
-              }
-            }
-          }
-          if (data.defaultSet) {
-            data.defaultSet = sanitizeDiceList(data.defaultSet);
-          }
-          // A backup that doesn't fit stops here: no reload, no false "Imported"
-          let fits = true;
-          const keep = (key: string, value: string) => { fits = saveItem(key, value) && fits; };
-          if (data.configs) {
-            const currentConfigs = JSON.parse(localStorage.getItem('diceConfigs') || '{}');
-            const mergedConfigs = { ...currentConfigs, ...data.configs };
-            keep('diceConfigs', JSON.stringify(mergedConfigs));
-          }
-          if (data.defaultSet) {
-            keep('defaultDiceSet', JSON.stringify(data.defaultSet));
-          }
-          if (Array.isArray(data.rollHistory)) {
-            keep('rollHistory', JSON.stringify(data.rollHistory.slice(0, MAX_HISTORY_LENGTH)));
-          }
-          if (data.theme) {
-            keep('appTheme', data.theme);
-          }
-          if (data.soundEnabled !== undefined) {
-            keep('soundEnabled', String(data.soundEnabled));
-          }
-          // Older backups have no dice size; they import at the default
-          keep('diceScale', String(sanitizeDiceScale(data.diceScale)));
-          // Pictures on faces; older backups have none
-          if (data.faceImages && !importFaceImages(data.faceImages)) {
-            showToast('Imported, but some pictures did not fit on this device. Reloading...');
-            setTimeout(() => window.location.reload(), 1500);
-            return;
-          }
-          if (!fits) return;
-
-          trackEvent('backup_imported');
-          showToast('Imported backup successfully! Reloading...');
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
-        } else {
+        const result = restoreBackup(JSON.parse(event.target?.result as string));
+        if (result === 'invalid') {
           showToast('Invalid backup file structure.');
+          return;
         }
+        // Storage full: the storage message is already up, so no reload
+        if (result === 'full') return;
+        if (result === 'pictures') {
+          showToast('Imported, but some pictures did not fit on this device. Reloading...');
+          setTimeout(() => window.location.reload(), 1500);
+          return;
+        }
+        trackEvent('backup_imported');
+        showToast('Imported backup successfully! Reloading...');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } catch (err) {
         console.error(err);
         showToast('Failed to parse backup file.');
