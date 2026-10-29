@@ -57,20 +57,19 @@ self.addEventListener('fetch', (e) => {
 
   if (isNavigation) {
     const cachedShell = () => caches.match(e.request).then((cached) => cached || caches.match('/index.html'));
-    const network = fetch(e.request).then((networkResponse) => {
-      if (networkResponse.status === 200) {
-        const copy = networkResponse.clone();
-        return caches.open(CACHE_NAME).then((cache) => cache.put(e.request, copy)).then(() => networkResponse);
-      }
-      return networkResponse;
-    });
-    // Keep the fresh copy saving even after a slow network loses the race below,
-    // so the newer version opens next time
-    e.waitUntil(network.catch(() => {}));
-    // A weak signal: after NAV_TIMEOUT_MS open the copy on the phone instead of
-    // a blank screen. With no copy yet, keep waiting for the network.
+    const network = fetch(e.request);
+    // Save the fresh page on the side: a good signal shows it straight away, and
+    // after a slow network loses the race below it still saves, so the newer
+    // version opens next time
+    e.waitUntil(network.then((networkResponse) => {
+      if (networkResponse.status !== 200) return;
+      const copy = networkResponse.clone();
+      return caches.open(CACHE_NAME).then((cache) => cache.put(e.request, copy));
+    }).catch(() => {}));
+    // A weak signal: after NAV_TIMEOUT_MS open this page's copy on the phone
+    // instead of a blank screen. With no copy of it yet, keep waiting.
     const slow = new Promise((resolve) => setTimeout(resolve, NAV_TIMEOUT_MS))
-      .then(() => cachedShell())
+      .then(() => caches.match(e.request))
       .then((cached) => cached || network);
     e.respondWith(
       Promise.race([network, slow]).catch(() => cachedShell())

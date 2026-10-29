@@ -9,11 +9,11 @@ const SW = readFileSync(resolve(__dirname, '../../public/sw.js'), 'utf8');
 type Res = { status: number; body: string; clone: () => Res };
 const res = (body: string, status = 200): Res => ({ status, body, clone: () => res(body, status) });
 
-function openApp(fetchImpl: () => Promise<Res>, saved?: Res) {
+function openApp(fetchImpl: () => Promise<Res>, saved?: Res, saveFails = false) {
   const store = new Map<string, Res>();
   if (saved) store.set('/index.html', saved);
   const listeners: Record<string, (e: unknown) => void> = {};
-  const cache = { put: (_req: unknown, r: Res) => { store.set('/index.html', r); return Promise.resolve(); } };
+  const cache = { put: (_req: unknown, r: Res) => { if (saveFails) return Promise.reject(new Error('full')); store.set('/index.html', r); return Promise.resolve(); } };
   const ctx = {
     self: { addEventListener: (t: string, fn: (e: unknown) => void) => { listeners[t] = fn; }, location: { origin: 'https://customdiceroller.com' } },
     caches: { open: () => Promise.resolve(cache), match: () => Promise.resolve(store.get('/index.html')), keys: () => Promise.resolve([]) },
@@ -62,6 +62,19 @@ describe('Opening the app on a weak signal', () => {
     const { response } = openApp(() => new Promise(r => setTimeout(() => r(res('fresh')), 8000)));
     await vi.advanceTimersByTimeAsync(8100);
     expect((await response).body).toBe('fresh');
+  });
+
+  it('a good signal still shows the fresh page when saving it fails', async () => {
+    const { response } = openApp(() => Promise.resolve(res('fresh')), res('saved'), true);
+    await vi.advanceTimersByTimeAsync(10);
+    expect((await response).body).toBe('fresh');
+  });
+
+  it('an error page from the network is shown but not saved', async () => {
+    const { response, store } = openApp(() => Promise.resolve(res('oops', 500)), res('saved'));
+    await vi.advanceTimersByTimeAsync(10);
+    expect((await response).status).toBe(500);
+    expect(store.get('/index.html')!.body).toBe('saved');
   });
 
   it('with no network at all, it opens the saved copy at once', async () => {
