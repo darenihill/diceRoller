@@ -37,6 +37,15 @@
   line-height: 1;
 }
 
+/* An old total, from before the dice changed: still readable, clearly faint */
+.rollBtnLabel {
+  transition: opacity 0.2s ease;
+}
+
+.rollBtnLabelStale {
+  opacity: 0.45;
+}
+
 /* Modifier rides along small so the total keeps the space */
 .rollBtnModSuffix {
   font-size: 14px;

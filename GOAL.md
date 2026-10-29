@@ -207,3 +207,11 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+
+- ~~Done 2026-10-29~~ The Roll button's old total fades once you change the dice
+  (Daren 2026-10-25, Build, "Fade the old total"): "The total turns faint as soon
+  as a die is added, removed or changed. The next roll shows it bright again."
+  1. ~~Done 2026-10-29~~ Adding, removing or editing a die after a roll makes the
+     Roll button's total faint; holding dice or changing the modifier doesn't;
+     the next roll brings it back. Done when an app test adds a die and holds
+     all, and a 390 px browser check shows the faint total.
