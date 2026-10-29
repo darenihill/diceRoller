@@ -5,6 +5,31 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- Export backup keeps all your settings, including RPG mode and shake to roll
+  (Daren 2026-10-28, Build). Builds on the storage-full change (pull request 41).
+  1. ~~Done 2026-10-29~~ One list names every value the app keeps on the device;
+     the app, dice state, analytics and pictures read and save through it, and a
+     browser that blocks storage opens the app instead of a blank screen. Done
+     when a unit test with storage blocked still sees the Roll button.
+  2. ~~Done 2026-10-29~~ The backup lives in its own file and carries RPG Mode,
+     shake to roll, target numbers, the analytics switch and usage stats; older
+     backups still import. Done when unit tests cover a round trip, a bad file,
+     an old backup and full storage, and a 390 px browser check exports and
+     imports the settings back.
+
+- ~~Done 2026-10-28~~ A "storage full" message instead of lost saves or a blank screen (Daren
+  2026-10-27, Build): "Save when storage is full: a message, no blank
+  screen; The message: an Export backup button." Picture saves already warn;
+  this brings games, the default set and settings in line.
+  1. ~~Done 2026-10-28~~ Every save of games, the default set, history and settings goes through
+     one safe step, so a full device never breaks the app. Done when a unit
+     test fills storage, saves a game and the app is still on screen.
+  2. ~~Done 2026-10-28~~ When a save is refused, a message says storage is full and offers
+     Export backup. Done when a unit test sees the message and its button
+     start a backup.
+  3. ~~Done 2026-10-28~~ "Saved as default" only shows when the save worked. Done when a unit
+     test with full storage sees the storage message instead.
+
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
   Build): "The big number stays the real total, and the math sits beside it in
   brackets: 9 (7+2), so the dice and the modifier are both visible and nobody

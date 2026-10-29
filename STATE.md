@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: backup keeps all settings, waiting on a merge tap after the storage-full change (pull request 41) (2026-10-29).
 
 # State
 

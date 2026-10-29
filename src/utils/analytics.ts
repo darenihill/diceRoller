@@ -1,3 +1,5 @@
+import { SAVED } from './savedValues';
+import { readItem } from './safeStorage';
 import { generateId } from './diceUtils';
 import { GA_MEASUREMENT_ID } from './constants';
 
@@ -19,8 +21,8 @@ export interface LocalAnalyticsStats {
   telemetryEnabled: boolean;
 }
 
-const STORAGE_KEY = 'diceAnalyticsStats';
-const PRIVACY_KEY = 'telemetryEnabled';
+const STORAGE_KEY = SAVED.usageStats;
+const PRIVACY_KEY = SAVED.telemetry;
 
 function getDefaultStats(): LocalAnalyticsStats {
   const now = new Date().toISOString();
@@ -39,13 +41,13 @@ function getDefaultStats(): LocalAnalyticsStats {
     backupsImportedCount: 0,
     shareLinksGeneratedCount: 0,
     favoriteTheme: 'theme-dark',
-    telemetryEnabled: localStorage.getItem(PRIVACY_KEY) !== 'false',
+    telemetryEnabled: readItem(PRIVACY_KEY) !== 'false',
   };
 }
 
 export function getLocalStats(): LocalAnalyticsStats {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = readItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
       return { ...getDefaultStats(), ...parsed };
