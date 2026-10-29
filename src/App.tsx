@@ -741,12 +741,12 @@ function App() {
 
       {/* Toast Notification */}
       {undoOffer ? (
-        <div className={`${styles.toast} ${styles.undoToast} ${rpgMode ? styles.toastBelowBox : ''}`} role="status">
+        <div className={`${styles.toast} ${styles.undoToast} ${rpgMode ? styles.toastAboveRpgBar : ''}`} role="status">
           <span>{undoOffer.message}</span>
           <button className={styles.undoButton} onClick={runUndo}>Undo</button>
         </div>
       ) : toast && (
-        <div className={`${styles.toast} ${rpgMode ? styles.toastBelowBox : ''}`}>
+        <div className={`${styles.toast} ${rpgMode ? styles.toastAboveRpgBar : ''}`}>
           {toast}
         </div>
       )}

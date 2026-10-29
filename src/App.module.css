@@ -108,7 +108,8 @@
 
 .toast {
   position: fixed;
-  top: 48px;
+  /* Just above the Roll, + and lock buttons, where Android puts its Undo */
+  bottom: calc(108px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--md-sys-color-primary);
@@ -119,13 +120,30 @@
   font-weight: 600;
   z-index: 1000;
   box-shadow: var(--elevation-3, 0 4px 12px rgba(0,0,0,0.3));
-  animation: slideDown 0.3s cubic-bezier(0.2, 0, 0, 1);
+  animation: slideUp 0.3s cubic-bezier(0.2, 0, 0, 1);
   pointer-events: none;
 }
 
-/* In RPG mode the Type a roll box sits where the toast would, so keep it in view */
-.toastBelowBox {
-  top: 132px;
+/* In RPG mode the bottom bar is taller (modifier and ADV / NORM / DIS rows) */
+.toastAboveRpgBar {
+  bottom: calc(270px + env(safe-area-inset-bottom, 0px));
+}
+
+/* On a phone the menu button sits above the lock on the left, so the bar
+   lines up with Roll on the right and stays clear of the menu */
+@media (max-width: 468px) {
+  .toast:not(.toastAboveRpgBar) {
+    left: auto;
+    right: max(16px, env(safe-area-inset-right, 0px));
+    transform: none;
+    max-width: calc(100vw - 120px);
+    animation-name: slideUpRight;
+  }
+}
+
+@keyframes slideUpRight {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: none; }
 }
 
 /* The Undo offer can be tapped, unlike a plain message */
@@ -165,8 +183,8 @@
   outline-offset: 2px;
 }
 
-@keyframes slideDown {
-  from { opacity: 0; transform: translate(-50%, -20px); }
+@keyframes slideUp {
+  from { opacity: 0; transform: translate(-50%, 20px); }
   to { opacity: 1; transform: translate(-50%, 0); }
 }
 
