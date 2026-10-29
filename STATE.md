@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: roll settings kept after a reopen (2026-10-29), waiting on Daren's Merge tap with the other Dice Roller pull requests.
 
 # State
 
