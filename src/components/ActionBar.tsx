@@ -13,6 +13,8 @@ interface ActionBarProps {
   onHoldAll: () => void;
   allHeld: boolean;
   totalVisible: boolean;
+  /** The dice changed since the total was rolled: show it faint */
+  totalStale?: boolean;
   lastTotal: number;
   /** The modifier counted in lastTotal (0 when none) */
   lastModifier?: number;
@@ -36,7 +38,7 @@ const DND_GRID_DICE = [
 const D20_OPTION = { label: 'D20', faces: 20, name: 'd20', color: '#384050' };
 
 export const ActionBar: React.FC<ActionBarProps> = ({ 
-  onAdd, onRoll, onHoldAll, allHeld, totalVisible, lastTotal, lastModifier = 0, modifier, onChangeModifier,
+  onAdd, onRoll, onHoldAll, allHeld, totalVisible, totalStale = false, lastTotal, lastModifier = 0, modifier, onChangeModifier,
   rpgMode, rollAdvantage, onChangeRollAdvantage
 }) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -217,7 +219,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
         >
           <Dice5 size={24} strokeWidth={2.5} className={styles.rollBtnIcon} />
           {totalVisible ? (
-            <span className={styles.rollBtnLabel} style={{ fontSize: totalFontSize }}>
+            <span className={`${styles.rollBtnLabel} ${totalStale ? styles.rollBtnLabelStale : ''}`} style={{ fontSize: totalFontSize }} data-stale={totalStale || undefined}>
               {lastTotal}
               {/* The total already counts the modifier, so show its math, not "+2" to add again */}
               {lastModifier !== 0 && (
