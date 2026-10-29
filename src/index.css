@@ -212,6 +212,14 @@ button {
   transform-origin: center;
 }
 
+/* With Reduce motion on, nothing shakes or slides: dice and bars just
+   appear, and a roll's number fades in (Dice.module.css) */
+@media (prefers-reduced-motion: reduce) {
+  .dice-shake {
+    animation: none;
+  }
+}
+
 /* Search landing pages (landing/pages.mjs) and the home page. The writing
    ships in the page HTML for search engines; the app shows it in its About
    dialog instead of below the dice, so the page never scrolls. */

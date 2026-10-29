@@ -207,3 +207,10 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+- Roll animation: with Reduce motion on, dice stay still and the number fades
+  in (Daren, Build 2026-10-26).
+  1. ~~Done 2026-10-29~~ With the phone's Reduce motion on, a rolling die
+     doesn't shake or flicker through faces: its number dims, then fades in
+     when it lands; dice and dialogs stop growing, spinning and sliding; the
+     target-hit toast fades instead of sliding. Done when a test with the
+     setting on checks no die turns, and a browser check shows the same.
