@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: Idea choices list refreshed from the Desk (2026-10-29), in pull request 30; it waits on Daren's Merge tap.
 
 # State
 
