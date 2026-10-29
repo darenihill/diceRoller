@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { DiceData } from '../types';
 import { generateId, parseFaceContent, faceNumericValue, FACE_ICON_PREFIX, isNumberedFaces } from '../utils/diceUtils';
+import { luckSet } from '../utils/fairOdds';
 import { MAX_DICE_LIMIT, MAX_HISTORY_LENGTH, ROLL_DURATION_MS, TOAST_DURATION_MS } from '../utils/constants';
 
 export interface RollHistoryItem {
@@ -14,6 +15,8 @@ export interface RollHistoryItem {
   modifier?: number;
   /** What was typed in the "Type a roll" box, e.g. "2d6+3" */
   typed?: string;
+  /** Which dice the roll used (faces only), so the Luck Meter can tell when they changed */
+  set?: string;
 }
 
 export interface RollSummary {
@@ -309,7 +312,8 @@ export const useDiceState = () => {
         isTargetHit,
         ...(onlyId !== undefined ? { single: true } : {}),
         ...(activeModifier !== 0 ? { modifier: activeModifier } : {}),
-        ...(typed && onlyId === undefined ? { typed: typed.text } : {})
+        ...(typed && onlyId === undefined ? { typed: typed.text } : {}),
+        ...(onlyId === undefined ? { set: luckSet(list) } : {})
       }, ...h].slice(0, MAX_HISTORY_LENGTH));
       setIsRolling(false);
       setRollingId(null);

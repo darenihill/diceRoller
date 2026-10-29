@@ -169,7 +169,8 @@
 }
 
 .freqLabel {
-  width: 48px;
+  min-width: 66px;
+  white-space: nowrap;
   font-weight: 700;
   text-align: right;
   color: var(--md-sys-color-on-surface-variant);
@@ -189,6 +190,34 @@
   background-color: var(--md-sys-color-primary);
   border-radius: 4px;
   transition: width 0.3s ease;
+}
+
+.freqFairMark {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background-color: var(--md-sys-color-on-surface);
+  opacity: 0.85;
+}
+
+.freqFairKey {
+  display: inline-block;
+  width: 3px;
+  height: 12px;
+  margin-right: 6px;
+  vertical-align: -2px;
+  border-radius: 2px;
+  background-color: var(--md-sys-color-on-surface);
+}
+
+.freqNote {
+  margin: 0 0 4px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--md-sys-color-on-surface-variant);
 }
 
 .freqCount {
