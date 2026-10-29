@@ -36,3 +36,23 @@ Daren's picks on suggested ideas for this app, from the Desk, oldest first: the 
 - 2026-10-26 · Build · Luck Meter adds a fair-dice mark to each bar, so you can tell luck from normal
 - 2026-10-26 · Build · Roll animation: with Reduce motion on, dice stay still and the number fades in
 - 2026-10-26 · Watch · Target odds: Target Highlight shows your chance of rolling each number
+- 2026-10-27 · Build · A "storage full" message instead of lost saves or a blank screen
+- 2026-10-27 · Build · Dice rolls switch to the browser's secure randomness, with no visible change
+- 2026-10-27 · Build · Install app tile in the menu puts Dice Roller on your home screen
+- 2026-10-27 · Build · Phone Back closes the open dialog instead of leaving Dice Roller
+- 2026-10-27 · Build · Press Space or R to roll on a computer
+- 2026-10-27 · Build · Tapping Roll while the dice tumble lands them at once
+- 2026-10-27 · Skip · Undo after Set Default brings back your old startup dice
+- 2026-10-28 · Build · A short buzz when the dice land, even with sound off (Android)
+- 2026-10-28 · Build · Buttons around a tapped die stay thumb-sized with six dice out
+- 2026-10-28 · Watch · Exploding dice: a die that lands its top number rolls again and adds
+- 2026-10-28 · Build · Export backup keeps all your settings, including RPG mode and shake to roll
+- 2026-10-28 · Build · In RPG Mode, only the big Roll button is filled blue
+- 2026-10-28 · Build · Menu and settings words grow when you raise your browser's text size
+- 2026-10-28 · Build · Paste a list into Add custom text and every line becomes a face
+- 2026-10-28 · Build · Screen stays on while Dice Roller is open, so no unlock between turns
+- 2026-10-28 · Build · The faces counter warns that it will replace your custom faces
+- 2026-10-28 · Build · The menu closes when you open Help, Games, History, Usage Stats or Customize
+- 2026-10-28 · Build · Usage Stats puts two numbers per row on a phone
+- 2026-10-28 · Build · When you open a die's settings, its faces show first, not the colour panel
+- 2026-10-29 · Build · A natural 20 sets off a one-second confetti burst
