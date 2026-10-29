@@ -207,3 +207,11 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+
+- ~~Done 2026-10-29~~ Undo bar and messages move to the bottom, just above the
+  Roll button (Daren 2026-10-25, Build): "The same bar, same words, same 5
+  seconds, moved from the top to just above the Roll, + and lock buttons."
+  1. ~~Done 2026-10-29~~ The bar sits just above the bottom buttons in plain and
+     RPG mode, on a phone and a computer, and never covers the menu button.
+     Done when a test reads the placement and 390, 360 and 1280 px screenshots
+     show it above Roll.
