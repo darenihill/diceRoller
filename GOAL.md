@@ -207,3 +207,12 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+
+- ~~Done 2026-10-29~~ Dice shading: each face of the RPG dice gets its own
+  shade, lit from above (Daren 2026-10-25, Build, "Each face its own shade"):
+  "the face-by-face shading from the first sketch, now on the dice you already
+  have, so the number and shapes stay as they are."
+  1. ~~Done 2026-10-29~~ All six RPG shapes draw each face as its own area,
+     lighter facing up and darker facing down, under the existing lines; the
+     number, shapes and colours are unchanged. Done when tests check every
+     shape's faces and their order, and a 390 px screenshot shows all six.
