@@ -21,8 +21,9 @@ interface DiceSettingsModalProps {
   allDice: DiceData[];
 }
 
-// Changing a die's faces releases its hold: the tap that opened these
-// settings also held it, and a held die with new faces would never roll
+// Adding, removing or replacing a die's faces releases its hold: the tap that opened these
+// settings also held it, and a held die with new faces would never roll.
+// Recolouring a face, its number or its picture keeps a deliberate hold.
 export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOpen, onClose, onUpdate, onRemove, onClone, allDice }) => {
   const [customInput, setCustomInput] = useState('');
   // What is typed in the faces box; null shows the die's count. Lets the box be cleared and retyped.
@@ -85,7 +86,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     const faceStr = newFaces[index];
     const parsed = parseFaceContent(faceStr);
     newFaces[index] = buildFace(parsed.content, color, parsed.value, parsed.image);
-    onUpdate(dice.id, { held: false, customFaces: newFaces });
+    onUpdate(dice.id, { customFaces: newFaces });
   };
 
   /** Sets or clears the number a face counts as in totals; blank clears it */
@@ -95,7 +96,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     const n = parseInt(raw, 10);
     const value = raw.trim() === '' || isNaN(n) ? undefined : Math.max(-9999, Math.min(9999, n));
     newFaces[index] = buildFace(parsed.content, parsed.bgColor || undefined, value, parsed.image);
-    onUpdate(dice.id, { held: false, customFaces: newFaces });
+    onUpdate(dice.id, { customFaces: newFaces });
   };
 
   const choosePicture = (target: number | 'new') => {
@@ -130,7 +131,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
       const newFaces = [...current.customFaces];
       const parsed = parseFaceContent(newFaces[target], '');
       newFaces[target] = buildFace(parsed.content, parsed.bgColor || undefined, parsed.value, id);
-      onUpdate(current.id, { held: false, customFaces: newFaces });
+      onUpdate(current.id, { customFaces: newFaces });
     }
   };
 
@@ -138,7 +139,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     const newFaces = [...dice.customFaces];
     const parsed = parseFaceContent(newFaces[index], '');
     newFaces[index] = buildFace(parsed.content, parsed.bgColor || undefined, parsed.value);
-    onUpdate(dice.id, { held: false, customFaces: newFaces });
+    onUpdate(dice.id, { customFaces: newFaces });
   };
 
   /** Every face its own colour; a plain numbered die becomes faces 1..n first */
@@ -148,7 +149,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     const keepShown = dice.customFaces.length === 0
       ? { currentFaceIndex: Math.min(Math.max(dice.numberValue, 1), customFaces.length) - 1 }
       : {};
-    onUpdate(dice.id, { held: false, customFaces, ...keepShown });
+    onUpdate(dice.id, { customFaces, ...keepShown });
   };
 
   const handleColorSelect = (color: string) => {
