@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: 3 new ideas on the Desk for Daren to pick (natural 20 confetti, read the total aloud, 3D tumbling dice), 2026-10-29; 28 pull requests wait on his Merge tap.
 
 # State
 
