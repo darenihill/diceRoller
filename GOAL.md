@@ -207,3 +207,12 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+
+- ~~Done 2026-10-29~~ Your +2 and Advantage stay set when you come back to the app
+  (Daren 2026-10-25, Build): "The app already remembers your dice, theme and
+  RPG mode. It would remember the modifier and the Advantage choice the same
+  way, on this phone only."
+  1. ~~Done 2026-10-29~~ The modifier and the ADV / NORM / DIS pick are kept on
+     the device and come back after a reopen; damaged stored values fall back
+     to +0 and NORM. Done when unit tests reopen the app with +2 / ADV and
+     −3 / DIS, and a 390 px browser reload still shows Roll +2 and ADV.
