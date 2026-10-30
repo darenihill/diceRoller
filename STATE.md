@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: RPG Mode, only the big Roll button filled blue; waits on a merge tap after pull request 31 (2026-10-30).
 
 # State
 

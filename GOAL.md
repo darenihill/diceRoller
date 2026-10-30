@@ -5,6 +5,31 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- In RPG Mode, only the big Roll button is filled blue (Daren 2026-10-28,
+  Build): "Typed-roll Roll button: grey instead of filled; Chosen roll type:
+  blue ring and text, no fill." Builds on Save a typed roll (pull request 31).
+  1. ~~Done 2026-10-30~~ The typed-roll Roll and Save buttons are grey; the
+     chosen roll type (ADV, NORM, DIS) has a blue ring and blue text, no fill;
+     nothing moves. Done when a test finds the big Roll button is the only
+     filled one in RPG Mode, and a 390 px check in dark and light themes shows it.
+  2. ~~Done 2026-10-30~~ Screen readers hear which roll type is on. Done when a
+     test sees the chosen type pressed and the others not.
+
+- ~~Done 2026-10-26~~ Save a typed roll as a button you tap to roll (Daren 2026-10-23, Build):
+  "After typing a roll, Save this roll asks for a short name and adds a button
+  under the box. Buttons are kept on this phone and go into backups. They only
+  show in RPG mode, next to the box they come from."
+  1. A Save this roll button by the Type a roll box asks for a short name and
+     adds a button under the box. Done when a unit test types 2d6+3, saves it
+     as "Sword" and finds the Sword button.
+  2. Tapping a saved button rolls it exactly like typing it. Done when a unit
+     test taps Sword and finds two d6 out with +3.
+  3. Saved buttons stay after a reload, only show in RPG mode, and removing
+     one offers Undo. Done when unit tests reload, turn RPG mode off, and
+     remove then undo.
+  4. Backups carry saved rolls. Done when a unit test exports a backup with
+     them and an import puts them back.
+
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
   Build): "The big number stays the real total, and the math sits beside it in
   brackets: 9 (7+2), so the dice and the modifier are both visible and nobody
