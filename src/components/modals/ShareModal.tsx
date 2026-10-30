@@ -13,6 +13,9 @@ export const ShareModal: React.FC<ShareModalProps> = ({ url, onClose }) => {
   const [copiedUrl, setCopiedUrl] = React.useState<string | null>(null);
   const copied = !!url && copiedUrl === url;
 
+  // Closing forgets the copy, so the box opens fresh next time
+  const handleClose = () => { setCopiedUrl(null); onClose(); };
+
   const selectLink = () => inputRef.current?.select();
 
   const handleCopy = () => {
@@ -26,7 +29,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ url, onClose }) => {
   };
 
   return (
-    <Modal isOpen={!!url} onClose={onClose} title="Share Link">
+    <Modal isOpen={!!url} onClose={handleClose} title="Share Link">
       <div className={modalStyles.formGroup}>
         <label className={modalStyles.formLabel} htmlFor="share-link-url">Copy this link to share your dice configuration:</label>
         <input 
@@ -39,7 +42,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ url, onClose }) => {
           onClick={(e) => (e.target as HTMLInputElement).select()}
         />
         <div className={modalStyles.buttonRow}>
-          <button className="md-button md-button-surface" onClick={onClose}>Done</button>
+          <button className="md-button md-button-surface" onClick={handleClose}>Done</button>
           <button className="md-button md-button-filled" onClick={handleCopy} aria-live="polite">
             {copied ? 'Copied' : 'Copy'}
           </button>

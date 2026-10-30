@@ -75,6 +75,18 @@ describe('Share link box', () => {
     expect(await screen.findByRole('button', { name: 'Copied' })).toBeInTheDocument();
   });
 
+  it('opens fresh after Done, even for the same link', async () => {
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText: vi.fn().mockResolvedValue(undefined) }, configurable: true });
+    const url = 'https://example.test/#share=abc';
+    const { rerender } = render(<ShareModal url={url} onClose={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Copy' }));
+    await screen.findByRole('button', { name: 'Copied' });
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+    rerender(<ShareModal url={null} onClose={() => {}} />);
+    rerender(<ShareModal url={url} onClose={() => {}} />);
+    expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument();
+  });
+
   it('selects the link when copying is refused', async () => {
     Object.defineProperty(navigator, 'clipboard', { value: { writeText: vi.fn().mockRejectedValue(new Error('no')) }, configurable: true });
     render(<ShareModal url="https://example.test/#share=abc" onClose={() => {}} />);
