@@ -47,7 +47,7 @@ export function sanitizeRollHistory(input: unknown): RollHistoryItem[] {
     const item: RollHistoryItem = {
       id: typeof r.id === 'string' && r.id ? r.id.slice(0, 64) : generateId(),
       total,
-      details: r.details.filter((d): d is string => typeof d === 'string').map(d => d.slice(0, 200)).slice(0, MAX_DICE_LIMIT),
+      details: r.details.filter((d): d is string => typeof d === 'string').map(d => d.slice(0, 200)).slice(0, MAX_DICE_LIMIT + 1), // every die, plus the Modifier line
     };
     if (r.isTargetHit === true) item.isTargetHit = true;
     if (r.single === true) item.single = true;

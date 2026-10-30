@@ -1,4 +1,4 @@
-Next: First security review written (reviews/2026-10-30-security.md) with four fixes, pull request open, waits on Daren's merge tap.
+Next: First security review written (reviews/2026-10-30-security.md) with five fixes, pull request open, waits on Daren's merge tap.
 
 # State
 
