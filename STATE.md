@@ -1,4 +1,4 @@
-Next: saved roll buttons are built and wait for Daren's Merge tap (Dice Roller is public).
+Next: RPG Mode, only the big Roll button filled blue; waits on a merge tap after pull request 31 (2026-10-30).
 
 # State
 

@@ -5,6 +5,16 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- In RPG Mode, only the big Roll button is filled blue (Daren 2026-10-28,
+  Build): "Typed-roll Roll button: grey instead of filled; Chosen roll type:
+  blue ring and text, no fill." Builds on Save a typed roll (pull request 31).
+  1. ~~Done 2026-10-30~~ The typed-roll Roll and Save buttons are grey; the
+     chosen roll type (ADV, NORM, DIS) has a blue ring and blue text, no fill;
+     nothing moves. Done when a test finds the big Roll button is the only
+     filled one in RPG Mode, and a 390 px check in dark and light themes shows it.
+  2. ~~Done 2026-10-30~~ Screen readers hear which roll type is on. Done when a
+     test sees the chosen type pressed and the others not.
+
 - ~~Done 2026-10-26~~ Save a typed roll as a button you tap to roll (Daren 2026-10-23, Build):
   "After typing a roll, Save this roll asks for a short name and adds a button
   under the box. Buttons are kept on this phone and go into backups. They only

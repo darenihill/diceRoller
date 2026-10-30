@@ -87,9 +87,10 @@
   transform: scale(1.05);
 }
 
+/* The chosen roll type: a blue ring and blue text, no fill, so the big Roll
+   button stays the only filled blue button in RPG Mode */
 .rpgFabActive {
-  background-color: var(--md-sys-color-primary-container) !important;
-  color: var(--md-sys-color-on-primary-container) !important;
+  color: var(--md-sys-color-primary) !important;
   border: 2px solid var(--md-sys-color-primary);
 }
 

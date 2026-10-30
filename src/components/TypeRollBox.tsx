@@ -88,7 +88,7 @@ export const TypeRollBox = ({ onRoll, disabled = false, savedRolls = [], onSaveR
               if (note) setNote(null);
             }}
           />
-          <button type="submit" className={`md-button md-button-filled ${styles.go}`} disabled={disabled || !text.trim()}>
+          <button type="submit" className={`md-button md-button-surface ${styles.go}`} disabled={disabled || !text.trim()}>
             Roll
           </button>
         </div>
@@ -122,7 +122,7 @@ export const TypeRollBox = ({ onRoll, disabled = false, savedRolls = [], onSaveR
             onChange={(e) => setName(e.target.value)}
             autoFocus
           />
-          <button type="submit" className={`md-button md-button-filled ${styles.go}`}>Save</button>
+          <button type="submit" className={`md-button md-button-surface ${styles.go}`}>Save</button>
           <button type="button" className={`md-button md-button-surface ${styles.go}`} onClick={() => setNaming(null)}>Cancel</button>
         </form>
       )}
