@@ -69,7 +69,8 @@
         window.dataLayer = window.dataLayer || [];
         window.gtag = function () { dataLayer.push(arguments); };
         gtag('js', new Date());
-        gtag('config', GA_ID);
+        // Share links carry the dice and the set's name after the #; never send them
+        gtag('config', GA_ID, { page_location: location.origin + location.pathname });
 
         if (!isDev) {
           var s = document.createElement('script');

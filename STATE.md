@@ -1,4 +1,4 @@
-Next: Type a roll landed (pull request 27, 2026-10-26); Idea choices (pull request 28) and the tap-twice rollback (pull request 29) landing.
+Next: First security review written (reviews/2026-10-30-security.md) with four fixes, pull request open, waits on Daren's merge tap.
 
 # State
 

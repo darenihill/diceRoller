@@ -33,6 +33,9 @@ import { spokenTotal } from './utils/totalMath';
 import { ShareModal } from './components/modals/ShareModal';
 import { StatsModal } from './components/modals/StatsModal';
 
+/** The themes the app ships; anything else in storage falls back to dark. */
+const THEMES = ['theme-dark', 'theme-light', 'theme-felt', 'theme-midnight'];
+
 function App() {
   const {
     diceList, setDiceList, rollHistory, isRolling, rollingId, modifier, setModifier,
@@ -85,7 +88,11 @@ function App() {
   });
   const [editingDiceId, setEditingDiceId] = useState<string | null>(null);
   const [revealedDiceId, setRevealedDiceId] = useState<string | null>(null);
-  const [theme, setTheme] = useState(() => localStorage.getItem('appTheme') || 'theme-dark');
+  // Only a known theme reaches the page's class list; a backup file could hold anything
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem('appTheme');
+    return saved && THEMES.includes(saved) ? saved : 'theme-dark';
+  });
   
   const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('soundEnabled') === 'true');
   const [diceScale, setDiceScale] = useState(() => sanitizeDiceScale(localStorage.getItem('diceScale')));
@@ -639,8 +646,8 @@ function App() {
       <SidebarMenu
         isOpen={menuOpen}
         onToggle={() => setMenuOpen(!menuOpen)}
-        onDonate={() => window.open('https://www.buymeacoffee.com/darenihill', '_blank')}
-        onIdeas={() => window.open('https://forms.gle/wqYaKsEZ5FQwizuMA', '_blank')}
+        onDonate={() => window.open('https://www.buymeacoffee.com/darenihill', '_blank', 'noopener,noreferrer')}
+        onIdeas={() => window.open('https://forms.gle/wqYaKsEZ5FQwizuMA', '_blank', 'noopener,noreferrer')}
         onHelp={() => setModalOpen('help')}
         onHistory={() => setModalOpen('history')}
         onStats={() => setModalOpen('stats')}

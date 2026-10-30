@@ -207,3 +207,9 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+
+- ~~Done 2026-10-30~~ First security review (security lens): walk spoofing,
+  tampering, repudiation, information leaks, denial of service and elevated
+  access across the app and its data, write it up under reviews/, and fix
+  what is real. Done when reviews/2026-10-30-security.md exists and its fixes
+  have tests that pass.
