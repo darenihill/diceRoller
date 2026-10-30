@@ -32,13 +32,36 @@ export interface TypedRollSetup {
   advantage: RollAdvantageMode;
 }
 
+/**
+ * Roll history can come from a backup file, which anyone can hand-edit, so
+ * keep only well-formed rolls. A malformed one would break the History screen.
+ */
+export function sanitizeRollHistory(input: unknown): RollHistoryItem[] {
+  if (!Array.isArray(input)) return [];
+  const out: RollHistoryItem[] = [];
+  for (const raw of input.slice(0, MAX_HISTORY_LENGTH)) {
+    if (!raw || typeof raw !== 'object') continue;
+    const r = raw as Record<string, unknown>;
+    const total = Number(r.total);
+    if (typeof r.total !== 'number' || !Number.isFinite(total) || !Array.isArray(r.details)) continue;
+    const item: RollHistoryItem = {
+      id: typeof r.id === 'string' && r.id ? r.id.slice(0, 64) : generateId(),
+      total,
+      details: r.details.filter((d): d is string => typeof d === 'string').map(d => d.slice(0, 200)).slice(0, MAX_DICE_LIMIT + 1), // every die, plus the Modifier line
+    };
+    if (r.isTargetHit === true) item.isTargetHit = true;
+    if (r.single === true) item.single = true;
+    if (typeof r.modifier === 'number' && Number.isFinite(r.modifier)) item.modifier = r.modifier;
+    if (typeof r.typed === 'string' && r.typed) item.typed = r.typed.slice(0, 40);
+    out.push(item);
+  }
+  return out;
+}
+
 const loadStoredHistory = (): RollHistoryItem[] => {
   try {
     const stored = localStorage.getItem('rollHistory');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed)) return parsed;
-    }
+    if (stored) return sanitizeRollHistory(JSON.parse(stored));
   } catch (e) {
     console.error('Failed to load roll history', e);
   }
