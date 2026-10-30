@@ -362,18 +362,32 @@ function App() {
     const url = `${window.location.origin}${window.location.pathname}#share=${compressed}${nameParam}`;
     
     trackEvent('share_link_copied', { diceCount: diceList.length });
-
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(url).then(() => {
-        showToast("Share link copied to clipboard!");
-      }).catch(err => {
-        console.error("Failed to copy link: ", err);
-        setShareFallbackUrl(url);
-      });
-    } else {
-      setShareFallbackUrl(url);
-    }
     setMenuOpen(false);
+
+    const copyLink = () => {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(url).then(() => {
+          showToast("Share link copied to clipboard!");
+        }).catch(err => {
+          console.error("Failed to copy link: ", err);
+          setShareFallbackUrl(url);
+        });
+      } else {
+        setShareFallbackUrl(url);
+      }
+    };
+
+    // The phone's own share sheet (Messages, WhatsApp...) when the browser has one
+    const shareData = { title: setName || 'Custom Dice Roller', url };
+    if (typeof navigator.share === 'function' && (!navigator.canShare || navigator.canShare(shareData))) {
+      navigator.share(shareData).catch(err => {
+        // Closing the sheet is a choice, not a failure
+        if (err && (err as Error).name === 'AbortError') return;
+        copyLink();
+      });
+      return;
+    }
+    copyLink();
   };
 
   const handleExportData = () => {

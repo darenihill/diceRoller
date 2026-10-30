@@ -207,3 +207,14 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+
+- ~~Done 2026-10-30~~ Share opens the phone's share sheet (Daren 2026-10-30,
+  Build): "Share opens your phone's share sheet (Messages, WhatsApp), with a
+  Copy button as backup." The link stays the same as today.
+  1. ~~Done 2026-10-30~~ Share in the menu opens the browser's share sheet with
+     the same link when the browser has one; closing the sheet does nothing
+     else. Done when a unit test sees the sheet get the link and a cancel
+     leave no box or message.
+  2. ~~Done 2026-10-30~~ Without a share sheet, the link is copied as today;
+     if that fails, the link box has a Copy button that copies it and says
+     Copied. Done when unit tests cover the copy and the Copy button.
