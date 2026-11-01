@@ -89,7 +89,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
   return (
     <div className={styles.actionBar}>
       <motion.button
-        className={`md-icon-button ${styles.actionBtn} ${styles.lockBtn}`}
+        className={`md-icon-button control-ring ${styles.actionBtn} ${styles.lockBtn}`}
         onClick={onHoldAll}
         title="Toggle Hold All"
         initial={{ rotate: 0 }}
@@ -140,7 +140,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
         </AnimatePresence>
 
         <button 
-          className={`md-icon-button ${styles.actionBtn}`} 
+          className={`md-icon-button control-ring ${styles.actionBtn}`} 
           onClick={handleAddClick} 
           title={rpgMode ? "Add D&D Dice Menu" : "Add Dice"}
         >
@@ -159,21 +159,21 @@ export const ActionBar: React.FC<ActionBarProps> = ({
             {/* Left Vertical Column: Advantage / Disadvantage FABs */}
             <div className={styles.verticalColumn}>
               <button
-                className={`${styles.rpgFabBtn} ${rollAdvantage === 'advantage' ? styles.rpgFabActive : ''}`}
+                className={`control-ring ${styles.rpgFabBtn} ${rollAdvantage === 'advantage' ? styles.rpgFabActive : ''}`}
                 onClick={() => onChangeRollAdvantage('advantage')}
                 title="Advantage: Keep Highest"
               >
                 ADV
               </button>
               <button
-                className={`${styles.rpgFabBtn} ${rollAdvantage === 'normal' ? styles.rpgFabActive : ''}`}
+                className={`control-ring ${styles.rpgFabBtn} ${rollAdvantage === 'normal' ? styles.rpgFabActive : ''}`}
                 onClick={() => onChangeRollAdvantage('normal')}
                 title="Normal Roll"
               >
                 NORM
               </button>
               <button
-                className={`${styles.rpgFabBtn} ${rollAdvantage === 'disadvantage' ? styles.rpgFabActive : ''}`}
+                className={`control-ring ${styles.rpgFabBtn} ${rollAdvantage === 'disadvantage' ? styles.rpgFabActive : ''}`}
                 onClick={() => onChangeRollAdvantage('disadvantage')}
                 title="Disadvantage: Keep Lowest"
               >
@@ -184,14 +184,14 @@ export const ActionBar: React.FC<ActionBarProps> = ({
             {/* Right Vertical Column: Modifier Stepper FABs */}
             <div className={`${styles.verticalColumn} ${styles.modifierColumn}`}>
               <button
-                className={`md-icon-button ${styles.rpgFabBtn}`}
+                className={`md-icon-button control-ring ${styles.rpgFabBtn}`}
                 onClick={() => onChangeModifier(modifier + 1)}
                 title="Increase modifier"
               >
                 <Plus size={28} strokeWidth={2.5} />
               </button>
               <button
-                className={`md-icon-button ${styles.rpgFabBtn} ${modifier === 0 ? styles.modifierBtnDisabled : ''}`}
+                className={`md-icon-button control-ring ${styles.rpgFabBtn} ${modifier === 0 ? styles.modifierBtnDisabled : ''}`}
                 onClick={() => onChangeModifier(0)}
                 title="Reset modifier"
                 disabled={modifier === 0}
@@ -199,7 +199,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
                 <RotateCcw size={22} />
               </button>
               <button
-                className={`md-icon-button ${styles.rpgFabBtn}`}
+                className={`md-icon-button control-ring ${styles.rpgFabBtn}`}
                 onClick={() => onChangeModifier(modifier - 1)}
                 title="Decrease modifier"
               >
@@ -210,7 +210,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
         )}
 
         <motion.button
-          className={`md-button md-button-filled ${styles.rollBtn}`}
+          className={`md-button md-button-filled control-ring ${styles.rollBtn}`}
           onClick={onRoll}
           whileTap={{ scale: 0.95 }}
           aria-label="Roll dice"

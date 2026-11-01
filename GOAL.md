@@ -207,3 +207,13 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+
+- ~~Done 2026-11-01~~ Bright ring on the round buttons (Daren 2026-10-31,
+  Build, way: bright ring): "The round buttons at the bottom get a thin ring
+  so you can find them in sun." His notes: "I'd want the roll button to stay
+  consistent with the other round buttons."
+  1. ~~Done 2026-11-01~~ Menu, Hold all, Add, the RPG buttons and Roll each
+     get a 2 px bright ring inside their edge in all four themes (dark grey on
+     the light theme); the chosen ADV, NORM or DIS keeps its blue ring. Done
+     when a unit test finds the ring on every bottom-bar button and phone-width
+     screenshots in each theme, and in simulated glare, show the edges.
