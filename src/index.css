@@ -1,6 +1,8 @@
 
 :root {
   --md-sys-color-background: #121212;
+  /* Bright ring on the bottom-bar buttons, so their edges show in sun */
+  --control-ring: #E3E3E3;
   --md-sys-color-surface: #1E1E1E;
   --md-sys-color-surface-variant: #2D2D2D;
   --md-sys-color-surface-hover: #383838;
@@ -40,6 +42,7 @@
 }
 
 body.theme-light {
+  --control-ring: #5F6368;
   --md-sys-color-background: #FDFDFD;
   --md-sys-color-surface: #F0F0F0;
   --md-sys-color-surface-variant: #E0E0E0;
@@ -60,6 +63,7 @@ body.theme-light {
 }
 
 body.theme-felt {
+  --control-ring: #EFE6D2;
   --md-sys-color-background: #1B4D3E; /* Casino Felt Green */
   --md-sys-color-surface: #13382D;
   --md-sys-color-surface-variant: #0F2E24;
@@ -78,6 +82,7 @@ body.theme-felt {
 }
 
 body.theme-midnight {
+  --control-ring: #DFE0FF;
   --md-sys-color-background: #090B10;
   --md-sys-color-surface: #121622;
   --md-sys-color-surface-variant: #1B2134;
@@ -124,6 +129,13 @@ button {
   /* Quick repeat taps (wet or gloved hands) roll again instead of zooming the page */
   touch-action: manipulation;
   outline: none;
+}
+
+/* Bottom-bar buttons (menu, hold all, add, RPG controls, Roll) get one
+   bright 2px ring inside their edge, so each one is easy to find in glare. */
+.control-ring {
+  outline: 2px solid var(--control-ring);
+  outline-offset: -2px;
 }
 
 /* Taps show no ring; the keyboard always shows where it is */

@@ -59,7 +59,7 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
   return (
     <>
       <div className={styles.toggleContainer}>
-        <button ref={toggleRef} className={`md-icon-button ${styles.toggleBtn} ${isOpen ? styles.toggleBtnOpen : ''}`} onClick={onToggle}
+        <button ref={toggleRef} className={`md-icon-button control-ring ${styles.toggleBtn} ${isOpen ? styles.toggleBtnOpen : ''}`} onClick={onToggle}
           title="Menu"
           aria-label={isOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={isOpen}

@@ -101,6 +101,8 @@
 .rpgFabActive {
   color: var(--md-sys-color-primary) !important;
   border: 2px solid var(--md-sys-color-primary);
+  /* The chosen roll type keeps its own colour ring */
+  outline-color: var(--md-sys-color-primary) !important;
 }
 
 .modifierBtnDisabled {
