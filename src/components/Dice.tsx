@@ -73,10 +73,12 @@ const DiceComponent: React.FC<DiceProps> = ({
     const box = el.getBoundingClientRect();
     const dx = glided.x - (box.left + box.width / 2);
     const dy = glided.y - (box.top + box.height / 2);
-    el.animate(
+    const glide = el.animate(
       [{ transform: `translate(${dx}px, ${dy}px) scale(0.3)`, opacity: 0.4 }, { transform: 'none', opacity: 1 }],
       { duration: 450, easing: 'cubic-bezier(0.2, 0, 0, 1)' }
     );
+    // Strict mode runs this twice: stop the first so the second measures the settled slot
+    return () => glide.cancel();
   }, [glided, calm]);
 
   useEffect(() => {

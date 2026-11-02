@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { StrictMode } from 'react';
 import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import App from '../App';
@@ -10,7 +10,7 @@ beforeAll(() => {
 let animate: ReturnType<typeof vi.fn>;
 beforeEach(() => {
   localStorage.clear();
-  animate = vi.fn();
+  animate = vi.fn(() => ({ cancel: vi.fn() }));
   (HTMLElement.prototype as unknown as { animate: unknown }).animate = animate;
 });
 afterEach(() => {
@@ -34,5 +34,18 @@ describe('A new die glides out of the + button', () => {
     expect(glides()).toHaveLength(0);
     fireEvent.click(screen.getAllByRole('button', { name: /^Copy / })[0]);
     expect(glides()).toHaveLength(0);
+  });
+
+  it('under strict mode the glide still starts from the + button', () => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
+      return (this.hasAttribute('data-add-button') ? { left: 100, top: 700, width: 56, height: 56 } : { left: 150, top: 200, width: 100, height: 100 }) as DOMRect;
+    });
+    render(<StrictMode><App /></StrictMode>);
+    fireEvent.click(screen.getByRole('button', { name: 'Add Dice' }));
+    const all = glides();
+    expect(all.length).toBeGreaterThan(0);
+    expect(all.at(-1)![0][0].transform).toBe('translate(-72px, 478px) scale(0.3)');
+    expect(animate.mock.results[0].value.cancel).toHaveBeenCalledTimes(all.length - 1);
+    vi.restoreAllMocks();
   });
 });
