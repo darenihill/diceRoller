@@ -229,3 +229,72 @@
     display: none !important;
   }
 }
+
+/* Narrow phones, and phones with a larger display size or zoom: at 72 px the
+   Hold All button (pinned left) ran under the add button below about 380 px
+   wide (4 px of overlap at 360, half the button at 320). Smaller buttons and
+   edges keep all three apart. */
+@media (max-width: 379px) {
+  .actionBar {
+    right: 16px;
+    bottom: 16px;
+    gap: 10px;
+  }
+
+  .actionBtn,
+  .rpgFabBtn {
+    width: 60px;
+    height: 60px;
+  }
+
+  .rollBtn {
+    height: 60px;
+    min-width: 136px;
+    padding: 0 20px;
+    gap: 12px;
+  }
+
+  .rollGroup {
+    min-width: 136px;
+  }
+
+  .lockBtn {
+    bottom: 16px !important;
+    left: 16px !important;
+  }
+}
+
+/* Very narrow (about 150% zoom or more): drop the dice icon from Roll so its
+   word and total keep their room. */
+@media (max-width: 299px) {
+  .actionBar {
+    right: 12px;
+    bottom: 12px;
+    gap: 8px;
+  }
+
+  .actionBtn,
+  .rpgFabBtn {
+    width: 52px;
+    height: 52px;
+  }
+
+  .rollBtn {
+    height: 52px;
+    min-width: 100px;
+    padding: 0 16px;
+  }
+
+  .rollBtnIcon {
+    display: none;
+  }
+
+  .rollGroup {
+    min-width: 100px;
+  }
+
+  .lockBtn {
+    bottom: 12px !important;
+    left: 12px !important;
+  }
+}

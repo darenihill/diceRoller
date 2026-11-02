@@ -92,6 +92,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
         className={`md-icon-button ${styles.actionBtn} ${styles.lockBtn}`}
         onClick={onHoldAll}
         title="Toggle Hold All"
+        aria-pressed={allHeld}
         initial={{ rotate: 0 }}
         animate={lockControls}
         style={{ color: allHeld ? 'var(--color-gold)' : undefined }}
@@ -161,6 +162,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
               <button
                 className={`${styles.rpgFabBtn} ${rollAdvantage === 'advantage' ? styles.rpgFabActive : ''}`}
                 onClick={() => onChangeRollAdvantage('advantage')}
+                aria-pressed={rollAdvantage === 'advantage'}
                 title="Advantage: Keep Highest"
               >
                 ADV
@@ -168,6 +170,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
               <button
                 className={`${styles.rpgFabBtn} ${rollAdvantage === 'normal' ? styles.rpgFabActive : ''}`}
                 onClick={() => onChangeRollAdvantage('normal')}
+                aria-pressed={rollAdvantage === 'normal'}
                 title="Normal Roll"
               >
                 NORM
@@ -175,6 +178,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
               <button
                 className={`${styles.rpgFabBtn} ${rollAdvantage === 'disadvantage' ? styles.rpgFabActive : ''}`}
                 onClick={() => onChangeRollAdvantage('disadvantage')}
+                aria-pressed={rollAdvantage === 'disadvantage'}
                 title="Disadvantage: Keep Lowest"
               >
                 DIS
@@ -213,7 +217,11 @@ export const ActionBar: React.FC<ActionBarProps> = ({
           className={`md-button md-button-filled ${styles.rollBtn}`}
           onClick={onRoll}
           whileTap={{ scale: 0.95 }}
-          aria-label="Roll dice"
+          // Says what the button shows (the last total, or Roll +2), so a
+          // screen reader and voice control match what is on screen
+          aria-label={totalVisible
+            ? `${lastTotal}${lastModifier !== 0 ? ` ${totalMath(lastTotal, lastModifier) ?? ''}` : ''}, roll again`
+            : `Roll dice${rpgMode && modifier !== 0 ? ` ${modifier > 0 ? '+' : ''}${modifier}` : ''}`}
         >
           <Dice5 size={24} strokeWidth={2.5} className={styles.rollBtnIcon} />
           {totalVisible ? (

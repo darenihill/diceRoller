@@ -415,12 +415,14 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                 key={icon.name} 
                 onClick={() => addCustomFace(`${FACE_ICON_PREFIX}${icon.name}`)}
                 className={styles.iconBtn}
+                aria-label={`Add ${icon.name} face`}
+                title={icon.name}
               >
                 <icon.icon size={18} strokeWidth={2.5} />
               </button>
             ))}
             {!showAllIcons && (
-              <button onClick={() => setShowAllIcons(true)} className={styles.iconBtnMore}>
+              <button onClick={() => setShowAllIcons(true)} className={styles.iconBtnMore} aria-label="More icons" title="More icons">
                 <Plus size={18} strokeWidth={2.5} />
               </button>
             )}
