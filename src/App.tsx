@@ -429,10 +429,10 @@ function App() {
     const previous = readItem(SAVED.defaultSet);
     setMenuOpen(false);
     // A refused save shows the storage-full message instead of offering Undo
-    if (!saveItem('defaultDiceSet', JSON.stringify(diceList))) return;
+    if (!saveItem(SAVED.defaultSet, JSON.stringify(diceList))) return;
     offerUndo('Startup dice set', () => {
       if (previous === null) { try { localStorage.removeItem(SAVED.defaultSet); } catch { /* storage blocked */ } }
-      else saveItem('defaultDiceSet', previous);
+      else saveItem(SAVED.defaultSet, previous);
     });
   };
 

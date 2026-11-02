@@ -60,6 +60,16 @@ describe('Space or R rolls on a computer', () => {
     expect(rolls()).toBe(0);
   });
 
+  it('R still rolls with the Roll button selected after a roll', () => {
+    render(<App />);
+    const roll = screen.getByRole('button', { name: /^Roll dice/ });
+    fireEvent.click(roll);
+    const before = rolls();
+    screen.getByRole('button', { name: /roll again$/ }).focus();
+    press('r');
+    expect(rolls()).toBe(before + 1);
+  });
+
   it('does nothing with the menu open', () => {
     render(<App />);
     fireEvent.click(screen.getAllByRole('button', { name: /menu/i })[0]);

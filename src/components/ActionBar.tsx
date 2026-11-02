@@ -217,6 +217,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
 
         <motion.button
           className={`md-button md-button-filled control-ring ${styles.rollBtn}`}
+          data-roll-button
           onClick={onRoll}
           whileTap={{ scale: 0.95 }}
           // Says what the button shows (the last total, or Roll +2), so a

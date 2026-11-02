@@ -22,7 +22,7 @@ export function useRollKeys(onRoll: () => void, blocked: boolean) {
       if (latest.current.blocked || document.querySelector('[role="dialog"], [role="alertdialog"]')) return;
       const focused = document.activeElement;
       // R also works with Roll selected; Space there is the button's own press
-      const onRollButton = !!focused?.matches('[aria-label="Roll dice"]') && e.code !== 'Space' && e.key !== ' ';
+      const onRollButton = !!focused?.matches('[data-roll-button]') && e.code !== 'Space' && e.key !== ' ';
       // Anything else selected other than the page itself keeps its own keys
       const onPage = !focused || focused === document.body || focused === document.documentElement;
       if (isTyping(focused) || (!onPage && !onRollButton)) return;
