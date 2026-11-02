@@ -45,6 +45,7 @@ describe('splitting a list into faces', () => {
 describe('Add custom text takes a list', () => {
   it('a pasted list of lines becomes one face per line', () => {
     render(<Harness />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom faces' }));
     paste('Anna\nBen\nCleo\n\nDev\nEli\nFay');
     expect(box().value).toBe('Anna, Ben, Cleo, Dev, Eli, Fay');
     add();
@@ -54,6 +55,7 @@ describe('Add custom text takes a list', () => {
 
   it('a comma list on one line becomes one face per name', () => {
     render(<Harness />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom faces' }));
     fireEvent.change(box(), { target: { value: 'Mop, Dishes, Bins' } });
     fireEvent.keyDown(box(), { key: 'Enter' });
     expect(latest.customFaces).toEqual(['Mop', 'Dishes', 'Bins']);
@@ -90,6 +92,7 @@ describe('Add custom text takes a list', () => {
 
   it('one typed face works as before, with no note', () => {
     render(<Harness />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom faces' }));
     fireEvent.change(box(), { target: { value: '  Crit  ' } });
     add();
     expect(latest.customFaces).toEqual(['Crit']);
@@ -98,6 +101,7 @@ describe('Add custom text takes a list', () => {
 
   it('pasting a single word is left to the browser', () => {
     render(<Harness />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom faces' }));
     const event = new Event('paste', { bubbles: true, cancelable: true });
     Object.assign(event, { clipboardData: { getData: () => 'Hello' } });
     box().dispatchEvent(event);

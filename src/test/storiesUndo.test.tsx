@@ -23,10 +23,11 @@ describe('Undo inside a die\'s settings', () => {
     render(<App />);
     openSettings();
     expect(screen.getByLabelText(/^Face 1: Cat/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: 'Dice Settings' }));
     fireEvent.click(screen.getByTitle('Increase faces'));
-    expect(screen.queryByLabelText(/^Face 1: Cat/)).toBeNull();
     expect(screen.getByText('Replaced 3 faces')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom faces' }));
     expect(screen.getByLabelText(/^Face 1: Cat/)).toBeInTheDocument();
     expect(screen.getByLabelText(/^Face 3: Fish/)).toBeInTheDocument();
   });

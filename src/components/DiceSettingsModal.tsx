@@ -38,6 +38,10 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   /** The colour row pins to the bottom only after a face is tapped, so the faces show first on open */
   const [colourPinnedFor, setColourPinnedFor] = useState<string | null>(null);
   const colourPinned = colourPinnedFor === dice.id;
+  /** The open tab, per die: a die with its own faces opens on them (faces show first), others on Dice Settings */
+  const [tabFor, setTabFor] = useState<{ id: string; tab: 'settings' | 'faces' } | null>(null);
+  const tab = tabFor?.id === dice.id ? tabFor.tab : dice.customFaces.length > 0 ? 'faces' : 'settings';
+  const setTab = (next: 'settings' | 'faces') => setTabFor({ id: dice.id, tab: next });
   const activeFace = Math.min(selectedFace, Math.max(0, dice.customFaces.length - 1));
   const activeFaceColour = parseFaceContent(dice.customFaces[activeFace] ?? '').bgColor;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -207,13 +211,32 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     setActiveColorPicker(null);
   };
 
+  // Two tabs in the title bar: Dice Settings and Custom faces (owner, 2026-11-02)
+  const tabsHeader = (
+    <div className={styles.tabs} role="tablist" aria-label="Dice settings">
+      {([['settings', 'Dice Settings'], ['faces', 'Custom faces']] as const).map(([key, label]) => (
+        <button
+          key={key}
+          type="button"
+          role="tab"
+          id={`${fieldId}-tab-${key}`}
+          aria-selected={tab === key}
+          aria-controls={`${fieldId}-panel-${key}`}
+          className={`${styles.tab} ${tab === key ? styles.tabActive : ''}`}
+          onClick={() => setTab(key)}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Dice Settings">
+    <Modal isOpen={isOpen} onClose={onClose} title="Dice Settings" header={tabsHeader}>
       <div className={styles.container} ref={containerRef}>
 
-        {/* General Settings */}
-        <div className={styles.sectionCard}>
-          <h3 className={styles.sectionTitle}>General Settings</h3>
+        {tab === 'settings' && (
+        <div className={styles.sectionCard} role="tabpanel" id={`${fieldId}-panel-settings`} aria-labelledby={`${fieldId}-tab-settings`}>
           <div style={{ marginBottom: 16 }}>
             <label className={styles.label} htmlFor={`${fieldId}-name`}>Name (Optional)</label>
             <input 
@@ -276,29 +299,11 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
           </div>
         </div>
 
-        {/* Custom Faces */}
-        <div className={styles.sectionCard}>
-          <h3 className={styles.sectionTitle}>Custom Faces</h3>
+        )}
 
-          <div style={{ marginBottom: 12 }}>
-            <label className={styles.sublabel} style={{ marginBottom: 6, display: 'block' }}>Quick Templates:</label>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              <button 
-                type="button"
-                className="md-button md-button-surface md-button-compact"
-                onClick={() => onUpdate(dice.id, { held: false, faces: 3, customFaces: ["YES:bg:#2E7D32", "NO:bg:#D32F2F", "MAYBE:bg:#FFD700"] })}
-              >
-                ❓ Decision Maker
-              </button>
-              <button 
-                type="button"
-                className="md-button md-button-surface md-button-compact"
-                onClick={() => onUpdate(dice.id, { held: false, faces: 4, customFaces: ["N:bg:#0056D2", "S:bg:#0056D2", "E:bg:#0056D2", "W:bg:#0056D2"] })}
-              >
-                🧭 Compass
-              </button>
-            </div>
-          </div>
+        {tab === 'faces' && (<div role="tabpanel" id={`${fieldId}-panel-faces`} aria-labelledby={`${fieldId}-tab-faces`} className={styles.container}>
+        <div className={styles.sectionCard}>
+
           
           {dice.customFaces.length > 0 && (
             <p className={styles.sublabel} style={{ margin: '0 0 6px' }}>
@@ -493,6 +498,8 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
             )}
           </div>
         </div>
+
+        </div>)}
 
         {/* Footer Actions */}
         <div className={styles.footerActions}>

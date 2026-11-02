@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { DiceSettingsModal } from '../components/DiceSettingsModal';
 import type { DiceData } from '../types';
 
@@ -8,9 +8,10 @@ const die = (customFaces: string[]): DiceData => ({
   id: 'd1', numberValue: 1, faces: 6, customFaces, color: '#6750A4', held: false,
 });
 
-const renderWith = (d: DiceData) => render(
-  <DiceSettingsModal dice={d} isOpen onClose={() => {}} onUpdate={() => {}} onRemove={() => {}} onClone={() => {}} allDice={[d]} />
-);
+const renderWith = (d: DiceData) => {
+  render(<DiceSettingsModal dice={d} isOpen onClose={() => {}} onUpdate={() => {}} onRemove={() => {}} onClone={() => {}} allDice={[d]} />);
+  fireEvent.click(screen.getByRole('tab', { name: 'Dice Settings' }));
+};
 
 describe('Faces counter label', () => {
   it('names the custom faces it would replace', () => {

@@ -5,6 +5,12 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-02~~ Dice settings tabs (Daren 2026-11-02: "remove the quick
+  templates from a dice settings ... shift dice settings to 2 main tabs 'Dice
+  Settings' ... and 'Custom faces' ... take up the top where Dice settings
+  title is currently and leave the close x on the top right"). Done when: the
+  two tabs sit in the title bar beside the close button, and Quick Templates
+  are gone (src/test/diceSettingsTabs.test.tsx).
 - ~~Done 2026-11-02~~ Die buttons (Daren 2026-11-02: "Delete can be red ...
   and then match the single roll with the regular roll blue"; "change the X on
   the dice for delete to a trash icon"). Done when: Roll one uses the Roll

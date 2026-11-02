@@ -11,10 +11,12 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
+  /** Shown in the title bar in place of the title, e.g. tabs; the title still names the dialog */
+  header?: React.ReactNode;
   children: React.ReactNode;
 }
 
-export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
+export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, header, children }) => {
   const panelRef = useRef<HTMLDivElement>(null);
   // Phone Back closes the dialog instead of leaving the app
   useBackToClose(isOpen, onClose);
@@ -89,7 +91,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
             onClick={(e) => e.stopPropagation()}
           >
             <div className={styles.header}>
-              <h2 className={styles.title}>{title}</h2>
+              {header ?? <h2 className={styles.title}>{title}</h2>}
               <button className="md-icon-button" onClick={onClose} aria-label="Close dialog" style={{ width: 48, height: 48 }}>
                 <X size={20} />
               </button>
