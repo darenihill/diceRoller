@@ -7,7 +7,7 @@ beforeAll(() => {
   globalThis.ResizeObserver ??= class { observe() {} unobserve() {} disconnect() {} } as unknown as typeof ResizeObserver;
 });
 
-const rollButton = () => screen.getByRole('button', { name: 'Roll dice' });
+const rollButton = () => screen.getByRole('button', { name: /^Roll dice|roll again$/ });
 const isFaint = () => rollButton().querySelector('[data-stale]') !== null;
 
 async function roll() {

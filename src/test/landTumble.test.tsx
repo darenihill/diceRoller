@@ -26,7 +26,7 @@ beforeEach(() => {
 afterEach(() => { vi.useRealTimers(); vi.clearAllMocks(); localStorage.clear(); });
 
 const history = () => JSON.parse(localStorage.getItem('rollHistory') ?? '[]') as { total: number }[];
-const tapRoll = () => fireEvent.click(screen.getByRole('button', { name: 'Roll dice' }));
+const tapRoll = () => fireEvent.click(screen.getByRole('button', { name: /^Roll dice|roll again$/ }));
 const wait = (ms: number) => act(() => { vi.advanceTimersByTime(ms); });
 const shownTotal = () => screen.getAllByLabelText(/^d6 showing/)
   .reduce((sum, el) => sum + Number(/showing (\d+)/.exec(el.getAttribute('aria-label') ?? '')?.[1] ?? 0), 0);

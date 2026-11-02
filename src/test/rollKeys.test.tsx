@@ -70,7 +70,7 @@ describe('Space or R rolls on a computer', () => {
 
   it('does nothing with a die selected, so Space stays that button\'s own press', () => {
     render(<App />);
-    screen.getAllByRole('button', { name: /Press to hold/ })[0].focus();
+    screen.getAllByRole('button', { name: /^Hold / })[0].focus();
     press(' ');
     press('r');
     expect(rolls()).toBe(0);

@@ -133,9 +133,9 @@ function App() {
   }, [shakeEnabled]);
 
   // Table view: each roll shows its total big for everyone at the table
-  const [tableView, setTableView] = useState(() => localStorage.getItem('tableView') === 'true');
+  const [tableView, setTableView] = useState(() => readItem(SAVED.tableView) === 'true');
   useEffect(() => {
-    localStorage.setItem('tableView', String(tableView));
+    saveItem(SAVED.tableView, String(tableView));
   }, [tableView]);
   // The roll whose big view was tapped away; the next roll shows big again
   const [tableDismissedId, setTableDismissedId] = useState<string | null>(null);
@@ -143,19 +143,19 @@ function App() {
   const [tableRolledIds, setTableRolledIds] = useState('');
   // Buzz when dice land: hidden and off until the private link turns it on (trial, 2026-10-28)
   const [buzzLinkOpened] = useState(() => isBuzzLink(window.location.hash));
-  const [buzzShown] = useState(() => buzzLinkOpened || localStorage.getItem(BUZZ_SHOWN_KEY) === 'true');
-  const [buzzEnabled, setBuzzEnabled] = useState(() => buzzLinkOpened || localStorage.getItem(BUZZ_KEY) === 'true');
+  const [buzzShown] = useState(() => buzzLinkOpened || readItem(BUZZ_SHOWN_KEY) === 'true');
+  const [buzzEnabled, setBuzzEnabled] = useState(() => buzzLinkOpened || readItem(BUZZ_KEY) === 'true');
   useEffect(() => {
-    localStorage.setItem(BUZZ_KEY, String(buzzEnabled));
+    saveItem(BUZZ_KEY, String(buzzEnabled));
   }, [buzzEnabled]);
   useEffect(() => {
-    if (buzzShown) localStorage.setItem(BUZZ_SHOWN_KEY, 'true');
+    if (buzzShown) saveItem(BUZZ_SHOWN_KEY, 'true');
   }, [buzzShown]);
 
   // Typed rolls kept as buttons under the Type a roll box, on this device and in backups
   const [savedRolls, setSavedRolls] = useState<SavedRoll[]>(loadSavedRolls);
   useEffect(() => {
-    localStorage.setItem(SAVED_ROLLS_KEY, JSON.stringify(savedRolls));
+    saveItem(SAVED_ROLLS_KEY, JSON.stringify(savedRolls));
   }, [savedRolls]);
 
   const [telemetryState, setTelemetryState] = useState(() => readItem(SAVED.telemetry) !== 'false');
@@ -367,7 +367,7 @@ function App() {
   );
 
   // Below this size the buttons round a tapped die get too small, so they move to one strip (owner, 2026-10-28)
-  const compactDieActions = diceList.length > 0 && optimalSize < COMPACT_DIE_SIZE;
+  const compactDieActions = diceList.length > 0 && containerSize.width > 0 && optimalSize < COMPACT_DIE_SIZE;
   const revealedDie = compactDieActions ? diceList.find(d => d.id === revealedDiceId) : undefined;
 
   const diceStyles = {
@@ -426,12 +426,12 @@ function App() {
 
   // Set Default can be undone for five seconds: Undo puts back the startup dice it replaced (or none)
   const handleSetDefault = () => {
-    const previous = localStorage.getItem('defaultDiceSet');
+    const previous = readItem(SAVED.defaultSet);
     setMenuOpen(false);
     // A refused save shows the storage-full message instead of offering Undo
     if (!saveItem('defaultDiceSet', JSON.stringify(diceList))) return;
     offerUndo('Startup dice set', () => {
-      if (previous === null) localStorage.removeItem('defaultDiceSet');
+      if (previous === null) { try { localStorage.removeItem(SAVED.defaultSet); } catch { /* storage blocked */ } }
       else saveItem('defaultDiceSet', previous);
     });
   };

@@ -46,7 +46,7 @@ describe('Shake to roll stays on the main screen', () => {
 
   it('does not roll under a die\'s settings', () => {
     render(<App />);
-    fireEvent.click(screen.getAllByRole('button', { name: 'Dice Settings' })[0]);
+    fireEvent.click(screen.getAllByRole('button', { name: /^Settings for/ })[0]);
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     shake();
     expect(rolls()).toBe(0);
@@ -61,7 +61,7 @@ describe('Messages', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
     fireEvent.click(screen.getByText('Set Default'));
-    expect(screen.getByRole('status')).toHaveTextContent('Saved as default');
+    expect(screen.getByRole('status')).toHaveTextContent('Startup dice set');
   });
 
   it('a newer message gets its full time on screen', () => {

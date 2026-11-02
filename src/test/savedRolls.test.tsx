@@ -67,8 +67,8 @@ describe('Save this roll', () => {
     typeRoll('');
     fireEvent.click(within(savedList()!).getByRole('button', { name: /Roll Sword/ }));
     act(() => { vi.advanceTimersByTime(ROLL_DURATION_MS + 50); });
-    expect(screen.getAllByRole('button', { name: /^d6 showing/ })).toHaveLength(2);
-    expect(screen.getByRole('button', { name: 'Roll dice' }).textContent).toMatch(/\(\d+\+3\)/);
+    expect(screen.getAllByRole('group', { name: /^d6 showing/ })).toHaveLength(2);
+    expect(screen.getByRole('button', { name: /^Roll dice|roll again$/ }).textContent).toMatch(/\(\d+\+3\)/);
   });
 
   it('stays after a reload and only shows in RPG mode', () => {

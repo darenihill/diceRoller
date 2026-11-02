@@ -39,8 +39,13 @@ describe('Natural 20 confetti', () => {
     confettiMock.mockClear();
     setReducedMotion(false);
     randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0.999); // every die lands on its top face
+    // Rolls draw from the browser's secure random numbers: feed them the same top face
+    vi.spyOn(globalThis.crypto, 'getRandomValues').mockImplementation(<T extends ArrayBufferView | null>(arr: T) => {
+      (arr as unknown as Uint32Array)[0] = Math.floor(Math.random() * 2 ** 32);
+      return arr;
+    });
   });
-  afterEach(() => randomSpy.mockRestore());
+  afterEach(() => vi.restoreAllMocks());
 
   it('a d20 rolling 20 in RPG Mode fires one burst', async () => {
     const s = await roll(true, r => r.addDice({ faces: 20 }));

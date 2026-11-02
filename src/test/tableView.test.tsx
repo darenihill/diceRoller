@@ -55,7 +55,7 @@ describe('Table view switch and big total', () => {
 
   const openMenu = () => fireEvent.click(screen.getAllByRole('button', { name: /menu/i })[0]);
   const roll = () => {
-    fireEvent.click(screen.getByRole('button', { name: 'Roll dice' }));
+    fireEvent.click(screen.getByRole('button', { name: /^Roll dice|roll again$/ }));
     act(() => { vi.advanceTimersByTime(ROLL_DURATION_MS + 50); });
   };
 

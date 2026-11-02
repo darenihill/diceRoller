@@ -30,7 +30,7 @@
 /* Second line under a label, e.g. what the faces counter would replace */
 .labelNote {
   display: block;
-  font-size: 12px;
+  font-size: 0.75rem;
   margin-top: 2px;
   overflow-wrap: anywhere;
 }

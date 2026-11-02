@@ -14,6 +14,7 @@ export const SAVED = {
   shakeToRoll: 'shakeToRoll',
   targetHighlight: 'targetHighlight',
   telemetry: 'telemetryEnabled',
+  tableView: 'tableView',
   usageStats: 'diceAnalyticsStats',
   /** Pictures on faces, kept apart because they are large (faceImages.ts) */
   faceImages: 'diceFaceImages',
