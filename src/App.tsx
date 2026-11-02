@@ -12,7 +12,7 @@ import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages, parseFaceContent } from './utils/diceUtils';
 import { usedFaceImages, importFaceImages } from './utils/faceImages';
-import { playRollSequence } from './utils/soundEffects';
+import { playRollSequence, playLandNow } from './utils/soundEffects';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { MAX_HISTORY_LENGTH } from './utils/constants';
 import { dicePresets } from './utils/presets';
@@ -594,12 +594,9 @@ function App() {
   };
 
   const handleRoll = () => {
-    // A second tap while the dice tumble used to start a second roll: two
-    // History entries, and the first total shown over the second roll's dice
-    if (isRolling) return;
     const hasUnheldDice = diceList.some(d => !d.held);
     setTableRolledIds(diceList.map(d => d.id).join());
-    rollDice(({ total, diceCount }) => {
+    const outcome = rollDice(({ total, diceCount }) => {
       // Fires when the roll resolves, so the actual total reaches analytics
       setHasRolledThisSession(true);
       setRolledSignature(rollSignature(latestDiceRef.current));
@@ -608,7 +605,10 @@ function App() {
       }
     });
 
-    if (hasUnheldDice && diceList.length > 0 && soundEnabled) {
+    // A tap during the tumble only lands the dice: the thud plays now, the rattle doesn't start again
+    if (outcome === 'landed') {
+      if (soundEnabled) playLandNow(soundTimersRef);
+    } else if (outcome === 'rolled' && hasUnheldDice && diceList.length > 0 && soundEnabled) {
       playRollSequence(soundTimersRef);
     }
   };
