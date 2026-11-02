@@ -308,3 +308,9 @@
     border-color: Highlight;
   }
 }
+
+/* Many small dice: the tapped die is outlined; its buttons sit in the strip above the bottom bar */
+.dice.outlined {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 3px;
+}
