@@ -24,6 +24,28 @@ export interface RollSummary {
 
 export type RollAdvantageMode = 'normal' | 'advantage' | 'disadvantage';
 
+export const MODIFIER_KEY = 'rollModifier';
+export const ADVANTAGE_KEY = 'rollAdvantage';
+const MAX_STORED_MODIFIER = 999;
+
+function readStored(key: string): string | null {
+  try { return localStorage.getItem(key); } catch { return null; }
+}
+
+function storeQuietly(key: string, value: string) {
+  try { localStorage.setItem(key, value); } catch { /* storage full or blocked: the setting just isn't kept */ }
+}
+
+function readStoredModifier(): number {
+  const n = Number(readStored(MODIFIER_KEY));
+  return Number.isInteger(n) && Math.abs(n) <= MAX_STORED_MODIFIER ? n : 0;
+}
+
+function readStoredAdvantage(): RollAdvantageMode {
+  const v = readStored(ADVANTAGE_KEY);
+  return v === 'advantage' || v === 'disadvantage' ? v : 'normal';
+}
+
 /** A roll typed in the box: the dice to put out, then roll straight away */
 export interface TypedRollSetup {
   text: string;
@@ -60,9 +82,13 @@ export const useDiceState = () => {
   const [isRolling, setIsRolling] = useState(false);
   // The die rolling on its own, or null when the whole set rolls
   const [rollingId, setRollingId] = useState<string | null>(null);
-  const [modifier, setModifier] = useState<number>(0);
+  // The +2 and the ADV / NORM / DIS pick are kept on this device, like RPG mode,
+  // so they are still set when someone comes back to the app
+  const [modifier, setModifier] = useState<number>(readStoredModifier);
   const [rpgMode, setRpgMode] = useState<boolean>(() => localStorage.getItem('rpgMode') === 'true');
-  const [rollAdvantage, setRollAdvantage] = useState<RollAdvantageMode>('normal');
+  const [rollAdvantage, setRollAdvantage] = useState<RollAdvantageMode>(readStoredAdvantage);
+  useEffect(() => { storeQuietly(MODIFIER_KEY, String(modifier)); }, [modifier]);
+  useEffect(() => { storeQuietly(ADVANTAGE_KEY, rollAdvantage); }, [rollAdvantage]);
   const [targetHighlight, setTargetHighlightState] = useState<string>(() => localStorage.getItem('targetHighlight') || '');
   const [toast, setToast] = useState<string | null>(null);
 
