@@ -10,6 +10,11 @@ import { MAX_SHAPED_FACE_LENGTH } from '../utils/constants';
 import { PolyhedralWireframe } from './PolyhedralWireframe';
 import { randomBelow } from '../utils/fairRandom';
 
+/** Material 3 emphasized easing, as on the menu icon */
+const EMPHASIZED = [0.2, 0, 0, 1] as const;
+/** How far a dropped die sinks back */
+const DROPPED_SCALE = 0.88;
+
 interface DiceProps {
   dice: DiceData;
   isRolling: boolean;
@@ -196,7 +201,9 @@ const DiceComponent: React.FC<DiceProps> = ({
       onTouchStart={() => onReveal()}
       layout
       initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
+      // A die dropped by Advantage or Disadvantage sinks back a little (Material 3 emphasized easing)
+      animate={{ scale: dice.dropped && !calm ? DROPPED_SCALE : 1 }}
+      transition={dice.dropped ? { duration: 0.4, ease: EMPHASIZED } : undefined}
       exit={{ scale: 0 }}
     >
       {/* Keyboard and screen-reader way to hold; a tap on the die does the same */}
@@ -224,7 +231,7 @@ const DiceComponent: React.FC<DiceProps> = ({
       )}
 
       {dice.dropped && (
-        <div className={styles.droppedBadge}>
+        <div className={styles.droppedBadge} data-testid="dropped-stamp">
           DROPPED
         </div>
       )}

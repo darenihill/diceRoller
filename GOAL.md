@@ -5,6 +5,12 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-02~~ Dropped die animation (Daren 2026-11-01, Build): "with
+  Advantage, the lower die shrinks back and a DROPPED stamp drops onto it."
+  Only in RPG Mode with Advantage or Disadvantage; nothing about the roll or
+  the total changes. Done when: the dropped die sinks back and dims with
+  Material 3 emphasized easing, the DROPPED stamp drops in, and Reduce motion
+  keeps both still (src/test/droppedDie.test.tsx).
 - ~~Done 2026-10-24~~ Show the result big for the table (Daren 2026-10-23, Build, picked "Table
   view switch in the menu"): "The Roll button stays a roll button. A Table
   view switch in the menu; while it is on, each roll shows the total huge in
