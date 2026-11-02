@@ -9,7 +9,8 @@ interface PolyhedralWireframeProps {
 /**
  * Facet overlay drawn across a die in RPG mode.
  *
- * Geometry comes from {@link DICE_SHAPES}, shared with the add-menu icons so
+ * Each face is tinted lighter or darker, as if lit from above, under the
+ * lines. Geometry comes from {@link DICE_SHAPES}, shared with the add-menu icons so
  * the two can never drift. Two paths per die: a heavy `outline` tracing the
  * silhouette and a light `inner` carrying the facets.
  *
@@ -46,6 +47,19 @@ export const PolyhedralWireframe: React.FC<PolyhedralWireframeProps> = React.mem
           miter spike runs past the silhouette and the clip trims it flush,
           which fills the corner exactly. Butt caps keep facet ends from
           bulging past the edges they land on. */}
+      {/* Each face its own shade, lit from the upper left: white lightens the
+          faces turned up toward the light, black darkens the ones turned away.
+          Drawn under the lines, so edges and the number stay as they are. */}
+      <g data-face-shading="">
+        {shape.faces.map((face, i) => face.shade === 0 ? null : (
+          <polygon
+            key={i}
+            points={face.points}
+            fill={face.shade > 0 ? '#FFFFFF' : '#000000'}
+            fillOpacity={Math.abs(face.shade)}
+          />
+        ))}
+      </g>
       <g opacity={LINE_OPACITY}>
         <path
           d={shape.outline}
