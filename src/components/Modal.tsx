@@ -87,7 +87,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
           >
             <div className={styles.header}>
               <h2 className={styles.title}>{title}</h2>
-              <button className="md-icon-button" onClick={onClose} aria-label="Close dialog" style={{ width: 40, height: 40 }}>
+              <button className="md-icon-button" onClick={onClose} aria-label="Close dialog" style={{ width: 48, height: 48 }}>
                 <X size={20} />
               </button>
             </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from '../Modal';
-import { Volume2, VolumeX, BarChart2, Smartphone } from 'lucide-react';
+import { Volume2, VolumeX, BarChart2, Smartphone, Minus, Plus } from 'lucide-react';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
 import { targetNote } from '../../utils/targets';
@@ -95,7 +95,15 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
               )}
             </div>
             <div className={modalStyles.sliderRow}>
-              <span className={modalStyles.toggleDesc} aria-hidden="true">Smaller</span>
+              <button
+                type="button"
+                className="md-icon-button"
+                aria-label="Smaller dice"
+                disabled={diceScale <= DICE_SCALE_MIN}
+                onClick={() => onChangeDiceScale(Math.max(DICE_SCALE_MIN, Math.round((diceScale - 0.1) * 10) / 10))}
+              >
+                <Minus size={20} />
+              </button>
               <input
                 type="range"
                 min={DICE_SCALE_MIN}
@@ -107,7 +115,15 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
                 aria-labelledby="dice-size-label"
                 aria-valuetext={`${Math.round(diceScale * 100)}%`}
               />
-              <span className={modalStyles.toggleDesc} aria-hidden="true">Bigger</span>
+              <button
+                type="button"
+                className="md-icon-button"
+                aria-label="Bigger dice"
+                disabled={diceScale >= DICE_SCALE_MAX}
+                onClick={() => onChangeDiceScale(Math.min(DICE_SCALE_MAX, Math.round((diceScale + 0.1) * 10) / 10))}
+              >
+                <Plus size={20} />
+              </button>
             </div>
           </div>
 

@@ -117,7 +117,7 @@
   border-radius: var(--shape-large);
   font-size: 14px;
   font-weight: 600;
-  z-index: 1000;
+  z-index: 1001; /* above Dice settings, so its Undo can be tapped */
   box-shadow: var(--elevation-3, 0 4px 12px rgba(0,0,0,0.3));
   animation: slideDown 0.3s cubic-bezier(0.2, 0, 0, 1);
   pointer-events: none;
