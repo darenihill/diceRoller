@@ -5,6 +5,11 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-02~~ Most used far right (Daren 2026-11-02: "I want the most
+  used items to the far right") and Clear History findable ("There isn't an
+  option to clear history"). Done when: Saves is the right-hand menu group,
+  each group ends with its most used tile, and Clear History sits at the top
+  of History.
 - ~~Done 2026-11-02~~ Even menu (Daren 2026-11-02: "update the menu to make
   it look cleaner, it's too inconsistently sized currently, 6 options in tools
   vs 3 in saves"). Done when: App, Saves and Settings hold four each (History

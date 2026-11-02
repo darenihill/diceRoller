@@ -54,6 +54,13 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
         <p style={{ color: 'var(--md-sys-color-on-surface-variant)', textAlign: 'center', padding: '16px 0' }}>No rolls yet. Each roll shows here.</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Clear History sits at the top, where it is seen without scrolling (owner, 2026-11-02) */}
+          <div className={modalStyles.sectionHeaderRow} style={{ borderTop: 'none', paddingTop: 0 }}>
+            <span className={modalStyles.toggleDesc}>{rollHistory.length} {rollHistory.length === 1 ? 'roll' : 'rolls'} saved</span>
+            <button className="md-button md-button-surface md-button-compact" onClick={onClearHistory}>
+              Clear History
+            </button>
+          </div>
           {/* Session Frequency Histogram */}
           <div>
             <h3 className={modalStyles.sectionHeaderFirst}>Roll Frequency ("Luck Meter")</h3>
@@ -97,12 +104,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
           </div>
 
           <div className={styles.historyList}>
-            <div className={modalStyles.sectionHeaderRow}>
-              <h3 className={modalStyles.sectionHeaderFirst} style={{ margin: 0 }}>Roll Log ({rollHistory.length})</h3>
-              <button className="md-button md-button-surface md-button-compact" onClick={onClearHistory}>
-                Clear History
-              </button>
-            </div>
+            <h3 className={modalStyles.sectionHeader}>Roll Log ({rollHistory.length})</h3>
             {rollHistory.map((roll, i) => (
               <div key={roll.id} className={styles.historyItem} style={{ borderLeft: roll.isTargetHit ? '4px solid var(--color-gold)' : 'none' }}>
                 <div className={styles.historyIndex}>Roll {rollHistory.length - i}{roll.single ? ' · one die' : ''}{roll.typed ? ` · ${roll.typed}` : ''}</div>

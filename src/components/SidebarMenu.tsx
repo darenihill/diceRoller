@@ -88,37 +88,39 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
               exit={{ y: 20, opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              {/* Three groups of four, so the columns line up (owner, 2026-11-02);
-                  on a phone each group fills one row of four */}
+              {/* Three groups of four, so the columns line up (owner, 2026-11-02).
+                  Most used sits far right (owner, 2026-11-02): Saves is the right-hand
+                  group, and each group ends with its most used tile, which is the
+                  right-hand tile of its row on a phone */}
               <div className={styles.menuColumn}>
                 <div className={styles.menuColumnHeader}>App</div>
-                <button className={styles.menuItem} onClick={onHelp}><HelpCircle size={18} /> <span>Help</span></button>
-                <button className={styles.menuItem} onClick={onShare}><Share2 size={18} /> <span>Share</span></button>
-                <button className={styles.menuItem} onClick={onIdeas}><Lightbulb size={18} /> <span>Feedback</span></button>
                 <button className={styles.menuItem} onClick={onDonate}><Coffee size={18} /> <span>Donate</span></button>
-              </div>
-
-              <div className={styles.menuColumn}>
-                <div className={styles.menuColumnHeader}>Saves</div>
-                <button className={styles.menuItem} onClick={onSets}><Dice6 size={18} /> <span>Games</span></button>
-                <button className={styles.menuItem} onClick={onSave}><Save size={18} /> <span>Save</span></button>
-                <button className={styles.menuItem} onClick={onSetDefault} title="Pin as startup default"><Pin size={18} /> <span>Set Default</span></button>
-                <button className={styles.menuItem} onClick={onHistory}><History size={18} /> <span>History</span></button>
+                <button className={styles.menuItem} onClick={onIdeas}><Lightbulb size={18} /> <span>Feedback</span></button>
+                <button className={styles.menuItem} onClick={onShare}><Share2 size={18} /> <span>Share</span></button>
+                <button className={styles.menuItem} onClick={onHelp}><HelpCircle size={18} /> <span>Help</span></button>
               </div>
 
               <div className={styles.menuColumn}>
                 <div className={styles.menuColumnHeader}>Settings</div>
+                <button className={styles.menuItem} onClick={onStats}><BarChart2 size={18} /> <span>Usage Stats</span></button>
                 <button className={styles.menuItem} onClick={onCustomize}><Palette size={18} /> <span>Customize</span></button>
-                <button className={styles.menuItem} onClick={onToggleRpgMode} title="Toggle RPG Mode (Advantage & Modifiers)" aria-pressed={rpgMode}>
-                  {rpgMode ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
-                  <span>RPG Mode</span>
-                </button>
                 <button className={styles.menuItem} onClick={onToggleTableView} aria-pressed={tableView}
                   title="Show each roll's total big for the whole table">
                   {tableView ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
                   <span>Table view</span>
                 </button>
-                <button className={styles.menuItem} onClick={onStats}><BarChart2 size={18} /> <span>Usage Stats</span></button>
+                <button className={styles.menuItem} onClick={onToggleRpgMode} title="Toggle RPG Mode (Advantage & Modifiers)" aria-pressed={rpgMode}>
+                  {rpgMode ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
+                  <span>RPG Mode</span>
+                </button>
+              </div>
+
+              <div className={styles.menuColumn}>
+                <div className={styles.menuColumnHeader}>Saves</div>
+                <button className={styles.menuItem} onClick={onSetDefault} title="Pin as startup default"><Pin size={18} /> <span>Set Default</span></button>
+                <button className={styles.menuItem} onClick={onSave}><Save size={18} /> <span>Save</span></button>
+                <button className={styles.menuItem} onClick={onHistory}><History size={18} /> <span>History</span></button>
+                <button className={styles.menuItem} onClick={onSets}><Dice6 size={18} /> <span>Games</span></button>
               </div>
 
               {/* Full-width bottom row: Install app (until the app is on the home
