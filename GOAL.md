@@ -5,6 +5,10 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-02~~ Even menu (Daren 2026-11-02: "update the menu to make
+  it look cleaner, it's too inconsistently sized currently, 6 options in tools
+  vs 3 in saves"). Done when: App, Saves and Settings hold four each (History
+  joins Saves; Install app sits beside Clear All in the bottom row).
 - ~~Done 2026-11-02~~ Bright rings as a Customize switch (Daren 2026-11-02:
   "I thought the bright rings were something that could be turned on in the
   custom section"). Done when: the ring shows only with Customize > Bright

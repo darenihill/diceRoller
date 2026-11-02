@@ -66,11 +66,21 @@
 }
 
 /* Spans every column beneath the grid, keeping the columns 4-for-4 */
-.menuFooterItem {
+.menuFooterRow {
   grid-column: 1 / -1;
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.menuFooterItem {
+  flex: 1;
   justify-content: center;
   color: var(--md-sys-color-error);
-  margin-top: 4px;
+}
+
+.menuInstallItem {
+  color: var(--md-sys-color-on-surface);
 }
 
 .menuColumnHeader {
@@ -131,8 +141,11 @@
   /* The footer spans here too, but has to opt out of the square-tile styling
      the other items take on at this width, or the grid stretches it into a
      full-width block. */
+  .menuFooterRow {
+    gap: 8px;
+  }
+
   .menuFooterItem {
-    grid-column: 1 / -1;
     aspect-ratio: auto;
     flex-direction: row;
     gap: 8px;
