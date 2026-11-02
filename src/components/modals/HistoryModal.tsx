@@ -81,7 +81,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
                 <div className={styles.historyDetails}>{roll.details.join(', ')}</div>
                 <div className={styles.historyTotal}>
                   Total: {roll.total}
-                  {roll.isTargetHit && <span style={{ marginLeft: 6, color: 'var(--color-gold)', fontSize: 12 }}>🎯 HIT!</span>}
+                  {roll.isTargetHit && <span style={{ marginLeft: 6, color: 'var(--color-gold)', fontSize: '0.75rem' }}>🎯 HIT!</span>}
                 </div>
               </div>
             ))}

@@ -14,13 +14,13 @@
 
 .sectionTitle {
   margin: 0 0 16px 0;
-  font-size: 16px;
+  font-size: 1rem;
   color: var(--md-sys-color-primary);
 }
 
 /* Labels */
 .label {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--md-sys-color-on-surface);
   display: block;
   margin-bottom: 8px;
@@ -28,7 +28,7 @@
 }
 
 .sublabel {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--md-sys-color-on-surface);
   display: block;
   margin-bottom: 8px;
@@ -44,7 +44,7 @@
   border: none;
   background-color: rgba(0, 0, 0, 0.2);
   color: var(--md-sys-color-on-surface);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 /* Two Column Grid */
@@ -99,7 +99,7 @@
   border: none;
   background-color: rgba(0, 0, 0, 0.2);
   color: var(--md-sys-color-on-surface);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 600;
   text-align: center;
 }
@@ -113,7 +113,7 @@
 }
 
 .emptyText {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--md-sys-color-on-surface);
   opacity: 0.7;
   grid-column: 1 / -1;
@@ -144,7 +144,7 @@
   padding: 4px 10px;
   border-radius: var(--shape-small);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
 }
@@ -244,7 +244,7 @@
 
 .pictureError {
   color: var(--md-sys-color-error);
-  font-size: 13px;
+  font-size: 0.8125rem;
   margin: 0 0 12px;
 }
 
@@ -373,7 +373,7 @@
 }
 
 .popoverTitle {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--md-sys-color-on-surface);
 }
@@ -429,7 +429,7 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   background: transparent;
   color: var(--md-sys-color-on-surface);
-  font-size: 14px;
+  font-size: 0.875rem;
   text-align: center;
   -moz-appearance: textfield;
 }

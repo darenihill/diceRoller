@@ -1,6 +1,6 @@
 .sectionHeader {
   margin: 16px 0 8px 0;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   border-top: 1px solid var(--md-sys-color-outline-variant);
   padding-top: 16px;
@@ -8,7 +8,7 @@
 
 .sectionHeaderFirst {
   margin: 0 0 12px 0;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   padding-top: 0;
   border-top: none;
@@ -21,7 +21,7 @@
 }
 
 .formLabel {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--md-sys-color-on-surface-variant);
 }
 
@@ -31,7 +31,7 @@
   border: 1px solid var(--md-sys-color-outline, rgba(255, 255, 255, 0.2));
   background: transparent;
   color: var(--md-sys-color-on-surface);
-  font-size: 16px;
+  font-size: 1rem;
   outline: none;
   transition: border-color 0.2s;
 }
@@ -42,7 +42,7 @@
 
 .formInputReadOnly {
   background: var(--md-sys-color-surface-variant);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .formInputInvalid,
@@ -52,7 +52,7 @@
 
 .fieldNote {
   margin: 6px 0 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.4;
   color: var(--md-sys-color-on-surface-variant);
   text-align: left;
@@ -84,11 +84,11 @@
 
 .toggleTitle {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 
 .toggleDesc {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--md-sys-color-on-surface-variant);
 }
 
@@ -112,14 +112,14 @@
 }
 
 .metricValue {
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--md-sys-color-primary);
   line-height: 1.1;
 }
 
 .metricLabel {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   color: var(--md-sys-color-on-surface-variant);
   text-transform: uppercase;
@@ -139,7 +139,7 @@
   padding: 8px 12px;
   background-color: var(--md-sys-color-surface-variant);
   border-radius: var(--shape-small);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .presetName {
@@ -165,7 +165,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 .freqLabel {
