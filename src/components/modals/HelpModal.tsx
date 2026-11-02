@@ -23,6 +23,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
           <li><strong>Keyboard:</strong> On a computer, press <kbd>Space</kbd> or <kbd>R</kbd> to roll. The keys do nothing while you type, while a window or the menu is open, or while a die or other button is selected.</li>
           <li><strong>Target Highlight:</strong> Set target totals under Tools &gt; Customize (e.g. <code>7, 11</code>) and get a 🎯 celebration whenever a roll hits one.</li>
           <li><strong>Usage Stats:</strong> Track total rolls, highest and average roll, and your most-played games under Tools &gt; Usage Stats. Everything is stored on your device only.</li>
+          <li><strong>Fair dice:</strong> Every roll uses your browser's secure random numbers, the same kind used to make passwords, so each face is equally likely.</li>
           <li><strong>Colorblind Friendly:</strong> Automatic contrast coloring ensures text and icons are perfectly readable against any background color.</li>
         </ul>
       </div>

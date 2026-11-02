@@ -8,6 +8,7 @@ import { parseFaceContent, FACE_ICON_PREFIX, getContrastColor } from '../utils/d
 import { useFaceImage } from '../utils/faceImages';
 import { MAX_SHAPED_FACE_LENGTH } from '../utils/constants';
 import { PolyhedralWireframe } from './PolyhedralWireframe';
+import { randomBelow } from '../utils/fairRandom';
 
 interface DiceProps {
   dice: DiceData;
@@ -74,10 +75,10 @@ const DiceComponent: React.FC<DiceProps> = ({
         }
       } else {
         if (dice.customFaces.length > 0) {
-          const idx = Math.floor(Math.random() * dice.customFaces.length);
+          const idx = randomBelow(dice.customFaces.length);
           setTempFaceIndex(idx);
         } else {
-          const val = Math.floor(Math.random() * dice.faces) + 1;
+          const val = randomBelow(dice.faces) + 1;
           setTempValue(val);
         }
       }
