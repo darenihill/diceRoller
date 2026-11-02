@@ -15,6 +15,7 @@ export const SAVED = {
   targetHighlight: 'targetHighlight',
   telemetry: 'telemetryEnabled',
   tableView: 'tableView',
+  brightRings: 'brightRings',
   usageStats: 'diceAnalyticsStats',
   /** Pictures on faces, kept apart because they are large (faceImages.ts) */
   faceImages: 'diceFaceImages',

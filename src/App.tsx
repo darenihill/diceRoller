@@ -190,6 +190,13 @@ function App() {
     document.body.classList.toggle('menu-open', menuOpen);
   }, [menuOpen]);
 
+  // Bright ring round the bottom-bar buttons for glare: a Customize switch, off until turned on
+  const [brightRings, setBrightRings] = useState(() => readItem(SAVED.brightRings) === 'true');
+  useEffect(() => {
+    document.body.classList.toggle('bright-rings', brightRings);
+    saveItem(SAVED.brightRings, String(brightRings));
+  }, [brightRings]);
+
   // Expose RPG mode to CSS so mobile layout can reserve room for the taller FAB stack
   useEffect(() => {
     document.body.classList.toggle('rpg-mode', rpgMode);
@@ -950,6 +957,8 @@ function App() {
         onChangeDiceScale={setDiceScale}
         shakeEnabled={shakeEnabled}
         onToggleShake={handleToggleShake}
+        brightRings={brightRings}
+        onToggleBrightRings={() => { setBrightRings(on => !on); trackEvent('bright_rings_toggled', { enabled: !brightRings }); }}
         buzzShown={buzzShown}
         buzzEnabled={buzzEnabled}
         onToggleBuzz={() => setBuzzEnabled(on => !on)}

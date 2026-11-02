@@ -135,9 +135,10 @@ button {
   outline: none;
 }
 
-/* Bottom-bar buttons (menu, hold all, add, RPG controls, Roll) get one
-   bright 2px ring inside their edge, so each one is easy to find in glare. */
-.control-ring {
+/* With Bright Rings on (Customize), the bottom-bar buttons (menu, hold all,
+   add, RPG controls, Roll) get one bright 2px ring inside their edge, so each
+   one is easy to find in glare. */
+.bright-rings .control-ring {
   outline: 2px solid var(--control-ring);
   outline-offset: -2px;
 }

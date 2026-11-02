@@ -1,7 +1,7 @@
 import React from 'react';
 import { readFileSync } from 'node:fs';
 import { describe, it, expect, beforeAll } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import App from '../App';
 
 beforeAll(() => {
@@ -23,6 +23,22 @@ describe('Bright ring on the bottom-bar buttons', () => {
   it('each theme sets its own ring colour', () => {
     const css = readFileSync('src/index.css', 'utf8');
     expect(css.match(/--control-ring:/g)).toHaveLength(4);
-    expect(css).toMatch(/\.control-ring \{\s*outline: 2px solid var\(--control-ring\);/);
+    expect(css).toMatch(/\.bright-rings \.control-ring \{\s*outline: 2px solid var\(--control-ring\);/);
+  });
+
+  it('is off until turned on in Customize, and stays on next time', () => {
+    localStorage.clear();
+    const { unmount } = render(<App />);
+    expect(document.body.classList.contains('bright-rings')).toBe(false);
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    fireEvent.click(screen.getByText('Customize'));
+    const toggle = screen.getByRole('button', { name: 'Bright rings' });
+    expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(toggle);
+    expect(document.body.classList.contains('bright-rings')).toBe(true);
+    unmount();
+    document.body.classList.remove('bright-rings');
+    render(<App />);
+    expect(document.body.classList.contains('bright-rings')).toBe(true);
   });
 });
