@@ -223,7 +223,10 @@ const DiceComponent: React.FC<DiceProps> = ({
       }}
       onTouchStart={() => onReveal()}
       layout
-Next: combined release (pull request 68) now also carries the dropped die, total pop, + glide, Bright Rings switch and even menu, 2026-11-02.
+      initial={glided && !calm ? false : { scale: 0 }}
+      // A die dropped by Advantage or Disadvantage sinks back a little (Material 3 emphasized easing)
+      animate={{ scale: sunk && !calm ? DROPPED_SCALE : 1 }}
+      transition={sunk ? { duration: 0.4, ease: EMPHASIZED } : undefined}
       exit={{ scale: 0 }}
     >
       {/* Keyboard and screen-reader way to hold; a tap on the die does the same */}
