@@ -122,7 +122,8 @@ export type AnalyticsEventName =
   | 'shake_toggled'
   | 'shake_roll'
   | 'table_view_toggled'
-  | 'modifier_toggled';
+  | 'modifier_toggled'
+  | 'install_clicked';
 
 /** Primary event logger */
 export function trackEvent(eventName: AnalyticsEventName, payload: Record<string, unknown> = {}): void {

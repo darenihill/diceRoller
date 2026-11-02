@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import styles from './SidebarMenu.module.css';
 import { useBackToClose } from '../hooks/useBackToClose';
-import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Share2, Palette, Pin, ToggleLeft, ToggleRight, BarChart2 } from 'lucide-react';
+import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Share2, Palette, Pin, ToggleLeft, ToggleRight, BarChart2, Download } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 // Material 3 "emphasized" easing for the menu icon turning into a close icon
@@ -38,10 +38,12 @@ interface SidebarMenuProps {
   onToggleRpgMode: () => void;
   tableView: boolean;
   onToggleTableView: () => void;
+  /** Install app tile; left out once the app runs from the home screen */
+  onInstall?: () => void;
 }
 
 export const SidebarMenu: React.FC<SidebarMenuProps> = ({
-  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onStats, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, rpgMode, onToggleRpgMode, tableView, onToggleTableView
+  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onStats, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, rpgMode, onToggleRpgMode, tableView, onToggleTableView, onInstall
 }) => {
   const toggleRef = useRef<HTMLButtonElement>(null);
   // Escape closes the menu, as it does every dialog, and focus goes back to the menu button
@@ -115,6 +117,11 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
                   {tableView ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
                   <span>Table view</span>
                 </button>
+                {onInstall && (
+                  <button className={styles.menuItem} onClick={onInstall} title="Put Dice Roller on your home screen">
+                    <Download size={18} /> <span>Install app</span>
+                  </button>
+                )}
               </div>
 
               {/* Destructive action gets its own full-width row so the three
