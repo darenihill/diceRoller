@@ -5,6 +5,10 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-02~~ Even menu (Daren 2026-11-02: "update the menu to make
+  it look cleaner, it's too inconsistently sized currently, 6 options in tools
+  vs 3 in saves"). Done when: App, Saves and Settings hold four each (History
+  joins Saves; Install app sits beside Clear All in the bottom row).
 - ~~Done 2026-10-24~~ Show the result big for the table (Daren 2026-10-23, Build, picked "Table
   view switch in the menu"): "The Roll button stays a roll button. A Table
   view switch in the menu; while it is on, each roll shows the total huge in

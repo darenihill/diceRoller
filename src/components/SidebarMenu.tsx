@@ -88,12 +88,14 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
               exit={{ y: 20, opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
+              {/* Three groups of four, so the columns line up (owner, 2026-11-02);
+                  on a phone each group fills one row of four */}
               <div className={styles.menuColumn}>
                 <div className={styles.menuColumnHeader}>App</div>
+                <button className={styles.menuItem} onClick={onHelp}><HelpCircle size={18} /> <span>Help</span></button>
+                <button className={styles.menuItem} onClick={onShare}><Share2 size={18} /> <span>Share</span></button>
                 <button className={styles.menuItem} onClick={onIdeas}><Lightbulb size={18} /> <span>Feedback</span></button>
                 <button className={styles.menuItem} onClick={onDonate}><Coffee size={18} /> <span>Donate</span></button>
-                <button className={styles.menuItem} onClick={onShare}><Share2 size={18} /> <span>Share</span></button>
-                <button className={styles.menuItem} onClick={onHelp}><HelpCircle size={18} /> <span>Help</span></button>
               </div>
 
               <div className={styles.menuColumn}>
@@ -101,12 +103,11 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
                 <button className={styles.menuItem} onClick={onSets}><Dice6 size={18} /> <span>Games</span></button>
                 <button className={styles.menuItem} onClick={onSave}><Save size={18} /> <span>Save</span></button>
                 <button className={styles.menuItem} onClick={onSetDefault} title="Pin as startup default"><Pin size={18} /> <span>Set Default</span></button>
+                <button className={styles.menuItem} onClick={onHistory}><History size={18} /> <span>History</span></button>
               </div>
 
               <div className={styles.menuColumn}>
-                <div className={styles.menuColumnHeader}>Tools</div>
-                <button className={styles.menuItem} onClick={onHistory}><History size={18} /> <span>History</span></button>
-                <button className={styles.menuItem} onClick={onStats}><BarChart2 size={18} /> <span>Usage Stats</span></button>
+                <div className={styles.menuColumnHeader}>Settings</div>
                 <button className={styles.menuItem} onClick={onCustomize}><Palette size={18} /> <span>Customize</span></button>
                 <button className={styles.menuItem} onClick={onToggleRpgMode} title="Toggle RPG Mode (Advantage & Modifiers)" aria-pressed={rpgMode}>
                   {rpgMode ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
@@ -117,21 +118,24 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
                   {tableView ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
                   <span>Table view</span>
                 </button>
+                <button className={styles.menuItem} onClick={onStats}><BarChart2 size={18} /> <span>Usage Stats</span></button>
+              </div>
+
+              {/* Full-width bottom row: Install app (until the app is on the home
+                  screen) beside Clear All, so the groups above stay four each */}
+              <div className={styles.menuFooterRow}>
                 {onInstall && (
-                  <button className={styles.menuItem} onClick={onInstall} title="Put Dice Roller on your home screen">
+                  <button className={`${styles.menuItem} ${styles.menuFooterItem} ${styles.menuInstallItem}`} onClick={onInstall} title="Put Dice Roller on your home screen">
                     <Download size={18} /> <span>Install app</span>
                   </button>
                 )}
+                <button
+                  className={`${styles.menuItem} ${styles.menuFooterItem}`}
+                  onClick={onDeleteAll}
+                >
+                  <Trash2 size={18} /> <span>Clear All</span>
+                </button>
               </div>
-
-              {/* Destructive action gets its own full-width row so the three
-                  columns stay even at four items each. */}
-              <button
-                className={`${styles.menuItem} ${styles.menuFooterItem}`}
-                onClick={onDeleteAll}
-              >
-                <Trash2 size={18} /> <span>Clear All</span>
-              </button>
             </motion.div>
           </>
         )}
