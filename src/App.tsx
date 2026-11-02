@@ -43,6 +43,9 @@ import { useWakeLock } from './hooks/useWakeLock';
 import { SAVED } from './utils/savedValues';
 import { buildBackup, restoreBackup } from './utils/backup';
 
+/** The themes the app ships; anything else in storage falls back to dark. */
+const THEMES = ['theme-dark', 'theme-light', 'theme-felt', 'theme-midnight'];
+
 function App() {
   // A phone on the game table stays awake between turns
   useWakeLock();
@@ -101,7 +104,11 @@ function App() {
   });
   const [editingDiceId, setEditingDiceId] = useState<string | null>(null);
   const [revealedDiceId, setRevealedDiceId] = useState<string | null>(null);
-  const [theme, setTheme] = useState(() => readItem(SAVED.theme) || 'theme-dark');
+  // Only a known theme reaches the page's class list; a backup file could hold anything
+  const [theme, setTheme] = useState(() => {
+    const saved = readItem(SAVED.theme);
+    return saved && THEMES.includes(saved) ? saved : 'theme-dark';
+  });
   
   // The dice a finished roll used, so the Roll button can tell when they change
   const [rolledSignature, setRolledSignature] = useState<string | null>(null);
@@ -820,8 +827,8 @@ function App() {
       <SidebarMenu
         isOpen={menuOpen}
         onToggle={() => setMenuOpen(!menuOpen)}
-        onDonate={() => window.open('https://www.buymeacoffee.com/darenihill', '_blank')}
-        onIdeas={() => window.open('https://forms.gle/wqYaKsEZ5FQwizuMA', '_blank')}
+        onDonate={() => window.open('https://www.buymeacoffee.com/darenihill', '_blank', 'noopener,noreferrer')}
+        onIdeas={() => window.open('https://forms.gle/wqYaKsEZ5FQwizuMA', '_blank', 'noopener,noreferrer')}
         onHelp={() => openFromMenu('help')}
         onHistory={() => openFromMenu('history')}
         onStats={() => openFromMenu('stats')}
