@@ -10,6 +10,7 @@ import { MAX_HISTORY_LENGTH } from './constants';
 import { readItem, saveItem } from './safeStorage';
 import { SAVED } from './savedValues';
 import { BUZZ_KEY, BUZZ_SHOWN_KEY } from './buzz';
+import { loadSavedRolls, sanitizeSavedRolls, withSavedRoll, SAVED_ROLLS_KEY } from './savedRolls';
 
 export const BACKUP_VERSION = '1.1';
 
@@ -39,6 +40,7 @@ export function buildBackup(onScreen: { customFaces: string[] }[] = []) {
     usageStats: readJson<Record<string, unknown> | null>(SAVED.usageStats, null),
     buzzOnLand: readItem(BUZZ_KEY) === 'true',
     buzzSwitchShown: readItem(BUZZ_SHOWN_KEY) === 'true',
+    savedRolls: loadSavedRolls(),
     // Only pictures a face still names, on screen or in a saved set
     faceImages: usedFaceImages(onScreen),
   };
@@ -81,6 +83,8 @@ export function restoreBackup(input: unknown): RestoreResult {
   // Older backups have no buzz settings; they keep this phone's own
   if (typeof data.buzzOnLand === 'boolean') keep(BUZZ_KEY, String(data.buzzOnLand));
   if (data.buzzSwitchShown === true) keep(BUZZ_SHOWN_KEY, 'true');
+  // Typed rolls saved as buttons join this device's own
+  if (Array.isArray(data.savedRolls)) keep(SAVED_ROLLS_KEY, JSON.stringify(sanitizeSavedRolls(data.savedRolls).reduce(withSavedRoll, loadSavedRolls())));
 
   if (!fits) return 'full';
   // Pictures on faces; older backups have none

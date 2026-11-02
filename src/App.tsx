@@ -7,6 +7,7 @@ import { useStorage } from './hooks/useStorage';
 import { Dice } from './components/Dice';
 import { ActionBar } from './components/ActionBar';
 import { TypeRollBox } from './components/TypeRollBox';
+import { loadSavedRolls, withSavedRoll, SAVED_ROLLS_KEY, MAX_SAVED_ROLLS, type SavedRoll } from './utils/savedRolls';
 import { TYPED_DIE_COLOR, type TypedRoll } from './utils/rollNotation';
 import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
@@ -141,6 +142,12 @@ function App() {
   useEffect(() => {
     if (buzzShown) localStorage.setItem(BUZZ_SHOWN_KEY, 'true');
   }, [buzzShown]);
+
+  // Typed rolls kept as buttons under the Type a roll box, on this device and in backups
+  const [savedRolls, setSavedRolls] = useState<SavedRoll[]>(loadSavedRolls);
+  useEffect(() => {
+    localStorage.setItem(SAVED_ROLLS_KEY, JSON.stringify(savedRolls));
+  }, [savedRolls]);
 
   const [telemetryState, setTelemetryState] = useState(() => readItem(SAVED.telemetry) !== 'false');
 
@@ -592,6 +599,30 @@ function App() {
     }
   };
 
+  const handleSaveRoll = (roll: SavedRoll) => {
+    // A full list never drops an older roll to make room
+    if (savedRolls.length >= MAX_SAVED_ROLLS && !savedRolls.some(r => r.name === roll.name)) {
+      showToast(`You can keep ${MAX_SAVED_ROLLS} saved rolls. Remove one to add another.`);
+      return;
+    }
+    setSavedRolls(list => withSavedRoll(list, roll));
+    showToast(`Saved ${roll.name}`);
+  };
+
+  // Removing a saved roll offers Undo, which puts it back in its place
+  const handleRemoveSavedRoll = (name: string) => {
+    const index = savedRolls.findIndex(r => r.name === name);
+    if (index < 0) return;
+    const removed = savedRolls[index];
+    setSavedRolls(list => list.filter(r => r.name !== name));
+    offerUndo(`Removed ${name}`, () => setSavedRolls(list => {
+      if (list.some(r => r.name === removed.name)) return list;
+      const next = [...list];
+      next.splice(Math.min(index, next.length), 0, removed);
+      return next;
+    }));
+  };
+
   /** Sound plays the rattle, thud and buzz; with sound off, Buzz when dice land still buzzes */
   const rollFeedback = () => {
     if (soundEnabled) playRollSequence(soundTimersRef);
@@ -719,7 +750,15 @@ function App() {
         )}
       </header>
 
-      {rpgMode && <TypeRollBox onRoll={handleTypedRoll} disabled={isRolling} />}
+      {rpgMode && (
+        <TypeRollBox
+          onRoll={handleTypedRoll}
+          disabled={isRolling}
+          savedRolls={savedRolls}
+          onSaveRoll={handleSaveRoll}
+          onRemoveSavedRoll={handleRemoveSavedRoll}
+        />
+      )}
 
       {showTable && lastMainRoll && (
         <TableView

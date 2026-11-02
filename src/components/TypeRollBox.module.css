@@ -52,3 +52,83 @@
 .note:empty {
   margin: 0;
 }
+
+/* Save this roll: a quiet text button, so the box stays simple */
+.saveLink {
+  display: block;
+  margin: 2px 0 0 auto;
+  min-height: 32px;
+  padding: 0 4px;
+  background: none;
+  border: none;
+  color: var(--md-sys-color-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.nameRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.saved {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.savedItem {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: var(--shape-small);
+  background-color: var(--md-sys-color-surface-variant);
+  overflow: hidden;
+}
+
+.savedRoll {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 4px 0 12px;
+  background: none;
+  border: none;
+  color: var(--md-sys-color-on-surface);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: center;
+  line-height: 44px;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.savedRoll:disabled {
+  opacity: 0.6;
+}
+
+.savedText {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.savedRemove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  background: none;
+  border: none;
+  color: var(--md-sys-color-on-surface-variant);
+  cursor: pointer;
+}

@@ -163,24 +163,24 @@ export const ActionBar: React.FC<ActionBarProps> = ({
             <div className={styles.verticalColumn}>
               <button
                 className={`${styles.rpgFabBtn} ${rollAdvantage === 'advantage' ? styles.rpgFabActive : ''}`}
-                onClick={() => onChangeRollAdvantage('advantage')}
                 aria-pressed={rollAdvantage === 'advantage'}
+                onClick={() => onChangeRollAdvantage('advantage')}
                 title="Advantage: Keep Highest"
               >
                 ADV
               </button>
               <button
                 className={`${styles.rpgFabBtn} ${rollAdvantage === 'normal' ? styles.rpgFabActive : ''}`}
-                onClick={() => onChangeRollAdvantage('normal')}
                 aria-pressed={rollAdvantage === 'normal'}
+                onClick={() => onChangeRollAdvantage('normal')}
                 title="Normal Roll"
               >
                 NORM
               </button>
               <button
                 className={`${styles.rpgFabBtn} ${rollAdvantage === 'disadvantage' ? styles.rpgFabActive : ''}`}
-                onClick={() => onChangeRollAdvantage('disadvantage')}
                 aria-pressed={rollAdvantage === 'disadvantage'}
+                onClick={() => onChangeRollAdvantage('disadvantage')}
                 title="Disadvantage: Keep Lowest"
               >
                 DIS
