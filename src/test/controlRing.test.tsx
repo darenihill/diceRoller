@@ -23,7 +23,9 @@ describe('Bright ring on the bottom-bar buttons', () => {
   it('each theme sets its own ring colour', () => {
     const css = readFileSync('src/index.css', 'utf8');
     expect(css.match(/--control-ring:/g)).toHaveLength(4);
-    expect(css).toMatch(/\.bright-rings \.control-ring \{\s*outline: 2px solid var\(--control-ring\);/);
+    expect(css).toMatch(/\.bright-rings \.control-ring:not\(:focus-visible\) \{\s*outline: 2px solid var\(--control-ring\);/);
+    // The keyboard focus ring always wins over the bright ring
+    expect(css).not.toMatch(/\.bright-rings \.control-ring \{/);
   });
 
   it('is off until turned on in Customize, and stays on next time', () => {
