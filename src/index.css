@@ -30,6 +30,8 @@
   /* Accent & Highlight Design Tokens */
   /* Gold means one thing on every theme: a held die, a target hit or a natural 20. */
   --color-gold: #FFD700;
+  /* Gold for icons and text (lock, HIT!): needs 3:1 / 4.5:1 against the surface it sits on */
+  --color-gold-ink: var(--color-gold);
   --color-crit-red: #D32F2F;
   --color-success: #2E7D32;
   --color-accent-blue: #0056D2;
@@ -60,6 +62,8 @@ body.theme-light {
   --md-sys-color-on-surface-variant: #444746;
   --md-sys-color-outline: #747775;
   --md-sys-color-outline-variant: #C4C7C5;
+  /* Bright gold vanishes on light grey; a deep gold keeps the lock and HIT! readable */
+  --color-gold-ink: #7A5C00;
 }
 
 body.theme-felt {
