@@ -16,6 +16,12 @@ export function diceSignature(dice: Partial<DiceData>[]): string {
   ]));
 }
 
+/** Which dice are out, for telling when the dice change after a roll.
+ *  Values and holds are left out: rolling or holding is not a change. */
+export function rollSignature(dice: DiceData[]): string {
+  return JSON.stringify(dice.map(d => d.id)) + diceSignature(dice);
+}
+
 export interface LoadedSet {
   name: string;
   signature: string;

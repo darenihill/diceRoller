@@ -16,7 +16,7 @@ import { playRollSequence } from './utils/soundEffects';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { MAX_HISTORY_LENGTH } from './utils/constants';
 import { dicePresets } from './utils/presets';
-import { currentSetName, diceSignature, readShareLink, nextFreeSaveName, type LoadedSet } from './utils/setName';
+import { currentSetName, diceSignature, rollSignature, readShareLink, nextFreeSaveName, type LoadedSet } from './utils/setName';
 import { readLandingStart, readLandingAbout } from './utils/landing';
 import { Info, Plus, Dice6 } from 'lucide-react';
 import { Modal } from './components/Modal';
@@ -90,6 +90,10 @@ function App() {
   const [revealedDiceId, setRevealedDiceId] = useState<string | null>(null);
   const [theme, setTheme] = useState(() => localStorage.getItem('appTheme') || 'theme-dark');
   
+  // The dice a finished roll used, so the Roll button can tell when they change
+  const [rolledSignature, setRolledSignature] = useState<string | null>(null);
+  const latestDiceRef = useRef<DiceData[]>([]);
+  useEffect(() => { latestDiceRef.current = diceList; }, [diceList]);
   const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('soundEnabled') === 'true');
   const [diceScale, setDiceScale] = useState(() => sanitizeDiceScale(localStorage.getItem('diceScale')));
 
@@ -271,6 +275,10 @@ function App() {
   const lastMainRoll = rollHistory.find(r => !r.single);
   const lastTotal = totalVisible && lastMainRoll ? lastMainRoll.total : 0;
   const lastModifier = totalVisible && lastMainRoll ? lastMainRoll.modifier ?? 0 : 0;
+  // The old total fades once a die is added, removed or edited after the roll;
+  // holding dice or changing the modifier leaves it bright
+  const diceNow = rollSignature(diceList);
+  const totalStale = totalVisible && rolledSignature !== null && rolledSignature !== diceNow;
   const setName = currentSetName(diceList, loadedSet);
   const showTable = tableView && totalVisible && !isRolling && !!lastMainRoll
     && lastMainRoll.id !== tableDismissedId && diceList.length > 0
@@ -537,6 +545,7 @@ function App() {
     setTableRolledIds(dice.map(d => d.id).join());
     rollDice(({ total, diceCount }) => {
       setHasRolledThisSession(true);
+      setRolledSignature(rollSignature(latestDiceRef.current));
       trackEvent('roll_dice', { diceCount, sum: total, modifier: roll.modifier, rpgMode, rollAdvantage: roll.advantage, typed: true });
     }, undefined, { text: roll.text, dice, modifier: roll.modifier, advantage: roll.advantage });
     if (soundEnabled) playRollSequence(soundTimersRef);
@@ -579,6 +588,7 @@ function App() {
     rollDice(({ total, diceCount }) => {
       // Fires when the roll resolves, so the actual total reaches analytics
       setHasRolledThisSession(true);
+      setRolledSignature(rollSignature(latestDiceRef.current));
       if (diceCount > 0) {
         trackEvent('roll_dice', { diceCount, sum: total, modifier, rpgMode, rollAdvantage });
       }
@@ -734,6 +744,7 @@ function App() {
         onHoldAll={toggleHoldAll}
         allHeld={allHeld}
         totalVisible={totalVisible}
+        totalStale={totalStale}
         lastTotal={lastTotal}
         lastModifier={lastModifier}
         modifier={modifier}
