@@ -5,6 +5,11 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-02~~ Bright rings as a Customize switch (Daren 2026-11-02:
+  "I thought the bright rings were something that could be turned on in the
+  custom section"). Done when: the ring shows only with Customize > Bright
+  Rings on, it is off by default and kept on this device
+  (src/test/controlRing.test.tsx).
 - ~~Done 2026-10-24~~ Show the result big for the table (Daren 2026-10-23, Build, picked "Table
   view switch in the menu"): "The Roll button stays a roll button. A Table
   view switch in the menu; while it is on, each roll shows the total huge in

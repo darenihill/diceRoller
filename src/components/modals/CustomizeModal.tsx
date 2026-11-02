@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from '../Modal';
-import { Volume2, VolumeX, BarChart2, Smartphone, Minus, Plus, Vibrate, VibrateOff } from 'lucide-react';
+import { Volume2, VolumeX, BarChart2, Smartphone, Minus, Plus, Vibrate, VibrateOff, CircleDot, Circle } from 'lucide-react';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
 import { targetNote } from '../../utils/targets';
@@ -24,6 +24,9 @@ interface CustomizeModalProps {
   onChangeDiceScale: (scale: number) => void;
   shakeEnabled: boolean;
   onToggleShake: () => void;
+  /** Bright ring round the bottom-bar buttons, easier to find in sun */
+  brightRings?: boolean;
+  onToggleBrightRings?: () => void;
   /** Buzz when dice land: shown only after its private link was opened */
   buzzShown?: boolean;
   buzzEnabled?: boolean;
@@ -45,6 +48,8 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
   onChangeDiceScale,
   shakeEnabled,
   onToggleShake,
+  brightRings = false,
+  onToggleBrightRings,
   buzzShown = false,
   buzzEnabled = false,
   onToggleBuzz,
@@ -167,6 +172,25 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
               <Smartphone size={20} />
             </button>
           </div>
+
+          {/* Bright rings: off until turned on (owner, 2026-11-02) */}
+          {onToggleBrightRings && (
+            <div className={modalStyles.toggleRow}>
+              <div className={modalStyles.toggleLabelCol}>
+                <span className={modalStyles.toggleTitle}>Bright Rings</span>
+                <span className={modalStyles.toggleDesc}>A bright ring round the bottom buttons, easier to find in sunlight</span>
+              </div>
+              <button
+                className="md-icon-button"
+                onClick={onToggleBrightRings}
+                title={brightRings ? "Turn off bright rings" : "Turn on bright rings"}
+                aria-label="Bright rings"
+                aria-pressed={brightRings}
+              >
+                {brightRings ? <CircleDot size={20} /> : <Circle size={20} />}
+              </button>
+            </div>
+          )}
 
           {/* Buzz when dice land: hidden until its private link is opened (trial) */}
           {buzzShown && onToggleBuzz && (

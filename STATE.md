@@ -1,4 +1,4 @@
-Next: big table view (pull request 24) brought up to date with main after Type a roll (27), Idea choices (28) and the tap-twice rollback (29) landed, 2026-10-26.
+Next: Bright Rings switch in Customize, on top of the combined release (pull request 68), 2026-11-02.
 
 # State
 
