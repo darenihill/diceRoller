@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import type { DiceData } from '../types';
 import { generateId, parseFaceContent, faceNumericValue, FACE_ICON_PREFIX, isNumberedFaces } from '../utils/diceUtils';
 import { luckSet } from '../utils/fairOdds';
+import { generateId, parseFaceContent, faceNumericValue, FACE_ICON_PREFIX, isNumberedFaces, percentileBonus } from '../utils/diceUtils';
 import { MAX_DICE_LIMIT, MAX_HISTORY_LENGTH, ROLL_DURATION_MS, TOAST_DURATION_MS } from '../utils/constants';
 import { randomBelow } from '../utils/fairRandom';
 import { saveItem } from '../utils/safeStorage';
@@ -315,6 +316,10 @@ export const useDiceState = () => {
       const dropSuffix = d.dropped ? ' (dropped)' : '';
       details.push(`${label}: ${shown}${dropSuffix}`);
     });
+
+    if (onlyId === undefined) {
+      rollTotal += percentileBonus(processedList.map(d => ({ ...d, value: d.targetValue ?? d.numberValue })));
+    }
 
     const activeModifier = rpgMode && onlyId === undefined ? rollModifier : 0;
     const finalTotal = rollTotal + activeModifier;
