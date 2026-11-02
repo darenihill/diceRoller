@@ -1,10 +1,10 @@
-import { useEffect, useState, useRef, useLayoutEffect } from 'react';
+import { useCallback, useEffect, useState, useRef, useLayoutEffect } from 'react';
 import LZString from 'lz-string';
 import styles from './App.module.css';
 import { useDiceState } from './hooks/useDiceState';
 import { useRollKeys } from './hooks/useRollKeys';
 import { useStorage } from './hooks/useStorage';
-import { Dice } from './components/Dice';
+import { Dice, type GlideOrigin } from './components/Dice';
 import { ActionBar } from './components/ActionBar';
 import { TypeRollBox } from './components/TypeRollBox';
 import { loadSavedRolls, withSavedRoll, SAVED_ROLLS_KEY, MAX_SAVED_ROLLS, type SavedRoll } from './utils/savedRolls';
@@ -659,6 +659,23 @@ function App() {
     trackEvent('dice_added');
   };
 
+  // A die added from the + button (or its RPG quick-add menu) glides out of it into its place
+  const glideFrom = useRef<GlideOrigin | null>(null);
+  const handleAddFromBar = (template?: Partial<DiceData>) => {
+    const plus = document.querySelector('[data-add-button]')?.getBoundingClientRect();
+    glideFrom.current = plus ? { x: plus.left + plus.width / 2, y: plus.top + plus.height / 2, at: Date.now() } : null;
+    handleAddDice(template);
+  };
+  // The first new die to ask claims the glide; asking again (React's strict
+  // mode calls twice) gets the same answer, and any other die gets none
+  const takeGlide = useCallback((id: string) => {
+    const origin = glideFrom.current;
+    if (!origin || Date.now() - origin.at > 1000) return null;
+    if (origin.claimedBy && origin.claimedBy !== id) return null;
+    origin.claimedBy = id;
+    return origin;
+  }, []);
+
   const handleSelectTheme = (newTheme: string) => {
     setTheme(newTheme);
     trackEvent('theme_changed', { theme: newTheme });
@@ -802,6 +819,7 @@ function App() {
             rollingAlone={rollingId === dice.id}
             rpgMode={rpgMode}
             compactActions={compactDieActions}
+            takeGlide={takeGlide}
           />
         ))}
       </div>
@@ -860,7 +878,7 @@ function App() {
       />
 
       <ActionBar
-        onAdd={handleAddDice}
+        onAdd={handleAddFromBar}
         onRoll={handleRoll}
         onHoldAll={toggleHoldAll}
         allHeld={allHeld}

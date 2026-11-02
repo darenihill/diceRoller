@@ -5,6 +5,11 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-02~~ New die animation (Daren 2026-11-01, Build): "a die you
+  add glides out of the + button into its place." Works for the RPG
+  quick-add menu too. Done when: a die added from + (or its menu) rises from
+  the button into its slot; dice already out, copies and Reduce motion keep
+  the usual appearance (src/test/addGlide.test.tsx).
 - ~~Done 2026-10-24~~ Show the result big for the table (Daren 2026-10-23, Build, picked "Table
   view switch in the menu"): "The Roll button stays a roll button. A Table
   view switch in the menu; while it is on, each roll shows the total huge in

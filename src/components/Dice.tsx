@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import type { DiceData } from '../types';
 import styles from './Dice.module.css';
 import { Lock, Unlock, Settings, X, Copy, Dices } from 'lucide-react';
@@ -25,10 +25,15 @@ interface DiceProps {
   rpgMode?: boolean;
   /** Many small dice: the buttons move to the strip above the bottom bar, and the tapped die gets an outline */
   compactActions?: boolean;
+  /** Asked once when the die appears: where the + button was, if it was just tapped */
+  takeGlide?: (id: string) => GlideOrigin | null;
 }
 
+/** The centre of the + button a new die glides out of, and when it was tapped */
+export interface GlideOrigin { x: number; y: number; at: number; claimedBy?: string }
+
 const DiceComponent: React.FC<DiceProps> = ({ 
-  dice, isRolling, isRevealed, onReveal, onToggleHold, onRemove, onOpenSettings, onClone, onRollOne, rollingAlone, rpgMode, compactActions 
+  dice, isRolling, isRevealed, onReveal, onToggleHold, onRemove, onOpenSettings, onClone, onRollOne, rollingAlone, rpgMode, compactActions, takeGlide 
 }) => {
   const diceRef = useRef<HTMLDivElement>(null);
 
@@ -59,6 +64,20 @@ const DiceComponent: React.FC<DiceProps> = ({
   // With the phone's Reduce motion on, a rolling die stays still and its
   // number fades in, instead of shaking through random faces
   const calm = !!useReducedMotion();
+
+  // Added from the + button: rise out of it into this slot (Material 3 emphasized easing)
+  const [glided] = useState(() => takeGlide?.(dice.id) ?? null);
+  useLayoutEffect(() => {
+    const el = diceRef.current;
+    if (!glided || calm || !el || typeof el.animate !== 'function') return;
+    const box = el.getBoundingClientRect();
+    const dx = glided.x - (box.left + box.width / 2);
+    const dy = glided.y - (box.top + box.height / 2);
+    el.animate(
+      [{ transform: `translate(${dx}px, ${dy}px) scale(0.3)`, opacity: 0.4 }, { transform: 'none', opacity: 1 }],
+      { duration: 450, easing: 'cubic-bezier(0.2, 0, 0, 1)' }
+    );
+  }, [glided, calm]);
 
   useEffect(() => {
     if (!rollingNow || calm) return;
@@ -195,7 +214,7 @@ const DiceComponent: React.FC<DiceProps> = ({
       }}
       onTouchStart={() => onReveal()}
       layout
-      initial={{ scale: 0 }}
+      initial={glided && !calm ? false : { scale: 0 }}
       animate={{ scale: 1 }}
       exit={{ scale: 0 }}
     >

@@ -144,6 +144,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
 
         <button 
           className={`md-icon-button control-ring ${styles.actionBtn}`} 
+          data-add-button
           onClick={handleAddClick} 
           title={rpgMode ? "Add D&D Dice Menu" : "Add Dice"}
         >
