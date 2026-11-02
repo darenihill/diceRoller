@@ -1,5 +1,4 @@
 import type { DiceData } from '../types';
-import { randomBelow } from './fairRandom';
 import {
   MAX_DICE_LIMIT, MIN_FACES, MAX_FACES, MAX_CUSTOM_FACES,
   MAX_FACE_TEXT_LENGTH, MAX_NAME_LENGTH

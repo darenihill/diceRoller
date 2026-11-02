@@ -12,7 +12,8 @@ import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages, parseFaceContent } from './utils/diceUtils';
 import { usedFaceImages, importFaceImages } from './utils/faceImages';
-import { playRollSequence, playLandNow } from './utils/soundEffects';
+import { playRollSequence, playLandNow, scheduleLandingBuzz } from './utils/soundEffects';
+import { BUZZ_KEY, BUZZ_SHOWN_KEY, canBuzz, isBuzzLink } from './utils/buzz';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { MAX_HISTORY_LENGTH } from './utils/constants';
 import { dicePresets } from './utils/presets';
@@ -127,6 +128,16 @@ function App() {
   const [tableDismissedId, setTableDismissedId] = useState<string | null>(null);
   // The dice a roll was made with; adding, removing or loading dice hides the big view
   const [tableRolledIds, setTableRolledIds] = useState('');
+  // Buzz when dice land: hidden and off until the private link turns it on (trial, 2026-10-28)
+  const [buzzLinkOpened] = useState(() => isBuzzLink(window.location.hash));
+  const [buzzShown] = useState(() => buzzLinkOpened || localStorage.getItem(BUZZ_SHOWN_KEY) === 'true');
+  const [buzzEnabled, setBuzzEnabled] = useState(() => buzzLinkOpened || localStorage.getItem(BUZZ_KEY) === 'true');
+  useEffect(() => {
+    localStorage.setItem(BUZZ_KEY, String(buzzEnabled));
+  }, [buzzEnabled]);
+  useEffect(() => {
+    if (buzzShown) localStorage.setItem(BUZZ_SHOWN_KEY, 'true');
+  }, [buzzShown]);
 
   const [telemetryState, setTelemetryState] = useState(() => localStorage.getItem('telemetryEnabled') !== 'false');
 
@@ -184,6 +195,13 @@ function App() {
   // Load shared config from URL, default set, or autosave on mount & record session telemetry
   useEffect(() => {
     recordSessionStart();
+
+    if (buzzLinkOpened) {
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      showToast(canBuzz()
+        ? 'Buzz when dice land is on for this phone. Turn it off in Customize.'
+        : "Buzz when dice land is on, but this browser can't buzz. Turn it off in Customize.");
+    }
 
     const hash = window.location.hash;
     if (hash.startsWith('#share=')) {
@@ -468,6 +486,8 @@ function App() {
         rollHistory: JSON.parse(localStorage.getItem('rollHistory') || '[]'),
         theme: localStorage.getItem('appTheme') || 'theme-dark',
         soundEnabled: localStorage.getItem('soundEnabled') === 'true',
+        buzzOnLand: localStorage.getItem(BUZZ_KEY) === 'true',
+        buzzSwitchShown: localStorage.getItem(BUZZ_SHOWN_KEY) === 'true',
         diceScale: sanitizeDiceScale(localStorage.getItem('diceScale')),
         // Only pictures a face still names, on screen or in a saved set
         faceImages: usedFaceImages(diceList)
@@ -532,6 +552,13 @@ function App() {
           if (data.soundEnabled !== undefined) {
             keep('soundEnabled', String(data.soundEnabled));
           }
+          // Older backups have no buzz settings; they keep this phone's own
+          if (typeof data.buzzOnLand === 'boolean') {
+            localStorage.setItem(BUZZ_KEY, String(data.buzzOnLand));
+          }
+          if (data.buzzSwitchShown === true) {
+            localStorage.setItem(BUZZ_SHOWN_KEY, 'true');
+          }
           // Older backups have no dice size; they import at the default
           keep('diceScale', String(sanitizeDiceScale(data.diceScale)));
           // Pictures on faces; older backups have none
@@ -581,7 +608,7 @@ function App() {
       setRolledSignature(rollSignature(latestDiceRef.current));
       trackEvent('roll_dice', { diceCount, sum: total, modifier: roll.modifier, rpgMode, rollAdvantage: roll.advantage, typed: true });
     }, undefined, { text: roll.text, dice, modifier: roll.modifier, advantage: roll.advantage });
-    if (soundEnabled) playRollSequence(soundTimersRef);
+    rollFeedback();
     if (before.dice.length > 0) {
       offerUndo(`Rolled ${roll.text}`, () => {
         restoreDice(before.dice);
@@ -591,9 +618,15 @@ function App() {
     }
   };
 
+  /** Sound plays the rattle, thud and buzz; with sound off, Buzz when dice land still buzzes */
+  const rollFeedback = () => {
+    if (soundEnabled) playRollSequence(soundTimersRef);
+    else if (buzzEnabled) scheduleLandingBuzz(soundTimersRef);
+  };
+
   const handleRollOne = (id: string) => {
     rollDice(() => trackEvent('roll_one_die'), id);
-    if (soundEnabled) playRollSequence(soundTimersRef);
+    rollFeedback();
   };
 
   const handleAddDice = (template?: Partial<DiceData>) => {
@@ -627,8 +660,8 @@ function App() {
     // A tap during the tumble only lands the dice: the thud plays now, the rattle doesn't start again
     if (outcome === 'landed') {
       if (soundEnabled) playLandNow(soundTimersRef);
-    } else if (outcome === 'rolled' && hasUnheldDice && diceList.length > 0 && soundEnabled) {
-      playRollSequence(soundTimersRef);
+    } else if (outcome === 'rolled' && hasUnheldDice && diceList.length > 0) {
+      rollFeedback();
     }
   };
 
@@ -836,6 +869,9 @@ function App() {
         onChangeDiceScale={setDiceScale}
         shakeEnabled={shakeEnabled}
         onToggleShake={handleToggleShake}
+        buzzShown={buzzShown}
+        buzzEnabled={buzzEnabled}
+        onToggleBuzz={() => setBuzzEnabled(on => !on)}
       />
 
       <SaveDialog 
