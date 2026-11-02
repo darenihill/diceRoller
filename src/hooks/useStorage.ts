@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { DiceConfig, DiceData } from '../types';
-import { saveItem } from '../utils/safeStorage';
+import { readItem, saveItem } from '../utils/safeStorage';
+import { SAVED } from '../utils/savedValues';
 
 export function useStorage() {
   const [savedConfigs, setSavedConfigs] = useState<Record<string, DiceConfig>>({});
@@ -9,7 +10,7 @@ export function useStorage() {
   useEffect(() => {
     const loadFromStorage = () => {
       try {
-        const stored = localStorage.getItem('diceConfigs');
+        const stored = readItem(SAVED.games);
         if (stored) {
           setSavedConfigs(JSON.parse(stored));
         }
@@ -23,7 +24,7 @@ export function useStorage() {
   const saveConfig = useCallback((name: string, config: DiceData[]) => {
     setSavedConfigs((prev) => {
       const updated = { ...prev, [name]: { name, config } };
-      saveItem('diceConfigs', JSON.stringify(updated));
+      saveItem(SAVED.games, JSON.stringify(updated));
       return updated;
     });
   }, []);
@@ -32,14 +33,14 @@ export function useStorage() {
     setSavedConfigs((prev) => {
       const updated = { ...prev };
       delete updated[name];
-      saveItem('diceConfigs', JSON.stringify(updated));
+      saveItem(SAVED.games, JSON.stringify(updated));
       return updated;
     });
   }, []);
 
   const getSystemAutosave = useCallback((): DiceConfig | null => {
     try {
-      const stored = localStorage.getItem('diceConfigs');
+      const stored = readItem(SAVED.games);
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed['systemAutosave']) {
