@@ -78,7 +78,8 @@ self.addEventListener('fetch', (e) => {
           }
           return networkResponse;
         }).catch(() => {
-          // Silent catch for network failures
+          // Offline: fall back to the cached copy, or a clean network error
+          return cachedResponse || Response.error();
         });
 
         // Return cached version if available, otherwise wait for network

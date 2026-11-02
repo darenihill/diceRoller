@@ -20,10 +20,6 @@ const FACE_IMAGE_RE = /:img:([a-z0-9]{1,16})$/;
 /** Trailing parts a face may carry after its text: picture, colour, Counts as. */
 const FACE_SUFFIX_RE = /(?::img:[a-z0-9]{1,16})?(?::bg:#[0-9a-fA-F]{3,8}|:bg:transparent)?(?::val:-?\d{1,4})?$/;
 
-export function getRandomNumber(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 export function generateId(): string {
   return Math.random().toString(36).substring(2, 9);
 }
