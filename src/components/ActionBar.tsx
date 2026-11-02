@@ -18,6 +18,8 @@ interface ActionBarProps {
   lastTotal: number;
   /** The landed roll the total belongs to; a new one makes the total pop once */
   totalKey?: string;
+  /** Dice are tumbling: hold the pop until they land */
+  rolling?: boolean;
   /** The modifier counted in lastTotal (0 when none) */
   lastModifier?: number;
   modifier: number;
@@ -40,11 +42,27 @@ const DND_GRID_DICE = [
 const D20_OPTION = { label: 'D20', faces: 20, name: 'd20', color: '#384050' };
 
 export const ActionBar: React.FC<ActionBarProps> = ({ 
-  onAdd, onRoll, onHoldAll, allHeld, totalVisible, totalStale = false, lastTotal, totalKey, lastModifier = 0, modifier, onChangeModifier,
+  onAdd, onRoll, onHoldAll, allHeld, totalVisible, totalStale = false, lastTotal, totalKey, rolling = false, lastModifier = 0, modifier, onChangeModifier,
   rpgMode, rollAdvantage, onChangeRollAdvantage
 }) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const calm = !!useReducedMotion();
+
+  // The total pops once per newly landed main roll: not for a single-die roll,
+  // which keeps the same total, and not when Undo brings an older roll back
+  const totalControls = useAnimationControls();
+  const seenTotals = useRef(new Set<string>());
+  // A total already showing when the bar appears is not a new landing
+  const startedWithTotal = useRef(!!totalKey);
+  const [pops, setPops] = useState(0);
+  useEffect(() => {
+    if (!totalKey || rolling || seenTotals.current.has(totalKey)) return;
+    const first = seenTotals.current.size === 0 && startedWithTotal.current;
+    seenTotals.current.add(totalKey);
+    if (first || calm) return;
+    setPops(n => n + 1);
+    totalControls.start({ scale: [1, 1.18, 1], transition: { duration: 0.35, ease: [0.2, 0, 0, 1] } });
+  }, [totalKey, rolling, calm, totalControls]);
 
   // Wiggle the lock only when allHeld actually changes — not on initial page load.
   // Imperative controls replace the old keyed-remount pattern so the mount render
@@ -233,14 +251,11 @@ export const ActionBar: React.FC<ActionBarProps> = ({
           {totalVisible ? (
             // Pops slightly bigger and settles when the dice land (owner, 2026-11-01)
             <motion.span
-              key={totalKey}
               className={`${styles.rollBtnLabel} ${totalStale ? styles.rollBtnLabelStale : ''}`}
               style={{ fontSize: totalFontSize }}
               data-stale={totalStale || undefined}
-              data-pop={totalKey && !calm ? 'on' : undefined}
-              initial={totalKey && !calm ? { scale: 1 } : false}
-              animate={totalKey && !calm ? { scale: [1, 1.18, 1] } : undefined}
-              transition={{ duration: 0.35, ease: [0.2, 0, 0, 1] }}
+              data-pops={pops || undefined}
+              animate={totalControls}
             >
               {lastTotal}
               {/* The total already counts the modifier, so show its math, not "+2" to add again */}
