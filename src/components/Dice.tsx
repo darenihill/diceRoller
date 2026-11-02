@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import type { DiceData } from '../types';
 import styles from './Dice.module.css';
 import { Lock, Unlock, Settings, X, Copy, Dices } from 'lucide-react';
-import { motion, useAnimationControls } from 'framer-motion';
+import { motion, useAnimationControls, useReducedMotion } from 'framer-motion';
 import { ALL_ICONS } from '../utils/iconUtils';
 import { parseFaceContent, FACE_ICON_PREFIX, getContrastColor } from '../utils/diceUtils';
 import { useFaceImage } from '../utils/faceImages';
@@ -56,9 +56,12 @@ const DiceComponent: React.FC<DiceProps> = ({
   }, []);
 
   const rollingNow = isRolling && (!dice.held || !!rollingAlone);
+  // With the phone's Reduce motion on, a rolling die stays still and its
+  // number fades in, instead of shaking through random faces
+  const calm = !!useReducedMotion();
 
   useEffect(() => {
-    if (!rollingNow) return;
+    if (!rollingNow || calm) return;
 
     let tickCount = 0;
 
@@ -91,7 +94,7 @@ const DiceComponent: React.FC<DiceProps> = ({
       setTempValue(null);
       setTempFaceIndex(null);
     };
-  }, [rollingNow, dice.faces, dice.customFaces, dice.targetValue, dice.targetFaceIndex]);
+  }, [rollingNow, calm, dice.faces, dice.customFaces, dice.targetValue, dice.targetFaceIndex]);
 
   const getDisplayText = () => {
     if (rollingNow) {
@@ -174,7 +177,7 @@ const DiceComponent: React.FC<DiceProps> = ({
   return (
     <motion.div
       ref={diceRef}
-      className={`${styles.dice} ${shapeClass ? styles.shaped : ''} ${rollingNow ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''} ${compactActions && isRevealed ? styles.outlined : ''} ${extraClass}`}
+      className={`${styles.dice} ${shapeClass ? styles.shaped : ''} ${rollingNow && !calm ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''} ${compactActions && isRevealed ? styles.outlined : ''} ${extraClass}`}
       data-dice-id={dice.id}
       // A group, not a button: a button's inner buttons are hidden from screen
       // readers, so settings, copy, roll-one and remove couldn't be reached.
@@ -209,9 +212,9 @@ const DiceComponent: React.FC<DiceProps> = ({
       </div>
 
       {faceImage ? (
-        <img src={faceImage} alt="" className={styles.faceImage} draggable={false} />
+        <img src={faceImage} alt="" className={`${styles.faceImage} ${calm ? styles.calmFace : ''} ${calm && rollingNow ? styles.calmRolling : ''}`} draggable={false} />
       ) : (
-        <div className={styles.number} style={{ fontSize: fontScale, color: textColor, zIndex: 2 }}>
+        <div className={`${styles.number} ${calm ? styles.calmFace : ''} ${calm && rollingNow ? styles.calmRolling : ''}`} data-calm={calm ? (rollingNow ? 'rolling' : 'still') : undefined} style={{ fontSize: fontScale, color: textColor, zIndex: 2 }}>
           {renderFace(faceContent)}
         </div>
       )}
