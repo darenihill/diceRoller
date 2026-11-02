@@ -17,6 +17,13 @@ describe('Dropped die with Advantage or Disadvantage', () => {
     expect(screen.getByTestId('dropped-stamp')).toHaveTextContent('DROPPED');
   });
 
+  it('waits for the dice to land before the stamp drops in', () => {
+    const { rerender } = render(<Dice dice={{ ...base, dropped: true }} {...props} isRolling />);
+    expect(screen.queryByTestId('dropped-stamp')).toBeNull();
+    rerender(<Dice dice={{ ...base, dropped: true }} {...props} isRolling={false} />);
+    expect(screen.getByTestId('dropped-stamp')).toBeInTheDocument();
+  });
+
   it('the stamp drops in with emphasized easing, and stays still under Reduce motion', () => {
     expect(css).toMatch(/\.droppedBadge\s*{[^}]*animation:\s*stampIn 0\.4s cubic-bezier\(0\.2, 0, 0, 1\)/);
     expect(css).toMatch(/@keyframes stampIn/);

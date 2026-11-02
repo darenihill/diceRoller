@@ -61,6 +61,8 @@ const DiceComponent: React.FC<DiceProps> = ({
   }, []);
 
   const rollingNow = isRolling && (!dice.held || !!rollingAlone);
+  // A dropped die sinks back, dims and gets its stamp once it lands, not mid-tumble
+  const sunk = !!dice.dropped && !rollingNow;
   // With the phone's Reduce motion on, a rolling die stays still and its
   // number fades in, instead of shaking through random faces
   const calm = !!useReducedMotion();
@@ -178,7 +180,7 @@ const DiceComponent: React.FC<DiceProps> = ({
   }
 
   const extraClass = [
-    dice.dropped ? styles.dropped : '',
+    sunk ? styles.dropped : '',
     dice.isCrit20 ? styles.crit20 : '',
     dice.isCrit1 ? styles.crit1 : ''
   ].filter(Boolean).join(' ');
@@ -202,8 +204,8 @@ const DiceComponent: React.FC<DiceProps> = ({
       layout
       initial={{ scale: 0 }}
       // A die dropped by Advantage or Disadvantage sinks back a little (Material 3 emphasized easing)
-      animate={{ scale: dice.dropped && !calm ? DROPPED_SCALE : 1 }}
-      transition={dice.dropped ? { duration: 0.4, ease: EMPHASIZED } : undefined}
+      animate={{ scale: sunk && !calm ? DROPPED_SCALE : 1 }}
+      transition={sunk ? { duration: 0.4, ease: EMPHASIZED } : undefined}
       exit={{ scale: 0 }}
     >
       {/* Keyboard and screen-reader way to hold; a tap on the die does the same */}
@@ -230,7 +232,7 @@ const DiceComponent: React.FC<DiceProps> = ({
         </div>
       )}
 
-      {dice.dropped && (
+      {sunk && (
         <div className={styles.droppedBadge} data-testid="dropped-stamp">
           DROPPED
         </div>
