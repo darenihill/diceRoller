@@ -1,4 +1,4 @@
-Next: dropped die animation (sinks back, DROPPED stamp drops in) on top of the combined release (pull request 68), 2026-11-02.
+Next: combined release (pull request 68) now also carries the dropped die, total pop, + glide, Bright Rings switch and even menu, 2026-11-02.
 
 # State
 

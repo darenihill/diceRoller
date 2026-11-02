@@ -5,6 +5,11 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-02~~ Total animation (Daren 2026-11-01, Build): "the total on
+  the Roll button pops slightly bigger and settles when the dice land." One
+  short scale on the number, nothing else moves. Done when: each landed roll
+  pops the total once, not while tumbling, and Reduce motion keeps it still
+  (src/test/totalPop.test.tsx).
 - ~~Done 2026-11-02~~ Dropped die animation (Daren 2026-11-01, Build): "with
   Advantage, the lower die shrinks back and a DROPPED stamp drops onto it."
   Only in RPG Mode with Advantage or Disadvantage; nothing about the roll or
