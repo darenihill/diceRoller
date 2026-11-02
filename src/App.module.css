@@ -145,6 +145,16 @@
   text-overflow: ellipsis;
 }
 
+/* The storage message wraps so it is read in full, with its buttons beside it */
+.storageToast {
+  white-space: normal;
+  width: calc(100vw - 32px);
+}
+
+.storageToast > span {
+  overflow: visible;
+}
+
 .undoButton {
   min-height: 44px;
   min-width: 64px;

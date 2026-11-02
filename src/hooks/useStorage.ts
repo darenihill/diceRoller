@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { DiceConfig, DiceData } from '../types';
+import { saveItem } from '../utils/safeStorage';
 
 export function useStorage() {
   const [savedConfigs, setSavedConfigs] = useState<Record<string, DiceConfig>>({});
@@ -22,7 +23,7 @@ export function useStorage() {
   const saveConfig = useCallback((name: string, config: DiceData[]) => {
     setSavedConfigs((prev) => {
       const updated = { ...prev, [name]: { name, config } };
-      localStorage.setItem('diceConfigs', JSON.stringify(updated));
+      saveItem('diceConfigs', JSON.stringify(updated));
       return updated;
     });
   }, []);
@@ -31,7 +32,7 @@ export function useStorage() {
     setSavedConfigs((prev) => {
       const updated = { ...prev };
       delete updated[name];
-      localStorage.setItem('diceConfigs', JSON.stringify(updated));
+      saveItem('diceConfigs', JSON.stringify(updated));
       return updated;
     });
   }, []);
