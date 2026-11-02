@@ -12,10 +12,10 @@ import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages, parseFaceContent } from './utils/diceUtils';
 import { DieActionStrip } from './components/DieActionStrip';
-import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages } from './utils/diceUtils';
 import { usedFaceImages, importFaceImages } from './utils/faceImages';
 import { playRollSequence, playLandNow, scheduleLandingBuzz } from './utils/soundEffects';
 import { BUZZ_KEY, BUZZ_SHOWN_KEY, canBuzz, isBuzzLink } from './utils/buzz';
+import { celebrateNatural20 } from './utils/confetti';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { MAX_HISTORY_LENGTH, COMPACT_DIE_SIZE } from './utils/constants';
 import { dicePresets } from './utils/presets';
@@ -612,9 +612,10 @@ function App() {
     setRollAdvantage(roll.advantage);
     // A typed roll puts out new dice, so Table view shows big for these
     setTableRolledIds(dice.map(d => d.id).join());
-    rollDice(({ total, diceCount }) => {
+    rollDice(({ total, diceCount, natural20Ids }) => {
       setHasRolledThisSession(true);
       setRolledSignature(rollSignature(latestDiceRef.current));
+      void celebrateNatural20(natural20Ids);
       trackEvent('roll_dice', { diceCount, sum: total, modifier: roll.modifier, rpgMode, rollAdvantage: roll.advantage, typed: true });
     }, undefined, { text: roll.text, dice, modifier: roll.modifier, advantage: roll.advantage });
     rollFeedback();
@@ -634,7 +635,10 @@ function App() {
   };
 
   const handleRollOne = (id: string) => {
-    rollDice(() => trackEvent('roll_one_die'), id);
+    rollDice(({ natural20Ids }) => {
+      void celebrateNatural20(natural20Ids);
+      trackEvent('roll_one_die');
+    }, id);
     rollFeedback();
   };
 
@@ -657,10 +661,11 @@ function App() {
   const handleRoll = () => {
     const hasUnheldDice = diceList.some(d => !d.held);
     setTableRolledIds(diceList.map(d => d.id).join());
-    const outcome = rollDice(({ total, diceCount }) => {
+    const outcome = rollDice(({ total, diceCount, natural20Ids }) => {
       // Fires when the roll resolves, so the actual total reaches analytics
       setHasRolledThisSession(true);
       setRolledSignature(rollSignature(latestDiceRef.current));
+      void celebrateNatural20(natural20Ids);
       if (diceCount > 0) {
         trackEvent('roll_dice', { diceCount, sum: total, modifier, rpgMode, rollAdvantage });
       }

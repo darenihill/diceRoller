@@ -22,6 +22,8 @@ export interface RollSummary {
   total: number;
   diceCount: number;
   isTargetHit: boolean;
+  /** Ids of d20s that rolled a 20 in RPG Mode and count (not held, not dropped) */
+  natural20Ids: string[];
 }
 
 export type RollAdvantageMode = 'normal' | 'advantage' | 'disadvantage';
@@ -328,6 +330,14 @@ export const useDiceState = () => {
 
     setDiceList(processedList);
 
+    // A natural 20 earns the confetti only when it was rolled now (not a held
+    // die keeping its 20) and counts (not the die Disadvantage drops)
+    const natural20Ids = rpgMode
+      ? processedList
+          .filter(d => d.isCrit20 && !d.dropped && (onlyId !== undefined ? d.id === onlyId : !d.held))
+          .map(d => d.id)
+      : [];
+
     // 2. Land the dice and reveal history once the tumble ends
     const land = () => {
       tumbleRef.current = null;
@@ -360,7 +370,8 @@ export const useDiceState = () => {
       onComplete?.({
         total: finalTotal,
         diceCount: onlyId !== undefined ? 1 : list.filter(d => !d.held).length,
-        isTargetHit
+        isTargetHit,
+        natural20Ids
       });
     };
     tumbleRef.current = { timer: setTimeout(land, ROLL_DURATION_MS), land };
