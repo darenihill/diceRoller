@@ -866,6 +866,10 @@ function App() {
         onClose={() => setModalOpen(null)} 
         rollHistory={rollHistory}
         onClearHistory={handleClearHistory}
+        dice={diceList}
+        rpgMode={rpgMode}
+        modifier={modifier}
+        rollAdvantage={rollAdvantage}
       />
 
       <SetsModal 
