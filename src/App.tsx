@@ -36,8 +36,11 @@ import { StatsModal } from './components/modals/StatsModal';
 import { TableView } from './components/TableView';
 import { tableTiles, tableMath } from './utils/tableView';
 import { saveItem, onSaveRefused } from './utils/safeStorage';
+import { useWakeLock } from './hooks/useWakeLock';
 
 function App() {
+  // A phone on the game table stays awake between turns
+  useWakeLock();
   const {
     diceList, setDiceList, rollHistory, isRolling, rollingId, modifier, setModifier,
     rpgMode, toggleRpgMode, rollAdvantage, setRollAdvantage,
