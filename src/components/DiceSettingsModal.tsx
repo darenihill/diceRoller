@@ -38,10 +38,15 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   /** The colour row pins to the bottom only after a face is tapped, so the faces show first on open */
   const [colourPinnedFor, setColourPinnedFor] = useState<string | null>(null);
   const colourPinned = colourPinnedFor === dice.id;
-  /** The open tab, per die: a die with its own faces opens on them (faces show first), others on Dice Settings */
-  const [tabFor, setTabFor] = useState<{ id: string; tab: 'settings' | 'faces' } | null>(null);
-  const tab = tabFor?.id === dice.id ? tabFor.tab : dice.customFaces.length > 0 ? 'faces' : 'settings';
-  const setTab = (next: 'settings' | 'faces') => setTabFor({ id: dice.id, tab: next });
+  /** The open tab, chosen once each time the dialog opens for a die: a die with its own
+   *  faces opens on them (faces show first), others on Dice Settings. Removing the last
+   *  face then keeps you on Custom faces. */
+  const openKey = isOpen ? dice.id : '';
+  const openingTab = dice.customFaces.length > 0 ? 'faces' : 'settings';
+  const [tabFor, setTabFor] = useState<{ key: string; tab: 'settings' | 'faces' }>({ key: openKey, tab: openingTab });
+  if (tabFor.key !== openKey) setTabFor({ key: openKey, tab: openingTab });
+  const tab = tabFor.key === openKey ? tabFor.tab : openingTab;
+  const setTab = (next: 'settings' | 'faces') => setTabFor({ key: openKey, tab: next });
   const activeFace = Math.min(selectedFace, Math.max(0, dice.customFaces.length - 1));
   const activeFaceColour = parseFaceContent(dice.customFaces[activeFace] ?? '').bgColor;
   const containerRef = useRef<HTMLDivElement>(null);

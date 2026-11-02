@@ -35,4 +35,15 @@ describe('Dice settings tabs', () => {
     expect(screen.queryByText(/Decision Maker/)).toBeNull();
     expect(screen.queryByText(/Compass/)).toBeNull();
   });
+
+  it('removing the last face keeps you on Custom faces', () => {
+    const Harness = () => {
+      const [d, setD] = React.useState(die(['Cat']));
+      return <DiceSettingsModal dice={d} isOpen onClose={() => {}} onUpdate={(_id, u) => setD(prev => ({ ...prev, ...u }))} onRemove={() => {}} onClone={() => {}} allDice={[d]} />;
+    };
+    render(<Harness />);
+    fireEvent.click(screen.getByRole('button', { name: 'Remove face 1' }));
+    expect(screen.queryByLabelText(/^Face 1: Cat/)).toBeNull();
+    expect(screen.getByRole('tab', { name: 'Custom faces' })).toHaveAttribute('aria-selected', 'true');
+  });
 });
