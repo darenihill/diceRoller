@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { totalMath } from '../utils/totalMath';
 import styles from './ActionBar.module.css';
 import { Plus, Minus, Dice5, Lock, Unlock, RotateCcw } from 'lucide-react';
-import { motion, AnimatePresence, useAnimationControls } from 'framer-motion';
+import { motion, AnimatePresence, useAnimationControls, useReducedMotion } from 'framer-motion';
 import type { RollAdvantageMode } from '../hooks/useDiceState';
 import type { DiceData } from '../types';
 import { DndShapeIcon } from './DndShapeIcon';
@@ -16,6 +16,8 @@ interface ActionBarProps {
   /** The dice changed since the total was rolled: show it faint */
   totalStale?: boolean;
   lastTotal: number;
+  /** The landed roll the total belongs to; a new one makes the total pop once */
+  totalKey?: string;
   /** The modifier counted in lastTotal (0 when none) */
   lastModifier?: number;
   modifier: number;
@@ -38,10 +40,11 @@ const DND_GRID_DICE = [
 const D20_OPTION = { label: 'D20', faces: 20, name: 'd20', color: '#384050' };
 
 export const ActionBar: React.FC<ActionBarProps> = ({ 
-  onAdd, onRoll, onHoldAll, allHeld, totalVisible, totalStale = false, lastTotal, lastModifier = 0, modifier, onChangeModifier,
+  onAdd, onRoll, onHoldAll, allHeld, totalVisible, totalStale = false, lastTotal, totalKey, lastModifier = 0, modifier, onChangeModifier,
   rpgMode, rollAdvantage, onChangeRollAdvantage
 }) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const calm = !!useReducedMotion();
 
   // Wiggle the lock only when allHeld actually changes — not on initial page load.
   // Imperative controls replace the old keyed-remount pattern so the mount render
@@ -228,13 +231,23 @@ export const ActionBar: React.FC<ActionBarProps> = ({
         >
           <Dice5 size={24} strokeWidth={2.5} className={styles.rollBtnIcon} />
           {totalVisible ? (
-            <span className={`${styles.rollBtnLabel} ${totalStale ? styles.rollBtnLabelStale : ''}`} style={{ fontSize: totalFontSize }} data-stale={totalStale || undefined}>
+            // Pops slightly bigger and settles when the dice land (owner, 2026-11-01)
+            <motion.span
+              key={totalKey}
+              className={`${styles.rollBtnLabel} ${totalStale ? styles.rollBtnLabelStale : ''}`}
+              style={{ fontSize: totalFontSize }}
+              data-stale={totalStale || undefined}
+              data-pop={totalKey && !calm ? 'on' : undefined}
+              initial={totalKey && !calm ? { scale: 1 } : false}
+              animate={totalKey && !calm ? { scale: [1, 1.18, 1] } : undefined}
+              transition={{ duration: 0.35, ease: [0.2, 0, 0, 1] }}
+            >
               {lastTotal}
               {/* The total already counts the modifier, so show its math, not "+2" to add again */}
               {lastModifier !== 0 && (
                 <span className={styles.rollBtnModSuffix}>{totalMath(lastTotal, lastModifier)}</span>
               )}
-            </span>
+            </motion.span>
           ) : (
             <span className={styles.rollBtnLabel}>
               Roll

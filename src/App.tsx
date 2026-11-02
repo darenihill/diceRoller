@@ -867,6 +867,7 @@ function App() {
         totalVisible={totalVisible}
         totalStale={totalStale}
         lastTotal={lastTotal}
+        totalKey={totalVisible && !isRolling && lastMainRoll ? lastMainRoll.id : undefined}
         lastModifier={lastModifier}
         modifier={modifier}
         onChangeModifier={setModifier}

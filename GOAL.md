@@ -5,6 +5,11 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-02~~ Total animation (Daren 2026-11-01, Build): "the total on
+  the Roll button pops slightly bigger and settles when the dice land." One
+  short scale on the number, nothing else moves. Done when: each landed roll
+  pops the total once, not while tumbling, and Reduce motion keeps it still
+  (src/test/totalPop.test.tsx).
 - ~~Done 2026-10-24~~ Show the result big for the table (Daren 2026-10-23, Build, picked "Table
   view switch in the menu"): "The Roll button stays a roll button. A Table
   view switch in the menu; while it is on, each roll shows the total huge in
