@@ -923,19 +923,19 @@ function App() {
 
       {/* Toast Notification */}
       {storageFull ? (
-        <div className={`${styles.toast} ${styles.undoToast} ${styles.storageToast} ${rpgMode ? styles.toastBelowBox : ''}`} role="alert">
+        <div className={`${styles.toast} ${styles.undoToast} ${styles.storageToast} ${rpgMode ? styles.toastAboveRpgBar : ''}`} role="alert">
           <span>Storage is full, so your last change wasn't saved.</span>
           <button className={styles.undoButton} onClick={() => { setStorageFull(false); handleExportData(); }}>Export backup</button>
           <button className={styles.undoButton} onClick={() => setStorageFull(false)} aria-label="Close storage message" style={{ minWidth: 44 }}>✕</button>
         </div>
       ) : undoOffer ? (
-        <div className={`${styles.toast} ${styles.undoToast} ${rpgMode ? styles.toastBelowBox : ''}`} role="status">
+        <div className={`${styles.toast} ${styles.undoToast} ${rpgMode ? styles.toastAboveRpgBar : ''}`} role="status">
           <span>{undoOffer.message}</span>
           <button className={styles.undoButton} onClick={runUndo}>Undo</button>
         </div>
       ) : toast && (
         // role="status" so a screen reader hears "Saved!" and the rest, as it does the Undo offer
-        <div className={`${styles.toast} ${rpgMode ? styles.toastBelowBox : ''}`} role="status">
+        <div className={`${styles.toast} ${rpgMode ? styles.toastAboveRpgBar : ''}`} role="status">
           {toast}
         </div>
       )}
