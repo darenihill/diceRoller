@@ -75,8 +75,9 @@
 }
 
 .primary .circle {
-  background-color: var(--md-sys-color-primary);
-  color: var(--md-sys-color-on-primary);
+  /* Same blue as the big Roll button (owner, 2026-11-02) */
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
 }
 
 .danger .circle {

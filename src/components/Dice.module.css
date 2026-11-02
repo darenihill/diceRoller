@@ -171,8 +171,9 @@
   bottom: calc(var(--dice-size) * -0.04);
   left: 50%;
   transform: translateX(-50%);
-  background-color: var(--md-sys-color-primary);
-  color: var(--md-sys-color-on-primary);
+  /* Same blue as the big Roll button (owner, 2026-11-02) */
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
   transition: opacity 0.2s, transform 0.2s;
 }
 

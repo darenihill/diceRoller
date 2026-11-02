@@ -5,6 +5,11 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-02~~ Die buttons (Daren 2026-11-02: "Delete can be red ...
+  and then match the single roll with the regular roll blue"; "change the X on
+  the dice for delete to a trash icon"). Done when: Roll one uses the Roll
+  button's blue, Delete stays red and shows a trash icon
+  (src/test/rollOneColour.test.ts).
 - ~~Done 2026-11-02~~ Most used far right (Daren 2026-11-02: "I want the most
   used items to the far right") and Clear History findable ("There isn't an
   option to clear history"). Done when: Saves is the right-hand menu group,

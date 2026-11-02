@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
-import { Lock, Unlock, Settings, X, Copy, Dices } from 'lucide-react';
+import { Lock, Unlock, Settings, Trash2, Copy, Dices } from 'lucide-react';
 import type { DiceData } from '../types';
 import { parseFaceContent, FACE_ICON_PREFIX } from '../utils/diceUtils';
 import styles from './DieActionStrip.module.css';
@@ -73,7 +73,7 @@ export const DieActionStrip: React.FC<DieActionStripProps> = ({ die, rpgMode, on
           <span className={styles.label}>Settings</span>
         </button>
         <button type="button" className={`${styles.btn} ${styles.danger}`} onClick={() => onRemove(die.id)}>
-          <span className={styles.circle}><X size={22} aria-hidden="true" /></span>
+          <span className={styles.circle}><Trash2 size={22} aria-hidden="true" /></span>
           <span className={styles.label}>Remove</span>
         </button>
       </div>

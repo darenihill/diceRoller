@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import type { DiceData } from '../types';
 import styles from './Dice.module.css';
-import { Lock, Unlock, Settings, X, Copy, Dices } from 'lucide-react';
+import { Lock, Unlock, Settings, Trash2, Copy, Dices } from 'lucide-react';
 import { motion, useAnimationControls, useReducedMotion } from 'framer-motion';
 import { ALL_ICONS } from '../utils/iconUtils';
 import { parseFaceContent, FACE_ICON_PREFIX, getContrastColor } from '../utils/diceUtils';
@@ -344,7 +344,7 @@ const DiceComponent: React.FC<DiceProps> = ({
         title="Remove Die"
         aria-label={`Remove ${dieName}`}
       >
-        <X size={20} strokeWidth={2.5} color="currentColor" />
+        <Trash2 size={18} strokeWidth={2.5} color="currentColor" />
       </button>
       </>)}
     </motion.div>
