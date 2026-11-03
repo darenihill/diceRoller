@@ -9,9 +9,10 @@ const d: DiceData = { id: 'd1', numberValue: 1, faces: 3, customFaces: ['YES', '
 describe('Colour row pinning in Dice settings', () => {
   it('sits in the list on open and pins after a face is tapped', () => {
     render(<DiceSettingsModal dice={d} isOpen onClose={() => {}} onUpdate={() => {}} onRemove={() => {}} onClone={() => {}} allDice={[d]} />);
-    const row = screen.getByRole('group', { name: 'Colour for face 1' });
+    // The colour picker is the group; the row around it is what pins
+    const row = screen.getByRole('group', { name: 'Colour for face 1' }).closest('[data-pinned]');
     expect(row).toHaveAttribute('data-pinned', 'false');
     fireEvent.click(screen.getByRole('button', { name: /^Face 2:/ }));
-    expect(screen.getByRole('group', { name: 'Colour for face 2' })).toHaveAttribute('data-pinned', 'true');
+    expect(screen.getByRole('group', { name: 'Colour for face 2' }).closest('[data-pinned]')).toHaveAttribute('data-pinned', 'true');
   });
 });

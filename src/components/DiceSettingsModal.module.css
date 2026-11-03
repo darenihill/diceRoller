@@ -55,27 +55,12 @@
   font-size: 0.875rem;
 }
 
-/* Two Column Grid */
-.twoColumnRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  /* A label that wraps (Base Color) keeps its button level with the steppers */
-  align-items: end;
+/* One field per block: the die colour picker needs the full width */
+.fieldBlock {
+  display: flex;
+  flex-direction: column;
 }
 
-/* Color Swatch */
-.colorSwatch {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: var(--elevation-1);
-}
 
 /* Stepper */
 .stepperRow {
@@ -186,40 +171,13 @@
   position: static;
 }
 
-.faceSwatches {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.faceSwatch,
-.faceSwatchCustom {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  cursor: pointer;
-  box-shadow: var(--elevation-1);
-}
-
-/* A picked face or swatch gets the same ring as a focused die: the theme's
+/* A picked face gets the same ring as a focused die: the theme's
    accent. Gold is kept for held dice, target hits and natural 20s. */
-.faceTile[aria-pressed='true'],
-.faceSwatch[aria-pressed='true'],
-.colorDot[aria-pressed='true'] {
+.faceTile[aria-pressed='true'] {
   outline: 3px solid var(--md-sys-color-primary);
   outline-offset: 2px;
 }
 
-.faceSwatchCustom {
-  position: relative;
-  background: conic-gradient(#E32227, #FBFB3C, #228B22, #0000FF, #B24BF3, #E32227);
-  color: #FFFFFF;
-}
 
 .faceCardRow {
   display: flex;
@@ -364,78 +322,13 @@
   border: 1px solid var(--md-sys-color-primary);
 }
 
-/* Color Popover */
-.popoverBackdrop {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 140;
-  cursor: default;
-}
 
-.colorPopover {
-  position: absolute;
-  left: 0;
-  right: 0;
-  z-index: 150;
-  background-color: var(--md-sys-color-surface);
-  padding: 16px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: var(--elevation-3);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
 
-.popoverHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
-.popoverTitle {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: var(--md-sys-color-on-surface);
-}
 
-.popoverClose {
-  background: none;
-  border: none;
-  color: var(--md-sys-color-on-surface);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
 
-.colorGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
 
-.colorDot {
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: var(--elevation-1);
-}
 
-.colorDotCustom {
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
 
 .hiddenInput {
   position: absolute;

@@ -1,16 +1,14 @@
 import React, { useState, useRef, useEffect, useId } from 'react';
 import type { DiceData } from '../types';
 import { Modal } from './Modal';
-import { COLORS, COLOR_NAMES, FACE_ICON_PREFIX, parseFaceContent, buildFace, faceNumericValue, getContrastColor, colourEveryFace } from '../utils/diceUtils';
-import { X, Plus, Minus, Star, Check, Copy, Trash2, Palette, ImagePlus, ImageOff, Rainbow, Ban } from 'lucide-react';
+import { FACE_ICON_PREFIX, parseFaceContent, buildFace, faceNumericValue, getContrastColor, colourEveryFace } from '../utils/diceUtils';
+import { X, Plus, Minus, Star, Check, Copy, Trash2, ImagePlus, ImageOff, Rainbow } from 'lucide-react';
 import { addFaceImage, useFaceImages, shrinkImage } from '../utils/faceImages';
 import { ALL_ICONS, COMMON_ICONS } from '../utils/iconUtils';
 import { MAX_CUSTOM_FACES } from '../utils/constants';
 import { splitFaceList, pastedListForBox } from '../utils/faceList';
+import { ColorPicker } from './ColorPicker';
 import styles from './DiceSettingsModal.module.css';
-
-/** Approximate rendered height of the colour popover, used to clamp its position. */
-const POPOVER_HEIGHT = 170;
 
 interface DiceSettingsModalProps {
   dice: DiceData;
@@ -32,7 +30,6 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   const [facesDraft, setFacesDraft] = useState<string | null>(null);
   const fieldId = useId();
   const [showAllIcons, setShowAllIcons] = useState(false);
-  const [activeColorPicker, setActiveColorPicker] = useState<{ type: 'base' | 'custom'; index?: number; top: number } | null>(null);
   /** The face the colour row paints: tap a face, then tap a colour */
   const [selectedFace, setSelectedFace] = useState(0);
   /** The colour row pins to the bottom only after a face is tapped, so the faces show first on open */
@@ -60,26 +57,6 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   // The faces as they are now, for edits that finish after a picture is shrunk
   const latestDice = useRef(dice);
   useEffect(() => { latestDice.current = dice; }, [dice]);
-
-  /**
-   * Anchor the popover just below whichever swatch opened it. Previously the
-   * offset was hardcoded (65px / 230px), so editing a face far down a long list
-   * left the popover floating near the top of the modal.
-   */
-  const openPicker = (e: React.MouseEvent, picker: { type: 'base' | 'custom'; index?: number }) => {
-    e.stopPropagation();
-    const container = containerRef.current;
-    const trigger = e.currentTarget as HTMLElement;
-    let top = 65;
-    if (container) {
-      const cRect = container.getBoundingClientRect();
-      const tRect = trigger.getBoundingClientRect();
-      // Position relative to the scrolled container, clamped so it stays inside
-      const raw = tRect.bottom - cRect.top + container.scrollTop + 8;
-      top = Math.max(8, Math.min(raw, container.scrollHeight - POPOVER_HEIGHT));
-    }
-    setActiveColorPicker({ ...picker, top });
-  };
 
   const setFaces = (num: number) => {
     if (num > 0) onUpdate(dice.id, { held: false, faces: num, customFaces: [] });
@@ -206,16 +183,6 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     onUpdate(dice.id, { customFaces, ...keepShown });
   };
 
-  const handleColorSelect = (color: string) => {
-    if (!activeColorPicker) return;
-    if (activeColorPicker.type === 'base') {
-      onUpdate(dice.id, { color });
-    } else if (activeColorPicker.index !== undefined) {
-      updateCustomFaceColor(activeColorPicker.index, color);
-    }
-    setActiveColorPicker(null);
-  };
-
   // Two tabs in the title bar: Dice Settings and Custom faces (owner, 2026-11-02)
   const tabsHeader = (
     <div className={styles.tabs} role="tablist" aria-label="Dice settings">
@@ -257,19 +224,12 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
             />
           </div>
 
-          <div className={styles.twoColumnRow}>
-            <div>
-              <label className={styles.label}>Base Color</label>
-              <button
-                onClick={(e) => openPicker(e, { type: 'base' })}
-                className={styles.colorSwatch}
-                style={{ backgroundColor: dice.color, color: getContrastColor(dice.color) }}
-                title="Pick base color"
-              >
-                <Palette size={20} strokeWidth={2} />
-              </button>
-            </div>
+          <div className={styles.fieldBlock}>
+            <span className={styles.label} aria-hidden="true">Die colour</span>
+            <ColorPicker key={dice.id} label="Die colour" value={dice.color} onChange={(color) => onUpdate(dice.id, { color })} />
+          </div>
 
+          <div className={styles.fieldBlock}>
             <div>
               <label className={styles.label} htmlFor={`${fieldId}-faces`}>
                 Standard Faces
@@ -388,45 +348,15 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
           </div>
 
           {dice.customFaces.length > 0 && (
-            <div className={`${styles.faceColourRow} ${colourPinned ? '' : styles.faceColourRowLoose}`} data-pinned={colourPinned} role="group" aria-label={`Colour for face ${activeFace + 1}`}>
+            <div className={`${styles.faceColourRow} ${colourPinned ? '' : styles.faceColourRowLoose}`} data-pinned={colourPinned}>
               <span className={styles.sublabel}>Colour for face {activeFace + 1}</span>
-              <div className={styles.faceSwatches}>
-                <button
-                  type="button"
-                  className={styles.faceSwatch}
-                  style={{ backgroundColor: dice.color, color: getContrastColor(dice.color) }}
-                  onClick={() => updateCustomFaceColor(activeFace, 'transparent')}
-                  aria-pressed={activeFaceColour === 'transparent'}
-                  aria-label="Same as the die"
-                  title="Same as the die"
-                >
-                  <Ban size={14} strokeWidth={2.5} />
-                </button>
-                {COLORS.map(c => {
-                  const current = activeFaceColour.toUpperCase() === c.toUpperCase();
-                  return (
-                    <button
-                      key={c}
-                      type="button"
-                      className={styles.faceSwatch}
-                      style={{ backgroundColor: c }}
-                      onClick={() => updateCustomFaceColor(activeFace, c)}
-                      aria-label={COLOR_NAMES[c] ?? c}
-                      aria-pressed={current}
-                    />
-                  );
-                })}
-                <label className={styles.faceSwatchCustom} title="Any colour">
-                  <Plus size={14} strokeWidth={2.5} />
-                  <input
-                    type="color"
-                    value={/^#[0-9a-fA-F]{6}$/.test(activeFaceColour) ? activeFaceColour : (/^#[0-9a-fA-F]{6}$/.test(dice.color) ? dice.color : '#808080')}
-                    onChange={(e) => updateCustomFaceColor(activeFace, e.target.value)}
-                    className={styles.hiddenInput}
-                    aria-label="Any colour"
-                  />
-                </label>
-              </div>
+              <ColorPicker
+                key={`${dice.id}-${activeFace}`}
+                label={`Colour for face ${activeFace + 1}`}
+                value={activeFaceColour}
+                sameAs={dice.color}
+                onChange={(color) => updateCustomFaceColor(activeFace, color)}
+              />
             </div>
           )}
           <button
@@ -527,40 +457,6 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
             <Check size={20} strokeWidth={2.5} /> Done
           </button>
         </div>
-
-        {/* Color Picker Popover */}
-        {activeColorPicker && (
-          <>
-            <div onClick={() => setActiveColorPicker(null)} className={styles.popoverBackdrop} />
-            <div className={styles.colorPopover} style={{ top: `${activeColorPicker.top}px` }}>
-              <div className={styles.popoverHeader}>
-                <span className={styles.popoverTitle}>Choose Color</span>
-                <button onClick={() => setActiveColorPicker(null)} className={styles.popoverClose}><X size={18} /></button>
-              </div>
-              <div className={styles.colorGrid}>
-                {COLORS.map(c => (
-                  <button 
-                    key={c}
-                    className={styles.colorDot}
-                    style={{ backgroundColor: c, border: 'none' }}
-                    onClick={() => handleColorSelect(c)}
-                    aria-label={COLOR_NAMES[c] ?? c}
-                    aria-pressed={c.toUpperCase() === dice.color.toUpperCase()}
-                  />
-                ))}
-                <label className={styles.colorDotCustom}>
-                  <Plus size={16} color="#fff" strokeWidth={2.5} />
-                  <input 
-                    type="color" 
-                    value={activeColorPicker.type === 'base' ? dice.color : '#ffffff'}
-                    onChange={(e) => handleColorSelect(e.target.value)}
-                    className={styles.hiddenInput}
-                  />
-                </label>
-              </div>
-            </div>
-          </>
-        )}
 
       </div>
     </Modal>

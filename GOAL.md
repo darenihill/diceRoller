@@ -5,6 +5,16 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-03~~ Lift and tag lock (Daren 2026-11-03: "For lock I like
+  the lift and held tag"). Done when: a held die lifts with a deeper shadow
+  and a gold HELD tag drops onto its top edge; a die loaded already held shows
+  the tag without the drop (src/test/heldTag.test.tsx).
+- ~~Done 2026-11-03~~ One colour picker (Daren 2026-11-03: "make sure all
+  color picking is consistent throughout the app (both non overflowing rows
+  and custom color selection)", "I like the color picker"). Done when: die
+  colour and face colour use the same twelve equal dots (two rows of six) in
+  the page, Custom opens the same sliders and colour code everywhere, and no
+  phone colour tool or floating box remains (src/test/colorPicker.test.tsx).
 - ~~Done 2026-11-02~~ Dice settings tabs (Daren 2026-11-02: "remove the quick
   templates from a dice settings ... shift dice settings to 2 main tabs 'Dice
   Settings' ... and 'Custom faces' ... take up the top where Dice settings
