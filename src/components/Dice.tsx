@@ -14,6 +14,8 @@ import { randomBelow } from '../utils/fairRandom';
 const EMPHASIZED = [0.2, 0, 0, 1] as const;
 /** How far a dropped die sinks back */
 const DROPPED_SCALE = 0.88;
+/** How far a held die lifts, as a share of its size */
+const HELD_LIFT = '-5%';
 
 interface DiceProps {
   dice: DiceData;
@@ -45,17 +47,17 @@ const DiceComponent: React.FC<DiceProps> = ({
   const [tempValue, setTempValue] = useState<number | null>(null);
   const [tempFaceIndex, setTempFaceIndex] = useState<number | null>(null);
 
-  // Wiggle the lock icon only when held actually changes — not when the die mounts
-  // (page load, preset load). NOTE: the mount-flag effect must be declared AFTER
-  // this one so the first run sees lockMountedRef=false and skips the wiggle.
+  // The HELD tag drops onto the die only when held actually changes — not when
+  // the die mounts (page load, preset load). NOTE: the mount-flag effect must be
+  // declared AFTER this one so the first run sees lockMountedRef=false and skips it.
   const lockControls = useAnimationControls();
   const lockMountedRef = useRef(false);
   useEffect(() => {
-    if (!lockMountedRef.current) return;
+    if (!lockMountedRef.current || !dice.held) return;
     lockControls.start({
-      rotate: [0, -45, 10, 0],
-      color: dice.held ? 'var(--color-gold-ink)' : 'var(--md-sys-color-on-surface)',
-      transition: { duration: 0.5, ease: 'easeInOut' }
+      y: ['-180%', '0%'],
+      opacity: [0, 1],
+      transition: { type: 'spring', stiffness: 520, damping: 22 }
     });
   }, [dice.held, lockControls]);
   useEffect(() => {
@@ -209,7 +211,7 @@ const DiceComponent: React.FC<DiceProps> = ({
   return (
     <motion.div
       ref={diceRef}
-      className={`${styles.dice} ${shapeClass ? styles.shaped : ''} ${rollingNow && !calm ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''} ${compactActions && isRevealed ? styles.outlined : ''} ${extraClass}`}
+      className={`${styles.dice} ${shapeClass ? styles.shaped : ''} ${rollingNow && !calm ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''} ${compactActions && isRevealed ? styles.outlined : ''} ${dice.held ? styles.held : ''} ${extraClass}`}
       data-dice-id={dice.id}
       // A group, not a button: a button's inner buttons are hidden from screen
       // readers, so settings, copy, roll-one and remove couldn't be reached.
@@ -225,7 +227,8 @@ const DiceComponent: React.FC<DiceProps> = ({
       layout
       initial={glided && !calm ? false : { scale: 0 }}
       // A die dropped by Advantage or Disadvantage sinks back a little (Material 3 emphasized easing)
-      animate={{ scale: sunk && !calm ? DROPPED_SCALE : 1 }}
+      // A held die lifts off the table (owner's pick, 2026-11-03: "Lift and tag")
+      animate={{ scale: sunk && !calm ? DROPPED_SCALE : 1, y: dice.held && !calm ? HELD_LIFT : 0 }}
       transition={sunk ? { duration: 0.4, ease: EMPHASIZED } : undefined}
       exit={{ scale: 0 }}
     >
@@ -280,29 +283,23 @@ const DiceComponent: React.FC<DiceProps> = ({
         </div>
       )}
 
-      <motion.div
-        initial={{ rotate: 0 }}
-        animate={lockControls}
-        style={{ color: dice.held ? 'var(--color-gold-ink)' : 'var(--md-sys-color-on-surface)' }}
-        className={`${styles.actionBtn} ${dice.held ? styles.holdIcon : styles.unlockIcon}`}
-      >
-        <div style={{ position: 'relative', width: 20, height: 20 }}>
-          <motion.div 
-            animate={{ opacity: dice.held ? 1 : 0 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            style={{ position: 'absolute', top: 0, left: 0, width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          >
-            <Lock size={20} strokeWidth={2.5} color="currentColor" />
-          </motion.div>
-          <motion.div 
-            animate={{ opacity: dice.held ? 0 : 1 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            style={{ position: 'absolute', top: 0, left: 0, width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          >
-            <Unlock size={20} strokeWidth={2.5} color="currentColor" />
-          </motion.div>
+      {dice.held ? (
+        // Held: a gold HELD tag sits on the top edge (it drops in when you hold the die)
+        <motion.div
+          className={styles.heldTag}
+          data-testid="held-tag"
+          aria-hidden="true"
+          initial={false}
+          animate={calm ? { y: '0%', opacity: 1 } : lockControls}
+        >
+          <Lock size="1em" strokeWidth={3} />
+          HELD
+        </motion.div>
+      ) : (
+        <div className={`${styles.actionBtn} ${styles.unlockIcon}`} aria-hidden="true">
+          <Unlock size={20} strokeWidth={2.5} color="currentColor" />
         </div>
-      </motion.div>
+      )}
 
       {!compactActions && (<>
       {/* Settings Button (Bottom-Right) */}

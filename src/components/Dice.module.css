@@ -116,13 +116,33 @@
   transform: scale(1.1);
 }
 
-.holdIcon {
-  top: calc(var(--dice-size) * -0.04);
-  right: calc(var(--dice-size) * -0.04);
-  background-color: var(--md-sys-color-surface-variant);
-  color: var(--md-sys-color-on-surface);
-  opacity: 1;
+/* Held: the die lifts (Dice.tsx) and casts a deeper shadow, and a gold HELD
+   tag sits on its top edge (owner's pick, 2026-11-03: "Lift and tag") */
+.held {
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.35), var(--elevation-3);
+}
+
+.heldTag {
+  position: absolute;
+  top: calc(var(--dice-size) * -0.08);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: max-content;
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+  background-color: var(--color-gold);
+  color: #1A1400;
+  font-size: max(0.625rem, calc(var(--dice-size) * 0.11));
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  padding: 0.35em 0.7em;
+  border-radius: 999px;
+  box-shadow: var(--elevation-3);
   pointer-events: none;
+  z-index: 12;
 }
 
 .unlockIcon {
@@ -316,8 +336,8 @@
     border: 2px solid CanvasText;
   }
 
-  .holdIcon {
-    border-color: Highlight;
+  .heldTag {
+    border: 2px solid Highlight;
   }
 }
 
