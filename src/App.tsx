@@ -42,6 +42,7 @@ import { TableView } from './components/TableView';
 import { tableTiles, tableMath } from './utils/tableView';
 import { saveItem, onSaveRefused, readItem } from './utils/safeStorage';
 import { useWakeLock } from './hooks/useWakeLock';
+import { useNewVersion } from './hooks/useNewVersion';
 import { SAVED } from './utils/savedValues';
 import { buildBackup, restoreBackup } from './utils/backup';
 
@@ -51,6 +52,7 @@ const THEMES = ['theme-dark', 'theme-light', 'theme-felt', 'theme-midnight'];
 function App() {
   // A phone on the game table stays awake between turns
   useWakeLock();
+  const newVersion = useNewVersion();
   const {
     diceList, setDiceList, rollHistory, isRolling, rollingId, modifier, setModifier,
     rpgMode, toggleRpgMode, rollAdvantage, setRollAdvantage,
@@ -995,10 +997,17 @@ function App() {
           <span>{undoOffer.message}</span>
           <button className={styles.undoButton} onClick={runUndo}>Undo</button>
         </div>
-      ) : toast && (
+      ) : toast ? (
         // role="status" so a screen reader hears "Saved!" and the rest, as it does the Undo offer
         <div className={`${styles.toast} ${rpgMode ? styles.toastAboveRpgBar : ''}`} role="status">
           {toast}
+        </div>
+      ) : newVersion.ready && (
+        // An app left open hears about a new version; Refresh loads it (owner's pick, 2026-11-03)
+        <div className={`${styles.toast} ${styles.undoToast} ${rpgMode ? styles.toastAboveRpgBar : ''}`} role="status" data-testid="new-version-bar">
+          <span style={{ flexShrink: 0 }}>New version</span>
+          <button className={styles.undoButton} onClick={() => window.location.reload()}>Refresh</button>
+          <button className={styles.undoButton} onClick={newVersion.later} aria-label="Later" title="Later" style={{ minWidth: 44 }}>✕</button>
         </div>
       )}
 

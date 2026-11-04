@@ -1,4 +1,4 @@
-Next: combined release (pull request 68) now also carries the dropped die, total pop, + glide, Bright Rings switch and even menu, 2026-11-02.
+Next: new-version bar built on top of release 68 (draft pull request), waits for 68 to merge, 2026-11-04.
 
 # State
 
