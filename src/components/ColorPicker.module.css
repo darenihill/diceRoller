@@ -4,18 +4,32 @@
   gap: 12px;
 }
 
-/* Twelve equal dots, two rows of six, on any width */
+/* Twelve equal dots, two rows of six, on any width. Each dot's size comes
+   from the grid's own width (cqi), not from a percentage plus aspect-ratio:
+   Safari sized the rows before the dots, so the second row spilled onto the
+   field below it (owner's screenshot, 2026-11-05). */
 .grid {
+  container-type: inline-size;
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 44px));
+  grid-template-columns: repeat(6, auto);
   justify-content: space-between;
-  gap: 10px;
+  gap: 10px 6px;
+}
+
+/* cqi on the dots, not the grid: it measures the nearest container above */
+.dot {
+  --dot: 44px;
+}
+
+@supports (width: 1cqi) {
+  .dot {
+    --dot: clamp(30px, calc((100cqi - 30px) / 6), 44px);
+  }
 }
 
 .dot {
-  width: 100%;
-  aspect-ratio: 1;
-  min-width: 36px;
+  width: var(--dot);
+  height: var(--dot);
   border-radius: 50%;
   border: 1px solid rgba(127, 127, 127, 0.45);
   padding: 0;

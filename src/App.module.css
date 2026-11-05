@@ -225,6 +225,17 @@
   }
 }
 
+/* Wider screens keep the RPG buttons in two columns of three in the bottom-right
+   corner, taller than the 120px the app keeps clear. The dice used to size
+   themselves underneath them (owner, 2026-11-05: "major collisions"). Width is
+   the cheaper side to give up here: 2 buttons (144) + gap (12) + the bar's 24px
+   edge + room for the buttons that ring a tapped die = 200. */
+@media (min-width: 769px) {
+  :global(body.rpg-mode) .diceContainer {
+    padding-right: 200px;
+  }
+}
+
 /* Shown only with no dice; the layer lets taps through except on its buttons */
 .emptyState {
   position: fixed;

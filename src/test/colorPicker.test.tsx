@@ -70,6 +70,7 @@ describe('Dice settings use the same picker for die and face colours', () => {
 
   it('face colour uses the same twelve dots', () => {
     render(<DiceSettingsModal dice={d} onUpdate={() => {}} {...props} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Colour' }));
     const face = screen.getByRole('group', { name: 'Colour for face 1' });
     expect(face.querySelectorAll('[aria-label="Custom colour"]')).toHaveLength(1);
     expect(face.querySelectorAll('button')).toHaveLength(COLORS.length + 2);

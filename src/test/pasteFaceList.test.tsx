@@ -26,7 +26,12 @@ function Harness({ faces = [] as string[] }) {
   );
 }
 
-const box = () => screen.getByLabelText('Custom face text') as HTMLInputElement;
+// Text is one of three folded buttons on Custom faces; open it when it is shut
+const box = () => {
+  const text = screen.getByRole('button', { name: 'Text' });
+  if (text.getAttribute('aria-expanded') !== 'true') fireEvent.click(text);
+  return screen.getByLabelText('Custom face text') as HTMLInputElement;
+};
 const add = () => fireEvent.click(screen.getByRole('button', { name: 'Add face' }));
 
 function paste(text: string) {

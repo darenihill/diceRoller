@@ -46,6 +46,7 @@ describe('Undo inside a die\'s settings', () => {
     localStorage.setItem('diceConfigs', JSON.stringify({ systemAutosave: { name: 'systemAutosave', config: [pets] } }));
     render(<App />);
     openSettings();
+    fireEvent.click(screen.getByRole('button', { name: 'Text' }));
     fireEvent.change(screen.getByLabelText('Custom face text'), { target: { value: 'Bird' } });
     fireEvent.click(screen.getByRole('button', { name: 'Add face' }));
     expect(screen.getByLabelText(/^Face 4: Bird/)).toBeInTheDocument();

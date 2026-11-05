@@ -2,13 +2,21 @@ import React, { useState, useRef, useEffect, useId } from 'react';
 import type { DiceData } from '../types';
 import { Modal } from './Modal';
 import { FACE_ICON_PREFIX, parseFaceContent, buildFace, faceNumericValue, getContrastColor, colourEveryFace } from '../utils/diceUtils';
-import { X, Plus, Minus, Star, Check, Copy, Trash2, ImagePlus, ImageOff, Rainbow } from 'lucide-react';
+import { X, Plus, Minus, Star, Check, Copy, Trash2, ImagePlus, ImageOff, Rainbow, Palette, Smile, Type, ChevronDown } from 'lucide-react';
 import { addFaceImage, useFaceImages, shrinkImage } from '../utils/faceImages';
 import { ALL_ICONS, COMMON_ICONS } from '../utils/iconUtils';
 import { MAX_CUSTOM_FACES } from '../utils/constants';
 import { splitFaceList, pastedListForBox } from '../utils/faceList';
 import { ColorPicker } from './ColorPicker';
 import styles from './DiceSettingsModal.module.css';
+
+type FacePanel = 'colour' | 'icons' | 'text';
+// The order the owner named them in
+const PANELS = [
+  ['colour', 'Colour', Palette],
+  ['icons', 'Icons', Smile],
+  ['text', 'Text', Type],
+] as const;
 
 interface DiceSettingsModalProps {
   dice: DiceData;
@@ -30,6 +38,9 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   const [facesDraft, setFacesDraft] = useState<string | null>(null);
   const fieldId = useId();
   const [showAllIcons, setShowAllIcons] = useState(false);
+  /** Which of Colour, Icons and Text is open on Custom faces. A die with no
+   *  faces yet opens on Text, the quickest way to add one. */
+  const [openPanel, setOpenPanel] = useState<FacePanel | null>(() => dice.customFaces.length === 0 ? 'text' : null);
   /** The face the colour row paints: tap a face, then tap a colour */
   const [selectedFace, setSelectedFace] = useState(0);
   /** The colour row pins to the bottom only after a face is tapped, so the faces show first on open */
@@ -209,28 +220,24 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
 
         {tab === 'settings' && (
         <div className={styles.sectionCard} role="tabpanel" id={`${fieldId}-panel-settings`} aria-labelledby={`${fieldId}-tab-settings`}>
-          <div style={{ marginBottom: 16 }}>
-            <label className={styles.label} htmlFor={`${fieldId}-name`}>Name (Optional)</label>
-            <input 
-              id={`${fieldId}-name`}
-              type="text" 
-              autoComplete="off"
-              enterKeyHint="done"
-              onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-              value={dice.name || ''} 
-              onChange={(e) => onUpdate(dice.id, { name: e.target.value })}
-              placeholder="e.g. Player 1"
-              className={styles.inputField}
-            />
-          </div>
-
-          <div className={styles.fieldBlock}>
-            <span className={styles.label} aria-hidden="true">Die colour</span>
-            <ColorPicker key={dice.id} label="Die colour" value={dice.color} onChange={(color) => onUpdate(dice.id, { color })} />
-          </div>
-
-          <div className={styles.fieldBlock}>
-            <div>
+          {/* Name and face count share the top row; the colour picker takes the full
+              width below (owner, 2026-11-05: "move standard faces up next to name") */}
+          <div className={styles.topRow}>
+            <div className={styles.nameField}>
+              <label className={styles.label} htmlFor={`${fieldId}-name`}>Name (Optional)</label>
+              <input 
+                id={`${fieldId}-name`}
+                type="text" 
+                autoComplete="off"
+                enterKeyHint="done"
+                onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+                value={dice.name || ''} 
+                onChange={(e) => onUpdate(dice.id, { name: e.target.value })}
+                placeholder="e.g. Player 1"
+                className={styles.inputField}
+              />
+            </div>
+            <div className={styles.facesField}>
               <label className={styles.label} htmlFor={`${fieldId}-faces`}>
                 Standard Faces
                 {dice.customFaces.length > 0 && (
@@ -261,6 +268,11 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                 </button>
               </div>
             </div>
+          </div>
+
+          <div className={styles.fieldBlock}>
+            <span className={styles.label} aria-hidden="true">Die colour</span>
+            <ColorPicker key={dice.id} label="Die colour" value={dice.color} onChange={(color) => onUpdate(dice.id, { color })} />
           </div>
         </div>
 
@@ -296,7 +308,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                       type="button"
                       className={styles.faceTile}
                       style={{ backgroundColor: tileColor, color: getContrastColor(tileColor) }}
-                      onClick={() => { setSelectedFace(i); setColourPinnedFor(dice.id); }}
+                      onClick={() => { setSelectedFace(i); setColourPinnedFor(dice.id); setOpenPanel('colour'); }}
                       aria-pressed={i === activeFace}
                       aria-label={`Face ${i + 1}: ${content.startsWith(FACE_ICON_PREFIX) ? content.replace(FACE_ICON_PREFIX, '') : content}${picture ? ', picture' : ''}`}
                     >
@@ -347,61 +359,112 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
             })}
           </div>
 
-          {dice.customFaces.length > 0 && (
-            <div className={`${styles.faceColourRow} ${colourPinned ? '' : styles.faceColourRowLoose}`} data-pinned={colourPinned}>
-              <span className={styles.sublabel}>Colour for face {activeFace + 1}</span>
-              <ColorPicker
-                key={`${dice.id}-${activeFace}`}
-                label={`Colour for face ${activeFace + 1}`}
-                value={activeFaceColour}
-                sameAs={dice.color}
-                onChange={(color) => updateCustomFaceColor(activeFace, color)}
-              />
+          {/* Colour, icons and text fold into three buttons, so a long list of faces
+              keeps the room (owner, 2026-11-05). One opens at a time. */}
+          <div className={styles.panelButtons}>
+            {PANELS.map(([key, label, Icon]) => (
+              <button
+                key={key}
+                type="button"
+                className={`${styles.panelBtn} ${openPanel === key ? styles.panelBtnOpen : ''}`}
+                aria-expanded={openPanel === key}
+                aria-controls={`${fieldId}-panel-${key}`}
+                onClick={() => setOpenPanel(openPanel === key ? null : key)}
+              >
+                <Icon size={18} strokeWidth={2.5} aria-hidden="true" />
+                {label}
+                <ChevronDown size={16} strokeWidth={2.5} aria-hidden="true" className={styles.panelChevron} />
+              </button>
+            ))}
+          </div>
+
+          {openPanel === 'colour' && (
+            <div id={`${fieldId}-panel-colour`} className={styles.panelBody}>
+              {dice.customFaces.length > 0 && (
+                <div className={`${styles.faceColourRow} ${colourPinned ? '' : styles.faceColourRowLoose}`} data-pinned={colourPinned}>
+                  <span className={styles.sublabel}>Colour for face {activeFace + 1}</span>
+                  <ColorPicker
+                    key={`${dice.id}-${activeFace}`}
+                    label={`Colour for face ${activeFace + 1}`}
+                    value={activeFaceColour}
+                    sameAs={dice.color}
+                    onChange={(color) => updateCustomFaceColor(activeFace, color)}
+                  />
+                </div>
+              )}
+              <button
+                type="button"
+                className={`md-button md-button-surface md-button-compact ${styles.addPictureBtn}`}
+                onClick={colourAllFaces}
+                disabled={dice.customFaces.length === 0 && dice.faces > 100}
+              >
+                <Rainbow size={18} strokeWidth={2.5} /> Colour every face differently
+              </button>
             </div>
           )}
-          <button
-            type="button"
-            className={`md-button md-button-surface md-button-compact ${styles.addPictureBtn}`}
-            onClick={colourAllFaces}
-            disabled={dice.customFaces.length === 0 && dice.faces > 100}
-          >
-            <Rainbow size={18} strokeWidth={2.5} /> Colour every face differently
-          </button>
 
-          <div className={styles.addFaceRow}>
-            <input 
-              type="text" 
-              value={customInput}
-              onChange={(e) => setCustomInput(e.target.value)}
-              onKeyDown={(e) => { if(e.key === 'Enter') addCustomFace(customInput); }}
-              onPaste={handleListPaste}
-              placeholder="Add custom text"
-              aria-label="Custom face text"
-              autoComplete="off"
-              className={styles.inputField}
-              style={{ flex: 1, minWidth: 0 }}
-            />
-            <button className={`md-button md-button-filled ${styles.addFaceBtn}`} onClick={() => addCustomFace(customInput)} aria-label="Add face" title="Add face">
-              <Plus size={20} strokeWidth={2.5} />
-            </button>
-          </div>
-          {/* Any later edit to the faces retires the note, so Undo never wipes that edit */}
-          {listNote && listNote.after === dice.customFaces && (
-            <p className={styles.listNote} role="status">
-              <span>{listNote.text}</span>
-              {listNote.canUndo && (
-                <button type="button" className={styles.listUndo} onClick={undoList}>Undo</button>
-              )}
-            </p>
+          {openPanel === 'icons' && (
+            <div id={`${fieldId}-panel-icons`} className={styles.panelBody}>
+              <span className={styles.sublabel}>Tap an icon to add it as a face</span>
+              <div className={styles.iconGrid} style={{ maxHeight: showAllIcons ? '150px' : 'auto', overflowY: showAllIcons ? 'auto' : 'visible' }}>
+                {(showAllIcons ? ALL_ICONS : COMMON_ICONS).map(icon => (
+                  <button 
+                    key={icon.name} 
+                    onClick={() => addCustomFace(`${FACE_ICON_PREFIX}${icon.name}`)}
+                    className={styles.iconBtn}
+                    aria-label={`Add ${icon.name} face`}
+                    title={icon.name}
+                  >
+                    <icon.icon size={18} strokeWidth={2.5} />
+                  </button>
+                ))}
+                {!showAllIcons && (
+                  <button onClick={() => setShowAllIcons(true)} className={styles.iconBtnMore} aria-label="More icons" title="More icons">
+                    <Plus size={18} strokeWidth={2.5} />
+                  </button>
+                )}
+              </div>
+              <button
+                type="button"
+                className={`md-button md-button-surface md-button-compact ${styles.addPictureBtn}`}
+                onClick={() => choosePicture('new')}
+              >
+                <ImagePlus size={18} strokeWidth={2.5} /> Add a picture face
+              </button>
+            </div>
           )}
 
-          <button
-            type="button"
-            className={`md-button md-button-surface md-button-compact ${styles.addPictureBtn}`}
-            onClick={() => choosePicture('new')}
-          >
-            <ImagePlus size={18} strokeWidth={2.5} /> Add a picture face
-          </button>
+          {openPanel === 'text' && (
+            <div id={`${fieldId}-panel-text`} className={styles.panelBody}>
+              <div className={styles.addFaceRow}>
+                <input 
+                  type="text" 
+                  value={customInput}
+                  onChange={(e) => setCustomInput(e.target.value)}
+                  onKeyDown={(e) => { if(e.key === 'Enter') addCustomFace(customInput); }}
+                  onPaste={handleListPaste}
+                  placeholder="Add custom text"
+                  aria-label="Custom face text"
+                  autoComplete="off"
+                  className={styles.inputField}
+                  style={{ flex: 1, minWidth: 0 }}
+                />
+                <button className={`md-button md-button-filled ${styles.addFaceBtn}`} onClick={() => addCustomFace(customInput)} aria-label="Add face" title="Add face">
+                  <Plus size={20} strokeWidth={2.5} />
+                </button>
+              </div>
+              {/* Any later edit to the faces retires the note, so Undo never wipes that edit */}
+              {listNote && listNote.after === dice.customFaces && (
+                <p className={styles.listNote} role="status">
+                  <span>{listNote.text}</span>
+                  {listNote.canUndo && (
+                    <button type="button" className={styles.listUndo} onClick={undoList}>Undo</button>
+                  )}
+                </p>
+              )}
+            </div>
+          )}
+
           <input
             ref={fileInputRef}
             type="file"
@@ -413,25 +476,6 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
           />
           {pictureError && <p className={styles.pictureError} role="alert">{pictureError}</p>}
 
-          <label className={styles.sublabel}>Or add an icon:</label>
-          <div className={styles.iconGrid} style={{ maxHeight: showAllIcons ? '150px' : 'auto', overflowY: showAllIcons ? 'auto' : 'visible' }}>
-            {(showAllIcons ? ALL_ICONS : COMMON_ICONS).map(icon => (
-              <button 
-                key={icon.name} 
-                onClick={() => addCustomFace(`${FACE_ICON_PREFIX}${icon.name}`)}
-                className={styles.iconBtn}
-                aria-label={`Add ${icon.name} face`}
-                title={icon.name}
-              >
-                <icon.icon size={18} strokeWidth={2.5} />
-              </button>
-            ))}
-            {!showAllIcons && (
-              <button onClick={() => setShowAllIcons(true)} className={styles.iconBtnMore} aria-label="More icons" title="More icons">
-                <Plus size={18} strokeWidth={2.5} />
-              </button>
-            )}
-          </div>
         </div>
 
         </div>)}
