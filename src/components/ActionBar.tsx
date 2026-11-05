@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { totalMath } from '../utils/totalMath';
 import styles from './ActionBar.module.css';
+import { useBackToClose } from '../hooks/useBackToClose';
 import { Plus, Minus, Dice5, Unlock, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence, useAnimationControls, useReducedMotion } from 'framer-motion';
 import type { RollAdvantageMode } from '../hooks/useDiceState';
@@ -109,6 +110,17 @@ export const ActionBar: React.FC<ActionBarProps> = ({
     setPops(n => n + 1);
     totalControls.start({ scale: [1, 1.18, 1], transition: { duration: 0.35, ease: [0.2, 0, 0, 1] } });
   }, [totalKey, rolling, calm, totalControls]);
+
+  // Escape and phone Back close the Add D&D Die menu, like the main menu
+  // (fresh eyes, 2026-11-05)
+  const addMenuOpen = rpgMode && popoverOpen;
+  useBackToClose(addMenuOpen, () => setPopoverOpen(false));
+  useEffect(() => {
+    if (!addMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setPopoverOpen(false); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [addMenuOpen]);
 
   const handleAddClick = () => {
     if (rpgMode) {

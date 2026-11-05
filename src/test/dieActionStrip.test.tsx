@@ -15,7 +15,7 @@ describe('Buttons for a tapped die with many dice out', () => {
     // A held die can't be rolled on its own until it is released (owner, 2026-11-05)
     expect(screen.getByRole('button', { name: 'Roll one' })).toBeDisabled();
     fireEvent.click(screen.getByRole('button', { name: 'Release' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Clone' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Copy' }));
     fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
     fireEvent.click(screen.getByRole('button', { name: 'Remove' }));
     expect(fns.onRollOne).not.toHaveBeenCalled();

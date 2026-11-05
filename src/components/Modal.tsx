@@ -62,8 +62,10 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, header, ch
     const id = window.setTimeout(() => {
       const panel = panelRef.current;
       if (!panel) return;
-      // Prefer a real control the user is likely to want (autoFocus inputs win)
-      const target = panel.querySelector<HTMLElement>('[autofocus]')
+      // Prefer a real control the user is likely to want. React's autoFocus
+      // leaves no attribute behind, so a field that should get the typing
+      // also carries data-autofocus (fresh eyes, 2026-11-05: Save's name box)
+      const target = panel.querySelector<HTMLElement>('[autofocus], [data-autofocus]')
         ?? panel.querySelector<HTMLElement>(FOCUSABLE);
       target?.focus();
     }, 0);

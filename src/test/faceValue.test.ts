@@ -8,6 +8,11 @@ describe('faces that count as a number', () => {
     expect(parseFaceContent(':icon:Star:bg:#FFD700')).toEqual({ content: ':icon:Star', bgColor: '#FFD700' });
     expect(faceNumericValue(':icon:Star:bg:#FFD700')).toBe(0);
     expect(faceNumericValue('Gold')).toBe(0);
+    // Words that start with a number aren't a number (fresh eyes, 2026-11-05)
+    expect(faceNumericValue('2+5')).toBe(0);
+    expect(faceNumericValue('3 Gold')).toBe(0);
+    expect(faceNumericValue('2+5:val:7')).toBe(7);
+    expect(faceNumericValue(' 4 ')).toBe(4);
     expect(faceNumericValue('5:bg:#E32227')).toBe(5);
   });
 
