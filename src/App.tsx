@@ -21,7 +21,7 @@ import { COMPACT_DIE_SIZE } from './utils/constants';
 import { dicePresets } from './utils/presets';
 import { currentSetName, diceSignature, rollSignature, readShareLink, nextFreeSaveName, type LoadedSet } from './utils/setName';
 import { readLandingStart, readLandingAbout } from './utils/landing';
-import { Info, Plus, Dice6, Table2 } from 'lucide-react';
+import { Info, Plus, Dice6, Table2, Swords } from 'lucide-react';
 import { Modal } from './components/Modal';
 import type { DiceData } from './types';
 
@@ -40,6 +40,7 @@ import { ShareModal } from './components/modals/ShareModal';
 import { StatsModal } from './components/modals/StatsModal';
 import { TableView } from './components/TableView';
 import { tableTiles, tableMath } from './utils/tableView';
+import { gameKeyOf } from './utils/rollGroups';
 import { saveItem, onSaveRefused, readItem } from './utils/safeStorage';
 import { useWakeLock } from './hooks/useWakeLock';
 import { useNewVersion } from './hooks/useNewVersion';
@@ -58,7 +59,7 @@ function App() {
     rpgMode, toggleRpgMode, rollAdvantage, setRollAdvantage,
     targetHighlight, setTargetHighlight,
     addDice, removeDice, updateDice, toggleHold, toggleHoldAll,
-    clearAllDice, rollDice, clearHistory, restoreHistory, toast, showToast, insertDiceAt, restoreDice
+    clearAllDice, rollDice, clearHistory, restoreHistory, toast, showToast, insertDiceAt, restoreDice, gameNameRef
   } = useDiceState();
   const { offer: undoOffer, offerUndo, runUndo } = useUndo();
 
@@ -361,6 +362,8 @@ function App() {
   const diceNow = rollSignature(diceList);
   const totalStale = totalVisible && rolledSignature !== null && rolledSignature !== diceNow;
   const setName = currentSetName(diceList, loadedSet);
+  // Each roll records the game it was made in, for History and Frequency by game
+  useEffect(() => { gameNameRef.current = setName; }, [setName, gameNameRef]);
   const tableReady = tableView && totalVisible && !isRolling && !!lastMainRoll
     && diceList.length > 0 && diceList.map(d => d.id).join() === tableRolledIds;
   const showTable = tableReady && lastMainRoll.id !== tableDismissedId;
@@ -507,6 +510,16 @@ function App() {
     if (before.length === 0) return;
     clearHistory();
     offerUndo(`Cleared ${before.length} ${before.length === 1 ? 'roll' : 'rolls'}`, () => restoreHistory(before));
+  };
+
+  // Clears one game's rolls and keeps the rest (owner, 2026-11-05)
+  const handleClearGame = (key: string, label: string) => {
+    const before = rollHistory;
+    const kept = before.filter(item => gameKeyOf(item) !== key);
+    const removed = before.length - kept.length;
+    if (removed === 0) return;
+    restoreHistory(kept);
+    offerUndo(`Cleared ${removed} ${label} ${removed === 1 ? 'roll' : 'rolls'}`, () => restoreHistory(before));
   };
 
   const handleShare = () => {
@@ -874,6 +887,18 @@ function App() {
             <button className="md-button md-button-surface" onClick={() => setModalOpen('sets')}>
               <Dice6 size={18} aria-hidden="true" /> Games
             </button>
+            {/* Straight into RPG Mode with a d20 out (owner, 2026-11-05) */}
+            {!rpgMode && (
+              <button
+                className="md-button md-button-surface"
+                onClick={() => {
+                  toggleRpgMode();
+                  handleAddDice({ numberValue: 1, faces: 20, name: 'd20', customFaces: [], color: '#384050' });
+                }}
+              >
+                <Swords size={18} aria-hidden="true" /> RPG Mode
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -937,6 +962,7 @@ function App() {
         onClose={() => setModalOpen(null)} 
         rollHistory={rollHistory}
         onClearHistory={handleClearHistory}
+        onClearGame={handleClearGame}
         dice={diceList}
         rpgMode={rpgMode}
         modifier={modifier}

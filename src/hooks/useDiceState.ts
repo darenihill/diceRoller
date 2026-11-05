@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import type { DiceData } from '../types';
 import { generateId, parseFaceContent, faceNumericValue, FACE_ICON_PREFIX, isNumberedFaces, percentileBonus } from '../utils/diceUtils';
 import { luckSet } from '../utils/fairOdds';
-import { MAX_DICE_LIMIT, MAX_HISTORY_LENGTH, ROLL_DURATION_MS, TOAST_DURATION_MS } from '../utils/constants';
+import { MAX_DICE_LIMIT, MAX_HISTORY_LENGTH, MAX_NAME_LENGTH, ROLL_DURATION_MS, TOAST_DURATION_MS } from '../utils/constants';
 import { randomBelow } from '../utils/fairRandom';
 import { saveItem, readItem, removeItem } from '../utils/safeStorage';
 import { SAVED } from '../utils/savedValues';
@@ -20,6 +20,10 @@ export interface RollHistoryItem {
   typed?: string;
   /** Which dice the roll used (faces, held values, RPG settings), so the Luck Meter can tell when they changed */
   set?: string;
+  /** The game's name when the dice matched one (Catan), for sorting history by game */
+  game?: string;
+  /** When it was rolled (ms), for the "Switched to …" lines in the log */
+  at?: number;
 }
 
 export interface RollSummary {
@@ -83,6 +87,10 @@ export function sanitizeRollHistory(input: unknown): RollHistoryItem[] {
     if (r.single === true) item.single = true;
     if (typeof r.modifier === 'number' && Number.isFinite(r.modifier)) item.modifier = r.modifier;
     if (typeof r.typed === 'string' && r.typed) item.typed = r.typed.slice(0, 40);
+    // Kept across reloads, so the Luck Meter and the per-game history still know the dice
+    if (typeof r.set === 'string' && r.set.length <= 50000) item.set = r.set;
+    if (typeof r.game === 'string' && r.game) item.game = r.game.slice(0, MAX_NAME_LENGTH);
+    if (typeof r.at === 'number' && Number.isFinite(r.at) && r.at > 0) item.at = r.at;
     out.push(item);
   }
   return out;
@@ -101,6 +109,8 @@ const loadStoredHistory = (): RollHistoryItem[] => {
 export const useDiceState = () => {
   const [diceList, setDiceList] = useState<DiceData[]>([]);
   const [rollHistory, setRollHistory] = useState<RollHistoryItem[]>(loadStoredHistory);
+  /** The game name for the dice on screen, kept up to date by App, so a roll can record it */
+  const gameNameRef = useRef<string | null>(null);
 
   // Persist roll history (capped) so it survives reloads and is included in backups
   useEffect(() => {
@@ -390,7 +400,9 @@ export const useDiceState = () => {
         ...(onlyId !== undefined ? { single: true } : {}),
         ...(activeModifier !== 0 ? { modifier: activeModifier } : {}),
         ...(typed && onlyId === undefined ? { typed: typed.text } : {}),
-        ...(onlyId === undefined ? { set: luckSet(list, rpgMode, rollModifier, advantageMode) } : {})
+        ...(onlyId === undefined ? { set: luckSet(list, rpgMode, rollModifier, advantageMode) } : {}),
+        ...(onlyId === undefined && !typed && gameNameRef.current ? { game: gameNameRef.current } : {}),
+        at: Date.now(),
       }, ...h].slice(0, MAX_HISTORY_LENGTH));
       setIsRolling(false);
       setRollingId(null);
@@ -444,6 +456,7 @@ export const useDiceState = () => {
     clearAllDice,
     rollDice,
     clearHistory,
+    gameNameRef,
     restoreHistory,
     toast,
     showToast,

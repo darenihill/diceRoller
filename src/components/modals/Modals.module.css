@@ -299,3 +299,51 @@
   opacity: 0.8;
   color: var(--md-sys-color-on-surface);
 }
+
+/* History by game: a line where the log switches game, and chips in Frequency */
+.gameDivider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.gameDivider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: var(--md-sys-color-outline-variant, rgba(127, 127, 127, 0.35));
+}
+
+.gameChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.gameChip {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--md-sys-color-outline);
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gameChip[aria-pressed='true'] {
+  border-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-primary);
+  background-color: var(--md-sys-color-surface-hover);
+}

@@ -3,6 +3,7 @@ import { Modal } from '../Modal';
 import type { RollHistoryItem, RollAdvantageMode } from '../../hooks/useDiceState';
 import type { DiceData } from '../../types';
 import { fairOdds, luckRows, furthestFromFair, luckSet } from '../../utils/fairOdds';
+import { gameKeyFor, gameKeyOf, recentGroups, groupLabel } from '../../utils/rollGroups';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
 // The same tabs as Dice Settings / Custom faces, so the two dialogs match
@@ -13,6 +14,8 @@ interface HistoryModalProps {
   onClose: () => void;
   rollHistory: RollHistoryItem[];
   onClearHistory: () => void;
+  /** Clears one game's rolls (its key and name), keeping the others */
+  onClearGame?: (key: string, label: string) => void;
   /** The dice on the table now, for the fair-dice marks */
   dice?: DiceData[];
   rpgMode?: boolean;
@@ -25,26 +28,38 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   onClose,
   rollHistory,
   onClearHistory,
+  onClearGame,
   dice = [],
   rpgMode = false,
   modifier = 0,
   rollAdvantage = 'normal',
 }) => {
+  // History by game (owner, 2026-11-05): Frequency counts the game on the table
+  // now, with chips for the last few games before it and All
+  const currentKey = gameKeyFor(dice);
+  const groups = recentGroups(rollHistory, currentKey);
+  const [picked, setPicked] = React.useState<string | null>(null);
+  const shownKey = picked === 'all' || groups.length === 0
+    ? null
+    : groups.some(g => g.key === picked) ? picked : groups[0].key;
+  const onCurrent = groups.length === 0 || shownKey === currentKey;
+
   // The chart counts whole-set rolls only; a die rolled on its own stays in the log
-  const counted = rollHistory.filter(item => !item.single);
+  const counted = rollHistory.filter(item => !item.single && (shownKey === null || gameKeyOf(item) === shownKey));
   const counts = new Map<number, number>();
   counted.forEach(item => counts.set(item.total, (counts.get(item.total) ?? 0) + 1));
 
   // Fair-dice marks: the count each total would get, on average, from fair
   // dice like the ones on the table now. Worked out only while History is
-  // open, and only again when the dice or settings change.
+  // open, and only again when the dice or settings change. Another game's
+  // rolls get no marks, since its dice are not on the table to work them out.
   const odds = React.useMemo(
     () => (isOpen ? fairOdds(dice, rpgMode, modifier, rollAdvantage) : new Map<number, number>()),
     [isOpen, dice, rpgMode, modifier, rollAdvantage],
   );
-  const rows = luckRows(counts, odds, counted.length);
+  const rows = luckRows(counts, onCurrent ? odds : new Map<number, number>(), counted.length);
   const scale = Math.max(1, ...rows.map(r => Math.max(r.count, r.fair)));
-  const showFair = odds.size > 0;
+  const showFair = odds.size > 0 && onCurrent;
   const odd = showFair && counted.length >= 3 ? furthestFromFair(rows) : null;
   const nowSet = luckSet(dice, rpgMode, modifier, rollAdvantage);
   const diceChanged = showFair && counted.some(item => item.set !== undefined && item.set !== nowSet);
@@ -56,7 +71,32 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   const [wasOpen, setWasOpen] = React.useState(isOpen);
   if (isOpen !== wasOpen) {
     setWasOpen(isOpen);
-    if (isOpen) setTab('history');
+    if (isOpen) { setTab('history'); setPicked(null); }
+  }
+  const currentLabel = currentKey ? groupLabel(rollHistory, currentKey) : '';
+  const currentHasRolls = groups.some(g => g.key === currentKey);
+  // A line at the top of each run of rolls from one game, once more than one
+  // game is in the log: "Catan · from 3:42 PM"
+  const runStarts = new Map<string, string>();
+  {
+    const keys = rollHistory.map(gameKeyOf);
+    if (new Set(keys.filter(Boolean)).size > 1) {
+      let i = 0;
+      while (i < rollHistory.length) {
+        const key = keys[i];
+        if (!key) { i++; continue; }
+        // The run: this roll and the older ones of the same game, singles in between included
+        let j = i;
+        let oldest = i;
+        while (j < rollHistory.length && (keys[j] === key || keys[j] === null)) {
+          if (keys[j] === key) oldest = j;
+          j++;
+        }
+        const from = rollHistory[oldest].at;
+        runStarts.set(rollHistory[i].id, `${groupLabel(rollHistory, key)}${from ? ` · from ${new Date(from).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` : ''}`);
+        i = oldest + 1;
+      }
+    }
   }
   const tabsId = React.useId();
   const tabsHeader = (
@@ -93,14 +133,28 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
             {/* Clear History sits at the top, where it is seen without scrolling (owner, 2026-11-02) */}
             <div className={modalStyles.sectionHeaderRow} style={{ borderTop: 'none', paddingTop: 0 }}>
               <span className={modalStyles.toggleDesc}>{rollHistory.length} {rollHistory.length === 1 ? 'roll' : 'rolls'} saved</span>
-              <button className="md-button md-button-surface md-button-compact" onClick={onClearHistory}>
-                Clear History
-              </button>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                {/* One game's rolls go, the others stay (owner, 2026-11-05) */}
+                {onClearGame && currentKey && currentHasRolls && groups.length > 1 && (
+                  <button className="md-button md-button-surface md-button-compact" onClick={() => onClearGame(currentKey, currentLabel)}>
+                    Clear {currentLabel}
+                  </button>
+                )}
+                <button className="md-button md-button-surface md-button-compact" onClick={onClearHistory}>
+                  Clear History
+                </button>
+              </div>
             </div>
             <div className={styles.historyList}>
               <h3 className={modalStyles.sectionHeader}>Roll Log ({rollHistory.length})</h3>
               {rollHistory.map((roll, i) => (
-                <div key={roll.id} className={styles.historyItem} style={{ borderLeft: roll.isTargetHit ? '4px solid var(--color-gold)' : 'none' }}>
+                <React.Fragment key={roll.id}>
+                {runStarts.get(roll.id) && (
+                  <div className={modalStyles.gameDivider} data-testid="game-divider">
+                    {runStarts.get(roll.id)}
+                  </div>
+                )}
+                <div className={styles.historyItem} style={{ borderLeft: roll.isTargetHit ? '4px solid var(--color-gold)' : 'none' }}>
                   <div className={styles.historyIndex}>Roll {rollHistory.length - i}{roll.single ? ' · one die' : ''}{roll.typed ? ` · ${roll.typed}` : ''}</div>
                   <div className={styles.historyDetails}>{roll.details.join(', ')}</div>
                   <div className={styles.historyTotal}>
@@ -108,6 +162,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
                     {roll.isTargetHit && <span style={{ marginLeft: 6, color: 'var(--color-gold-ink)', fontSize: '0.75rem' }}>🎯 HIT!</span>}
                   </div>
                 </div>
+                </React.Fragment>
               ))}
             </div>
           </>)}
@@ -115,6 +170,24 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
             {/* Session Frequency Histogram */}
             <div>
               <h3 className={modalStyles.sectionHeaderFirst}>Luck Meter</h3>
+              {groups.length > 1 && (
+                <div className={modalStyles.gameChips} role="group" aria-label="Which game">
+                  {groups.map(g => (
+                    <button
+                      key={g.key}
+                      type="button"
+                      className={modalStyles.gameChip}
+                      aria-pressed={shownKey === g.key}
+                      onClick={() => setPicked(g.key)}
+                    >
+                      {g.label}{g.key === currentKey ? ' (now)' : ''}
+                    </button>
+                  ))}
+                  <button type="button" className={modalStyles.gameChip} aria-pressed={shownKey === null} onClick={() => setPicked('all')}>
+                    All
+                  </button>
+                </div>
+              )}
               <div className={modalStyles.freqCard}>
                 {showFair && (
                   <p className={modalStyles.freqNote}>

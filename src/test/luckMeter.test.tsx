@@ -139,7 +139,7 @@ describe('History modal', () => {
   it('says so when the dice changed since some rolls', () => {
     const { container } = render(
       <HistoryModal isOpen onClose={() => {}} onClearHistory={() => {}} dice={dice}
-        rollHistory={[roll(9, luckSet([die(6), die(6)])), roll(3, set)]} />,
+        rollHistory={[roll(5, luckSet(dice, true, 2)), roll(3, set)]} />,
     );
     fireEvent.click(screen.getByRole('tab', { name: 'Frequency' }));
     expect(container.ownerDocument.body.textContent).toContain('they changed since some of these rolls');
