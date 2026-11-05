@@ -8,6 +8,7 @@ import { parseFaceContent, FACE_ICON_PREFIX, getContrastColor, faceParts, faceLa
 import { useFaceImage } from '../utils/faceImages';
 import { MAX_SHAPED_FACE_LENGTH } from '../utils/constants';
 import { PolyhedralWireframe } from './PolyhedralWireframe';
+import { DICE_SHAPES } from '../utils/diceShapes';
 import { randomBelow } from '../utils/fairRandom';
 
 /** Material 3 emphasized easing, as on the menu icon */
@@ -238,6 +239,15 @@ const DiceComponent: React.FC<DiceProps> = ({
     else if (dice.faces === 20) shapeClass = styles.shapeD20;
   }
 
+  // Gem look: the number sits on the front face, sized to fit it, so no facet
+  // line runs through it; the shape already says which die it is, so a plain
+  // "d20" name isn't shown on it (owner's pick, 2026-11-05)
+  const spot = shapeEligible ? DICE_SHAPES[dice.faces]?.number : undefined;
+  const numberStyle: React.CSSProperties = spot
+    ? { fontSize: `calc(${fontScale} * ${spot.scale * (String(faceContent).length > 1 ? 0.78 : 1)})`, color: textColor, zIndex: 2, top: `${spot.y}%`, left: `${spot.x}%`, fontWeight: 700 }
+    : { fontSize: fontScale, color: textColor, zIndex: 2 };
+  const nameIsShape = !!spot && dice.name === `d${dice.faces}`;
+
   const extraClass = [
     sunk ? styles.dropped : '',
     // The natural 20 / natural 1 glow waits for the die to land: the result is
@@ -289,7 +299,7 @@ const DiceComponent: React.FC<DiceProps> = ({
       {faceImage ? (
         <img src={faceImage} alt="" className={`${styles.faceImage} ${calm ? styles.calmFace : ''} ${calm && rollingNow ? styles.calmRolling : ''}`} draggable={false} />
       ) : (
-        <div className={`${styles.number} ${calm ? styles.calmFace : ''} ${calm && rollingNow ? styles.calmRolling : ''}`} data-calm={calm ? (rollingNow ? 'rolling' : 'still') : undefined} style={{ fontSize: fontScale, color: textColor, zIndex: 2 }}>
+        <div className={`${styles.number} ${calm ? styles.calmFace : ''} ${calm && rollingNow ? styles.calmRolling : ''}`} data-calm={calm ? (rollingNow ? 'rolling' : 'still') : undefined} style={numberStyle}>
           {renderFace(faceContent)}
         </div>
       )}
@@ -300,7 +310,7 @@ const DiceComponent: React.FC<DiceProps> = ({
         </div>
       )}
 
-      {dice.name && (
+      {dice.name && !nameIsShape && (
         <div style={{
           position: 'absolute',
           bottom: '8%',

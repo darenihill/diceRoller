@@ -279,6 +279,22 @@
   border: 2px solid var(--color-crit-red);
 }
 
+/* A shaped die's natural 20 / natural 1 glow follows its real outline, not a
+   square box around it (owner, 2026-11-05) */
+.dice.shaped.crit20,
+.dice.shaped.crit1 {
+  box-shadow: none !important;
+  border: none;
+}
+
+.dice.shaped.crit20 {
+  filter: drop-shadow(0 0 2px var(--color-gold)) drop-shadow(0 0 10px var(--color-gold));
+}
+
+.dice.shaped.crit1 {
+  filter: drop-shadow(0 0 2px var(--color-crit-red)) drop-shadow(0 0 10px var(--color-crit-red));
+}
+
 /* Polyhedral RPG Shapes (active when rpgMode is ON) */
 .shapeD4 {
   clip-path: polygon(50% 2%, 96% 92%, 4% 92%);
