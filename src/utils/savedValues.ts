@@ -16,6 +16,7 @@ export const SAVED = {
   telemetry: 'telemetryEnabled',
   tableView: 'tableView',
   brightRings: 'brightRings',
+  dice3D: 'dice3D',
   usageStats: 'diceAnalyticsStats',
   /** Pictures on faces, kept apart because they are large (faceImages.ts) */
   faceImages: 'diceFaceImages',

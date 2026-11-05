@@ -462,3 +462,31 @@
 .diceHidden {
   display: none;
 }
+
+/* 3D Dice: the tray the dice tumble across, between the top line and the
+   bottom bar (owner, 2026-11-02). Fades out after the dice land. */
+.tray3d {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  margin: 0 8px;
+  border-radius: 20px;
+  background:
+    radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--md-sys-color-surface-variant) 92%, var(--md-sys-color-primary)), var(--md-sys-color-surface));
+  box-shadow: inset 0 0 0 1px var(--md-sys-color-outline-variant), inset 0 6px 24px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  animation: trayIn 160ms ease-out;
+}
+.tray3d[data-phase='landed'] {
+  cursor: pointer;
+}
+.tray3d :global(.dice-box-canvas) {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+@keyframes trayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

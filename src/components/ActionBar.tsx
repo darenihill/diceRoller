@@ -147,7 +147,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
   };
 
   return (
-    <div className={styles.actionBar}>
+    <div className={styles.actionBar} data-action-bar>
 
       {/* Add Button & Quick D&D Popover */}
       <div className={styles.addPopoverContainer}>

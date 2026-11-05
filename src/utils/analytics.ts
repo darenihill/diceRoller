@@ -120,6 +120,7 @@ export type AnalyticsEventName =
   | 'theme_changed'
   | 'sound_toggled'
   | 'shake_toggled'
+  | 'dice_3d_toggled'
   | 'bright_rings_toggled'
   | 'shake_roll'
   | 'table_view_toggled'

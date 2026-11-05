@@ -1,4 +1,4 @@
-Next: 3D dice tray, step 1 of 4 (switch, tray, test copy, pull request), 2026-11-05.
+Next: 3D dice tray built (switch, tray, tests); second read and a private test copy next, 2026-11-05.
 
 # State
 
