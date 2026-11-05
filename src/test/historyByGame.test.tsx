@@ -18,7 +18,7 @@ const roll = (total: number, dice: DiceData[], game?: string, at?: number): Roll
   ({ id: `r${n++}`, total, details: [String(total)], set: luckSet(dice), ...(game ? { game } : {}), ...(at ? { at } : {}) });
 
 describe('Sorting rolls by game', () => {
-  it('the same faces are the same game, whatever the colour, holds or modifier', () => {
+  it('the same faces are the same game, whatever the color, holds or modifier', () => {
     const recoloured = catan.map(d => ({ ...d, color: '#E32227' }));
     expect(gameKeyFor(recoloured)).toBe(gameKeyFor(catan));
     expect(gameKeyOf({ id: 'a', total: 7, details: [], set: luckSet(catan, true, 3) })).toBe(gameKeyFor(catan));

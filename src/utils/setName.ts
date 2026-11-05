@@ -4,7 +4,7 @@ import { sanitizeDiceList } from './diceUtils';
 import { MAX_NAME_LENGTH } from './constants';
 import type { DiceData } from '../types';
 
-// What makes a dice set "the same game": each die's faces, symbols, colour and
+// What makes a dice set "the same game": each die's faces, symbols, color and
 // label. Rolled values, holds and ids change during play and are left out, so
 // rolling Catan is still Catan, but adding, removing or editing a die is not.
 export function diceSignature(dice: Partial<DiceData>[]): string {

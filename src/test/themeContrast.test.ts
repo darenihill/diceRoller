@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-// Every theme's text colours stay readable on the surfaces they sit on, so a
+// Every theme's text colors stay readable on the surfaces they sit on, so a
 // theme that forgets a token (light once inherited the dark theme's pale error
 // pink, and Clear All read at 1.3:1) fails here instead of on someone's phone.
 const css = fs.readFileSync(path.resolve(__dirname, '../index.css'), 'utf-8');
@@ -40,7 +40,7 @@ const pairs: [string, string][] = [
   ['on-primary-container', 'primary-container'], // the Roll one button on a die
 ];
 
-describe('Theme colours stay readable', () => {
+describe('Theme colors stay readable', () => {
   for (const theme of themes) {
     const t = { ...root, ...tokens(`body.${theme}`) };
     for (const [fg, bg] of pairs) {
@@ -53,7 +53,7 @@ describe('Theme colours stay readable', () => {
 });
 
 // Delete (red) and Roll one (blue) sit side by side on a die. They must stay
-// clearly different for red-green colour blindness too, not only by hue.
+// clearly different for red-green color blindness too, not only by hue.
 // Machado 2009 full-strength matrices; distance is CIE76 in Lab.
 const CVD: Record<string, number[][]> = {
   protanopia: [[0.152286, 1.052583, -0.204868], [0.114503, 0.786281, 0.099216], [-0.003882, -0.048116, 1.051998]],
@@ -76,7 +76,7 @@ const simulate = (hex: string, m: number[][]) => {
 };
 const distance = (a: number[], b: number[]) => Math.hypot(...lab(a).map((v, i) => v - lab(b)[i]));
 
-describe('Delete stays apart from Roll one with colour blindness', () => {
+describe('Delete stays apart from Roll one with color blindness', () => {
   for (const theme of themes) {
     const t = { ...root, ...tokens(`body.${theme}`) };
     for (const [kind, m] of Object.entries(CVD)) {

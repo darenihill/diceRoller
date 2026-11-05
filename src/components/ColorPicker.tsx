@@ -4,18 +4,18 @@ import { COLORS, COLOR_NAMES, getContrastColor } from '../utils/diceUtils';
 import styles from './ColorPicker.module.css';
 
 /**
- * The one colour picker, used for a die's colour and for a face's colour
+ * The one color picker, used for a die's color and for a face's color
  * (owner, 2026-11-03). Twelve equal dots in two rows of six: the eleven
- * colours plus Custom, which opens sliders in place. The sliders look the same
- * on every phone, unlike the phone's own colour tool they replace.
+ * colors plus Custom, which opens sliders in place. The sliders look the same
+ * on every phone, unlike the phone's own color tool they replace.
  */
 interface ColorPickerProps {
-  /** A #RRGGBB colour, or 'transparent' for "Same as the die" */
+  /** A #RRGGBB color, or 'transparent' for "Same as the die" */
   value: string;
   onChange: (color: string) => void;
-  /** Spoken name of the group, e.g. "Die colour" */
+  /** Spoken name of the group, e.g. "Die color" */
   label: string;
-  /** Shows a "Same as the die" chip in this colour (face colours only) */
+  /** Shows a "Same as the die" chip in this color (face colors only) */
   sameAs?: string;
 }
 
@@ -35,7 +35,7 @@ function hexToHsl(hex: string): { h: number; l: number } {
   return { h: Math.round((h * 60 + 360) % 360), l: Math.round(l * 100) };
 }
 
-/** Saturation is fixed at 85%: two sliders (colour, light/dark) are enough for a die */
+/** Saturation is fixed at 85%: two sliders (color, light/dark) are enough for a die */
 function hslToHex(h: number, l: number): string {
   const s = 0.85, ll = l / 100;
   const a = s * Math.min(ll, 1 - ll);
@@ -51,10 +51,10 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ value, onChange, label
   const isSame = value === 'transparent';
   const isPreset = COLORS.some(c => c.toUpperCase() === value.toUpperCase());
   const isCustom = !isSame && !isPreset && HEX.test(value);
-  // Opens already showing the sliders when the colour is a custom one.
+  // Opens already showing the sliders when the color is a custom one.
   // Give the picker a key per die or face so this starts fresh for each.
   const [showSliders, setShowSliders] = useState(isCustom);
-  // A custom colour starts the sliders where it is; from a ready colour they
+  // A custom color starts the sliders where it is; from a ready color they
   // start at its hue but mid light, so the first slide isn't near white or black
   const start = isCustom ? hexToHsl(value) : { h: HEX.test(value) ? hexToHsl(value).h : 210, l: 50 };
   const [hue, setHue] = useState(start.h);
@@ -101,7 +101,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ value, onChange, label
           type="button"
           className={`${styles.dot} ${styles.custom}`}
           onClick={() => setShowSliders(o => !o)}
-          aria-label="Custom colour"
+          aria-label="Custom color"
           aria-pressed={isCustom}
           aria-expanded={showSliders}
           aria-controls={`${id}-custom`}
@@ -117,7 +117,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ value, onChange, label
             <span className={styles.preview} style={{ backgroundColor: preview }} aria-hidden="true" />
             <input
               className={styles.hex}
-              aria-label="Colour code"
+              aria-label="Color code"
               value={draft ?? (HEX.test(value) ? value.toUpperCase() : hslToHex(hue, light))}
               maxLength={7}
               spellCheck={false}
@@ -135,7 +135,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ value, onChange, label
             />
           </div>
           <label className={styles.sliderLabel}>
-            Colour
+            Color
             <input
               type="range" min={0} max={359} value={hue}
               className={`${styles.range} ${styles.hue}`}

@@ -279,7 +279,7 @@ export const useDiceState = () => {
       // Group PLAIN dice by face count (e.g. 2d20s, 4d6s). Custom-faced dice are excluded:
       // a percentile pair (tens + units) is two different dice that both report faces=10,
       // and grouping them would silently drop one half of every d100 roll. A die
-      // whose faces are just 1..n in colour still counts as plain.
+      // whose faces are just 1..n in color still counts as plain.
       const faceGroups: Record<number, { index: number; val: number }[]> = {};
       processedList.forEach((d, i) => {
         if (d.customFaces.length > 0 && !isNumberedFaces(d.customFaces)) return;

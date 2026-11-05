@@ -40,7 +40,7 @@ export const PolyhedralWireframe: React.FC<PolyhedralWireframeProps> = React.mem
       {/* Opacity lives on the group, and both strokes are fully opaque. Drawing
           them semi-transparent instead would darken every point where a facet
           meets the outline, since the two strokes composite against each other.
-          A group renders flat first, so junctions stay one even colour.
+          A group renders flat first, so junctions stay one even color.
 
           Joins are mitered, not rounded: the clip-path corners are sharp, so a
           round join pulls the stroke away from each corner and blunts it. The

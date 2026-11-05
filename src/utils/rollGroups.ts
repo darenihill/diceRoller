@@ -2,7 +2,7 @@ import type { DiceData } from '../types';
 import type { RollHistoryItem } from '../hooks/useDiceState';
 
 /**
- * Rolls sorted by game: which dice made them, by faces only. Colours, names,
+ * Rolls sorted by game: which dice made them, by faces only. Colors, names,
  * holds and RPG settings are left out, so recolouring Catan or changing the
  * modifier is still the same game, but loading That's Pretty Clever is not
  * (owner, 2026-11-05: histories got conflated when switching games).

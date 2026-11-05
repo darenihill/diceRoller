@@ -41,7 +41,7 @@ const FACE_VALUE_RE = /:val:(-?\d{1,4})$/;
  */
 export const FACE_IMAGE_DELIMITER = ':img:';
 const FACE_IMAGE_RE = /:img:([a-z0-9]{1,16})$/;
-/** Trailing parts a face may carry after its text: picture, colour, Counts as. */
+/** Trailing parts a face may carry after its text: picture, color, Counts as. */
 const FACE_SUFFIX_RE = /(?::img:[a-z0-9]{1,16})?(?::bg:#[0-9a-fA-F]{3,8}|:bg:transparent)?(?::val:-?\d{1,4})?$/;
 
 export function generateId(): string {
@@ -83,7 +83,7 @@ export function buildFace(content: string, bgColor?: string, value?: number, ima
 
 /**
  * The dice as a share link carries them: pictures stay on this device, so
- * each picture face travels as its text, colour and number only.
+ * each picture face travels as its text, color and number only.
  */
 export function withoutFaceImages(dice: DiceData[]): DiceData[] {
   return dice.map(d => d.customFaces.some(f => f.includes(FACE_IMAGE_DELIMITER))
@@ -160,7 +160,7 @@ export function sanitizeDiceList(input: unknown): DiceData[] {
           .slice(0, MAX_CUSTOM_FACES)
           .filter((f): f is string => typeof f === 'string')
           .map(f => {
-            // Trim the face text but keep its picture, colour and Counts as parts intact
+            // Trim the face text but keep its picture, color and Counts as parts intact
             const m = f.match(FACE_SUFFIX_RE);
             const suffix = m ? m[0] : '';
             const base = f.slice(0, f.length - suffix.length);
@@ -213,7 +213,7 @@ export const COLORS = [
   "#AA5518"  // brown
 ];
 
-/** Colours for "Colour every face differently", picked to be easy to tell apart. */
+/** Colors for "Color every face differently", picked to be easy to tell apart. */
 export const DISTINCT_FACE_COLORS = [
   "#E32227", // red
   "#0000FF", // blue
@@ -229,7 +229,7 @@ export const DISTINCT_FACE_COLORS = [
   "#C0C0C0"  // gray
 ];
 
-/** n colours, all different: the list above first, then evenly spread hues. */
+/** n colors, all different: the list above first, then evenly spread hues. */
 export function distinctFaceColors(n: number): string[] {
   const out = DISTINCT_FACE_COLORS.slice(0, Math.max(0, n));
   for (let i = out.length; i < n; i++) {
@@ -251,7 +251,7 @@ function hslToHex(h: number, s: number, l: number): string {
 
 /**
  * True when the faces are just the numbers 1..n in order (whatever their
- * colours or pictures), as "Colour every face differently" makes from a plain
+ * colors or pictures), as "Color every face differently" makes from a plain
  * die. Such a die still rolls and groups like the plain die it came from.
  */
 export function isNumberedFaces(customFaces: string[]): boolean {
@@ -262,17 +262,17 @@ export function isNumberedFaces(customFaces: string[]): boolean {
 }
 
 /**
- * Gives every face its own colour, keeping each face's text, picture and
+ * Gives every face its own color, keeping each face's text, picture and
  * number. A plain numbered die becomes custom faces 1..n first.
  */
 export function colourEveryFace(faces: number, customFaces: string[]): string[] {
   const list = customFaces.length > 0
     ? customFaces
     : Array.from({ length: Math.min(faces, MAX_CUSTOM_FACES) }, (_, i) => String(i + 1));
-  const colours = distinctFaceColors(list.length);
+  const colors = distinctFaceColors(list.length);
   return list.map((f, i) => {
     const p = parseFaceContent(f, '');
-    return buildFace(p.content, colours[i], p.value, p.image);
+    return buildFace(p.content, colors[i], p.value, p.image);
   });
 }
 

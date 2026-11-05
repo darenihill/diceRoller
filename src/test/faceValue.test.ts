@@ -11,7 +11,7 @@ describe('faces that count as a number', () => {
     expect(faceNumericValue('5:bg:#E32227')).toBe(5);
   });
 
-  it('reads a Counts as number with or without a colour', () => {
+  it('reads a Counts as number with or without a color', () => {
     expect(parseFaceContent(':icon:Star:bg:#FFD700:val:6')).toEqual({ content: ':icon:Star', bgColor: '#FFD700', value: 6 });
     expect(faceNumericValue(':icon:Star:val:6')).toBe(6);
     expect(faceNumericValue('Miss:val:-1')).toBe(-1);
@@ -34,7 +34,7 @@ describe('faces that count as a number', () => {
 });
 
 describe('pictures on faces', () => {
-  it('reads and builds a picture marker beside colour and Counts as', () => {
+  it('reads and builds a picture marker beside color and Counts as', () => {
     expect(parseFaceContent('3:img:k2x9a1:bg:#FFD700:val:6')).toEqual({ content: '3', bgColor: '#FFD700', value: 6, image: 'k2x9a1' });
     expect(parseFaceContent('3:img:k2x9a1')).toEqual({ content: '3', bgColor: 'transparent', image: 'k2x9a1' });
     expect(buildFace('3', '#FFD700', 6, 'k2x9a1')).toBe('3:img:k2x9a1:bg:#FFD700:val:6');
@@ -43,7 +43,7 @@ describe('pictures on faces', () => {
     expect(faceNumericValue(':icon:Star:img:k2x9a1:val:6')).toBe(6);
   });
 
-  it('leaves pictures out of share links, keeping text, colour and number', () => {
+  it('leaves pictures out of share links, keeping text, color and number', () => {
     const dice = sanitizeDiceList([{ faces: 2, customFaces: ['3:img:k2x9a1:bg:#FFD700:val:6', 'Plain'] }]);
     const [shared] = withoutFaceImages(dice);
     expect(shared.customFaces).toEqual(['3:bg:#FFD700:val:6', 'Plain']);
@@ -108,13 +108,13 @@ describe('letting go of pictures nothing uses', () => {
   });
 });
 
-describe('colour every face differently', () => {
-  it('gives n faces n different colours', () => {
+describe('color every face differently', () => {
+  it('gives n faces n different colors', () => {
     for (const n of [1, 6, 12, 20, 100]) {
-      const colours = distinctFaceColors(n);
-      expect(colours).toHaveLength(n);
-      expect(new Set(colours).size).toBe(n);
-      colours.forEach(c => expect(c).toMatch(/^#[0-9A-F]{6}$/));
+      const colors = distinctFaceColors(n);
+      expect(colors).toHaveLength(n);
+      expect(new Set(colors).size).toBe(n);
+      colors.forEach(c => expect(c).toMatch(/^#[0-9A-F]{6}$/));
     }
   });
 
@@ -133,7 +133,7 @@ describe('colour every face differently', () => {
   });
 });
 
-describe('numbered faces in colour', () => {
+describe('numbered faces in color', () => {
   it('still count as the plain die they came from', () => {
     expect(isNumberedFaces(colourEveryFace(20, []))).toBe(true);
     expect(isNumberedFaces(['1', '2', 'Gold'])).toBe(false);

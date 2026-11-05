@@ -10,10 +10,10 @@ import { splitFaceList, pastedListForBox } from '../utils/faceList';
 import { ColorPicker } from './ColorPicker';
 import styles from './DiceSettingsModal.module.css';
 
-type FacePanel = 'colour' | 'icons' | 'text';
+type FacePanel = 'color' | 'icons' | 'text';
 // The order the owner named them in
 const PANELS = [
-  ['colour', 'Colour', Palette],
+  ['color', 'Color', Palette],
   ['icons', 'Icons', Smile],
   ['text', 'Text', Type],
 ] as const;
@@ -38,14 +38,14 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   const [facesDraft, setFacesDraft] = useState<string | null>(null);
   const fieldId = useId();
   const [showAllIcons, setShowAllIcons] = useState(false);
-  /** Which of Colour, Icons and Text is open on Custom faces. A die with no
+  /** Which of Color, Icons and Text is open on Custom faces. A die with no
    *  faces yet opens on Text, the quickest way to add one. */
   const [openPanel, setOpenPanel] = useState<FacePanel | null>(() => dice.customFaces.length === 0 ? 'text' : null);
-  /** The face the colour row paints: tap a face, then tap a colour */
+  /** The face the color row paints: tap a face, then tap a color */
   const [selectedFace, setSelectedFace] = useState(0);
   /** The face Icons and Text change, once one is tapped; none means they add new faces */
   const [editFace, setEditFace] = useState<{ die: string; index: number } | null>(null);
-  /** The colour row pins to the bottom only after a face is tapped, so the faces show first on open */
+  /** The color row pins to the bottom only after a face is tapped, so the faces show first on open */
   const [colourPinnedFor, setColourPinnedFor] = useState<string | null>(null);
   const colourPinned = colourPinnedFor === dice.id;
   /** The open tab, chosen once each time the dialog opens for a die: a die with its own
@@ -133,7 +133,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     onUpdate(dice.id, { customFaces: newFaces });
   };
 
-  /** Changes a face's words, keeping its icon, colour, picture and number */
+  /** Changes a face's words, keeping its icon, color, picture and number */
   const setFaceText = (index: number, text: string) => {
     const newFaces = [...dice.customFaces];
     const parsed = parseFaceContent(newFaces[index], '');
@@ -214,7 +214,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     onUpdate(dice.id, { customFaces: newFaces });
   };
 
-  /** Every face its own colour; a plain numbered die becomes faces 1..n first */
+  /** Every face its own color; a plain numbered die becomes faces 1..n first */
   const colourAllFaces = () => {
     const customFaces = colourEveryFace(dice.faces, dice.customFaces);
     // A plain die keeps showing the number it last rolled
@@ -250,7 +250,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
 
         {tab === 'settings' && (
         <div className={styles.sectionCard} role="tabpanel" id={`${fieldId}-panel-settings`} aria-labelledby={`${fieldId}-tab-settings`}>
-          {/* Name and face count share the top row; the colour picker takes the full
+          {/* Name and face count share the top row; the color picker takes the full
               width below (owner, 2026-11-05: "move standard faces up next to name") */}
           <div className={styles.topRow}>
             <div className={styles.nameField}>
@@ -301,8 +301,8 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
           </div>
 
           <div className={styles.fieldBlock}>
-            <span className={styles.label} aria-hidden="true">Die colour</span>
-            <ColorPicker key={dice.id} label="Die colour" value={dice.color} onChange={(color) => onUpdate(dice.id, { color })} />
+            <span className={styles.label} aria-hidden="true">Die color</span>
+            <ColorPicker key={dice.id} label="Die color" value={dice.color} onChange={(color) => onUpdate(dice.id, { color })} />
           </div>
         </div>
 
@@ -345,7 +345,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                         setEditFace({ die: dice.id, index: i });
                         setColourPinnedFor(dice.id);
                         // Icons or Text stay open, now changing this face; otherwise Color opens
-                        setOpenPanel(p => (p === 'icons' || p === 'text' ? p : 'colour'));
+                        setOpenPanel(p => (p === 'icons' || p === 'text' ? p : 'color'));
                       }}
                       aria-pressed={i === activeFace}
                       aria-label={`Face ${i + 1}: ${[parts.icon, parts.text].filter(Boolean).join(' ')}${picture ? ', picture' : ''}`}
@@ -396,7 +396,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
             })}
           </div>
 
-          {/* Colour, icons and text fold into three buttons, so a long list of faces
+          {/* Color, icons and text fold into three buttons, so a long list of faces
               keeps the room (owner, 2026-11-05). One opens at a time. */}
           <div className={styles.panelButtons}>
             {PANELS.map(([key, label, Icon]) => (
@@ -415,14 +415,14 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
             ))}
           </div>
 
-          {openPanel === 'colour' && (
-            <div id={`${fieldId}-panel-colour`} className={`${styles.panelBody} ${styles.panelBodyColour}`}>
+          {openPanel === 'color' && (
+            <div id={`${fieldId}-panel-color`} className={`${styles.panelBody} ${styles.panelBodyColour}`}>
               {dice.customFaces.length > 0 && (
                 <div className={`${styles.faceColourRow} ${colourPinned ? '' : styles.faceColourRowLoose}`} data-pinned={colourPinned}>
-                  <span className={styles.sublabel}>Colour for face {activeFace + 1}</span>
+                  <span className={styles.sublabel}>Color for face {activeFace + 1}</span>
                   <ColorPicker
                     key={`${dice.id}-${activeFace}`}
-                    label={`Colour for face ${activeFace + 1}`}
+                    label={`Color for face ${activeFace + 1}`}
                     value={activeFaceColour}
                     sameAs={dice.color}
                     onChange={(color) => updateCustomFaceColor(activeFace, color)}
@@ -435,7 +435,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                 onClick={colourAllFaces}
                 disabled={dice.customFaces.length === 0 && dice.faces > 100}
               >
-                <Rainbow size={18} strokeWidth={2.5} /> Colour every face differently
+                <Rainbow size={18} strokeWidth={2.5} /> Color every face differently
               </button>
             </div>
           )}

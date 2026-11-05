@@ -8,14 +8,14 @@ const withFaces: DiceData = { id: 'd1', numberValue: 1, faces: 3, customFaces: [
 const plain: DiceData = { id: 'd2', numberValue: 1, faces: 6, customFaces: [], color: '#6750A4', held: false };
 const props = { isOpen: true, onClose: () => {}, onUpdate: () => {}, onRemove: () => {}, onClone: () => {} };
 
-describe('Custom faces folds colour, icons and text into three buttons', () => {
+describe('Custom faces folds color, icons and text into three buttons', () => {
   it('opens with all three shut when the die has faces', () => {
     render(<DiceSettingsModal dice={withFaces} allDice={[withFaces]} {...props} />);
-    for (const name of ['Colour', 'Icons', 'Text']) {
+    for (const name of ['Color', 'Icons', 'Text']) {
       expect(screen.getByRole('button', { name })).toHaveAttribute('aria-expanded', 'false');
     }
     expect(screen.queryByLabelText('Custom face text')).toBeNull();
-    expect(screen.queryByRole('group', { name: /Colour for face/ })).toBeNull();
+    expect(screen.queryByRole('group', { name: /Color for face/ })).toBeNull();
     expect(screen.queryByRole('button', { name: 'More icons' })).toBeNull();
   });
 
@@ -31,11 +31,11 @@ describe('Custom faces folds colour, icons and text into three buttons', () => {
     expect(screen.queryByLabelText('Custom face text')).toBeNull();
   });
 
-  it('tapping a face opens its colour', () => {
+  it('tapping a face opens its color', () => {
     render(<DiceSettingsModal dice={withFaces} allDice={[withFaces]} {...props} />);
     fireEvent.click(screen.getByRole('button', { name: /^Face 3:/ }));
-    expect(screen.getByRole('button', { name: 'Colour' })).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByRole('group', { name: 'Colour for face 3' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Color' })).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('group', { name: 'Color for face 3' })).toBeInTheDocument();
   });
 
   it('a die with no faces yet opens on Text, ready to type one', () => {
@@ -54,7 +54,7 @@ describe('Dice Settings puts Standard Faces beside Name', () => {
   });
 });
 
-describe('the face colour row stays under Remove, Clone and Done until pinned', () => {
+describe('the face color row stays under Remove, Clone and Done until pinned', () => {
   it('the open panels are plain blocks, and the loose row has no stacking order of its own', async () => {
     const { readFileSync } = await import('node:fs');
     const { resolve } = await import('node:path');

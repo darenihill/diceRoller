@@ -23,7 +23,7 @@ describe('Bright ring on the bottom-bar buttons', () => {
     expect(document.querySelectorAll('.control-ring').length).toBeGreaterThanOrEqual(7);
   });
 
-  it('each theme sets its own ring colour', () => {
+  it('each theme sets its own ring color', () => {
     const css = readFileSync('src/index.css', 'utf8');
     expect(css.match(/--control-ring:/g)).toHaveLength(4);
     expect(css).toMatch(/\.bright-rings \.control-ring:not\(:focus-visible\) \{\s*outline: 2px solid var\(--control-ring\);/);
