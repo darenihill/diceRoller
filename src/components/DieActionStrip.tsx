@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { Lock, Unlock, Settings, Trash2, Copy, Dices } from 'lucide-react';
 import type { DiceData } from '../types';
-import { parseFaceContent, FACE_ICON_PREFIX } from '../utils/diceUtils';
+import { parseFaceContent, faceLabel } from '../utils/diceUtils';
 import styles from './DieActionStrip.module.css';
 
 interface DieActionStripProps {
@@ -21,7 +21,7 @@ const showing = (die: DiceData): string => {
   if (die.customFaces.length > 0) {
     const raw = die.customFaces[Math.min(die.currentFaceIndex ?? 0, die.customFaces.length - 1)] ?? '';
     const content = parseFaceContent(raw).content;
-    return content.startsWith(FACE_ICON_PREFIX) ? content.replace(FACE_ICON_PREFIX, '') : content;
+    return faceLabel(content);
   }
   return String(die.numberValue);
 };

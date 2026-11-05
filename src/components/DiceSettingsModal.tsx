@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect, useId } from 'react';
 import type { DiceData } from '../types';
 import { Modal } from './Modal';
-import { FACE_ICON_PREFIX, parseFaceContent, buildFace, faceNumericValue, getContrastColor, colourEveryFace } from '../utils/diceUtils';
+import { FACE_ICON_PREFIX, parseFaceContent, buildFace, faceNumericValue, getContrastColor, colourEveryFace, faceParts, joinFace } from '../utils/diceUtils';
 import { X, Plus, Minus, Star, Check, Copy, Trash2, ImagePlus, ImageOff, Rainbow, Palette, Smile, Type, ChevronDown } from 'lucide-react';
 import { addFaceImage, useFaceImages, shrinkImage } from '../utils/faceImages';
 import { ALL_ICONS, COMMON_ICONS } from '../utils/iconUtils';
-import { MAX_CUSTOM_FACES } from '../utils/constants';
+import { MAX_CUSTOM_FACES, MAX_FACE_TEXT_LENGTH } from '../utils/constants';
 import { splitFaceList, pastedListForBox } from '../utils/faceList';
 import { ColorPicker } from './ColorPicker';
 import styles from './DiceSettingsModal.module.css';
@@ -43,6 +43,8 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   const [openPanel, setOpenPanel] = useState<FacePanel | null>(() => dice.customFaces.length === 0 ? 'text' : null);
   /** The face the colour row paints: tap a face, then tap a colour */
   const [selectedFace, setSelectedFace] = useState(0);
+  /** The face Icons and Text change, once one is tapped; none means they add new faces */
+  const [editFace, setEditFace] = useState<{ die: string; index: number } | null>(null);
   /** The colour row pins to the bottom only after a face is tapped, so the faces show first on open */
   const [colourPinnedFor, setColourPinnedFor] = useState<string | null>(null);
   const colourPinned = colourPinnedFor === dice.id;
@@ -56,6 +58,8 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   const tab = tabFor.key === openKey ? tabFor.tab : openingTab;
   const setTab = (next: 'settings' | 'faces') => setTabFor({ key: openKey, tab: next });
   const activeFace = Math.min(selectedFace, Math.max(0, dice.customFaces.length - 1));
+  const editing = editFace && editFace.die === dice.id && editFace.index < dice.customFaces.length ? editFace.index : null;
+  const editingParts = editing !== null ? faceParts(parseFaceContent(dice.customFaces[editing]).content) : null;
   const activeFaceColour = parseFaceContent(dice.customFaces[activeFace] ?? '').bgColor;
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -117,7 +121,33 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     setCustomInput([head, pastedListForBox(pasted), tail].filter(Boolean).join(', '));
   };
 
+  /** Puts an icon on a face (or takes it off, tapping the same one), keeping its words */
+  const setFaceIcon = (index: number, icon: string) => {
+    const newFaces = [...dice.customFaces];
+    const parsed = parseFaceContent(newFaces[index], '');
+    const parts = faceParts(parsed.content);
+    const nextIcon = parts.icon === icon ? undefined : icon;
+    // A face keeps something to show: its icon stays when it has no words or picture
+    if (!nextIcon && !parts.text && !parsed.image) return;
+    newFaces[index] = buildFace(joinFace(nextIcon, parts.text), parsed.bgColor || undefined, parsed.value, parsed.image);
+    onUpdate(dice.id, { customFaces: newFaces });
+  };
+
+  /** Changes a face's words, keeping its icon, colour, picture and number */
+  const setFaceText = (index: number, text: string) => {
+    const newFaces = [...dice.customFaces];
+    const parsed = parseFaceContent(newFaces[index], '');
+    const parts = faceParts(parsed.content);
+    const room = MAX_FACE_TEXT_LENGTH - (parts.icon ? joinFace(parts.icon, 'x').length - 1 : 0);
+    newFaces[index] = buildFace(joinFace(parts.icon, text.slice(0, room)), parsed.bgColor || undefined, parsed.value, parsed.image);
+    onUpdate(dice.id, { customFaces: newFaces });
+  };
+
   const removeCustomFace = (index: number) => {
+    if (editing !== null) {
+      if (editing === index) setEditFace(null);
+      else if (editing > index) setEditFace({ die: dice.id, index: editing - 1 });
+    }
     const newFaces = [...dice.customFaces];
     newFaces.splice(index, 1);
     onUpdate(dice.id, { held: false, customFaces: newFaces });
@@ -300,6 +330,8 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               const bgColor = parsed.bgColor;
               const picture = parsed.image ? images[parsed.image] : undefined;
               const tileColor = bgColor !== 'transparent' ? bgColor : dice.color;
+              const parts = faceParts(content);
+              const TileIcon = parts.icon ? (ALL_ICONS.find(icon => icon.name === parts.icon)?.icon || Star) : null;
               
               return (
                 <div key={i} className={`${styles.faceCard} ${i === activeFace ? styles.faceCardSelected : ''}`}>
@@ -308,14 +340,19 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                       type="button"
                       className={styles.faceTile}
                       style={{ backgroundColor: tileColor, color: getContrastColor(tileColor) }}
-                      onClick={() => { setSelectedFace(i); setColourPinnedFor(dice.id); setOpenPanel('colour'); }}
+                      onClick={() => {
+                        setSelectedFace(i);
+                        setEditFace({ die: dice.id, index: i });
+                        setColourPinnedFor(dice.id);
+                        // Icons or Text stay open, now changing this face; otherwise Color opens
+                        setOpenPanel(p => (p === 'icons' || p === 'text' ? p : 'colour'));
+                      }}
                       aria-pressed={i === activeFace}
-                      aria-label={`Face ${i + 1}: ${content.startsWith(FACE_ICON_PREFIX) ? content.replace(FACE_ICON_PREFIX, '') : content}${picture ? ', picture' : ''}`}
+                      aria-label={`Face ${i + 1}: ${[parts.icon, parts.text].filter(Boolean).join(' ')}${picture ? ', picture' : ''}`}
                     >
                       {picture && <img src={picture} alt="" className={styles.faceThumb} />}
-                      {content.startsWith(FACE_ICON_PREFIX) 
-                        ? React.createElement(ALL_ICONS.find(icon => icon.name === content.replace(FACE_ICON_PREFIX, ''))?.icon || Star, { size: 20, strokeWidth: 2.5 }) 
-                        : <span className={styles.faceTileText}>{content}</span>}
+                      {TileIcon && <TileIcon size={20} strokeWidth={2.5} style={{ flex: 'none' }} />}
+                      {parts.text && <span className={styles.faceTileText} style={TileIcon ? { marginLeft: 6 } : undefined}>{parts.text}</span>}
                     </button>
                     <div className={styles.faceActions}>
                       <input
@@ -405,14 +442,22 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
 
           {openPanel === 'icons' && (
             <div id={`${fieldId}-panel-icons`} className={styles.panelBody}>
-              <span className={styles.sublabel}>Tap an icon to add it as a face</span>
+              {editing !== null ? (
+                <div className={styles.editNote}>
+                  <span className={styles.sublabel} style={{ margin: 0 }}>Tap an icon to put it on face {editing + 1}</span>
+                  <button type="button" className={styles.listUndo} onClick={() => setEditFace(null)}>Add a new face instead</button>
+                </div>
+              ) : (
+                <span className={styles.sublabel}>Tap an icon to add it as a face</span>
+              )}
               <div className={styles.iconGrid} style={{ maxHeight: showAllIcons ? '150px' : 'auto', overflowY: showAllIcons ? 'auto' : 'visible' }}>
                 {(showAllIcons ? ALL_ICONS : COMMON_ICONS).map(icon => (
                   <button 
                     key={icon.name} 
-                    onClick={() => addCustomFace(`${FACE_ICON_PREFIX}${icon.name}`)}
+                    onClick={() => editing !== null ? setFaceIcon(editing, icon.name) : addCustomFace(`${FACE_ICON_PREFIX}${icon.name}`)}
                     className={styles.iconBtn}
-                    aria-label={`Add ${icon.name} face`}
+                    aria-label={editing !== null ? `${icon.name} on face ${editing + 1}` : `Add ${icon.name} face`}
+                    aria-pressed={editing !== null ? editingParts?.icon === icon.name : undefined}
                     title={icon.name}
                   >
                     <icon.icon size={18} strokeWidth={2.5} />
@@ -436,6 +481,28 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
 
           {openPanel === 'text' && (
             <div id={`${fieldId}-panel-text`} className={styles.panelBody}>
+              {editing !== null && editingParts ? (
+                <>
+                  <div className={styles.editNote}>
+                    <span className={styles.sublabel} style={{ margin: 0 }}>Words on face {editing + 1}{editingParts.icon ? `, under the ${editingParts.icon.toLowerCase()}` : ''}</span>
+                    <button type="button" className={styles.listUndo} onClick={() => setEditFace(null)}>Add a new face instead</button>
+                  </div>
+                  <div className={styles.addFaceRow}>
+                    <input
+                      type="text"
+                      value={editingParts.text}
+                      onChange={(e) => setFaceText(editing, e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+                      placeholder={editingParts.icon ? 'Add words under the icon' : 'Face text'}
+                      aria-label={`Words on face ${editing + 1}`}
+                      autoComplete="off"
+                      enterKeyHint="done"
+                      className={styles.inputField}
+                      style={{ flex: 1, minWidth: 0 }}
+                    />
+                  </div>
+                </>
+              ) : (
               <div className={styles.addFaceRow}>
                 <input 
                   type="text" 
@@ -453,6 +520,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                   <Plus size={20} strokeWidth={2.5} />
                 </button>
               </div>
+              )}
               {/* Any later edit to the faces retires the note, so Undo never wipes that edit */}
               {listNote && listNote.after === dice.customFaces && (
                 <p className={styles.listNote} role="status">

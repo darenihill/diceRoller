@@ -357,3 +357,22 @@
   opacity: 0.15;
   transition: none;
 }
+
+/* A face with an icon and words: the icon above, the words under it */
+.iconWithText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--dice-size) * 0.02);
+  max-width: 92%;
+  line-height: 1;
+}
+
+.iconWords {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}

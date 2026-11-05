@@ -48,6 +48,10 @@
 
 .custom {
   background: conic-gradient(#E32227, #FBFB3C, #228B22, #00B7FF, #0000FF, #B24BF3, #E32227);
+  /* Sized to the outer edge: from the padding box the wheel repeated a sliver
+     into the 1px border, which looked like a clipped rim (owner, 2026-11-05) */
+  background-origin: border-box;
+  border-color: transparent;
 }
 
 .customCentre {

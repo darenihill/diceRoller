@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { DiceData } from '../types';
-import { generateId, parseFaceContent, faceNumericValue, FACE_ICON_PREFIX, isNumberedFaces, percentileBonus } from '../utils/diceUtils';
+import { generateId, parseFaceContent, faceNumericValue, faceLabel, isNumberedFaces, percentileBonus } from '../utils/diceUtils';
 import { luckSet } from '../utils/fairOdds';
 import { MAX_DICE_LIMIT, MAX_HISTORY_LENGTH, MAX_NAME_LENGTH, ROLL_DURATION_MS, TOAST_DURATION_MS } from '../utils/constants';
 import { randomBelow } from '../utils/fairRandom';
@@ -338,7 +338,7 @@ export const useDiceState = () => {
         const idx = d.targetFaceIndex ?? d.currentFaceIndex ?? 0;
         const parsedFace = parseFaceContent(d.customFaces[idx] ?? '');
         const face = parsedFace.content;
-        shown = face.startsWith(FACE_ICON_PREFIX) ? face.replace(FACE_ICON_PREFIX, '') : (face || String(val));
+        shown = faceLabel(face) || String(val);
         // A symbol or word that counts as a number shows both, e.g. "Star (6)"
         if (parsedFace.value !== undefined && shown !== String(parsedFace.value)) shown = `${shown} (${parsedFace.value})`;
       }

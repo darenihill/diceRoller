@@ -1,5 +1,5 @@
 import type { DiceData } from '../types';
-import { parseFaceContent, faceNumericValue, FACE_ICON_PREFIX } from './diceUtils';
+import { parseFaceContent, faceNumericValue, faceParts } from './diceUtils';
 
 /** A die as the big table view shows it: a small tile with its face. */
 export interface TableTile {
@@ -32,8 +32,8 @@ export function tableTiles(dice: DiceData[]): TableTile[] {
       const raw = d.customFaces[d.currentFaceIndex ?? 0] ?? '';
       const face = parseFaceContent(raw).content;
       value = faceNumericValue(raw);
-      // An icon face has no text to show, so its tile shows the number it counts as
-      text = face.startsWith(FACE_ICON_PREFIX) || !face ? String(value) : face;
+      // An icon face shows its words when it has some, else the number it counts as
+      text = faceParts(face).text || String(value);
     }
     return { id: d.id, text, value, dropped: !!d.dropped, held: d.held };
   });

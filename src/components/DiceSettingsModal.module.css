@@ -532,3 +532,13 @@
     line-height: 1.15;
   }
 }
+
+/* Icons or Text changing a tapped face: what they change, and the way back to adding */
+.editNote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 8px;
+  margin-bottom: 4px;
+}

@@ -6,6 +6,30 @@ import {
 
 export const FACE_BG_DELIMITER = ':bg:';
 export const FACE_ICON_PREFIX = ':icon:';
+/** An icon face can carry words too: ':icon:Sword:text:Attack' (owner, 2026-11-05) */
+export const FACE_TEXT_DELIMITER = ':text:';
+
+/** A face's icon (if any) and its words */
+export function faceParts(content: string): { icon?: string; text: string } {
+  if (!content.startsWith(FACE_ICON_PREFIX)) return { text: content };
+  const rest = content.slice(FACE_ICON_PREFIX.length);
+  const at = rest.indexOf(FACE_TEXT_DELIMITER);
+  return at < 0
+    ? { icon: rest, text: '' }
+    : { icon: rest.slice(0, at), text: rest.slice(at + FACE_TEXT_DELIMITER.length) };
+}
+
+/** Puts an icon and words back into one face's content */
+export function joinFace(icon: string | undefined, text: string): string {
+  if (!icon) return text;
+  return `${FACE_ICON_PREFIX}${icon}${text ? `${FACE_TEXT_DELIMITER}${text}` : ''}`;
+}
+
+/** What a face says in words: its text, else its icon's name */
+export function faceLabel(content: string): string {
+  const { icon, text } = faceParts(content);
+  return text || icon || '';
+}
 /** Optional suffix giving a symbol or word face a number to count as, e.g. ':icon:Star:bg:#FFD700:val:6' */
 export const FACE_VALUE_DELIMITER = ':val:';
 const FACE_VALUE_RE = /:val:(-?\d{1,4})$/;

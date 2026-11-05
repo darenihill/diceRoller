@@ -4,7 +4,7 @@ import styles from './Dice.module.css';
 import { Lock, Unlock, Settings, Trash2, Copy, Dices } from 'lucide-react';
 import { motion, useAnimationControls, useReducedMotion } from 'framer-motion';
 import { ALL_ICONS } from '../utils/iconUtils';
-import { parseFaceContent, FACE_ICON_PREFIX, getContrastColor } from '../utils/diceUtils';
+import { parseFaceContent, FACE_ICON_PREFIX, getContrastColor, faceParts, faceLabel } from '../utils/diceUtils';
 import { useFaceImage } from '../utils/faceImages';
 import { MAX_SHAPED_FACE_LENGTH } from '../utils/constants';
 import { PolyhedralWireframe } from './PolyhedralWireframe';
@@ -175,7 +175,7 @@ const DiceComponent: React.FC<DiceProps> = ({
   const textColor = getContrastColor(backgroundColor);
   // Names the die in every button around it, so a screen reader hears "Remove Red", not five "Remove Die"
   const dieName = dice.name || `d${dice.faces}`;
-  const spokenFace = faceContent.startsWith(FACE_ICON_PREFIX) ? faceContent.replace(FACE_ICON_PREFIX, '') : faceContent;
+  const spokenFace = faceLabel(faceContent);
 
   let longestFace = 1;
   // Letters run wider than digits, so word faces ("YES", "MAYBE") get a little
@@ -195,10 +195,21 @@ const DiceComponent: React.FC<DiceProps> = ({
 
   const renderFace = (faceStr: string) => {
     if (!faceStr) return null;
-    if (faceStr.startsWith(FACE_ICON_PREFIX)) {
-      const iconName = faceStr.replace(FACE_ICON_PREFIX, '');
-      const IconComp = ALL_ICONS.find(i => i.name === iconName)?.icon;
-      if (IconComp) return <IconComp size="calc(var(--dice-size) * 0.58)" strokeWidth={2.5} color={textColor} />;
+    const { icon, text } = faceParts(faceStr);
+    if (icon) {
+      const IconComp = ALL_ICONS.find(i => i.name === icon)?.icon;
+      if (IconComp && !text) return <IconComp size="calc(var(--dice-size) * 0.58)" strokeWidth={2.5} color={textColor} />;
+      // An icon with words: the icon above, the words small under it (owner, 2026-11-05)
+      if (IconComp) {
+        const wordSize = Math.min(0.22, 1.25 / Math.max(1, text.length));
+        return (
+          <span className={styles.iconWithText}>
+            <IconComp size="calc(var(--dice-size) * 0.42)" strokeWidth={2.5} color={textColor} />
+            <span className={styles.iconWords} style={{ fontSize: `calc(var(--dice-size) * ${wordSize})` }}>{text}</span>
+          </span>
+        );
+      }
+      return text || icon;
     }
     return faceStr;
   };
