@@ -51,6 +51,8 @@ describe('Screen readers reach every die and its buttons', () => {
     const rpg = screen.getByRole('button', { name: /RPG Mode/ });
     expect(rpg).toHaveAttribute('aria-pressed', 'false');
     fireEvent.click(rpg);
+    expect(screen.getByRole('button', { name: 'Roll type: Normal. Change' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Roll type: Normal. Change' }));
     expect(screen.getByRole('button', { name: /Normal Roll|NORM/ })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('button', { name: /Advantage: Keep Highest|ADV/ })).toHaveAttribute('aria-pressed', 'false');
   });

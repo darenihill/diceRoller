@@ -927,6 +927,8 @@ function App() {
         onToggleRpgMode={toggleRpgMode}
         tableView={tableView}
         onToggleTableView={toggleTableView}
+        allHeld={allHeld}
+        onHoldAll={() => { toggleHoldAll(); setMenuOpen(false); }}
         onInstall={installed ? undefined : handleInstall}
       />
 

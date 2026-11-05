@@ -190,3 +190,35 @@
     height: 52px;
   }
 }
+
+/* RPG Mode has no Hold All button at the bottom (it is in this menu), so on a
+   phone the menu button drops into its corner */
+@media (max-width: 468px) {
+  :global(body.rpg-mode) .toggleContainer {
+    bottom: 24px;
+  }
+
+  :global(body.rpg-mode) .menu {
+    bottom: 104px;
+  }
+}
+
+@media (max-width: 379px) {
+  :global(body.rpg-mode) .toggleContainer {
+    bottom: 16px;
+  }
+
+  :global(body.rpg-mode) .menu {
+    bottom: 84px;
+  }
+}
+
+@media (max-width: 299px) {
+  :global(body.rpg-mode) .toggleContainer {
+    bottom: 12px;
+  }
+
+  :global(body.rpg-mode) .menu {
+    bottom: 72px;
+  }
+}

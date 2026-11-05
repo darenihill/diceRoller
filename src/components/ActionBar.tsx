@@ -41,12 +41,27 @@ const DND_GRID_DICE = [
 
 const D20_OPTION = { label: 'D20', faces: 20, name: 'd20', color: '#384050' };
 
+const ROLL_TYPES = [
+  ['advantage', 'ADV', 'Advantage: Keep Highest'],
+  ['normal', 'NORM', 'Normal Roll'],
+  ['disadvantage', 'DIS', 'Disadvantage: Keep Lowest'],
+] as const;
+const ROLL_TYPE_NAMES: Record<RollAdvantageMode, string> = { advantage: 'Advantage', normal: 'Normal', disadvantage: 'Disadvantage' };
+const signed = (n: number) => `${n > 0 ? '+' : ''}${n}`;
+
 export const ActionBar: React.FC<ActionBarProps> = ({ 
   onAdd, onRoll, onHoldAll, allHeld, totalVisible, totalStale = false, lastTotal, totalKey, rolling = false, lastModifier = 0, modifier, onChangeModifier,
   rpgMode, rollAdvantage, onChangeRollAdvantage
 }) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const calm = !!useReducedMotion();
+  // Which RPG chip is open into its buttons; a roll closes it
+  const [open, setOpen] = useState<'type' | 'mod' | null>(null);
+  const [wasRolling, setWasRolling] = useState(rolling);
+  if (rolling !== wasRolling) {
+    setWasRolling(rolling);
+    if (rolling) setOpen(null);
+  }
 
   // The total pops once per newly landed main roll: not for a single-die roll,
   // which keeps the same total, and not when Undo brings an older roll back
@@ -111,7 +126,8 @@ export const ActionBar: React.FC<ActionBarProps> = ({
 
   return (
     <div className={styles.actionBar}>
-      <motion.button
+      {/* In RPG Mode Hold All lives in the menu, which gives the chips the room */}
+      {!rpgMode && <motion.button
         className={`md-icon-button control-ring ${styles.actionBtn} ${styles.lockBtn}`}
         onClick={onHoldAll}
         title="Toggle Hold All"
@@ -121,7 +137,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
         style={{ color: allHeld ? 'var(--color-gold-ink)' : undefined }}
       >
         {allHeld ? <Unlock size={24} strokeWidth={2.5} /> : <Lock size={24} strokeWidth={2.5} />}
-      </motion.button>
+      </motion.button>}
 
       {/* Add Button & Quick D&D Popover */}
       <div className={styles.addPopoverContainer}>
@@ -174,72 +190,73 @@ export const ActionBar: React.FC<ActionBarProps> = ({
       </div>
 
       <div className={styles.rollGroup}>
+        {/* RPG controls as two chips that show what is set ("ADV", "+2"); a tap
+            opens one into its buttons, and a roll shrinks it back (owner, 2026-11-05) */}
         {rpgMode && (
-          <motion.div 
-            className={styles.rpgColumns}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-          >
-            {/* Left Vertical Column: Advantage / Disadvantage FABs */}
-            <div className={styles.verticalColumn}>
+          <div className={styles.rpgChips}>
+            {open === 'type' ? (
+              <div className={styles.rpgPill} role="group" aria-label="Roll type">
+                {ROLL_TYPES.map(([mode, label, title]) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    className={`control-ring ${styles.rpgSeg} ${rollAdvantage === mode ? styles.rpgSegOn : ''}`}
+                    aria-pressed={rollAdvantage === mode}
+                    onClick={() => onChangeRollAdvantage(mode)}
+                    title={title}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            ) : (
               <button
-                className={`control-ring ${styles.rpgFabBtn} ${rollAdvantage === 'advantage' ? styles.rpgFabActive : ''}`}
-                aria-pressed={rollAdvantage === 'advantage'}
-                onClick={() => onChangeRollAdvantage('advantage')}
-                title="Advantage: Keep Highest"
+                type="button"
+                className={`control-ring ${styles.rpgChip} ${rollAdvantage !== 'normal' ? styles.rpgChipSet : ''}`}
+                aria-expanded={false}
+                aria-label={`Roll type: ${ROLL_TYPE_NAMES[rollAdvantage]}. Change`}
+                onClick={() => setOpen('type')}
+                data-testid="roll-type-chip"
               >
-                ADV
+                {ROLL_TYPES.find(([mode]) => mode === rollAdvantage)![1]}
               </button>
-              <button
-                className={`control-ring ${styles.rpgFabBtn} ${rollAdvantage === 'normal' ? styles.rpgFabActive : ''}`}
-                aria-pressed={rollAdvantage === 'normal'}
-                onClick={() => onChangeRollAdvantage('normal')}
-                title="Normal Roll"
-              >
-                NORM
-              </button>
-              <button
-                className={`control-ring ${styles.rpgFabBtn} ${rollAdvantage === 'disadvantage' ? styles.rpgFabActive : ''}`}
-                aria-pressed={rollAdvantage === 'disadvantage'}
-                onClick={() => onChangeRollAdvantage('disadvantage')}
-                title="Disadvantage: Keep Lowest"
-              >
-                DIS
-              </button>
-            </div>
+            )}
 
-            {/* Right Vertical Column: Modifier Stepper FABs */}
-            <div className={`${styles.verticalColumn} ${styles.modifierColumn}`}>
+            {open === 'mod' ? (
+              <div className={styles.rpgPill} role="group" aria-label="Modifier">
+                <button type="button" className={`md-icon-button control-ring ${styles.rpgSeg}`} onClick={() => onChangeModifier(modifier - 1)} title="Decrease modifier">
+                  <Minus size={20} strokeWidth={2.5} />
+                </button>
+                {/* The value; a tap sets it back to 0 */}
+                <button
+                  type="button"
+                  className={`md-icon-button control-ring ${styles.rpgSeg} ${styles.modifierValue} ${modifier === 0 ? styles.modifierBtnDisabled : ''}`}
+                  onClick={() => onChangeModifier(0)}
+                  title="Reset modifier"
+                  aria-label={modifier === 0 ? 'Modifier 0' : `Modifier ${signed(modifier)}, reset to 0`}
+                  disabled={modifier === 0}
+                  data-testid="modifier-value"
+                >
+                  <span className={styles.modifierNumber}>{signed(modifier)}</span>
+                  {modifier !== 0 && <RotateCcw size={12} strokeWidth={2.5} aria-hidden="true" />}
+                </button>
+                <button type="button" className={`md-icon-button control-ring ${styles.rpgSeg}`} onClick={() => onChangeModifier(modifier + 1)} title="Increase modifier">
+                  <Plus size={20} strokeWidth={2.5} />
+                </button>
+              </div>
+            ) : (
               <button
-                className={`md-icon-button control-ring ${styles.rpgFabBtn}`}
-                onClick={() => onChangeModifier(modifier + 1)}
-                title="Increase modifier"
+                type="button"
+                className={`control-ring ${styles.rpgChip} ${modifier !== 0 ? styles.rpgChipSet : ''}`}
+                aria-expanded={false}
+                aria-label={`Modifier ${signed(modifier)}. Change`}
+                onClick={() => setOpen('mod')}
+                data-testid="modifier-chip"
               >
-                <Plus size={28} strokeWidth={2.5} />
+                {modifier === 0 ? '±0' : signed(modifier)}
               </button>
-              {/* Shows the modifier set now, so it can be read even when the Roll
-                  button is showing the last total (owner, 2026-11-05). Tap resets it. */}
-              <button
-                className={`md-icon-button control-ring ${styles.rpgFabBtn} ${styles.modifierValue} ${modifier === 0 ? styles.modifierBtnDisabled : ''}`}
-                onClick={() => onChangeModifier(0)}
-                title="Reset modifier"
-                aria-label={modifier === 0 ? 'Modifier 0' : `Modifier ${modifier > 0 ? '+' : ''}${modifier}, reset to 0`}
-                disabled={modifier === 0}
-                data-testid="modifier-value"
-              >
-                <span className={styles.modifierNumber}>{modifier > 0 ? '+' : ''}{modifier}</span>
-                {modifier !== 0 && <RotateCcw size={12} strokeWidth={2.5} aria-hidden="true" />}
-              </button>
-              <button
-                className={`md-icon-button control-ring ${styles.rpgFabBtn}`}
-                onClick={() => onChangeModifier(modifier - 1)}
-                title="Decrease modifier"
-              >
-                <Minus size={28} strokeWidth={2.5} />
-              </button>
-            </div>
-          </motion.div>
+            )}
+          </div>
         )}
 
         <motion.button

@@ -16,8 +16,11 @@ describe('Bright ring on the bottom-bar buttons', () => {
     const ringed = (name: RegExp | string) => screen.getAllByRole('button', { name })[0].classList.contains('control-ring');
     expect(ringed('Roll dice')).toBe(true);
     expect(ringed(/menu/i)).toBe(true);
+    expect(ringed(/^Roll type/)).toBe(true);
+    expect(ringed(/^Modifier/)).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: /^Roll type/ }));
     for (const b of ['ADV', 'NORM', 'DIS']) expect(ringed(b)).toBe(true);
-    expect(document.querySelectorAll('.control-ring').length).toBeGreaterThanOrEqual(10);
+    expect(document.querySelectorAll('.control-ring').length).toBeGreaterThanOrEqual(7);
   });
 
   it('each theme sets its own ring colour', () => {

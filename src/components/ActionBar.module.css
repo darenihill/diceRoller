@@ -56,6 +56,7 @@
 }
 
 .rollGroup {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -63,64 +64,10 @@
   align-items: flex-end;
 }
 
-.rpgColumns {
-  display: flex;
-  gap: 12px;
-  align-items: flex-end;
-}
 
-.verticalColumn {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: center;
-}
 
-.rpgFabBtn {
-  width: 72px;
-  height: 72px;
-  background-color: var(--md-sys-color-surface-variant);
-  color: var(--md-sys-color-on-surface);
-  box-shadow: var(--elevation-3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 500;
-  border-radius: 50%;
-  transition: opacity 0.2s, background-color 0.2s, color 0.2s, transform 0.2s;
-}
 
-.rpgFabBtn:hover {
-  background-color: var(--md-sys-color-surface-hover);
-  transform: scale(1.05);
-}
 
-/* The chosen roll type: a blue ring and blue text, no fill, so the big Roll
-   button stays the only filled blue button in RPG Mode */
-.rpgFabActive {
-  color: var(--md-sys-color-primary) !important;
-  border: 2px solid var(--md-sys-color-primary);
-  /* The chosen roll type keeps its own colour ring */
-  outline-color: var(--md-sys-color-primary) !important;
-}
-
-.modifierValue {
-  flex-direction: column;
-  gap: 2px;
-}
-
-.modifierNumber {
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.modifierBtnDisabled {
-  opacity: 0.4;
-  pointer-events: none;
-}
 
 /* Quick D&D Dice Add Popover */
 .addPopoverContainer {
@@ -211,38 +158,6 @@
   transform: scale(1.02);
 }
 
-@media (max-width: 768px) {
-  /* Float the RPG controls above the roll button rather than leaving them in
-     the flow. In flow, the 232px-wide block widens the roll group and shoves
-     the add-dice button 76px left the instant RPG mode is switched on. */
-  .rollGroup {
-    position: relative;
-  }
-
-  /* Rotate the controls: two rows of three instead of three rows of two.
-     Same buttons, ~80px shorter, and that height goes back to the dice.
-     column-reverse lifts the modifier stepper to the top row, so its "+" is
-     no longer sitting directly above the add-dice "+". */
-  .rpgColumns {
-    position: absolute;
-    bottom: calc(100% + 10px);
-    right: 0;
-    flex-direction: column-reverse;
-    align-items: flex-end;
-    gap: 8px;
-  }
-
-  .verticalColumn {
-    flex-direction: row;
-  }
-
-  /* Minus on the left, plus on the right — the usual reading order for a
-     horizontal stepper, and the reverse of how it sits stacked vertically. */
-  .modifierColumn {
-    flex-direction: row-reverse;
-  }
-}
-
 @media (max-width: 468px) {
   .lockBtn {
     position: fixed !important;
@@ -252,7 +167,7 @@
     z-index: 101 !important;
   }
 
-  :global(.menu-open) .rpgColumns {
+  :global(.menu-open) .rpgChips {
     display: none !important;
   }
 }
@@ -268,8 +183,7 @@
     gap: 10px;
   }
 
-  .actionBtn,
-  .rpgFabBtn {
+  .actionBtn {
     width: 60px;
     height: 60px;
   }
@@ -300,8 +214,7 @@
     gap: 8px;
   }
 
-  .actionBtn,
-  .rpgFabBtn {
+  .actionBtn {
     width: 52px;
     height: 52px;
   }
@@ -326,61 +239,92 @@
   }
 }
 
-/* Phones and small tablets: the six round RPG buttons become two slim pills,
-   roll type [ADV | NORM | DIS] and modifier [− +2 +], stacked above Roll.
-   About 48px shorter than two rows of 72px circles, and that height goes back
-   to the dice (owner, 2026-11-05: "mobile rpg mode is feeling cluttered").
-   Last in the file so it wins over the narrow-phone circle sizes above. */
-@media (max-width: 768px) {
-  .rpgColumns {
-    gap: 8px;
-  }
+/* RPG Mode: two chips above Roll that say what is set ("ADV", "+2"). A tap
+   opens one into its buttons; a roll shrinks it back (owner, 2026-11-05).
+   They float above Roll, so switching RPG Mode on never moves the + button. */
+.rpgChips {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  white-space: nowrap;
+}
 
-  .verticalColumn {
-    gap: 2px;
-    padding: 3px;
-    border-radius: 999px;
-    background-color: var(--md-sys-color-surface-variant);
-    box-shadow: var(--elevation-3);
-  }
+.rpgChip {
+  min-width: 64px;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 999px;
+  background-color: var(--md-sys-color-surface-variant);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: var(--elevation-3);
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
 
-  .verticalColumn .rpgFabBtn {
-    width: auto;
-    min-width: 52px;
-    height: 44px;
-    padding: 0 12px;
-    border-radius: 999px;
-    background-color: transparent;
-    box-shadow: none;
-  }
+/* Something other than plain: the chip says so in the accent */
+.rpgChipSet {
+  border-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-primary);
+}
 
-  .verticalColumn .rpgFabBtn:hover {
-    transform: none;
-  }
+.rpgPill {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background-color: var(--md-sys-color-surface-variant);
+  box-shadow: var(--elevation-3);
+}
 
-  /* The chosen roll type fills its segment; still blue text, so the big Roll
-     button stays the only filled blue button */
-  .verticalColumn .rpgFabActive {
-    border-width: 2px;
-    background-color: var(--md-sys-color-surface);
-  }
+.rpgSeg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 44px;
+  padding: 0 12px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
 
-  .modifierColumn .rpgFabBtn {
-    min-width: 44px;
-    padding: 0 8px;
-  }
+.rpgSeg:hover {
+  background-color: var(--md-sys-color-surface-hover);
+}
 
-  .modifierColumn .modifierValue {
-    min-width: 56px;
-  }
+/* The chosen roll type: a blue ring and blue text, no fill, so the big Roll
+   button stays the only filled blue button */
+.rpgSegOn {
+  border-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-primary);
+  background-color: var(--md-sys-color-surface);
+}
 
-  /* In the pill the number says enough; the reset arrow sits beside it */
-  .modifierColumn .modifierValue {
-    flex-direction: row;
-    gap: 4px;
-  }
+.modifierValue {
+  gap: 4px;
+  min-width: 60px;
+}
 
-  .modifierColumn .modifierNumber {
-    font-size: 17px;
-  }
+.modifierNumber {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.modifierBtnDisabled {
+  opacity: 0.4;
+  pointer-events: none;
 }

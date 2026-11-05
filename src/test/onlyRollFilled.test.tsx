@@ -21,6 +21,7 @@ describe('RPG Mode: only the big Roll button is filled blue', () => {
   it('tells screen readers which roll type is on', () => {
     localStorage.setItem('rpgMode', 'true');
     render(<App />);
+    fireEvent.click(screen.getByTestId('roll-type-chip'));
     const normal = screen.getByTitle('Normal Roll');
     const adv = screen.getByTitle('Advantage: Keep Highest');
     expect(normal).toHaveAttribute('aria-pressed', 'true');
