@@ -53,3 +53,14 @@ describe('Dice Settings puts Standard Faces beside Name', () => {
     expect(name.parentElement?.parentElement).toBe(faces.parentElement?.parentElement?.parentElement);
   });
 });
+
+describe('the face colour row stays under Remove, Clone and Done until pinned', () => {
+  it('the open panels are plain blocks, and the loose row has no stacking order of its own', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { resolve } = await import('node:path');
+    const css = readFileSync(resolve(__dirname, '../components/DiceSettingsModal.module.css'), 'utf8');
+    const rule = (sel: string) => css.match(new RegExp(`\\n${sel.replace('.', '\\.')}\\s*\\{([^}]*)\\}`))?.[1] ?? '';
+    expect(rule('.panelBody')).toMatch(/display:\s*block/);
+    expect(rule('.faceColourRowLoose')).toMatch(/z-index:\s*auto/);
+  });
+});

@@ -169,6 +169,7 @@
 /* Before a face is tapped the colour row sits in the list, so the faces show first */
 .faceColourRowLoose {
   position: static;
+  z-index: auto;
 }
 
 /* A picked face gets the same ring as a focused die: the theme's
@@ -395,6 +396,7 @@
 
 .tab {
   flex: 1 1 auto;
+  min-width: 0;
   min-height: 48px;
   padding: 0 4px;
   border: none;
@@ -454,6 +456,13 @@
   }
 }
 
+/* Narrow phones: the word alone, so all three fit */
+@media (max-width: 379px) {
+  .panelBtn svg {
+    display: none;
+  }
+}
+
 .panelBtn:hover {
   background-color: var(--md-sys-color-surface-hover);
 }
@@ -478,14 +487,10 @@
 }
 
 .panelBody {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  /* A block, not flex: as a flex item the loose colour row's z-index would
+     apply and paint it over the Remove / Clone / Done row */
+  display: block;
   margin-bottom: 4px;
-}
-
-.panelBody > .addPictureBtn {
-  align-self: flex-start;
 }
 
 /* Settings tab: Name and Standard Faces share the top row, wrapping on a narrow phone */
@@ -509,4 +514,13 @@
 /* The name box lines up with the 44px stepper beside it */
 .nameField .inputField {
   height: 44px;
+}
+
+/* Narrow phones: the tab names wrap to two lines instead of running under the close button */
+@media (max-width: 379px) {
+  .tab {
+    white-space: normal;
+    font-size: 0.875rem;
+    line-height: 1.15;
+  }
 }

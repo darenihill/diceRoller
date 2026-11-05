@@ -13,7 +13,7 @@
   display: grid;
   grid-template-columns: repeat(6, auto);
   justify-content: space-between;
-  gap: 10px 6px;
+  gap: 10px 4px;
 }
 
 /* cqi on the dots, not the grid: it measures the nearest container above */
@@ -23,7 +23,7 @@
 
 @supports (width: 1cqi) {
   .dot {
-    --dot: clamp(30px, calc((100cqi - 30px) / 6), 44px);
+    --dot: clamp(22px, calc((100cqi - 20px) / 6), 44px);
   }
 }
 
