@@ -59,29 +59,22 @@
 }
 
 .ringLine {
-  x: calc(var(--line) / 2 + 1px);
-  y: calc(var(--line) / 2 + 1px);
-  width: calc(100% - var(--line) - 2px);
-  height: calc(100% - var(--line) - 2px);
-  rx: 20px;
-  ry: 20px;
   fill: none;
   stroke: currentColor;
   stroke-width: var(--line);
   stroke-linecap: round;
-  /* One dash that shrinks from the whole line to nothing, its start moved to
-     the top middle (--start, the share of the line before that point) */
-  --start: 0;
-  stroke-dasharray: 1 0;
-  stroke-dashoffset: calc(var(--start) * -1px);
+  /* The path starts at the top middle; one dash as long as the whole line,
+     its start sliding clockwise round to the end */
+  stroke-dasharray: 1px 1px;
+  stroke-dashoffset: 0px;
   animation-name: undoDrain;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
 }
 
 @keyframes undoDrain {
-  from { stroke-dasharray: 1px 0px; stroke-dashoffset: calc(var(--start) * -1px); }
-  to { stroke-dasharray: 0px 1px; stroke-dashoffset: calc(-1px - var(--start) * 1px); }
+  from { stroke-dashoffset: 0px; }
+  to { stroke-dashoffset: -1px; }
 }
 
 .close {
