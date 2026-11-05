@@ -15,6 +15,13 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   colour and face colour use the same twelve equal dots (two rows of six) in
   the page, Custom opens the same sliders and colour code everywhere, and no
   phone colour tool or floating box remains (src/test/colorPicker.test.tsx).
+- ~~Done 2026-11-04~~ New-version bar (Daren 2026-11-03, Build: "The
+  installed app shows a bar when a new version is ready"). Done when: an app
+  left open shows "New version · Refresh · ✕ (Later)" once a newer version is
+  live (checked when it comes back on screen, when signal returns and every
+  30 minutes), Refresh loads it, Later hides it until the next version, and
+  the offline worker lets the check reach the network
+  (src/test/newVersion.test.tsx).
 - ~~Done 2026-11-02~~ Dice settings tabs (Daren 2026-11-02: "remove the quick
   templates from a dice settings ... shift dice settings to 2 main tabs 'Dice
   Settings' ... and 'Custom faces' ... take up the top where Dice settings

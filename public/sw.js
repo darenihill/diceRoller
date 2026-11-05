@@ -57,6 +57,10 @@ self.addEventListener('fetch', (e) => {
   
   if (!isLocal && !isGoogleFont) return;
 
+  // The page's "is there a new version?" check must reach the network, never a
+  // saved copy (src/hooks/useNewVersion.ts)
+  if (isLocal && url.searchParams.has('version-check')) return;
+
   // Navigation requests (the HTML shell) use network-first. Under
   // stale-while-revalidate a returning visitor would render the PREVIOUS
   // deploy's index.html on every visit — permanently one release behind,
