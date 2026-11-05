@@ -104,11 +104,6 @@
   text-decoration: line-through;
 }
 
-.hint {
-  margin: 4px 0 0;
-  font-size: 13px;
-  color: var(--md-sys-color-on-surface-variant);
-}
 
 .turnOff {
   min-height: 44px;

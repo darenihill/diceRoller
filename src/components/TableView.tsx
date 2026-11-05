@@ -50,7 +50,6 @@ export const TableView: React.FC<TableViewProps> = ({ total, math, tiles, onShow
           </li>
         ))}
       </ul>
-      <p className={styles.hint}>Tap the number to see the dice</p>
       {/* Off from the main screen, not only the menu (owner, 2026-11-05) */}
       {onTurnOff && (
         <button type="button" className={styles.turnOff} onClick={onTurnOff}>

@@ -108,16 +108,18 @@ describe('Table view switch and big total', () => {
     expect(within(screen.getByTestId('table-view')).getByRole('button', { name: /^Total \d+\. Show the dice$/ })).toBeEnabled();
   });
 
-  it('after showing the dice, a Table button goes back to the table (owner, 2026-11-05)', () => {
+  it('one Table | Dice switch flips between the two, in the same place both ways (owner, 2026-11-05)', () => {
     localStorage.setItem('tableView', 'true');
     render(<App />);
+    expect(screen.queryByRole('group', { name: 'Show' })).toBeNull();
     roll();
-    expect(screen.queryByRole('button', { name: /^Show table/ })).toBeNull();
-    fireEvent.click(within(screen.getByTestId('table-view')).getByRole('button', { name: /Show the dice$/ }));
+    const sw = () => within(screen.getByRole('group', { name: 'Show' }));
+    expect(sw().getByRole('button', { name: /^Table, total \d+$/ })).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(sw().getByRole('button', { name: 'Dice' }));
     expect(screen.queryByTestId('table-view')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: /^Show table, total \d+$/ }));
+    expect(sw().getByRole('button', { name: 'Dice' })).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(sw().getByRole('button', { name: /^Table, total \d+$/ }));
     expect(screen.getByTestId('table-view')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /^Show table/ })).toBeNull();
   });
 
   it('table view can be turned off from the table itself', () => {

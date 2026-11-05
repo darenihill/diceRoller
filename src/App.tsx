@@ -849,11 +849,32 @@ function App() {
             />
           </div>
         )}
-        {canReturnToTable && (
-          <button className={styles.tableButton} onClick={() => setTableDismissedId(null)} aria-label={`Show table, total ${lastTotal}`} title="Show table">
-            <Table2 size={18} aria-hidden="true" />
-            <span>Table</span>
-          </button>
+        {/* One Table | Dice switch in the same place both ways, whenever a roll
+            can show on the table (owner, 2026-11-05: "consistent button") */}
+        {(showTable || canReturnToTable) && lastMainRoll && (
+          <div className={styles.viewSwitch} role="group" aria-label="Show">
+            <button
+              type="button"
+              className={styles.viewSwitchBtn}
+              aria-pressed={showTable}
+              disabled={tableRolling}
+              onClick={() => setTableDismissedId(null)}
+              aria-label={`Table, total ${lastTotal}`}
+            >
+              <Table2 size={18} aria-hidden="true" />
+              <span>Table</span>
+            </button>
+            <button
+              type="button"
+              className={styles.viewSwitchBtn}
+              aria-pressed={!showTable}
+              disabled={tableRolling}
+              onClick={() => setTableDismissedId(lastMainRoll.id)}
+            >
+              <Dice6 size={18} aria-hidden="true" />
+              <span>Dice</span>
+            </button>
+          </div>
         )}
         {landingAbout && (
           <button className={styles.aboutButton} onClick={() => setModalOpen('about')} aria-label="About" title="About">
