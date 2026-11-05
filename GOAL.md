@@ -5,6 +5,83 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-03~~ Lift and tag lock (Daren 2026-11-03: "For lock I like
+  the lift and held tag"). Done when: a held die lifts with a deeper shadow
+  and a gold HELD tag drops onto its top edge; a die loaded already held shows
+  the tag without the drop (src/test/heldTag.test.tsx).
+- ~~Done 2026-11-03~~ One colour picker (Daren 2026-11-03: "make sure all
+  color picking is consistent throughout the app (both non overflowing rows
+  and custom color selection)", "I like the color picker"). Done when: die
+  colour and face colour use the same twelve equal dots (two rows of six) in
+  the page, Custom opens the same sliders and colour code everywhere, and no
+  phone colour tool or floating box remains (src/test/colorPicker.test.tsx).
+- ~~Done 2026-11-04~~ New-version bar (Daren 2026-11-03, Build: "The
+  installed app shows a bar when a new version is ready"). Done when: an app
+  left open shows "New version · Refresh · ✕ (Later)" once a newer version is
+  live (checked when it comes back on screen, when signal returns and every
+  30 minutes), Refresh loads it, Later hides it until the next version, and
+  the offline worker lets the check reach the network
+  (src/test/newVersion.test.tsx).
+- ~~Done 2026-11-02~~ Dice settings tabs (Daren 2026-11-02: "remove the quick
+  templates from a dice settings ... shift dice settings to 2 main tabs 'Dice
+  Settings' ... and 'Custom faces' ... take up the top where Dice settings
+  title is currently and leave the close x on the top right"). Done when: the
+  two tabs sit in the title bar beside the close button, and Quick Templates
+  are gone (src/test/diceSettingsTabs.test.tsx).
+- ~~Done 2026-11-02~~ Die buttons (Daren 2026-11-02: "Delete can be red ...
+  and then match the single roll with the regular roll blue"; "change the X on
+  the dice for delete to a trash icon"). Done when: Roll one uses the Roll
+  button's blue, Delete stays red and shows a trash icon
+  (src/test/rollOneColour.test.ts).
+- ~~Done 2026-11-02~~ Most used far right (Daren 2026-11-02: "I want the most
+  used items to the far right") and Clear History findable ("There isn't an
+  option to clear history"). Done when: Saves is the right-hand menu group,
+  each group ends with its most used tile, and Clear History sits at the top
+  of History.
+- ~~Done 2026-11-02~~ Even menu (Daren 2026-11-02: "update the menu to make
+  it look cleaner, it's too inconsistently sized currently, 6 options in tools
+  vs 3 in saves"). Done when: App, Saves and Settings hold four each (History
+  joins Saves; Install app sits beside Clear All in the bottom row).
+- ~~Done 2026-11-02~~ Bright rings as a Customize switch (Daren 2026-11-02:
+  "I thought the bright rings were something that could be turned on in the
+  custom section"). Done when: the ring shows only with Customize > Bright
+  Rings on, it is off by default and kept on this device
+  (src/test/controlRing.test.tsx).
+- ~~Done 2026-11-02~~ New die animation (Daren 2026-11-01, Build): "a die you
+  add glides out of the + button into its place." Works for the RPG
+  quick-add menu too. Done when: a die added from + (or its menu) rises from
+  the button into its slot; dice already out, copies and Reduce motion keep
+  the usual appearance (src/test/addGlide.test.tsx).
+- ~~Done 2026-11-02~~ Total animation (Daren 2026-11-01, Build): "the total on
+  the Roll button pops slightly bigger and settles when the dice land." One
+  short scale on the number, nothing else moves. Done when: each landed roll
+  pops the total once, not while tumbling, and Reduce motion keeps it still
+  (src/test/totalPop.test.tsx).
+- ~~Done 2026-11-02~~ Dropped die animation (Daren 2026-11-01, Build): "with
+  Advantage, the lower die shrinks back and a DROPPED stamp drops onto it."
+  Only in RPG Mode with Advantage or Disadvantage; nothing about the roll or
+  the total changes. Done when: the dropped die sinks back and dims with
+  Material 3 emphasized easing, the DROPPED stamp drops in, and Reduce motion
+  keeps both still (src/test/droppedDie.test.tsx).
+- ~~Done 2026-10-24~~ Show the result big for the table (Daren 2026-10-23, Build, picked "Table
+  view switch in the menu"): "The Roll button stays a roll button. A Table
+  view switch in the menu; while it is on, each roll shows the total huge in
+  the dice area, its math under it, the dice as small tiles and an upside-down
+  copy at the top. The Roll button below keeps rolling, and tapping the big
+  number shows the dice again. Flipped 6 and 9 are underlined."
+  1. ~~Done 2026-10-24~~ A Table view switch in the menu, off by default and remembered. Done when
+     a unit test finds it off, taps it on and finds it on after a reload.
+  2. ~~Done 2026-10-24~~ While it is on, a roll shows the total huge in the dice area with its
+     math under it, the dice as small tiles, and an upside-down copy at the
+     top; the Roll button keeps rolling. Done when a unit test rolls with it
+     on and finds the big total, the math and the flipped copy, and a
+     phone-size browser check shows it.
+  3. ~~Done 2026-10-24~~ Tapping the big number shows the dice again, and the next roll shows it
+     big once more. Done when a unit test taps the number and finds the dice.
+  4. ~~Done 2026-10-24~~ A 6 or a 9 shown on its own (big total or small tile) is underlined, so
+     the flipped copy reads right. Done when a unit test finds 6 and 9
+     underlined and 8 not.
+
 - ~~Done 2026-10-22~~ Say the total includes the modifier (Daren 2026-10-22,
   Build): "The big number stays the real total, and the math sits beside it in
   brackets: 9 (7+2), so the dice and the modifier are both visible and nobody
@@ -96,6 +173,19 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   2. ~~Done 2026-10-22~~ Rolls celebrate exactly as before. Done when a unit test
      shows the note counts what a roll counts, and the roll code is unchanged.
 
+- ~~Done 2026-10-24~~ Fixes from the 2026-10-24 on-the-go review
+  (reviews/2026-10-24-stories.md): the light theme's Clear All is readable
+  (it showed the dark theme's pale pink at 1.3:1), shake to roll waits while
+  any dialog or the menu is open, and plain messages are spoken to screen
+  readers. Done when a theme contrast test covers every theme and unit tests
+  shake under Save and Dice settings without a roll.
+- Code health: move the remembered settings and the backup out of App.tsx
+  (reviews/2026-10-24-code-health.md). One shared remembered-setting piece
+  with the storage guard in one place, and a backup module with a round-trip
+  test. Nothing on screen changes. Done when App.tsx has no direct storage
+  calls for settings, a backup exported and imported in a test comes back
+  the same, and a full storage shows a message instead of a blank screen.
+
 - One highlight colour per meaning (Daren 2026-10-17, Build): "Every selected
   or focused thing (a theme card, a face, a colour swatch, the focused die)
   would use the theme's own accent colour, the same one the Roll button uses.
@@ -160,6 +250,15 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   saved game is named for screen readers; rolling with no dice logs nothing.
   Done when a unit test shows an empty roll leaves history empty and the Save
   button has a fill at 390 px. ~~Done 2026-10-22~~
+- Fixes from the 2026-10-26 review (reviews/2026-10-26-access.md):
+  screen readers reach each die's buttons, states are spoken, Escape closes
+  the menu, the bottom buttons stop overlapping below 380 px wide, and high
+  contrast draws edges. Done when unit tests find each die's named buttons
+  and Escape closing the menu, and a 320 px browser check shows no overlap.
+  ~~Done 2026-10-26~~
+- At 200% zoom (about 195 px wide) the bottom buttons still overlap: give
+  them one row that fits, for example the menu and Hold All side by side
+  above Add and Roll. Done when a 195 px browser check shows no overlap.
 - The phone's back gesture closes the open dialog or menu first, instead of
   leaving the app (trunk test, reviews/2026-10-07-trunk-test.md, finding 4).
 - Donations cover the domain: count Donate taps (a donate_clicked event, no
@@ -207,3 +306,9 @@ customdiceroller.com. Public app: every merge to master publishes the site.
      clear of the dice and the Roll button.
   3. ~~Done 2026-10-23~~ History shows what was typed beside the result. Done when a unit test
      reads the typed text on the history entry.
+- ~~Done 2026-10-28~~ The faces counter warns that it will replace your custom faces (Daren
+  2026-10-28, Build): "Dice settings: the faces counter's label names the
+  custom faces it would replace; No new control or behaviour". Wording only.
+  1. ~~Done 2026-10-28~~ When a die has custom faces, the Standard Faces label adds "Replaces your
+     N custom faces". Done when a component test reads it (and the singular),
+     a plain die shows no note, and a 390 px check shows it wrapping cleanly.

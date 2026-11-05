@@ -6,6 +6,30 @@ import {
 
 export const FACE_BG_DELIMITER = ':bg:';
 export const FACE_ICON_PREFIX = ':icon:';
+/** An icon face can carry words too: ':icon:Sword:text:Attack' (owner, 2026-11-05) */
+export const FACE_TEXT_DELIMITER = ':text:';
+
+/** A face's icon (if any) and its words */
+export function faceParts(content: string): { icon?: string; text: string } {
+  if (!content.startsWith(FACE_ICON_PREFIX)) return { text: content };
+  const rest = content.slice(FACE_ICON_PREFIX.length);
+  const at = rest.indexOf(FACE_TEXT_DELIMITER);
+  return at < 0
+    ? { icon: rest, text: '' }
+    : { icon: rest.slice(0, at), text: rest.slice(at + FACE_TEXT_DELIMITER.length) };
+}
+
+/** Puts an icon and words back into one face's content */
+export function joinFace(icon: string | undefined, text: string): string {
+  if (!icon) return text;
+  return `${FACE_ICON_PREFIX}${icon}${text ? `${FACE_TEXT_DELIMITER}${text}` : ''}`;
+}
+
+/** What a face says in words: its text, else its icon's name */
+export function faceLabel(content: string): string {
+  const { icon, text } = faceParts(content);
+  return text || icon || '';
+}
 /** Optional suffix giving a symbol or word face a number to count as, e.g. ':icon:Star:bg:#FFD700:val:6' */
 export const FACE_VALUE_DELIMITER = ':val:';
 const FACE_VALUE_RE = /:val:(-?\d{1,4})$/;
@@ -17,12 +41,8 @@ const FACE_VALUE_RE = /:val:(-?\d{1,4})$/;
  */
 export const FACE_IMAGE_DELIMITER = ':img:';
 const FACE_IMAGE_RE = /:img:([a-z0-9]{1,16})$/;
-/** Trailing parts a face may carry after its text: picture, colour, Counts as. */
+/** Trailing parts a face may carry after its text: picture, color, Counts as. */
 const FACE_SUFFIX_RE = /(?::img:[a-z0-9]{1,16})?(?::bg:#[0-9a-fA-F]{3,8}|:bg:transparent)?(?::val:-?\d{1,4})?$/;
-
-export function getRandomNumber(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
 export function generateId(): string {
   return Math.random().toString(36).substring(2, 9);
@@ -63,7 +83,7 @@ export function buildFace(content: string, bgColor?: string, value?: number, ima
 
 /**
  * The dice as a share link carries them: pictures stay on this device, so
- * each picture face travels as its text, colour and number only.
+ * each picture face travels as its text, color and number only.
  */
 export function withoutFaceImages(dice: DiceData[]): DiceData[] {
   return dice.map(d => d.customFaces.some(f => f.includes(FACE_IMAGE_DELIMITER))
@@ -75,6 +95,14 @@ export function withoutFaceImages(dice: DiceData[]): DiceData[] {
         })
       }
     : d);
+}
+
+/** Whether a face adds anything to a total: a Counts as number or number text */
+export function faceScores(faceStr: string): boolean {
+  const parsed = parseFaceContent(faceStr);
+  if (parsed.value !== undefined) return true;
+  if (parsed.content.startsWith(FACE_ICON_PREFIX)) return false;
+  return !isNaN(parseInt(parsed.content));
 }
 
 /** What a face adds to a total: its Counts as number, else its number text, else 0. */
@@ -132,7 +160,7 @@ export function sanitizeDiceList(input: unknown): DiceData[] {
           .slice(0, MAX_CUSTOM_FACES)
           .filter((f): f is string => typeof f === 'string')
           .map(f => {
-            // Trim the face text but keep its picture, colour and Counts as parts intact
+            // Trim the face text but keep its picture, color and Counts as parts intact
             const m = f.match(FACE_SUFFIX_RE);
             const suffix = m ? m[0] : '';
             const base = f.slice(0, f.length - suffix.length);
@@ -185,7 +213,7 @@ export const COLORS = [
   "#AA5518"  // brown
 ];
 
-/** Colours for "Colour every face differently", picked to be easy to tell apart. */
+/** Colors for "Color every face differently", picked to be easy to tell apart. */
 export const DISTINCT_FACE_COLORS = [
   "#E32227", // red
   "#0000FF", // blue
@@ -201,7 +229,7 @@ export const DISTINCT_FACE_COLORS = [
   "#C0C0C0"  // gray
 ];
 
-/** n colours, all different: the list above first, then evenly spread hues. */
+/** n colors, all different: the list above first, then evenly spread hues. */
 export function distinctFaceColors(n: number): string[] {
   const out = DISTINCT_FACE_COLORS.slice(0, Math.max(0, n));
   for (let i = out.length; i < n; i++) {
@@ -223,7 +251,7 @@ function hslToHex(h: number, s: number, l: number): string {
 
 /**
  * True when the faces are just the numbers 1..n in order (whatever their
- * colours or pictures), as "Colour every face differently" makes from a plain
+ * colors or pictures), as "Color every face differently" makes from a plain
  * die. Such a die still rolls and groups like the plain die it came from.
  */
 export function isNumberedFaces(customFaces: string[]): boolean {
@@ -234,17 +262,17 @@ export function isNumberedFaces(customFaces: string[]): boolean {
 }
 
 /**
- * Gives every face its own colour, keeping each face's text, picture and
+ * Gives every face its own color, keeping each face's text, picture and
  * number. A plain numbered die becomes custom faces 1..n first.
  */
 export function colourEveryFace(faces: number, customFaces: string[]): string[] {
   const list = customFaces.length > 0
     ? customFaces
     : Array.from({ length: Math.min(faces, MAX_CUSTOM_FACES) }, (_, i) => String(i + 1));
-  const colours = distinctFaceColors(list.length);
+  const colors = distinctFaceColors(list.length);
   return list.map((f, i) => {
     const p = parseFaceContent(f, '');
-    return buildFace(p.content, colours[i], p.value, p.image);
+    return buildFace(p.content, colors[i], p.value, p.image);
   });
 }
 
@@ -324,4 +352,20 @@ export function scaleGridDimensions(
   const fit = Math.floor((safeWidth + size * GAP_RATIO) / (size * (1 + GAP_RATIO)));
   const columns = Math.min(diceCount, Math.max(1, fit));
   return { optimalSize: size, optimalColumns: columns, dynamicGap: Math.floor(size * GAP_RATIO) };
+}
+
+const TENS_FACES = ['00', '10', '20', '30', '40', '50', '60', '70', '80', '90'].join();
+const UNITS_FACES = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].join();
+const faceTexts = (d: Pick<DiceData, 'customFaces'>) => d.customFaces.map(f => parseFaceContent(f).content).join();
+
+/**
+ * Percentile dice read 00 + 0 as 100, not 0. Returns the 100 to add when the
+ * rolled set holds one tens die (00-90) and one units die (0-9) and both
+ * landed on zero.
+ */
+export function percentileBonus(dice: (Pick<DiceData, 'customFaces' | 'dropped'> & { value: number })[]): number {
+  const live = dice.filter(d => !d.dropped);
+  const tens = live.filter(d => faceTexts(d) === TENS_FACES);
+  const units = live.filter(d => faceTexts(d) === UNITS_FACES);
+  return tens.length === 1 && units.length === 1 && tens[0].value === 0 && units[0].value === 0 ? 100 : 0;
 }

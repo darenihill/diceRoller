@@ -20,13 +20,26 @@
 export interface DiceFacets {
   outline: string;
   inner: string;
+  /** Each face as its own area, with its shade: above 0 lighter, below 0
+   *  darker. Light falls from the upper left, so upward faces are lighter. */
+  faces: { points: string; shade: number }[];
+  /** Where the number sits (the middle of the front face, in the 0-100 space)
+   *  and its size against a plain die's, so no facet line runs through it */
+  number: { x: number; y: number; scale: number };
 }
 
 export const DICE_SHAPES: Record<number, DiceFacets> = {
-  // Tetrahedron: triangle with edges converging on the near apex
+  // Tetrahedron, tipped toward you: three faces meet at the near point, and
+  // the front face below it holds the number (owner's pick, 2026-11-05)
   4: {
     outline: 'M 50 2 L 96 92 L 4 92 Z',
-    inner: 'M 50 2 L 50 62 M 4 92 L 50 62 M 96 92 L 50 62',
+    inner: 'M 50 2 L 50 48 M 4 92 L 50 48 M 96 92 L 50 48',
+    faces: [
+      { points: '50,2 4,92 50,48', shade: 0.18 },
+      { points: '50,2 96,92 50,48', shade: -0.06 },
+      { points: '4,92 96,92 50,48', shade: -0.2 },
+    ],
+    number: { x: 50, y: 74, scale: 0.42 },
   },
 
   // Cube seen from slightly above: edges rise to the upper vertices, so the top
@@ -34,6 +47,12 @@ export const DICE_SHAPES: Record<number, DiceFacets> = {
   6: {
     outline: 'M 50 2 L 95 26 L 95 74 L 50 98 L 5 74 L 5 26 Z',
     inner: 'M 50 50 L 5 26 M 50 50 L 95 26 M 50 50 L 50 98',
+    faces: [
+      { points: '50,2 95,26 50,50 5,26', shade: 0.2 },
+      { points: '5,26 50,50 50,98 5,74', shade: 0 },
+      { points: '95,26 50,50 50,98 95,74', shade: -0.2 },
+    ],
+    number: { x: 50, y: 27, scale: 0.45 },
   },
 
   // Octahedron face-on: hexagon with the front face inscribed on alternating
@@ -41,12 +60,27 @@ export const DICE_SHAPES: Record<number, DiceFacets> = {
   8: {
     outline: 'M 50 3 L 94 28 L 94 72 L 50 97 L 6 72 L 6 28 Z',
     inner: 'M 50 3 L 94 72 L 6 72 Z',
+    faces: [
+      { points: '50,3 94,72 6,72', shade: 0.06 },
+      { points: '50,3 6,28 6,72', shade: 0.16 },
+      { points: '50,3 94,28 94,72', shade: -0.06 },
+      { points: '6,72 94,72 50,97', shade: -0.24 },
+    ],
+    number: { x: 50, y: 52, scale: 0.6 },
   },
 
   // Pentagonal trapezohedron: rhombus with a kite front face tilted up
   10: {
     outline: 'M 50 2 L 96 50 L 50 98 L 4 50 Z',
     inner: 'M 50 2 L 72 44 L 50 70 L 28 44 Z M 28 44 L 4 50 M 72 44 L 96 50 M 50 70 L 50 98',
+    faces: [
+      { points: '50,2 72,44 50,70 28,44', shade: 0.1 },
+      { points: '50,2 28,44 4,50', shade: 0.2 },
+      { points: '50,2 96,50 72,44', shade: 0 },
+      { points: '4,50 28,44 50,70 50,98', shade: -0.14 },
+      { points: '96,50 72,44 50,70 50,98', shade: -0.26 },
+    ],
+    number: { x: 50, y: 40, scale: 0.45 },
   },
 
   // Dodecahedron: decagon outline around a central pentagonal face
@@ -56,13 +90,36 @@ export const DICE_SHAPES: Record<number, DiceFacets> = {
     inner:
       'M 50 30 L 71 45 L 63 70 L 37 70 L 29 45 Z ' +
       'M 50 30 L 50 1 M 71 45 L 97 35 M 63 70 L 79 90 M 37 70 L 21 90 M 29 45 L 3 35',
+    faces: [
+      { points: '50,30 71,45 63,70 37,70 29,45', shade: 0.06 },
+      { points: '50,30 50,1 79,10 97,35 71,45', shade: 0.14 },
+      { points: '71,45 97,35 97,65 79,90 63,70', shade: -0.1 },
+      { points: '63,70 79,90 50,99 21,90 37,70', shade: -0.24 },
+      { points: '37,70 21,90 3,65 3,35 29,45', shade: -0.04 },
+      { points: '29,45 3,35 21,10 50,1 50,30', shade: 0.22 },
+    ],
+    number: { x: 50, y: 53, scale: 0.5 },
   },
 
-  // Icosahedron face-on: hexagon, inscribed triangle, inverted central face
+  // Icosahedron face-on: hexagon around a large front triangle, each of its
+  // corners meeting the faces around it (the Gem look, owner's pick 2026-11-05)
   20: {
     outline: 'M 50 2 L 94 26 L 94 74 L 50 98 L 6 74 L 6 26 Z',
     inner:
-      'M 50 2 L 94 74 L 6 74 Z M 72 38 L 50 74 L 28 38 Z ' +
-      'M 94 26 L 72 38 M 6 26 L 28 38 M 50 98 L 50 74',
+      'M 50 22 L 80 70 L 20 70 Z M 50 22 L 50 2 M 50 22 L 6 26 M 50 22 L 94 26 ' +
+      'M 20 70 L 6 26 M 20 70 L 6 74 M 20 70 L 50 98 M 80 70 L 94 26 M 80 70 L 94 74 M 80 70 L 50 98',
+    faces: [
+      { points: '50,22 80,70 20,70', shade: 0.12 },
+      { points: '50,2 6,26 50,22', shade: 0.22 },
+      { points: '50,2 94,26 50,22', shade: 0.06 },
+      { points: '50,22 6,26 20,70', shade: 0.1 },
+      { points: '50,22 94,26 80,70', shade: -0.14 },
+      { points: '6,26 6,74 20,70', shade: -0.04 },
+      { points: '94,26 94,74 80,70', shade: -0.24 },
+      { points: '20,70 80,70 50,98', shade: -0.2 },
+      { points: '6,74 20,70 50,98', shade: -0.16 },
+      { points: '94,74 80,70 50,98', shade: -0.3 },
+    ],
+    number: { x: 50, y: 55, scale: 0.45 },
   },
 };

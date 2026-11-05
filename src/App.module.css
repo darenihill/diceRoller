@@ -20,15 +20,6 @@
   padding: 16px;
 }
 
-.helpList {
-  padding-left: 20px;
-  line-height: 1.6;
-}
-
-.helpList li {
-  margin-bottom: 12px;
-}
-
 .historyList {
   display: flex;
   flex-direction: column;
@@ -51,18 +42,13 @@
 }
 
 .historyDetails {
-  font-family: monospace;
   font-size: 14px;
+  font-variant-numeric: tabular-nums;
 }
 
 .historyTotal {
   font-weight: 700;
   text-align: right;
-}
-
-.setsContainer h3 {
-  margin-top: 0;
-  margin-bottom: 16px;
 }
 
 .setsGrid {
@@ -108,7 +94,8 @@
 
 .toast {
   position: fixed;
-  top: 48px;
+  /* Just above the Roll, + and lock buttons, where Android puts its Undo */
+  bottom: calc(108px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--md-sys-color-primary);
@@ -117,15 +104,35 @@
   border-radius: var(--shape-large);
   font-size: 14px;
   font-weight: 600;
-  z-index: 1000;
+  z-index: 1001; /* above Dice settings, so its Undo can be tapped */
   box-shadow: var(--elevation-3, 0 4px 12px rgba(0,0,0,0.3));
-  animation: slideDown 0.3s cubic-bezier(0.2, 0, 0, 1);
+  animation: slideUp 0.3s cubic-bezier(0.2, 0, 0, 1);
   pointer-events: none;
 }
 
-/* In RPG mode the Type a roll box sits where the toast would, so keep it in view */
-.toastBelowBox {
-  top: 132px;
+/* In RPG mode the bottom bar is taller (modifier and ADV / NORM / DIS rows) */
+.toastAboveRpgBar {
+  /* Above RPG Mode's chip row: 24 + Roll 72 + 10 + chips 44 = 150, plus a gap */
+  bottom: calc(162px + env(safe-area-inset-bottom, 0px));
+}
+
+/* On a phone the menu button sits above the lock on the left, so the bar
+   lines up with Roll on the right and stays clear of the menu */
+@media (max-width: 468px) {
+  /* Doubled so it outranks the Undo bar's own screen-wide max-width, in
+     RPG Mode too (second read, 2026-11-05) */
+  .toast.toast {
+    left: auto;
+    right: max(16px, env(safe-area-inset-right, 0px));
+    transform: none;
+    max-width: calc(100vw - 120px);
+    animation-name: slideUpRight;
+  }
+}
+
+@keyframes slideUpRight {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: none; }
 }
 
 /* The Undo offer can be tapped, unlike a plain message */
@@ -143,6 +150,16 @@
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* The storage message wraps so it is read in full, with its buttons beside it */
+.storageToast {
+  white-space: normal;
+  width: calc(100vw - 32px);
+}
+
+.storageToast > span {
+  overflow: visible;
 }
 
 .undoButton {
@@ -165,9 +182,22 @@
   outline-offset: 2px;
 }
 
-@keyframes slideDown {
-  from { opacity: 0; transform: translate(-50%, -20px); }
+@keyframes slideUp {
+  from { opacity: 0; transform: translate(-50%, 20px); }
   to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes toastFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Reduce motion: the toast (a target hit's celebration included) fades in
+   where it is instead of sliding */
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: toastFadeIn 0.2s ease-out;
+  }
 }
 
 .srOnly {
@@ -183,18 +213,19 @@
 }
 
 @media (max-width: 768px) {
+  /* Room for the chip row above Roll (RPG Mode's chips, or Release while dice
+     are held); the app already keeps Roll's own row clear. Kept the same in
+     both modes and whether or not anything is held, so holding the first die
+     never moves the dice under your finger (second read, 2026-11-05) */
   .diceContainer {
-    padding-bottom: 96px !important; /* Reserve spacing for bottom action buttons on mobile */
+    padding-bottom: 52px !important;
   }
+}
 
-  /* RPG mode stacks its controls above the bottom edge; reserve that space so the
-     dice grid never sizes itself underneath them. Since the controls rotate to two
-     rows here: 2 rows of FABs (152) + gap (10) + roll button (72) + the bar's own
-     24px offset = 258. The app already keeps 120px clear at the bottom, so the grid
-     adds the other 138 plus its usual 16. Reserving all 258 again left a d20 6px
-     tall on a small phone once the Type a roll box took its row. */
-  :global(body.rpg-mode) .diceContainer {
-    padding-bottom: 154px !important;
+/* The same chip-row room on wider screens */
+@media (min-width: 769px) {
+  .diceContainer {
+    padding-bottom: 52px;
   }
 }
 
@@ -213,8 +244,8 @@
 
 .emptyTitle {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 400;
   color: var(--md-sys-color-on-surface-variant);
 }
 
@@ -235,14 +266,42 @@
 
 .topLine {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-wrap: wrap;
+  /* Top, not centre: with RPG saved rolls under the box, the name and About
+     stay level with the box's first line instead of sliding down */
+  align-items: flex-start;
+  gap: 8px 12px;
   min-height: 32px;
-  padding: 0 16px;
+  padding: 0;
   flex-shrink: 0;
 }
 
+/* RPG mode's Type a roll box, beside the name. The box starts at the top of its
+   cell so its Save link and saved rolls grow downwards, not round the name. */
+.topRoll {
+  flex: 1 1 280px;
+  min-width: 0;
+  max-width: 520px;
+  align-self: flex-start;
+}
+
+.topRoll > * {
+  margin: 0;
+  max-width: none;
+}
+
+/* A phone: the name and About keep the first line, the box takes the next */
+@media (max-width: 600px) {
+  .topRoll {
+    order: 10;
+    flex-basis: 100%;
+    max-width: none;
+  }
+}
+
 .appName {
+  /* Same height as the About button and the roll box, so the three line up */
+  line-height: 44px;
   font-size: 16px;
   font-weight: 500;
   color: var(--md-sys-color-on-surface);
@@ -250,6 +309,7 @@
 }
 
 .setChip {
+  margin-top: 6px;
   display: inline-flex;
   align-items: center;
   height: 32px;
@@ -279,12 +339,110 @@
   white-space: nowrap;
 }
 
+.viewControls {
+  order: 5;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+}
+
+.viewOff {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+  cursor: pointer;
+}
+
+.viewOff:hover {
+  background-color: var(--md-sys-color-surface-hover);
+}
+
+.viewSwitch {
+  display: inline-flex;
+  height: 44px;
+  padding: 3px;
+  gap: 2px;
+  border-radius: 999px;
+  border: 1px solid var(--md-sys-color-outline);
+}
+
+.viewSwitchBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.viewSwitchBtn:hover:not(:disabled) {
+  background-color: var(--md-sys-color-surface-hover);
+}
+
+/* The view showing now: the accent, no fill, so Roll stays the one filled button */
+.viewSwitchBtn[aria-pressed='true'] {
+  background-color: var(--md-sys-color-surface-variant);
+  color: var(--md-sys-color-primary);
+}
+
+.viewSwitchBtn:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* Below about 390px the switch shows icons only, so the × and the switch
+   stay on the header row */
+@media (max-width: 389px) {
+  .viewSwitchBtn span {
+    display: none;
+  }
+}
+
+/* Small phones: a tighter switch so it stays on the header row, clear of the table */
+@media (max-width: 379px) {
+  .topLine {
+    column-gap: 8px;
+  }
+
+  .viewSwitch {
+    padding: 2px;
+  }
+
+  .viewSwitchBtn {
+    gap: 4px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+
+  .viewSwitchBtn svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
 .aboutButton:hover {
   background-color: var(--md-sys-color-surface-hover);
 }
 
 /* On a phone the game's name gets the room; the About button keeps its icon */
 @media (max-width: 468px) {
+  .topLine {
+    column-gap: 8px;
+  }
+
   .aboutLabel {
     display: none;
   }
@@ -294,4 +452,9 @@
     padding: 0;
     justify-content: center;
   }
+}
+
+/* Table view shows the big total in this space; the grid stays mounted so its size is kept */
+.diceHidden {
+  display: none;
 }

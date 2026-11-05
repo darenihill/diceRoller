@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { totalMath } from '../utils/totalMath';
 import styles from './ActionBar.module.css';
-import { Plus, Minus, Dice5, Lock, Unlock, RotateCcw } from 'lucide-react';
-import { motion, AnimatePresence, useAnimationControls } from 'framer-motion';
+import { Plus, Minus, Dice5, Unlock, RotateCcw } from 'lucide-react';
+import { motion, AnimatePresence, useAnimationControls, useReducedMotion } from 'framer-motion';
 import type { RollAdvantageMode } from '../hooks/useDiceState';
 import type { DiceData } from '../types';
 import { DndShapeIcon } from './DndShapeIcon';
@@ -10,10 +10,17 @@ import { DndShapeIcon } from './DndShapeIcon';
 interface ActionBarProps {
   onAdd: (template?: Partial<DiceData>) => void;
   onRoll: () => void;
-  onHoldAll: () => void;
-  allHeld: boolean;
+  /** How many dice are held; above 0 a Release chip shows above the bar */
+  heldCount: number;
+  onReleaseAll: () => void;
   totalVisible: boolean;
+  /** The dice changed since the total was rolled: show it faint */
+  totalStale?: boolean;
   lastTotal: number;
+  /** The landed roll the total belongs to; a new one makes the total pop once */
+  totalKey?: string;
+  /** Dice are tumbling: hold the pop until they land */
+  rolling?: boolean;
   /** The modifier counted in lastTotal (0 when none) */
   lastModifier?: number;
   modifier: number;
@@ -35,32 +42,73 @@ const DND_GRID_DICE = [
 
 const D20_OPTION = { label: 'D20', faces: 20, name: 'd20', color: '#384050' };
 
+const ROLL_TYPES = [
+  ['advantage', 'ADV', 'Advantage: Keep Highest'],
+  ['normal', 'NORM', 'Normal Roll'],
+  ['disadvantage', 'DIS', 'Disadvantage: Keep Lowest'],
+] as const;
+const ROLL_TYPE_NAMES: Record<RollAdvantageMode, string> = { advantage: 'Advantage', normal: 'Normal', disadvantage: 'Disadvantage' };
+const signed = (n: number) => `${n > 0 ? '+' : ''}${n}`;
+
 export const ActionBar: React.FC<ActionBarProps> = ({ 
-  onAdd, onRoll, onHoldAll, allHeld, totalVisible, lastTotal, lastModifier = 0, modifier, onChangeModifier,
+  onAdd, onRoll, heldCount, onReleaseAll, totalVisible, totalStale = false, lastTotal, totalKey, rolling = false, lastModifier = 0, modifier, onChangeModifier,
   rpgMode, rollAdvantage, onChangeRollAdvantage
 }) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
-
-  // Wiggle the lock only when allHeld actually changes — not on initial page load.
-  // Imperative controls replace the old keyed-remount pattern so the mount render
-  // stays static. NOTE: the mount-flag effect must be declared AFTER this one so
-  // the first run of this effect sees mountedRef=false and skips the wiggle.
-  const lockControls = useAnimationControls();
-  const mountedRef = useRef(false);
+  const calm = !!useReducedMotion();
+  // Which RPG chip is open into its buttons; a roll closes it
+  const [open, setOpen] = useState<'type' | 'mod' | null>(null);
+  const [wasRolling, setWasRolling] = useState(rolling);
+  if (rolling !== wasRolling) {
+    setWasRolling(rolling);
+    if (rolling) setOpen(null);
+  }
+  // Keyboard: opening a chip moves focus into its buttons (the chip itself is
+  // gone), and Escape shrinks it back with focus on the chip again
+  const chipsRef = useRef<HTMLDivElement>(null);
+  const focusAfter = useRef<'pill' | 'type' | 'mod' | null>(null);
+  const openChip = (which: 'type' | 'mod') => { focusAfter.current = 'pill'; setOpen(which); };
   useEffect(() => {
-    if (!mountedRef.current) return;
-    lockControls.start({
-      rotate: [0, -45, 10, 0],
-      color: allHeld ? 'var(--color-gold)' : 'var(--md-sys-color-on-surface)',
-      transition: { duration: 0.5, ease: 'easeInOut' }
-    });
-  }, [allHeld, lockControls]);
+    const want = focusAfter.current;
+    focusAfter.current = null;
+    const box = chipsRef.current;
+    if (!want || !box) return;
+    const target = want === 'pill'
+      ? box.querySelector<HTMLButtonElement>('[aria-pressed="true"], [data-pill-focus]')
+      : box.querySelector<HTMLButtonElement>(`[data-testid="${want === 'type' ? 'roll-type-chip' : 'modifier-chip'}"]`);
+    target?.focus();
+  }, [open]);
+  // A tap anywhere outside the chips shrinks an open one back
   useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
+    if (!open) return;
+    const onDown = (e: PointerEvent) => {
+      if (!chipsRef.current?.contains(e.target as Node)) setOpen(null);
     };
-  }, []);
+    document.addEventListener('pointerdown', onDown);
+    return () => document.removeEventListener('pointerdown', onDown);
+  }, [open]);
+  const onPillKey = (e: React.KeyboardEvent) => {
+    if (e.key !== 'Escape' || !open) return;
+    e.stopPropagation();
+    focusAfter.current = open;
+    setOpen(null);
+  };
+
+  // The total pops once per newly landed main roll: not for a single-die roll,
+  // which keeps the same total, and not when Undo brings an older roll back
+  const totalControls = useAnimationControls();
+  const seenTotals = useRef(new Set<string>());
+  // A total already showing when the bar appears is not a new landing
+  const startedWithTotal = useRef(!!totalKey);
+  const [pops, setPops] = useState(0);
+  useEffect(() => {
+    if (!totalKey || rolling || seenTotals.current.has(totalKey)) return;
+    const first = seenTotals.current.size === 0 && startedWithTotal.current;
+    seenTotals.current.add(totalKey);
+    if (first || calm) return;
+    setPops(n => n + 1);
+    totalControls.start({ scale: [1, 1.18, 1], transition: { duration: 0.35, ease: [0.2, 0, 0, 1] } });
+  }, [totalKey, rolling, calm, totalControls]);
 
   const handleAddClick = () => {
     if (rpgMode) {
@@ -88,16 +136,6 @@ export const ActionBar: React.FC<ActionBarProps> = ({
 
   return (
     <div className={styles.actionBar}>
-      <motion.button
-        className={`md-icon-button ${styles.actionBtn} ${styles.lockBtn}`}
-        onClick={onHoldAll}
-        title="Toggle Hold All"
-        initial={{ rotate: 0 }}
-        animate={lockControls}
-        style={{ color: allHeld ? 'var(--color-gold)' : undefined }}
-      >
-        {allHeld ? <Unlock size={24} strokeWidth={2.5} /> : <Lock size={24} strokeWidth={2.5} />}
-      </motion.button>
 
       {/* Add Button & Quick D&D Popover */}
       <div className={styles.addPopoverContainer}>
@@ -140,7 +178,8 @@ export const ActionBar: React.FC<ActionBarProps> = ({
         </AnimatePresence>
 
         <button 
-          className={`md-icon-button ${styles.actionBtn}`} 
+          className={`md-icon-button control-ring ${styles.actionBtn}`} 
+          data-add-button
           onClick={handleAddClick} 
           title={rpgMode ? "Add D&D Dice Menu" : "Add Dice"}
         >
@@ -149,81 +188,120 @@ export const ActionBar: React.FC<ActionBarProps> = ({
       </div>
 
       <div className={styles.rollGroup}>
-        {rpgMode && (
-          <motion.div 
-            className={styles.rpgColumns}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-          >
-            {/* Left Vertical Column: Advantage / Disadvantage FABs */}
-            <div className={styles.verticalColumn}>
+        {/* RPG controls as two chips that show what is set ("ADV", "+2"); a tap
+            opens one into its buttons, and a roll shrinks it back (owner, 2026-11-05) */}
+        {(rpgMode || heldCount > 0) && (
+          <div className={styles.rpgChips} ref={chipsRef} onKeyDown={onPillKey}>
+            {/* Held dice: one chip clears them all, shown only while any are held.
+                It replaced the always-on Hold All button (owner, 2026-11-05: option B) */}
+            {/* In RPG Mode it is the lock and the count, so three chips fit beside +,
+                and it steps aside while a chip is open */}
+            {heldCount > 0 && !(rpgMode && open) && (
               <button
-                className={`${styles.rpgFabBtn} ${rollAdvantage === 'advantage' ? styles.rpgFabActive : ''}`}
-                onClick={() => onChangeRollAdvantage('advantage')}
-                title="Advantage: Keep Highest"
+                type="button"
+                className={`control-ring ${styles.rpgChip} ${styles.releaseChip}`}
+                onClick={onReleaseAll}
+                aria-label={`Release ${heldCount} held ${heldCount === 1 ? 'die' : 'dice'}`}
+                data-testid="release-chip"
               >
-                ADV
+                <Unlock size={14} strokeWidth={2.5} aria-hidden="true" />
+                {rpgMode ? heldCount : `Release ${heldCount}`}
               </button>
+            )}
+            {rpgMode && (<>
+            {open === 'type' ? (
+              <div className={styles.rpgPill} role="group" aria-label="Roll type">
+                {ROLL_TYPES.map(([mode, label, title]) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    className={`control-ring ${styles.rpgSeg} ${rollAdvantage === mode ? styles.rpgSegOn : ''}`}
+                    aria-pressed={rollAdvantage === mode}
+                    onClick={() => onChangeRollAdvantage(mode)}
+                    title={title}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            ) : (
               <button
-                className={`${styles.rpgFabBtn} ${rollAdvantage === 'normal' ? styles.rpgFabActive : ''}`}
-                onClick={() => onChangeRollAdvantage('normal')}
-                title="Normal Roll"
+                type="button"
+                className={`control-ring ${styles.rpgChip} ${rollAdvantage !== 'normal' ? styles.rpgChipSet : ''}`}
+                aria-expanded={false}
+                aria-label={`Roll type: ${ROLL_TYPE_NAMES[rollAdvantage]}. Change`}
+                onClick={() => openChip('type')}
+                data-testid="roll-type-chip"
               >
-                NORM
+                {ROLL_TYPES.find(([mode]) => mode === rollAdvantage)![1]}
               </button>
-              <button
-                className={`${styles.rpgFabBtn} ${rollAdvantage === 'disadvantage' ? styles.rpgFabActive : ''}`}
-                onClick={() => onChangeRollAdvantage('disadvantage')}
-                title="Disadvantage: Keep Lowest"
-              >
-                DIS
-              </button>
-            </div>
+            )}
 
-            {/* Right Vertical Column: Modifier Stepper FABs */}
-            <div className={`${styles.verticalColumn} ${styles.modifierColumn}`}>
+            {open === 'mod' ? (
+              <div className={styles.rpgPill} role="group" aria-label="Modifier">
+                <button type="button" className={`md-icon-button control-ring ${styles.rpgSeg}`} onClick={() => onChangeModifier(modifier - 1)} title="Decrease modifier">
+                  <Minus size={20} strokeWidth={2.5} />
+                </button>
+                {/* The value; a tap sets it back to 0 */}
+                <button
+                  type="button"
+                  className={`md-icon-button control-ring ${styles.rpgSeg} ${styles.modifierValue} ${modifier === 0 ? styles.modifierBtnDisabled : ''}`}
+                  onClick={() => onChangeModifier(0)}
+                  title="Reset modifier"
+                  aria-label={modifier === 0 ? 'Modifier 0' : `Modifier ${signed(modifier)}, reset to 0`}
+                  disabled={modifier === 0}
+                  data-testid="modifier-value"
+                >
+                  <span className={styles.modifierNumber}>{signed(modifier)}</span>
+                  {modifier !== 0 && <RotateCcw size={12} strokeWidth={2.5} aria-hidden="true" />}
+                </button>
+                <button type="button" className={`md-icon-button control-ring ${styles.rpgSeg}`} onClick={() => onChangeModifier(modifier + 1)} title="Increase modifier" data-pill-focus>
+                  <Plus size={20} strokeWidth={2.5} />
+                </button>
+              </div>
+            ) : (
               <button
-                className={`md-icon-button ${styles.rpgFabBtn}`}
-                onClick={() => onChangeModifier(modifier + 1)}
-                title="Increase modifier"
+                type="button"
+                className={`control-ring ${styles.rpgChip} ${modifier !== 0 ? styles.rpgChipSet : ''}`}
+                aria-expanded={false}
+                aria-label={`Modifier ${signed(modifier)}. Change`}
+                onClick={() => openChip('mod')}
+                data-testid="modifier-chip"
               >
-                <Plus size={28} strokeWidth={2.5} />
+                {modifier === 0 ? '±0' : signed(modifier)}
               </button>
-              <button
-                className={`md-icon-button ${styles.rpgFabBtn} ${modifier === 0 ? styles.modifierBtnDisabled : ''}`}
-                onClick={() => onChangeModifier(0)}
-                title="Reset modifier"
-                disabled={modifier === 0}
-              >
-                <RotateCcw size={22} />
-              </button>
-              <button
-                className={`md-icon-button ${styles.rpgFabBtn}`}
-                onClick={() => onChangeModifier(modifier - 1)}
-                title="Decrease modifier"
-              >
-                <Minus size={28} strokeWidth={2.5} />
-              </button>
-            </div>
-          </motion.div>
+            )}
+            </>)}
+          </div>
         )}
 
         <motion.button
-          className={`md-button md-button-filled ${styles.rollBtn}`}
+          className={`md-button md-button-filled control-ring ${styles.rollBtn}`}
+          data-roll-button
           onClick={onRoll}
           whileTap={{ scale: 0.95 }}
-          aria-label="Roll dice"
+          // Says what the button shows (the last total, or Roll +2), so a
+          // screen reader and voice control match what is on screen
+          aria-label={totalVisible
+            ? `${lastTotal}${lastModifier !== 0 ? ` ${totalMath(lastTotal, lastModifier) ?? ''}` : ''}, roll again`
+            : `Roll dice${rpgMode && modifier !== 0 ? ` ${modifier > 0 ? '+' : ''}${modifier}` : ''}`}
         >
           <Dice5 size={24} strokeWidth={2.5} className={styles.rollBtnIcon} />
           {totalVisible ? (
-            <span className={styles.rollBtnLabel} style={{ fontSize: totalFontSize }}>
+            // Pops slightly bigger and settles when the dice land (owner, 2026-11-01)
+            <motion.span
+              className={`${styles.rollBtnLabel} ${totalStale ? styles.rollBtnLabelStale : ''}`}
+              style={{ fontSize: totalFontSize }}
+              data-stale={totalStale || undefined}
+              data-pops={pops || undefined}
+              animate={totalControls}
+            >
               {lastTotal}
               {/* The total already counts the modifier, so show its math, not "+2" to add again */}
               {lastModifier !== 0 && (
                 <span className={styles.rollBtnModSuffix}>{totalMath(lastTotal, lastModifier)}</span>
               )}
-            </span>
+            </motion.span>
           ) : (
             <span className={styles.rollBtnLabel}>
               Roll

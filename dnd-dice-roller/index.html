@@ -7,23 +7,28 @@
     <meta name="theme-color" content="#121212" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>D&amp;D Dice Roller — Free Online d20, d12, d10, d8, d6, d4</title>
-    <meta name="description" content="Free D&amp;D dice roller with the full polyhedral set, advantage and disadvantage, modifiers and natural 20 highlighting. No sign-up, works on any device.">
+    <meta name="description" content="Free online dice roller for board games and tabletop RPGs. Build custom dice with any faces, colors and icons, then share your set with a link.">
 
     <!-- Open Graph / Discord / Facebook (scrapers require absolute image URLs) -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://customdiceroller.com/dnd-dice-roller/" />
     <meta property="og:title" content="D&amp;D Dice Roller — Free Online d20, d12, d10, d8, d6, d4" />
-    <meta property="og:description" content="Free D&amp;D dice roller with the full polyhedral set, advantage and disadvantage, modifiers and natural 20 highlighting. No sign-up, works on any device." />
+    <meta property="og:description" content="Free online dice roller for board games and tabletop RPGs. Build custom dice with any faces, colors and icons, then share your set with a link." />
     <meta property="og:image" content="https://customdiceroller.com/og-image.jpg" />
     <meta property="og:site_name" content="Custom Dice Roller" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:title" content="D&amp;D Dice Roller — Free Online d20, d12, d10, d8, d6, d4" />
-    <meta property="twitter:description" content="Free D&amp;D dice roller with the full polyhedral set, advantage and disadvantage, modifiers and natural 20 highlighting. No sign-up, works on any device." />
+    <meta property="twitter:description" content="Free online dice roller for board games and tabletop RPGs. Build custom dice with any faces, colors and icons, then share your set with a link." />
     <meta property="twitter:image" content="https://customdiceroller.com/og-image.jpg" />
     <link rel="canonical" href="https://customdiceroller.com/dnd-dice-roller/" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- Roboto loads without holding up the first paint: on a slow or stuck
+         signal the app shows in the system font, then swaps. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" media="print" onload="this.media='all'" />
 
     <!-- Structured data. The app carries almost no crawlable text by nature, so
          this is most of what a search engine has to go on until the per-preset
@@ -34,7 +39,7 @@
       "@type": "WebApplication",
       "name": "Custom Dice Roller",
       "url": "https://customdiceroller.com/",
-      "description": "Free online dice roller for board games and tabletop RPGs. Build custom dice with any number of faces, custom text, icons and per-face colours, then share a set with a link.",
+      "description": "Free online dice roller for board games and tabletop RPGs. Build custom dice with any number of faces, custom text, icons and per-face colors, then share a set with a link.",
       "applicationCategory": "GameApplication",
       "operatingSystem": "Any device with a web browser",
       "browserRequirements": "Requires JavaScript",
@@ -46,7 +51,7 @@
       },
       "featureList": [
         "Custom dice with any number of faces",
-        "Custom text, icons and per-face colours",
+        "Custom text, icons and per-face colors",
         "Polyhedral RPG dice: d4, d6, d8, d10, d12, d20",
         "Advantage and disadvantage rolls with modifiers",
         "Hold dice between rolls",
@@ -69,7 +74,8 @@
         window.dataLayer = window.dataLayer || [];
         window.gtag = function () { dataLayer.push(arguments); };
         gtag('js', new Date());
-        gtag('config', GA_ID);
+        // Share links carry the dice and the set's name after the #; never send them
+        gtag('config', GA_ID, { page_location: location.href.split('#')[0] });
 
         if (!isDev) {
           var s = document.createElement('script');
@@ -99,7 +105,7 @@
 <h2>Advantage, modifiers and crits</h2>
 <p>RPG mode is already on. Choose advantage to roll two d20s and keep the higher, or disadvantage to keep the lower. Add your modifier and the total includes it. A natural 20 and a natural 1 are highlighted so nobody misses a critical.</p>
 <h2>Make it your character's set</h2>
-<p>Hold dice between rolls, change colours, or add more d6s for a fireball. Save the set under your character's name, then share it with your table as a link, so everyone rolls the same dice. It is free, needs no account and works on phones, tablets and laptops.</p>
+<p>Hold dice between rolls, change colors, or add more d6s for a fireball. Save the set under your character's name, then share it with your table as a link, so everyone rolls the same dice. It is free, needs no account and works on phones, tablets and laptops.</p>
     <nav class="landing-more" aria-label="More dice rollers"><a href="/d20-roller/">d20 roller</a> · <a href="/catan-dice-roller/">Catan dice roller</a> · <a href="/classroom-dice-roller/">Classroom dice roller</a> · <a href="/">Build your own dice</a></nav>
     </article>
     <noscript><p class="landing-article">This app needs JavaScript enabled to roll dice.</p></noscript>

@@ -25,7 +25,7 @@ export const landingPages = [
 <h2>Advantage, modifiers and crits</h2>
 <p>RPG mode is already on. Choose advantage to roll two d20s and keep the higher, or disadvantage to keep the lower. Add your modifier and the total includes it. A natural 20 and a natural 1 are highlighted so nobody misses a critical.</p>
 <h2>Make it your character's set</h2>
-<p>Hold dice between rolls, change colours, or add more d6s for a fireball. Save the set under your character's name, then share it with your table as a link, so everyone rolls the same dice. It is free, needs no account and works on phones, tablets and laptops.</p>
+<p>Hold dice between rolls, change colors, or add more d6s for a fireball. Save the set under your character's name, then share it with your table as a link, so everyone rolls the same dice. It is free, needs no account and works on phones, tablets and laptops.</p>
 `,
   },
   {

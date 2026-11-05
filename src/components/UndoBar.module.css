@@ -1,0 +1,103 @@
+/* The one Undo bar: words, a filled Undo pill with its countdown, then × */
+/* Doubled class: wins over the shared message box's own padding */
+.bar.bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 6px 6px 20px;
+  pointer-events: auto;
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+
+/* Single class on purpose: a phone's narrower limit, which keeps the bar clear
+   of the menu button (App.module.css .toast), wins over this one */
+.bar {
+  max-width: calc(100vw - 32px); /* a long name never pushes Undo off screen */
+}
+
+.message {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.undo {
+  position: relative;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 16px 0 14px;
+  border: none;
+  border-radius: 999px;
+  /* Filled, the reverse of the bar: the bar's text colour as the fill */
+  background-color: var(--md-sys-color-on-primary);
+  color: var(--md-sys-color-primary);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  /* About one eighteenth of the pill's height: 2px on a phone */
+  --line: 2px;
+}
+
+.undo:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* The countdown: a line in the words' colour, inside the pill, starting at the
+   top and running clockwise, draining away. No track under it. */
+.ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ringLine {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--line);
+  stroke-linecap: round;
+  /* The path starts at the top middle; one dash as long as the whole line,
+     its start sliding clockwise round to the end */
+  stroke-dasharray: 1px 1px;
+  stroke-dashoffset: 0px;
+  animation-name: undoDrain;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes undoDrain {
+  from { stroke-dashoffset: 0px; }
+  to { stroke-dashoffset: -1px; }
+}
+
+.close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.close:hover {
+  background-color: rgba(127, 127, 127, 0.18);
+}
+
+/* Tablet or computer: 3px */
+@media (min-width: 769px) {
+  .undo {
+    --line: 3px;
+  }
+}

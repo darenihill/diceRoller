@@ -14,21 +14,29 @@
 
 .sectionTitle {
   margin: 0 0 16px 0;
-  font-size: 16px;
+  font-size: 1rem;
   color: var(--md-sys-color-primary);
 }
 
 /* Labels */
 .label {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--md-sys-color-on-surface);
   display: block;
   margin-bottom: 8px;
   opacity: 0.8;
 }
 
+/* Second line under a label, e.g. what the faces counter would replace */
+.labelNote {
+  display: block;
+  font-size: 0.75rem;
+  margin-top: 2px;
+  overflow-wrap: anywhere;
+}
+
 .sublabel {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--md-sys-color-on-surface);
   display: block;
   margin-bottom: 8px;
@@ -44,28 +52,15 @@
   border: none;
   background-color: rgba(0, 0, 0, 0.2);
   color: var(--md-sys-color-on-surface);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
-/* Two Column Grid */
-.twoColumnRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-/* Color Swatch */
-.colorSwatch {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.15);
+/* One field per block: the die colour picker needs the full width */
+.fieldBlock {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: var(--elevation-1);
+  flex-direction: column;
 }
+
 
 /* Stepper */
 .stepperRow {
@@ -99,7 +94,7 @@
   border: none;
   background-color: rgba(0, 0, 0, 0.2);
   color: var(--md-sys-color-on-surface);
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 600;
   text-align: center;
 }
@@ -113,7 +108,7 @@
 }
 
 .emptyText {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--md-sys-color-on-surface);
   opacity: 0.7;
   grid-column: 1 / -1;
@@ -144,7 +139,7 @@
   padding: 4px 10px;
   border-radius: var(--shape-small);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
 }
@@ -161,49 +156,29 @@
   gap: 6px;
   margin: 10px -10px 12px;
   padding: 10px;
-  /* Stays in view while scrolling a long list of faces */
+  /* Stays in view while scrolling a long list of faces, just above the
+     pinned Done row (56px tall) */
   position: sticky;
-  bottom: 0;
+  bottom: 56px;
   z-index: 5;
   background-color: var(--md-sys-color-surface);
   border-radius: var(--shape-medium);
   box-shadow: var(--elevation-2);
 }
 
-.faceSwatches {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+/* Before a face is tapped the colour row sits in the list, so the faces show first */
+.faceColourRowLoose {
+  position: static;
+  z-index: auto;
 }
 
-.faceSwatch,
-.faceSwatchCustom {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  cursor: pointer;
-  box-shadow: var(--elevation-1);
-}
-
-/* A picked face or swatch gets the same ring as a focused die: the theme's
+/* A picked face gets the same ring as a focused die: the theme's
    accent. Gold is kept for held dice, target hits and natural 20s. */
-.faceTile[aria-pressed='true'],
-.faceSwatch[aria-pressed='true'],
-.colorDot[aria-pressed='true'] {
+.faceTile[aria-pressed='true'] {
   outline: 3px solid var(--md-sys-color-primary);
   outline-offset: 2px;
 }
 
-.faceSwatchCustom {
-  position: relative;
-  background: conic-gradient(#E32227, #FBFB3C, #228B22, #0000FF, #B24BF3, #E32227);
-  color: #FFFFFF;
-}
 
 .faceCardRow {
   display: flex;
@@ -244,7 +219,7 @@
 
 .pictureError {
   color: var(--md-sys-color-error);
-  font-size: 13px;
+  font-size: 0.8125rem;
   margin: 0 0 12px;
 }
 
@@ -318,6 +293,15 @@
   display: flex;
   gap: 8px;
   margin-top: 8px;
+  /* Done stays on screen while the faces scroll (standard 20.2) */
+  /* The dialog's 24px padding would leave a strip of faces showing under it */
+  position: sticky;
+  bottom: -24px;
+  /* Above the pinned face-colour row (5): a tap on Done always lands on Done */
+  z-index: 6;
+  padding: 8px 0 32px;
+  margin-bottom: -24px;
+  background-color: var(--md-sys-color-surface);
 }
 
 .footerBtnRemove,
@@ -340,78 +324,13 @@
   border: 1px solid var(--md-sys-color-primary);
 }
 
-/* Color Popover */
-.popoverBackdrop {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 140;
-  cursor: default;
-}
 
-.colorPopover {
-  position: absolute;
-  left: 0;
-  right: 0;
-  z-index: 150;
-  background-color: var(--md-sys-color-surface);
-  padding: 16px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: var(--elevation-3);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
 
-.popoverHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
-.popoverTitle {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--md-sys-color-on-surface);
-}
 
-.popoverClose {
-  background: none;
-  border: none;
-  color: var(--md-sys-color-on-surface);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
 
-.colorGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
 
-.colorDot {
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: var(--elevation-1);
-}
 
-.colorDotCustom {
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
 
 .hiddenInput {
   position: absolute;
@@ -429,7 +348,7 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   background: transparent;
   color: var(--md-sys-color-on-surface);
-  font-size: 14px;
+  font-size: 0.875rem;
   text-align: center;
   -moz-appearance: textfield;
 }
@@ -443,4 +362,183 @@
 .faceValueInput:focus {
   outline: none;
   border-color: var(--md-sys-color-primary);
+}
+
+/* "Added 6 faces. Undo" after a list goes in */
+.listNote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 0.8125rem;
+  color: var(--md-sys-color-on-surface);
+}
+
+.listUndo {
+  min-height: 44px;
+  padding: 0 12px;
+  border: none;
+  border-radius: var(--shape-small);
+  background: transparent;
+  color: var(--md-sys-color-primary);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Two tabs in the title bar, beside the close button (owner, 2026-11-02) */
+.tabs {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.tab {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 4px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tabActive {
+  color: var(--md-sys-color-primary);
+  border-bottom-color: var(--md-sys-color-primary);
+}
+
+/* Custom faces: Colour, Icons and Text as three buttons that open their tools */
+.panelButtons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.panelBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid var(--md-sys-color-outline);
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.panelBtn svg {
+  flex: none;
+}
+
+/* On a phone the three share about 240px: keep the icon and word, drop the arrow */
+@media (max-width: 480px) {
+  .panelBtn {
+    gap: 4px;
+    padding: 0 4px;
+  }
+
+  .panelChevron {
+    display: none;
+  }
+}
+
+/* Narrow phones: the word alone, so all three fit */
+@media (max-width: 379px) {
+  .panelBtn svg {
+    display: none;
+  }
+}
+
+.panelBtn:hover {
+  background-color: var(--md-sys-color-surface-hover);
+}
+
+.panelBtnOpen {
+  border-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-primary);
+}
+
+.panelChevron {
+  transition: transform 0.2s ease;
+}
+
+.panelBtnOpen .panelChevron {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panelChevron {
+    transition: none;
+  }
+}
+
+.panelBody {
+  /* A block, not flex: as a flex item the loose colour row's z-index would
+     apply and paint it over the Remove / Clone / Done row */
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* The colour panel draws no box of its own, so the pinned colour row sticks
+   within the whole faces card, as before, and stays above Remove / Clone / Done.
+   Inside a short box of its own it rode down over them (second read, 2026-11-05). */
+.panelBodyColour {
+  display: contents;
+}
+
+/* Settings tab: Name and Standard Faces share the top row, wrapping on a narrow phone */
+.topRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.nameField {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+
+.facesField {
+  flex: 0 0 auto;
+}
+
+/* The name box lines up with the 44px stepper beside it */
+.nameField .inputField {
+  height: 44px;
+}
+
+/* Narrow phones: the tab names wrap to two lines instead of running under the close button */
+@media (max-width: 379px) {
+  .tab {
+    white-space: normal;
+    font-size: 0.875rem;
+    line-height: 1.15;
+  }
+}
+
+/* Icons or Text changing a tapped face: what they change, and the way back to adding */
+.editNote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 8px;
+  margin-bottom: 4px;
 }

@@ -28,6 +28,13 @@ on-primary-container, error, on-error. Accent tokens (`--color-gold`,
 `--color-crit-red`, `--color-success`, `--color-accent-blue`, `--color-orange`,
 `--color-purple`) are dice and celebration colors, not UI roles.
 
+Contrast (2026-10-26, reviews/2026-10-26-ui-contrast.md): every theme keeps
+text at 4.5:1 and icons at 3:1, checked by `src/test/themeContrast.test.ts`.
+The light theme sets its own M3 light `error`/`on-error`. Gold used as an icon
+or text colour (the held lock, Hold all, HIT!) is `--color-gold-ink`, which is
+bright gold on dark themes and deep gold on light; glows and borders keep
+`--color-gold`.
+
 ## 5. Component vocabulary
 
 | Need | Use | Maps to (M3) |

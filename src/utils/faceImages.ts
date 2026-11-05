@@ -1,3 +1,5 @@
+import { SAVED } from './savedValues';
+import { readItem } from './safeStorage';
 import { useSyncExternalStore } from 'react';
 import { generateId } from './diceUtils';
 
@@ -6,7 +8,7 @@ import { generateId } from './diceUtils';
  * the picture itself, shrunk to a small square, is kept here in local storage.
  * Share links never carry pictures (roadmap decision, 2026-08-17), backups do.
  */
-const STORAGE_KEY = 'diceFaceImages';
+const STORAGE_KEY = SAVED.faceImages;
 /** Pictures are stored as this many pixels square. */
 export const FACE_IMAGE_SIZE = 128;
 /** Longest stored picture we accept, as a data URL (a 128px JPEG is usually 4-12 KB). */
@@ -38,7 +40,7 @@ const listeners = new Set<() => void>();
 function read(): FaceImageMap {
   if (cache) return cache;
   try {
-    cache = sanitizeFaceImages(JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'));
+    cache = sanitizeFaceImages(JSON.parse(readItem(STORAGE_KEY) || '{}'));
   } catch {
     cache = {};
   }
@@ -74,8 +76,8 @@ export function faceImagesInUse(extra: { customFaces: string[] }[] = []): Set<st
     if (!text) return;
     for (const m of text.matchAll(IMAGE_REF_RE)) ids.add(m[1]);
   };
-  scan(localStorage.getItem('diceConfigs'));
-  scan(localStorage.getItem('defaultDiceSet'));
+  scan(readItem(SAVED.games));
+  scan(readItem(SAVED.defaultSet));
   for (const d of extra) d.customFaces.forEach(scan);
   return ids;
 }

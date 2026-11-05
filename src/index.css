@@ -1,7 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
 :root {
   --md-sys-color-background: #121212;
+  /* Bright ring on the bottom-bar buttons, so their edges show in sun */
+  --control-ring: #E3E3E3;
   --md-sys-color-surface: #1E1E1E;
   --md-sys-color-surface-variant: #2D2D2D;
   --md-sys-color-surface-hover: #383838;
@@ -11,8 +12,14 @@
   --md-sys-color-on-primary: #062E6F;
   --md-sys-color-primary-container: #004A77;
   --md-sys-color-on-primary-container: #C2E7FF;
-  --md-sys-color-error: #F2B8B5;
-  --md-sys-color-on-error: #601410;
+  /* Delete red: a strong red, picked by the owner from swatches (2026-11-05,
+     option C). The vermilion before it read as orange to his colour vision. */
+  --md-sys-color-error: #FF6155;
+  --md-sys-color-on-error: #2D0001;
+  /* Secondary text and dividers: used across the dialogs, never defined until now */
+  --md-sys-color-on-surface-variant: #C4C7C5;
+  --md-sys-color-outline: #8E918F;
+  --md-sys-color-outline-variant: #444746;
   
   --elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.30);
   --elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.30);
@@ -25,6 +32,8 @@
   /* Accent & Highlight Design Tokens */
   /* Gold means one thing on every theme: a held die, a target hit or a natural 20. */
   --color-gold: #FFD700;
+  /* Gold for icons and text (lock, HIT!): needs 3:1 / 4.5:1 against the surface it sits on */
+  --color-gold-ink: var(--color-gold);
   --color-crit-red: #D32F2F;
   --color-success: #2E7D32;
   --color-accent-blue: #0056D2;
@@ -37,6 +46,7 @@
 }
 
 body.theme-light {
+  --control-ring: #5F6368;
   --md-sys-color-background: #FDFDFD;
   --md-sys-color-surface: #F0F0F0;
   --md-sys-color-surface-variant: #E0E0E0;
@@ -47,9 +57,20 @@ body.theme-light {
   --md-sys-color-on-primary: #FFFFFF;
   --md-sys-color-primary-container: #D7E3FF;
   --md-sys-color-on-primary-container: #001B3F;
+  /* Light theme's own error pair (M3 light). Without it the dark theme's pale
+     pink showed through, and Clear All read at 1.3:1 on the light menu.
+     A deep strong red, matching the dark themes' one (owner, 2026-11-05). */
+  --md-sys-color-error: #BA1A1A;
+  --md-sys-color-on-error: #FFFFFF;
+  --md-sys-color-on-surface-variant: #444746;
+  --md-sys-color-outline: #747775;
+  --md-sys-color-outline-variant: #C4C7C5;
+  /* Bright gold vanishes on light grey; a deep gold keeps the lock and HIT! readable */
+  --color-gold-ink: #7A5C00;
 }
 
 body.theme-felt {
+  --control-ring: #EFE6D2;
   --md-sys-color-background: #1B4D3E; /* Casino Felt Green */
   --md-sys-color-surface: #13382D;
   --md-sys-color-surface-variant: #0F2E24;
@@ -62,9 +83,18 @@ body.theme-felt {
   --md-sys-color-on-primary: #13382D;
   --md-sys-color-primary-container: #EFE6D2;
   --md-sys-color-on-primary-container: #13382D;
+  --md-sys-color-on-surface-variant: #D3E4DC;
+  /* Felt keeps its lighter vermilion: no red is both readable on the green
+     and, with red-green colour blindness, apart from the cream Roll one button
+     (checked 2026-11-05 when the other themes went strong red) */
+  --md-sys-color-error: #FF9F6B;
+  --md-sys-color-on-error: #1F0A00;
+  --md-sys-color-outline: #8FA89E;
+  --md-sys-color-outline-variant: #2F5A4C;
 }
 
 body.theme-midnight {
+  --control-ring: #DFE0FF;
   --md-sys-color-background: #090B10;
   --md-sys-color-surface: #121622;
   --md-sys-color-surface-variant: #1B2134;
@@ -75,6 +105,9 @@ body.theme-midnight {
   --md-sys-color-on-primary: #0A114A;
   --md-sys-color-primary-container: #262D6E;
   --md-sys-color-on-primary-container: #DFE0FF;
+  --md-sys-color-on-surface-variant: #C5C6DD;
+  --md-sys-color-outline: #8E90A8;
+  --md-sys-color-outline-variant: #2E3450;
 }
 
 body {
@@ -92,13 +125,36 @@ body {
   box-sizing: border-box;
 }
 
+/* Hint text readable in sun on every theme (browser grey was 2.1:1 on felt) */
+input::placeholder,
+textarea::placeholder {
+  color: var(--md-sys-color-on-surface);
+  opacity: 0.7;
+}
+
 button {
   font-family: 'Roboto', sans-serif;
   border: none;
   background: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  /* Quick repeat taps (wet or gloved hands) roll again instead of zooming the page */
+  touch-action: manipulation;
   outline: none;
+}
+
+/* With Bright Rings on (Customize), the bottom-bar buttons (menu, hold all,
+   add, RPG controls, Roll) get one bright 2px ring inside their edge, so each
+   one is easy to find in glare. */
+.bright-rings .control-ring:not(:focus-visible) {
+  outline: 2px solid var(--control-ring);
+  outline-offset: -2px;
+}
+
+/* Taps show no ring; the keyboard always shows where it is */
+button:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
 }
 
 /* Base Material Button */
@@ -212,6 +268,14 @@ button {
   transform-origin: center;
 }
 
+/* With Reduce motion on, nothing shakes or slides: dice and bars just
+   appear, and a roll's number fades in (Dice.module.css) */
+@media (prefers-reduced-motion: reduce) {
+  .dice-shake {
+    animation: none;
+  }
+}
+
 /* Search landing pages (landing/pages.mjs) and the home page. The writing
    ships in the page HTML for search engines; the app shows it in its About
    dialog instead of below the dice, so the page never scrolls. */
@@ -252,4 +316,13 @@ body > .landing-article {
 .landing-more {
   margin-top: 20px;
   font-size: 14px;
+}
+
+/* High contrast (Windows) removes button fills, so round and pill buttons
+   lost their shape and read as loose icons. Draw their edge instead. */
+@media (forced-colors: active) {
+  .md-button,
+  .md-icon-button {
+    border: 2px solid ButtonText;
+  }
 }

@@ -1,5 +1,6 @@
 .dice {
   display: flex;
+  touch-action: manipulation;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -11,7 +12,7 @@
   box-sizing: border-box;
   z-index: 1;
   box-shadow: var(--elevation-1);
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.2s, opacity 0.4s cubic-bezier(0.2, 0, 0, 1), filter 0.4s cubic-bezier(0.2, 0, 0, 1);
   /* The element is a rounded SQUARE even when the die inside it is clipped to a
      polyhedron, so the default touch highlight paints a square block over the
      shape. Buttons already opt out in index.css; this element is a focusable
@@ -29,9 +30,24 @@
   outline: none;
 }
 
-.dice:focus-visible {
+.dice:focus-visible,
+.dice:has(.holdBtn:focus-visible) {
   outline: 3px solid var(--md-sys-color-primary);
   outline-offset: 3px;
+}
+
+/* The die's hold button: there for the keyboard and screen readers, drawn by
+   the die itself (the ring above shows when it has focus). */
+.holdBtn {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* A polyhedral die is not a rounded square, so the card shadow would halo the
@@ -100,13 +116,33 @@
   transform: scale(1.1);
 }
 
-.holdIcon {
-  top: calc(var(--dice-size) * -0.04);
-  right: calc(var(--dice-size) * -0.04);
-  background-color: var(--md-sys-color-surface-variant);
-  color: var(--md-sys-color-on-surface);
-  opacity: 1;
+/* Held: the die lifts (Dice.tsx) and casts a deeper shadow, and a gold HELD
+   tag sits on its top edge (owner's pick, 2026-11-03: "Lift and tag") */
+.held {
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.35), var(--elevation-3);
+}
+
+.heldTag {
+  position: absolute;
+  top: calc(var(--dice-size) * -0.08);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: max-content;
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+  background-color: var(--color-gold);
+  color: #1A1400;
+  font-size: max(0.625rem, calc(var(--dice-size) * 0.11));
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  padding: 0.35em 0.7em;
+  border-radius: 999px;
+  box-shadow: var(--elevation-3);
   pointer-events: none;
+  z-index: 12;
 }
 
 .unlockIcon {
@@ -155,8 +191,9 @@
   bottom: calc(var(--dice-size) * -0.04);
   left: 50%;
   transform: translateX(-50%);
-  background-color: var(--md-sys-color-primary);
-  color: var(--md-sys-color-on-primary);
+  /* Same blue as the big Roll button (owner, 2026-11-02) */
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
   transition: opacity 0.2s, transform 0.2s;
 }
 
@@ -219,6 +256,17 @@
   z-index: 15;
   box-shadow: 0 2px 8px rgba(0,0,0,0.4);
   letter-spacing: 0.5px;
+  /* Drops onto the die like a stamp instead of appearing */
+  animation: stampIn 0.4s cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+@keyframes stampIn {
+  from { opacity: 0; transform: translate(-50%, -110%) rotate(-15deg) scale(1.6); }
+  to { opacity: 1; transform: translate(-50%, -50%) rotate(-15deg) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .droppedBadge { animation: none; }
 }
 
 .crit20 {
@@ -229,6 +277,22 @@
 .crit1 {
   box-shadow: 0 0 20px 4px var(--color-crit-red), var(--elevation-3) !important;
   border: 2px solid var(--color-crit-red);
+}
+
+/* A shaped die's natural 20 / natural 1 glow follows its real outline, not a
+   square box around it (owner, 2026-11-05) */
+.dice.shaped.crit20,
+.dice.shaped.crit1 {
+  box-shadow: none !important;
+  border: none;
+}
+
+.dice.shaped.crit20 {
+  filter: drop-shadow(0 0 2px var(--color-gold)) drop-shadow(0 0 10px var(--color-gold));
+}
+
+.dice.shaped.crit1 {
+  filter: drop-shadow(0 0 2px var(--color-crit-red)) drop-shadow(0 0 10px var(--color-crit-red));
 }
 
 /* Polyhedral RPG Shapes (active when rpgMode is ON) */
@@ -278,4 +342,53 @@
 .shapeD20 {
   clip-path: polygon(50% 2%, 94% 26%, 94% 74%, 50% 98%, 6% 74%, 6% 26%);
   border-radius: 0 !important;
+}
+
+/* High contrast (Windows) drops background colours, which left each die as a
+   bare number and its small buttons as loose icons. Give them back an edge. */
+@media (forced-colors: active) {
+  .dice,
+  .actionBtn {
+    border: 2px solid CanvasText;
+  }
+
+  .heldTag {
+    border: 2px solid Highlight;
+  }
+}
+
+/* Many small dice: the tapped die is outlined; its buttons sit in the strip above the bottom bar */
+.dice.outlined {
+  outline: 3px solid var(--md-sys-color-primary);
+  outline-offset: 3px;
+}
+
+/* Reduce motion: the die stays still while rolling and the number fades
+   back in when it lands */
+.calmFace {
+  transition: opacity 0.35s ease-out;
+}
+
+.calmRolling {
+  opacity: 0.15;
+  transition: none;
+}
+
+/* A face with an icon and words: the icon above, the words under it */
+.iconWithText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--dice-size) * 0.02);
+  max-width: 92%;
+  line-height: 1;
+}
+
+.iconWords {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
 }

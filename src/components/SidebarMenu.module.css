@@ -28,7 +28,8 @@
   bottom: 104px;
   left: 24px;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  /* minmax(0, …): with bigger text the words wrap in their tile instead of pushing a column off screen */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   z-index: 120;
   padding: 16px;
@@ -44,7 +45,7 @@
   background-color: var(--md-sys-color-surface-variant);
   color: var(--md-sys-color-on-surface);
   border-radius: var(--shape-small);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   transition: background-color 0.2s, transform 0.1s;
   justify-content: flex-start;
@@ -65,15 +66,25 @@
 }
 
 /* Spans every column beneath the grid, keeping the columns 4-for-4 */
-.menuFooterItem {
+.menuFooterRow {
   grid-column: 1 / -1;
-  justify-content: center;
-  color: var(--md-sys-color-error);
+  display: flex;
+  gap: 6px;
   margin-top: 4px;
 }
 
+.menuFooterItem {
+  flex: 1;
+  justify-content: center;
+  color: var(--md-sys-color-error);
+}
+
+.menuInstallItem {
+  color: var(--md-sys-color-on-surface);
+}
+
 .menuColumnHeader {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 600;
   opacity: 0.6;
   padding-left: 4px;
@@ -81,8 +92,10 @@
 }
 
 @media (max-width: 468px) {
+  /* No Hold All button below it any more (owner, 2026-11-05), so the menu
+     button sits in the bottom corner, level with + and Roll */
   .toggleContainer {
-    bottom: 112px;
+    bottom: 24px;
     left: 24px;
     right: auto;
   }
@@ -96,11 +109,11 @@
   }
   
   .menu {
-    bottom: 192px;
+    bottom: 104px;
     left: 16px;
     right: 16px;
     width: auto;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 8px;
     z-index: 130;
     max-height: 55vh;
@@ -114,30 +127,37 @@
     align-items: center;
     aspect-ratio: 1;
     padding: 6px;
-    font-size: 10px;
+    font-size: 0.625rem;
     gap: 4px;
     text-align: center;
   }
   
   .menuItem span {
-    font-size: 9px;
+    font-size: 0.5625rem;
     line-height: 1.1;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    hyphens: auto;
   }
 
   /* The footer spans here too, but has to opt out of the square-tile styling
      the other items take on at this width, or the grid stretches it into a
      full-width block. */
+  .menuFooterRow {
+    gap: 8px;
+  }
+
   .menuFooterItem {
-    grid-column: 1 / -1;
     aspect-ratio: auto;
     flex-direction: row;
     gap: 8px;
+    min-height: 48px;
     padding: 10px;
     margin-top: 2px;
   }
 
   .menuFooterItem span {
-    font-size: 12px;
+    font-size: 0.75rem;
   }
 }
 
@@ -146,4 +166,37 @@
 .toggleBtn.toggleBtnOpen:hover {
   background-color: var(--md-sys-color-primary-container);
   color: var(--md-sys-color-on-primary-container);
+}
+
+/* Matches the smaller bottom row on narrow screens (ActionBar.module.css) */
+@media (max-width: 379px) {
+  .toggleContainer {
+    bottom: 16px;
+    left: 16px;
+  }
+
+  .menu {
+    bottom: 84px;
+  }
+
+  .toggleBtn {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+@media (max-width: 299px) {
+  .toggleContainer {
+    bottom: 12px;
+    left: 12px;
+  }
+
+  .menu {
+    bottom: 72px;
+  }
+
+  .toggleBtn {
+    width: 52px;
+    height: 52px;
+  }
 }

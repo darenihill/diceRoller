@@ -1,13 +1,22 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import type { DiceData } from '../types';
 import styles from './Dice.module.css';
-import { Lock, Unlock, Settings, X, Copy, Dices } from 'lucide-react';
-import { motion, useAnimationControls } from 'framer-motion';
+import { Lock, Unlock, Settings, Trash2, Copy, Dices } from 'lucide-react';
+import { motion, useAnimationControls, useReducedMotion } from 'framer-motion';
 import { ALL_ICONS } from '../utils/iconUtils';
-import { parseFaceContent, FACE_ICON_PREFIX, getContrastColor } from '../utils/diceUtils';
+import { parseFaceContent, FACE_ICON_PREFIX, getContrastColor, faceParts, faceLabel } from '../utils/diceUtils';
 import { useFaceImage } from '../utils/faceImages';
 import { MAX_SHAPED_FACE_LENGTH } from '../utils/constants';
 import { PolyhedralWireframe } from './PolyhedralWireframe';
+import { DICE_SHAPES } from '../utils/diceShapes';
+import { randomBelow } from '../utils/fairRandom';
+
+/** Material 3 emphasized easing, as on the menu icon */
+const EMPHASIZED = [0.2, 0, 0, 1] as const;
+/** How far a dropped die sinks back */
+const DROPPED_SCALE = 0.88;
+/** How far a held die lifts, as a share of its size */
+const HELD_LIFT = '-5%';
 
 interface DiceProps {
   dice: DiceData;
@@ -22,27 +31,34 @@ interface DiceProps {
   /** This die is rolling on its own, so it animates even when held */
   rollingAlone?: boolean;
   rpgMode?: boolean;
+  /** Many small dice: the buttons move to the strip above the bottom bar, and the tapped die gets an outline */
+  compactActions?: boolean;
+  /** Asked once when the die appears: where the + button was, if it was just tapped */
+  takeGlide?: (id: string) => GlideOrigin | null;
 }
 
+/** The centre of the + button a new die glides out of, and when it was tapped */
+export interface GlideOrigin { x: number; y: number; at: number; claimedBy?: string }
+
 const DiceComponent: React.FC<DiceProps> = ({ 
-  dice, isRolling, isRevealed, onReveal, onToggleHold, onRemove, onOpenSettings, onClone, onRollOne, rollingAlone, rpgMode 
+  dice, isRolling, isRevealed, onReveal, onToggleHold, onRemove, onOpenSettings, onClone, onRollOne, rollingAlone, rpgMode, compactActions, takeGlide 
 }) => {
   const diceRef = useRef<HTMLDivElement>(null);
 
   const [tempValue, setTempValue] = useState<number | null>(null);
   const [tempFaceIndex, setTempFaceIndex] = useState<number | null>(null);
 
-  // Wiggle the lock icon only when held actually changes — not when the die mounts
-  // (page load, preset load). NOTE: the mount-flag effect must be declared AFTER
-  // this one so the first run sees lockMountedRef=false and skips the wiggle.
+  // The HELD tag drops onto the die only when held actually changes — not when
+  // the die mounts (page load, preset load). NOTE: the mount-flag effect must be
+  // declared AFTER this one so the first run sees lockMountedRef=false and skips it.
   const lockControls = useAnimationControls();
   const lockMountedRef = useRef(false);
   useEffect(() => {
-    if (!lockMountedRef.current) return;
+    if (!lockMountedRef.current || !dice.held) return;
     lockControls.start({
-      rotate: [0, -45, 10, 0],
-      color: dice.held ? 'var(--color-gold)' : '#FFFFFF',
-      transition: { duration: 0.5, ease: 'easeInOut' }
+      y: ['-180%', '0%'],
+      opacity: [0, 1],
+      transition: { type: 'spring', stiffness: 520, damping: 22 }
     });
   }, [dice.held, lockControls]);
   useEffect(() => {
@@ -53,9 +69,55 @@ const DiceComponent: React.FC<DiceProps> = ({
   }, []);
 
   const rollingNow = isRolling && (!dice.held || !!rollingAlone);
+  // A dropped die sinks back, dims and gets its stamp once it lands, not mid-tumble
+  const sunk = !!dice.dropped && !rollingNow;
+  // With the phone's Reduce motion on, a rolling die stays still and its
+  // number fades in, instead of shaking through random faces
+  const calm = !!useReducedMotion();
+
+  // Added from the + button: rise out of it into this slot (Material 3 emphasized easing)
+  const [glided] = useState(() => takeGlide?.(dice.id) ?? null);
+  useLayoutEffect(() => {
+    const el = diceRef.current;
+    if (!glided || calm || !el || typeof el.animate !== 'function') return;
+    const box = el.getBoundingClientRect();
+    const dx = glided.x - (box.left + box.width / 2);
+    const dy = glided.y - (box.top + box.height / 2);
+    // While it flies in from outside the dice area, the area would count it as
+    // overflow and flash a scroll bar it doesn't need (owner, 2026-11-05). If the
+    // dice fit without scrolling, the area hides overflow until the die lands.
+    // Several dice can be in flight at once, so the area counts them and gives
+    // its scroll bar back only when the last one lands.
+    const area = el.parentElement;
+    const inFlight = () => Number(area?.dataset.gliding ?? 0);
+    const hideBar = !!area && (inFlight() > 0 || (area.scrollHeight <= area.clientHeight && area.scrollWidth <= area.clientWidth));
+    if (hideBar && area) {
+      area.dataset.gliding = String(inFlight() + 1);
+      area.style.overflow = 'hidden';
+    }
+    let restored = false;
+    const restore = () => {
+      if (!hideBar || !area || restored) return;
+      restored = true;
+      const left = inFlight() - 1;
+      if (left > 0) {
+        area.dataset.gliding = String(left);
+      } else {
+        delete area.dataset.gliding;
+        area.style.removeProperty('overflow');
+      }
+    };
+    const glide = el.animate(
+      [{ transform: `translate(${dx}px, ${dy}px) scale(0.3)`, opacity: 0.4 }, { transform: 'none', opacity: 1 }],
+      { duration: 450, easing: 'cubic-bezier(0.2, 0, 0, 1)' }
+    );
+    glide.addEventListener?.('finish', restore);
+    // Strict mode runs this twice: stop the first so the second measures the settled slot
+    return () => { glide.cancel(); restore(); };
+  }, [glided, calm]);
 
   useEffect(() => {
-    if (!rollingNow) return;
+    if (!rollingNow || calm) return;
 
     let tickCount = 0;
 
@@ -74,10 +136,10 @@ const DiceComponent: React.FC<DiceProps> = ({
         }
       } else {
         if (dice.customFaces.length > 0) {
-          const idx = Math.floor(Math.random() * dice.customFaces.length);
+          const idx = randomBelow(dice.customFaces.length);
           setTempFaceIndex(idx);
         } else {
-          const val = Math.floor(Math.random() * dice.faces) + 1;
+          const val = randomBelow(dice.faces) + 1;
           setTempValue(val);
         }
       }
@@ -88,7 +150,7 @@ const DiceComponent: React.FC<DiceProps> = ({
       setTempValue(null);
       setTempFaceIndex(null);
     };
-  }, [rollingNow, dice.faces, dice.customFaces, dice.targetValue, dice.targetFaceIndex]);
+  }, [rollingNow, calm, dice.faces, dice.customFaces, dice.targetValue, dice.targetFaceIndex]);
 
   const getDisplayText = () => {
     if (rollingNow) {
@@ -112,25 +174,43 @@ const DiceComponent: React.FC<DiceProps> = ({
   const faceImage = useFaceImage(parsed.image);
 
   const textColor = getContrastColor(backgroundColor);
+  // Names the die in every button around it, so a screen reader hears "Remove Red", not five "Remove Die"
+  const dieName = dice.name || `d${dice.faces}`;
+  const spokenFace = faceLabel(faceContent);
 
   let longestFace = 1;
+  // Letters run wider than digits, so word faces ("YES", "MAYBE") get a little
+  // more room per character and stay on one line
+  let wordFaces = false;
   if (dice.customFaces.length > 0) {
     const textFaces = dice.customFaces.map(f => parseFaceContent(f).content).filter(f => !f.startsWith(FACE_ICON_PREFIX));
     if (textFaces.length > 0) {
       longestFace = Math.max(...textFaces.map(f => f.length));
+      wordFaces = textFaces.some(f => /[^\d\s.+-]/.test(f));
     }
   } else {
     longestFace = dice.numberValue.toString().length;
   }
   
-  const fontScale = `min(calc(var(--dice-size) * 0.7), calc(var(--dice-size) * 1.66 / ${longestFace || 1}))`;
+  const fontScale = `min(calc(var(--dice-size) * 0.7), calc(var(--dice-size) * ${wordFaces ? 1.3 : 1.66} / ${longestFace || 1}))`;
 
   const renderFace = (faceStr: string) => {
     if (!faceStr) return null;
-    if (faceStr.startsWith(FACE_ICON_PREFIX)) {
-      const iconName = faceStr.replace(FACE_ICON_PREFIX, '');
-      const IconComp = ALL_ICONS.find(i => i.name === iconName)?.icon;
-      if (IconComp) return <IconComp size="calc(var(--dice-size) * 0.58)" strokeWidth={2.5} color={textColor} />;
+    const { icon, text } = faceParts(faceStr);
+    if (icon) {
+      const IconComp = ALL_ICONS.find(i => i.name === icon)?.icon;
+      if (IconComp && !text) return <IconComp size="calc(var(--dice-size) * 0.58)" strokeWidth={2.5} color={textColor} />;
+      // An icon with words: the icon above, the words small under it (owner, 2026-11-05)
+      if (IconComp) {
+        const wordSize = Math.min(0.22, 1.25 / Math.max(1, text.length));
+        return (
+          <span className={styles.iconWithText}>
+            <IconComp size="calc(var(--dice-size) * 0.42)" strokeWidth={2.5} color={textColor} />
+            <span className={styles.iconWords} style={{ fontSize: `calc(var(--dice-size) * ${wordSize})` }}>{text}</span>
+          </span>
+        );
+      }
+      return text || icon;
     }
     return faceStr;
   };
@@ -159,39 +239,55 @@ const DiceComponent: React.FC<DiceProps> = ({
     else if (dice.faces === 20) shapeClass = styles.shapeD20;
   }
 
+  // Gem look: the number sits on the front face, sized to fit it, so no facet
+  // line runs through it; the shape already says which die it is, so a plain
+  // "d20" name isn't shown on it (owner's pick, 2026-11-05)
+  const spot = shapeEligible ? DICE_SHAPES[dice.faces]?.number : undefined;
+  const numberStyle: React.CSSProperties = spot
+    ? { fontSize: `calc(${fontScale} * ${spot.scale * (String(faceContent).length > 1 ? 0.78 : 1)})`, color: textColor, zIndex: 2, top: `${spot.y}%`, left: `${spot.x}%`, fontWeight: 700 }
+    : { fontSize: fontScale, color: textColor, zIndex: 2 };
+  const nameIsShape = !!spot && dice.name === `d${dice.faces}`;
+
   const extraClass = [
-    dice.dropped ? styles.dropped : '',
-    dice.isCrit20 ? styles.crit20 : '',
-    dice.isCrit1 ? styles.crit1 : ''
+    sunk ? styles.dropped : '',
+    // The natural 20 / natural 1 glow waits for the die to land: the result is
+    // known when the roll starts, but showing it then gave it away (owner, 2026-11-05)
+    dice.isCrit20 && !rollingNow ? styles.crit20 : '',
+    dice.isCrit1 && !rollingNow ? styles.crit1 : ''
   ].filter(Boolean).join(' ');
 
   return (
     <motion.div
       ref={diceRef}
-      className={`${styles.dice} ${shapeClass ? styles.shaped : ''} ${rollingNow ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''} ${extraClass}`}
+      className={`${styles.dice} ${shapeClass ? styles.shaped : ''} ${rollingNow && !calm ? 'dice-shake' : ''} ${isRevealed ? styles.revealed : ''} ${compactActions && isRevealed ? styles.outlined : ''} ${dice.held ? styles.held : ''} ${extraClass}`}
       data-dice-id={dice.id}
-      role="button"
-      tabIndex={0}
-      aria-label={`${dice.name || `d${dice.faces}`} showing ${faceContent.startsWith(FACE_ICON_PREFIX) ? faceContent.replace(FACE_ICON_PREFIX, '') : faceContent}${dice.held ? ', held' : ''}. Press to ${dice.held ? 'release' : 'hold'}.`}
+      // A group, not a button: a button's inner buttons are hidden from screen
+      // readers, so settings, copy, roll-one and remove couldn't be reached.
+      // Holding moves to its own (visually hidden) button below.
+      role="group"
+      aria-label={`${dieName} showing ${spokenFace}${dice.held ? ', held' : ''}`}
       onClick={(e) => {
         if ((e.target as HTMLElement).closest('button')) return;
         onReveal();
         onToggleHold(dice.id);
       }}
-      onKeyDown={(e) => {
-        if (e.target !== e.currentTarget) return;
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onReveal();
-          onToggleHold(dice.id);
-        }
-      }}
       onTouchStart={() => onReveal()}
       layout
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
+      initial={glided && !calm ? false : { scale: 0 }}
+      // A die dropped by Advantage or Disadvantage sinks back a little (Material 3 emphasized easing)
+      // A held die lifts off the table (owner's pick, 2026-11-03: "Lift and tag")
+      animate={{ scale: sunk && !calm ? DROPPED_SCALE : 1, y: dice.held && !calm ? HELD_LIFT : 0 }}
+      transition={sunk ? { duration: 0.4, ease: EMPHASIZED } : undefined}
       exit={{ scale: 0 }}
     >
+      {/* Keyboard and screen-reader way to hold; a tap on the die does the same */}
+      <button
+        className={styles.holdBtn}
+        aria-pressed={!!dice.held}
+        aria-label={`Hold ${dieName}`}
+        onClick={() => { onReveal(); onToggleHold(dice.id); }}
+      />
+
       {/* Background shape container so clip-path does NOT clip action buttons */}
       <div className={`${styles.diceShapeBg} ${shapeClass}`} style={{ backgroundColor }}>
         {/* 3D Wireframe Facet Lines Overlay - placed INSIDE diceShapeBg to match silhouette bounds perfectly */}
@@ -201,20 +297,20 @@ const DiceComponent: React.FC<DiceProps> = ({
       </div>
 
       {faceImage ? (
-        <img src={faceImage} alt="" className={styles.faceImage} draggable={false} />
+        <img src={faceImage} alt="" className={`${styles.faceImage} ${calm ? styles.calmFace : ''} ${calm && rollingNow ? styles.calmRolling : ''}`} draggable={false} />
       ) : (
-        <div className={styles.number} style={{ fontSize: fontScale, color: textColor, zIndex: 2 }}>
+        <div className={`${styles.number} ${calm ? styles.calmFace : ''} ${calm && rollingNow ? styles.calmRolling : ''}`} data-calm={calm ? (rollingNow ? 'rolling' : 'still') : undefined} style={numberStyle}>
           {renderFace(faceContent)}
         </div>
       )}
 
-      {dice.dropped && (
-        <div className={styles.droppedBadge}>
+      {sunk && (
+        <div className={styles.droppedBadge} data-testid="dropped-stamp">
           DROPPED
         </div>
       )}
 
-      {dice.name && (
+      {dice.name && !nameIsShape && (
         <div style={{
           position: 'absolute',
           bottom: '8%',
@@ -235,35 +331,30 @@ const DiceComponent: React.FC<DiceProps> = ({
         </div>
       )}
 
-      <motion.div
-        initial={{ rotate: 0 }}
-        animate={lockControls}
-        style={{ color: dice.held ? 'var(--color-gold)' : '#FFFFFF' }}
-        className={`${styles.actionBtn} ${dice.held ? styles.holdIcon : styles.unlockIcon}`}
-      >
-        <div style={{ position: 'relative', width: 20, height: 20 }}>
-          <motion.div 
-            animate={{ opacity: dice.held ? 1 : 0 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            style={{ position: 'absolute', top: 0, left: 0, width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          >
-            <Lock size={20} strokeWidth={2.5} color="currentColor" />
-          </motion.div>
-          <motion.div 
-            animate={{ opacity: dice.held ? 0 : 1 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            style={{ position: 'absolute', top: 0, left: 0, width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          >
-            <Unlock size={20} strokeWidth={2.5} color="currentColor" />
-          </motion.div>
+      {dice.held ? (
+        // Held: a gold HELD tag sits on the top edge (it drops in when you hold the die)
+        <motion.div
+          className={styles.heldTag}
+          data-testid="held-tag"
+          aria-hidden="true"
+          initial={false}
+          animate={calm ? { y: '0%', opacity: 1 } : lockControls}
+        >
+          <Lock size="1em" strokeWidth={3} />
+          HELD
+        </motion.div>
+      ) : (
+        <div className={`${styles.actionBtn} ${styles.unlockIcon}`} aria-hidden="true">
+          <Unlock size={20} strokeWidth={2.5} color="currentColor" />
         </div>
-      </motion.div>
+      )}
 
+      {!compactActions && (<>
       {/* Settings Button (Bottom-Right) */}
       <button className={`${styles.actionBtn} ${styles.settingsBtn}`} onClick={(e) => {
         e.stopPropagation();
         onOpenSettings(dice.id);
-      }} title="Dice Settings">
+      }} title="Dice Settings" aria-label={`Settings for ${dieName}`}>
         <Settings size={20} strokeWidth={2.5} color="currentColor" />
       </button>
 
@@ -273,18 +364,19 @@ const DiceComponent: React.FC<DiceProps> = ({
           className={`${styles.actionBtn} ${styles.cloneBtn}`} 
           onClick={(e) => { e.stopPropagation(); onClone(dice); }}
           title="Clone Die"
+          aria-label={`Copy ${dieName}`}
         >
           <Copy size={20} strokeWidth={2.5} color="currentColor" />
         </button>
       )}
 
-      {/* Roll This Die (Bottom-Centre) */}
-      {onRollOne && (
+      {/* Roll This Die (Bottom-Centre); a held die stays put until it is released (owner, 2026-11-05) */}
+      {onRollOne && !dice.held && (
         <button 
           className={`${styles.actionBtn} ${styles.rollOneBtn}`} 
           onClick={(e) => { e.stopPropagation(); onRollOne(dice.id); }}
           title="Roll This Die"
-          aria-label="Roll this die"
+          aria-label={`Roll only ${dieName}`}
         >
           <Dices size={20} strokeWidth={2.5} color="currentColor" />
         </button>
@@ -295,9 +387,11 @@ const DiceComponent: React.FC<DiceProps> = ({
         className={`${styles.actionBtn} ${styles.removeBtn}`} 
         onClick={(e) => { e.stopPropagation(); onRemove(dice.id); }}
         title="Remove Die"
+        aria-label={`Remove ${dieName}`}
       >
-        <X size={20} strokeWidth={2.5} color="currentColor" />
+        <Trash2 size={18} strokeWidth={2.5} color="currentColor" />
       </button>
+      </>)}
     </motion.div>
   );
 };

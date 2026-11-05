@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-// One highlight colour per meaning: the theme's accent marks what is selected or
+// One highlight color per meaning: the theme's accent marks what is selected or
 // focused; gold marks only a held die, a target hit or a natural 20.
 const root = join(__dirname, '..');
 const css = readFileSync(join(root, 'index.css'), 'utf8');
@@ -13,7 +13,7 @@ function files(dir: string): string[] {
     e.isDirectory() ? files(join(dir, e.name)) : /\.(tsx|css)$/.test(e.name) ? [join(dir, e.name)] : []);
 }
 
-describe('highlight colours', () => {
+describe('highlight colors', () => {
   it('no theme uses gold as its accent', () => {
     expect(gold).toBe('#FFD700');
     const accents = [...css.matchAll(/--md-sys-color-primary(?:-container)?:\s*(#[0-9A-Fa-f]{6})/g)].map(m => m[1].toUpperCase());
@@ -23,7 +23,7 @@ describe('highlight colours', () => {
 
   it('components name gold and accents by token, not by hex', () => {
     const offenders = files(join(root, 'components'))
-      // Face colours people pick (':bg:#FFD700') are colours, not highlights.
+      // Face colors people pick (':bg:#FFD700') are colors, not highlights.
       .filter(f => /#FFD700|solid #8E99F3/i.test(readFileSync(f, 'utf8').replace(/:bg:#FFD700/gi, '')));
     expect(offenders).toEqual([]);
   });

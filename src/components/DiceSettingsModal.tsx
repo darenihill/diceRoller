@@ -1,14 +1,22 @@
 import React, { useState, useRef, useEffect, useId } from 'react';
 import type { DiceData } from '../types';
 import { Modal } from './Modal';
-import { COLORS, COLOR_NAMES, FACE_ICON_PREFIX, parseFaceContent, buildFace, faceNumericValue, getContrastColor, colourEveryFace } from '../utils/diceUtils';
-import { X, Plus, Minus, Star, Check, Copy, Trash2, Palette, ImagePlus, ImageOff, Rainbow, Ban } from 'lucide-react';
+import { FACE_ICON_PREFIX, parseFaceContent, buildFace, faceNumericValue, getContrastColor, colourEveryFace, faceParts, joinFace } from '../utils/diceUtils';
+import { X, Plus, Minus, Star, Check, Copy, Trash2, ImagePlus, ImageOff, Rainbow, Palette, Smile, Type, ChevronDown } from 'lucide-react';
 import { addFaceImage, useFaceImages, shrinkImage } from '../utils/faceImages';
 import { ALL_ICONS, COMMON_ICONS } from '../utils/iconUtils';
+import { MAX_CUSTOM_FACES, MAX_FACE_TEXT_LENGTH } from '../utils/constants';
+import { splitFaceList, pastedListForBox } from '../utils/faceList';
+import { ColorPicker } from './ColorPicker';
 import styles from './DiceSettingsModal.module.css';
 
-/** Approximate rendered height of the colour popover, used to clamp its position. */
-const POPOVER_HEIGHT = 170;
+type FacePanel = 'color' | 'icons' | 'text';
+// The order the owner named them in
+const PANELS = [
+  ['color', 'Color', Palette],
+  ['icons', 'Icons', Smile],
+  ['text', 'Text', Type],
+] as const;
 
 interface DiceSettingsModalProps {
   dice: DiceData;
@@ -21,61 +29,134 @@ interface DiceSettingsModalProps {
   allDice: DiceData[];
 }
 
+// Adding, removing or replacing a die's faces releases its hold: the tap that opened these
+// settings also held it, and a held die with new faces would never roll.
+// Recolouring a face, its number or its picture keeps a deliberate hold.
 export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOpen, onClose, onUpdate, onRemove, onClone, allDice }) => {
   const [customInput, setCustomInput] = useState('');
   // What is typed in the faces box; null shows the die's count. Lets the box be cleared and retyped.
   const [facesDraft, setFacesDraft] = useState<string | null>(null);
   const fieldId = useId();
   const [showAllIcons, setShowAllIcons] = useState(false);
-  const [activeColorPicker, setActiveColorPicker] = useState<{ type: 'base' | 'custom'; index?: number; top: number } | null>(null);
-  /** The face the colour row paints: tap a face, then tap a colour */
+  /** Which of Color, Icons and Text is open on Custom faces. A die with no
+   *  faces yet opens on Text, the quickest way to add one. */
+  const [openPanel, setOpenPanel] = useState<FacePanel | null>(() => dice.customFaces.length === 0 ? 'text' : null);
+  /** The face the color row paints: tap a face, then tap a color */
   const [selectedFace, setSelectedFace] = useState(0);
+  /** The face Icons and Text change, once one is tapped; none means they add new faces */
+  const [editFace, setEditFace] = useState<{ die: string; index: number } | null>(null);
+  // What's typed in a face's words box, while it differs from the saved words
+  const [textDraft, setTextDraft] = useState<{ index: number; text: string } | null>(null);
+  /** The color row pins to the bottom only after a face is tapped, so the faces show first on open */
+  const [colourPinnedFor, setColourPinnedFor] = useState<string | null>(null);
+  const colourPinned = colourPinnedFor === dice.id;
+  /** The open tab, chosen once each time the dialog opens for a die: a die with its own
+   *  faces opens on them (faces show first), others on Dice Settings. Removing the last
+   *  face then keeps you on Custom faces. */
+  const openKey = isOpen ? dice.id : '';
+  const openingTab = dice.customFaces.length > 0 ? 'faces' : 'settings';
+  const [tabFor, setTabFor] = useState<{ key: string; tab: 'settings' | 'faces' }>({ key: openKey, tab: openingTab });
+  if (tabFor.key !== openKey) setTabFor({ key: openKey, tab: openingTab });
+  const tab = tabFor.key === openKey ? tabFor.tab : openingTab;
+  const setTab = (next: 'settings' | 'faces') => setTabFor({ key: openKey, tab: next });
   const activeFace = Math.min(selectedFace, Math.max(0, dice.customFaces.length - 1));
+  const editing = editFace && editFace.die === dice.id && editFace.index < dice.customFaces.length ? editFace.index : null;
+  const editingParts = editing !== null ? faceParts(parseFaceContent(dice.customFaces[editing]).content) : null;
   const activeFaceColour = parseFaceContent(dice.customFaces[activeFace] ?? '').bgColor;
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   /** Which face the next chosen picture goes on; 'new' adds a picture face */
   const pictureTarget = useRef<number | 'new'>('new');
   const [pictureError, setPictureError] = useState('');
+  /** After a list is added: what to say, and the faces to put back on Undo */
+  const [listNote, setListNote] = useState<{ text: string; before: string[]; after: string[]; canUndo: boolean } | null>(null);
   const images = useFaceImages();
   // The faces as they are now, for edits that finish after a picture is shrunk
   const latestDice = useRef(dice);
   useEffect(() => { latestDice.current = dice; }, [dice]);
 
-  /**
-   * Anchor the popover just below whichever swatch opened it. Previously the
-   * offset was hardcoded (65px / 230px), so editing a face far down a long list
-   * left the popover floating near the top of the modal.
-   */
-  const openPicker = (e: React.MouseEvent, picker: { type: 'base' | 'custom'; index?: number }) => {
-    e.stopPropagation();
-    const container = containerRef.current;
-    const trigger = e.currentTarget as HTMLElement;
-    let top = 65;
-    if (container) {
-      const cRect = container.getBoundingClientRect();
-      const tRect = trigger.getBoundingClientRect();
-      // Position relative to the scrolled container, clamped so it stays inside
-      const raw = tRect.bottom - cRect.top + container.scrollTop + 8;
-      top = Math.max(8, Math.min(raw, container.scrollHeight - POPOVER_HEIGHT));
-    }
-    setActiveColorPicker({ ...picker, top });
-  };
-
   const setFaces = (num: number) => {
-    if (num > 0) onUpdate(dice.id, { faces: num, customFaces: [] });
+    if (num > 0) onUpdate(dice.id, { held: false, faces: num, customFaces: [] });
   };
 
-  const addCustomFace = (face: string) => {
-    if (!face.trim()) return;
-    onUpdate(dice.id, { customFaces: [...dice.customFaces, face.trim()] });
+  const addCustomFace = (text: string) => {
+    const faces = splitFaceList(text);
+    if (faces.length === 0) return;
+    const before = dice.customFaces;
+    const room = Math.max(0, MAX_CUSTOM_FACES - before.length);
+    const added = faces.slice(0, room);
+    const leftOut = faces.length - added.length;
+    const after = added.length > 0 ? [...before, ...added] : before;
+    if (added.length > 0) onUpdate(dice.id, { held: false, customFaces: after });
     setCustomInput('');
+    if (faces.length > 1 || leftOut > 0) {
+      const addedText = `Added ${added.length} face${added.length === 1 ? '' : 's'}`;
+      setListNote({
+        text: leftOut > 0
+          ? `${addedText}; ${leftOut} left out, a die holds ${MAX_CUSTOM_FACES}.`
+          : `${addedText}.`,
+        before,
+        after,
+        canUndo: added.length > 0,
+      });
+    } else {
+      setListNote(null);
+    }
+  };
+
+  const undoList = () => {
+    if (!listNote) return;
+    onUpdate(dice.id, { customFaces: listNote.before });
+    setListNote(null);
+  };
+
+  // A pasted list keeps its lines: they show as commas, which + splits on
+  const handleListPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pasted = e.clipboardData.getData('text');
+    if (!/[\r\n]/.test(pasted)) return;
+    e.preventDefault();
+    const input = e.currentTarget;
+    const start = input.selectionStart ?? customInput.length;
+    const end = input.selectionEnd ?? customInput.length;
+    const head = customInput.slice(0, start).replace(/[,\s]*$/, '');
+    const tail = customInput.slice(end).replace(/^[,\s]*/, '');
+    setCustomInput([head, pastedListForBox(pasted), tail].filter(Boolean).join(', '));
+  };
+
+  /** Puts an icon on a face (or takes it off, tapping the same one), keeping its words */
+  const setFaceIcon = (index: number, icon: string) => {
+    const newFaces = [...dice.customFaces];
+    const parsed = parseFaceContent(newFaces[index], '');
+    const parts = faceParts(parsed.content);
+    const nextIcon = parts.icon === icon ? undefined : icon;
+    // A face keeps something to show: its icon stays when it has no words or picture
+    if (!nextIcon && !parts.text && !parsed.image) return;
+    newFaces[index] = buildFace(joinFace(nextIcon, parts.text), parsed.bgColor || undefined, parsed.value, parsed.image);
+    onUpdate(dice.id, { customFaces: newFaces });
+  };
+
+  /** Changes a face's words, keeping its icon, color, picture and number */
+  const setFaceText = (index: number, text: string) => {
+    const newFaces = [...dice.customFaces];
+    const parsed = parseFaceContent(newFaces[index], '');
+    const parts = faceParts(parsed.content);
+    // A words-only face is never saved blank: the box can be emptied while
+    // typing, and the old words stay on the die until new ones go in
+    setTextDraft({ index, text });
+    if (!text.trim() && !parts.icon && !parsed.image) return;
+    const room = MAX_FACE_TEXT_LENGTH - (parts.icon ? joinFace(parts.icon, 'x').length - 1 : 0);
+    newFaces[index] = buildFace(joinFace(parts.icon, text.slice(0, room)), parsed.bgColor || undefined, parsed.value, parsed.image);
+    onUpdate(dice.id, { customFaces: newFaces });
   };
 
   const removeCustomFace = (index: number) => {
+    if (editing !== null) {
+      if (editing === index) setEditFace(null);
+      else if (editing > index) setEditFace({ die: dice.id, index: editing - 1 });
+    }
     const newFaces = [...dice.customFaces];
     newFaces.splice(index, 1);
-    onUpdate(dice.id, { customFaces: newFaces });
+    onUpdate(dice.id, { held: false, customFaces: newFaces });
   };
 
   const updateCustomFaceColor = (index: number, color: string) => {
@@ -123,7 +204,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     if (target === 'new') {
       // The face's number is what shows where the picture can't (a share link)
       const n = current.customFaces.length + 1;
-      onUpdate(current.id, { customFaces: [...current.customFaces, buildFace(String(n), undefined, undefined, id)] });
+      onUpdate(current.id, { held: false, customFaces: [...current.customFaces, buildFace(String(n), undefined, undefined, id)] });
     } else if (target < current.customFaces.length) {
       const newFaces = [...current.customFaces];
       const parsed = parseFaceContent(newFaces[target], '');
@@ -139,7 +220,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     onUpdate(dice.id, { customFaces: newFaces });
   };
 
-  /** Every face its own colour; a plain numbered die becomes faces 1..n first */
+  /** Every face its own color; a plain numbered die becomes faces 1..n first */
   const colourAllFaces = () => {
     const customFaces = colourEveryFace(dice.faces, dice.customFaces);
     // A plain die keeps showing the number it last rolled
@@ -149,53 +230,58 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     onUpdate(dice.id, { customFaces, ...keepShown });
   };
 
-  const handleColorSelect = (color: string) => {
-    if (!activeColorPicker) return;
-    if (activeColorPicker.type === 'base') {
-      onUpdate(dice.id, { color });
-    } else if (activeColorPicker.index !== undefined) {
-      updateCustomFaceColor(activeColorPicker.index, color);
-    }
-    setActiveColorPicker(null);
-  };
+  // Two tabs in the title bar: Dice Settings and Custom faces (owner, 2026-11-02)
+  const tabsHeader = (
+    <div className={styles.tabs} role="tablist" aria-label="Dice settings">
+      {([['settings', 'Dice Settings'], ['faces', 'Custom faces']] as const).map(([key, label]) => (
+        <button
+          key={key}
+          type="button"
+          role="tab"
+          id={`${fieldId}-tab-${key}`}
+          aria-selected={tab === key}
+          aria-controls={`${fieldId}-panel-${key}`}
+          className={`${styles.tab} ${tab === key ? styles.tabActive : ''}`}
+          onClick={() => setTab(key)}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Dice Settings">
+    <Modal isOpen={isOpen} onClose={onClose} title="Dice Settings" header={tabsHeader}>
       <div className={styles.container} ref={containerRef}>
 
-        {/* General Settings */}
-        <div className={styles.sectionCard}>
-          <h3 className={styles.sectionTitle}>General Settings</h3>
-          <div style={{ marginBottom: 16 }}>
-            <label className={styles.label} htmlFor={`${fieldId}-name`}>Name (Optional)</label>
-            <input 
-              id={`${fieldId}-name`}
-              type="text" 
-              autoComplete="off"
-              enterKeyHint="done"
-              onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-              value={dice.name || ''} 
-              onChange={(e) => onUpdate(dice.id, { name: e.target.value })}
-              placeholder="e.g. Player 1"
-              className={styles.inputField}
-            />
-          </div>
-
-          <div className={styles.twoColumnRow}>
-            <div>
-              <label className={styles.label}>Base Color</label>
-              <button
-                onClick={(e) => openPicker(e, { type: 'base' })}
-                className={styles.colorSwatch}
-                style={{ backgroundColor: dice.color, color: getContrastColor(dice.color) }}
-                title="Pick base color"
-              >
-                <Palette size={20} strokeWidth={2} />
-              </button>
+        {tab === 'settings' && (
+        <div className={styles.sectionCard} role="tabpanel" id={`${fieldId}-panel-settings`} aria-labelledby={`${fieldId}-tab-settings`}>
+          {/* Name and face count share the top row; the color picker takes the full
+              width below (owner, 2026-11-05: "move standard faces up next to name") */}
+          <div className={styles.topRow}>
+            <div className={styles.nameField}>
+              <label className={styles.label} htmlFor={`${fieldId}-name`}>Name (Optional)</label>
+              <input 
+                id={`${fieldId}-name`}
+                type="text" 
+                autoComplete="off"
+                enterKeyHint="done"
+                onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+                value={dice.name || ''} 
+                onChange={(e) => onUpdate(dice.id, { name: e.target.value })}
+                placeholder="e.g. Player 1"
+                className={styles.inputField}
+              />
             </div>
-
-            <div>
-              <label className={styles.label} htmlFor={`${fieldId}-faces`}>Standard Faces</label>
+            <div className={styles.facesField}>
+              <label className={styles.label} htmlFor={`${fieldId}-faces`}>
+                Standard Faces
+                {dice.customFaces.length > 0 && (
+                  <span className={styles.labelNote}>
+                    Replaces your {dice.customFaces.length} custom {dice.customFaces.length === 1 ? 'face' : 'faces'}
+                  </span>
+                )}
+              </label>
               <div className={styles.stepperRow}>
                 <button className={styles.stepperBtn} onClick={() => setFaces(dice.faces - 1)} title="Decrease faces">
                   <Minus size={18} strokeWidth={2.5} />
@@ -219,31 +305,18 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               </div>
             </div>
           </div>
+
+          <div className={styles.fieldBlock}>
+            <span className={styles.label} aria-hidden="true">Die color</span>
+            <ColorPicker key={dice.id} label="Die color" value={dice.color} onChange={(color) => onUpdate(dice.id, { color })} />
+          </div>
         </div>
 
-        {/* Custom Faces */}
-        <div className={styles.sectionCard}>
-          <h3 className={styles.sectionTitle}>Custom Faces</h3>
+        )}
 
-          <div style={{ marginBottom: 12 }}>
-            <label className={styles.sublabel} style={{ marginBottom: 6, display: 'block' }}>Quick Templates:</label>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              <button 
-                type="button"
-                className="md-button md-button-surface md-button-compact"
-                onClick={() => onUpdate(dice.id, { faces: 3, customFaces: ["YES:bg:#2E7D32", "NO:bg:#D32F2F", "MAYBE:bg:#FFD700"] })}
-              >
-                ❓ Decision Maker
-              </button>
-              <button 
-                type="button"
-                className="md-button md-button-surface md-button-compact"
-                onClick={() => onUpdate(dice.id, { faces: 4, customFaces: ["N:bg:#0056D2", "S:bg:#0056D2", "E:bg:#0056D2", "W:bg:#0056D2"] })}
-              >
-                🧭 Compass
-              </button>
-            </div>
-          </div>
+        {tab === 'faces' && (<div role="tabpanel" id={`${fieldId}-panel-faces`} aria-labelledby={`${fieldId}-tab-faces`} className={styles.container}>
+        <div className={styles.sectionCard}>
+
           
           {dice.customFaces.length > 0 && (
             <p className={styles.sublabel} style={{ margin: '0 0 6px' }}>
@@ -263,6 +336,8 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               const bgColor = parsed.bgColor;
               const picture = parsed.image ? images[parsed.image] : undefined;
               const tileColor = bgColor !== 'transparent' ? bgColor : dice.color;
+              const parts = faceParts(content);
+              const TileIcon = parts.icon ? (ALL_ICONS.find(icon => icon.name === parts.icon)?.icon || Star) : null;
               
               return (
                 <div key={i} className={`${styles.faceCard} ${i === activeFace ? styles.faceCardSelected : ''}`}>
@@ -271,14 +346,19 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                       type="button"
                       className={styles.faceTile}
                       style={{ backgroundColor: tileColor, color: getContrastColor(tileColor) }}
-                      onClick={() => setSelectedFace(i)}
+                      onClick={() => {
+                        setSelectedFace(i);
+                        setEditFace({ die: dice.id, index: i });
+                        setColourPinnedFor(dice.id);
+                        // Icons or Text stay open, now changing this face; otherwise Color opens
+                        setOpenPanel(p => (p === 'icons' || p === 'text' ? p : 'color'));
+                      }}
                       aria-pressed={i === activeFace}
-                      aria-label={`Face ${i + 1}: ${content.startsWith(FACE_ICON_PREFIX) ? content.replace(FACE_ICON_PREFIX, '') : content}${picture ? ', picture' : ''}`}
+                      aria-label={`Face ${i + 1}: ${[parts.icon, parts.text].filter(Boolean).join(' ')}${picture ? ', picture' : ''}`}
                     >
                       {picture && <img src={picture} alt="" className={styles.faceThumb} />}
-                      {content.startsWith(FACE_ICON_PREFIX) 
-                        ? React.createElement(ALL_ICONS.find(icon => icon.name === content.replace(FACE_ICON_PREFIX, ''))?.icon || Star, { size: 20, strokeWidth: 2.5 }) 
-                        : <span className={styles.faceTileText}>{content}</span>}
+                      {TileIcon && <TileIcon size={20} strokeWidth={2.5} style={{ flex: 'none' }} />}
+                      {parts.text && <span className={styles.faceTileText} style={TileIcon ? { marginLeft: 6 } : undefined}>{parts.text}</span>}
                     </button>
                     <div className={styles.faceActions}>
                       <input
@@ -322,81 +402,144 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
             })}
           </div>
 
-          {dice.customFaces.length > 0 && (
-            <div className={styles.faceColourRow} role="group" aria-label={`Colour for face ${activeFace + 1}`}>
-              <span className={styles.sublabel}>Colour for face {activeFace + 1}</span>
-              <div className={styles.faceSwatches}>
-                <button
-                  type="button"
-                  className={styles.faceSwatch}
-                  style={{ backgroundColor: dice.color, color: getContrastColor(dice.color) }}
-                  onClick={() => updateCustomFaceColor(activeFace, 'transparent')}
-                  aria-pressed={activeFaceColour === 'transparent'}
-                  aria-label="Same as the die"
-                  title="Same as the die"
-                >
-                  <Ban size={14} strokeWidth={2.5} />
-                </button>
-                {COLORS.map(c => {
-                  const current = activeFaceColour.toUpperCase() === c.toUpperCase();
-                  return (
-                    <button
-                      key={c}
-                      type="button"
-                      className={styles.faceSwatch}
-                      style={{ backgroundColor: c }}
-                      onClick={() => updateCustomFaceColor(activeFace, c)}
-                      aria-label={COLOR_NAMES[c] ?? c}
-                      aria-pressed={current}
-                    />
-                  );
-                })}
-                <label className={styles.faceSwatchCustom} title="Any colour">
-                  <Plus size={14} strokeWidth={2.5} />
-                  <input
-                    type="color"
-                    value={/^#[0-9a-fA-F]{6}$/.test(activeFaceColour) ? activeFaceColour : (/^#[0-9a-fA-F]{6}$/.test(dice.color) ? dice.color : '#808080')}
-                    onChange={(e) => updateCustomFaceColor(activeFace, e.target.value)}
-                    className={styles.hiddenInput}
-                    aria-label="Any colour"
-                  />
-                </label>
-              </div>
-            </div>
-          )}
-          <button
-            type="button"
-            className={`md-button md-button-surface md-button-compact ${styles.addPictureBtn}`}
-            onClick={colourAllFaces}
-            disabled={dice.customFaces.length === 0 && dice.faces > 100}
-          >
-            <Rainbow size={18} strokeWidth={2.5} /> Colour every face differently
-          </button>
-
-          <div className={styles.addFaceRow}>
-            <input 
-              type="text" 
-              value={customInput}
-              onChange={(e) => setCustomInput(e.target.value)}
-              onKeyDown={(e) => { if(e.key === 'Enter') addCustomFace(customInput); }}
-              placeholder="Add custom text"
-              aria-label="Custom face text"
-              autoComplete="off"
-              className={styles.inputField}
-              style={{ flex: 1, minWidth: 0 }}
-            />
-            <button className={`md-button md-button-filled ${styles.addFaceBtn}`} onClick={() => addCustomFace(customInput)} aria-label="Add face" title="Add face">
-              <Plus size={20} strokeWidth={2.5} />
-            </button>
+          {/* Color, icons and text fold into three buttons, so a long list of faces
+              keeps the room (owner, 2026-11-05). One opens at a time. */}
+          <div className={styles.panelButtons}>
+            {PANELS.map(([key, label, Icon]) => (
+              <button
+                key={key}
+                type="button"
+                className={`${styles.panelBtn} ${openPanel === key ? styles.panelBtnOpen : ''}`}
+                aria-expanded={openPanel === key}
+                aria-controls={`${fieldId}-panel-${key}`}
+                onClick={() => setOpenPanel(openPanel === key ? null : key)}
+              >
+                <Icon size={18} strokeWidth={2.5} aria-hidden="true" />
+                {label}
+                <ChevronDown size={16} strokeWidth={2.5} aria-hidden="true" className={styles.panelChevron} />
+              </button>
+            ))}
           </div>
 
-          <button
-            type="button"
-            className={`md-button md-button-surface md-button-compact ${styles.addPictureBtn}`}
-            onClick={() => choosePicture('new')}
-          >
-            <ImagePlus size={18} strokeWidth={2.5} /> Add a picture face
-          </button>
+          {openPanel === 'color' && (
+            <div id={`${fieldId}-panel-color`} className={`${styles.panelBody} ${styles.panelBodyColour}`}>
+              {dice.customFaces.length > 0 && (
+                <div className={`${styles.faceColourRow} ${colourPinned ? '' : styles.faceColourRowLoose}`} data-pinned={colourPinned}>
+                  <span className={styles.sublabel}>Color for face {activeFace + 1}</span>
+                  <ColorPicker
+                    key={`${dice.id}-${activeFace}`}
+                    label={`Color for face ${activeFace + 1}`}
+                    value={activeFaceColour}
+                    sameAs={dice.color}
+                    onChange={(color) => updateCustomFaceColor(activeFace, color)}
+                  />
+                </div>
+              )}
+              <button
+                type="button"
+                className={`md-button md-button-surface md-button-compact ${styles.addPictureBtn}`}
+                onClick={colourAllFaces}
+                disabled={dice.customFaces.length === 0 && dice.faces > 100}
+              >
+                <Rainbow size={18} strokeWidth={2.5} /> Color every face differently
+              </button>
+            </div>
+          )}
+
+          {openPanel === 'icons' && (
+            <div id={`${fieldId}-panel-icons`} className={styles.panelBody}>
+              {editing !== null ? (
+                <div className={styles.editNote}>
+                  <span className={styles.sublabel} style={{ margin: 0 }}>Tap an icon to put it on face {editing + 1}</span>
+                  <button type="button" className={styles.listUndo} onClick={() => setEditFace(null)}>Add a new face instead</button>
+                </div>
+              ) : (
+                <span className={styles.sublabel}>Tap an icon to add it as a face</span>
+              )}
+              <div className={styles.iconGrid} style={{ maxHeight: showAllIcons ? '150px' : 'auto', overflowY: showAllIcons ? 'auto' : 'visible' }}>
+                {(showAllIcons ? ALL_ICONS : COMMON_ICONS).map(icon => (
+                  <button 
+                    key={icon.name} 
+                    onClick={() => editing !== null ? setFaceIcon(editing, icon.name) : addCustomFace(`${FACE_ICON_PREFIX}${icon.name}`)}
+                    className={styles.iconBtn}
+                    aria-label={editing !== null ? `${icon.name} on face ${editing + 1}` : `Add ${icon.name} face`}
+                    aria-pressed={editing !== null ? editingParts?.icon === icon.name : undefined}
+                    title={icon.name}
+                  >
+                    <icon.icon size={18} strokeWidth={2.5} />
+                  </button>
+                ))}
+                {!showAllIcons && (
+                  <button onClick={() => setShowAllIcons(true)} className={styles.iconBtnMore} aria-label="More icons" title="More icons">
+                    <Plus size={18} strokeWidth={2.5} />
+                  </button>
+                )}
+              </div>
+              <button
+                type="button"
+                className={`md-button md-button-surface md-button-compact ${styles.addPictureBtn}`}
+                onClick={() => choosePicture('new')}
+              >
+                <ImagePlus size={18} strokeWidth={2.5} /> Add a picture face
+              </button>
+            </div>
+          )}
+
+          {openPanel === 'text' && (
+            <div id={`${fieldId}-panel-text`} className={styles.panelBody}>
+              {editing !== null && editingParts ? (
+                <>
+                  <div className={styles.editNote}>
+                    <span className={styles.sublabel} style={{ margin: 0 }}>Words on face {editing + 1}{editingParts.icon ? `, under the ${editingParts.icon.toLowerCase()}` : ''}</span>
+                    <button type="button" className={styles.listUndo} onClick={() => setEditFace(null)}>Add a new face instead</button>
+                  </div>
+                  <div className={styles.addFaceRow}>
+                    <input
+                      type="text"
+                      value={textDraft?.index === editing ? textDraft.text : editingParts.text}
+                      onChange={(e) => setFaceText(editing, e.target.value)}
+                      onBlur={() => setTextDraft(null)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+                      placeholder={editingParts.icon ? 'Add words under the icon' : 'Face text'}
+                      aria-label={`Words on face ${editing + 1}`}
+                      autoComplete="off"
+                      enterKeyHint="done"
+                      className={styles.inputField}
+                      style={{ flex: 1, minWidth: 0 }}
+                    />
+                  </div>
+                </>
+              ) : (
+              <div className={styles.addFaceRow}>
+                <input 
+                  type="text" 
+                  value={customInput}
+                  onChange={(e) => setCustomInput(e.target.value)}
+                  onKeyDown={(e) => { if(e.key === 'Enter') addCustomFace(customInput); }}
+                  onPaste={handleListPaste}
+                  placeholder="Add custom text"
+                  aria-label="Custom face text"
+                  autoComplete="off"
+                  className={styles.inputField}
+                  style={{ flex: 1, minWidth: 0 }}
+                />
+                <button className={`md-button md-button-filled ${styles.addFaceBtn}`} onClick={() => addCustomFace(customInput)} aria-label="Add face" title="Add face">
+                  <Plus size={20} strokeWidth={2.5} />
+                </button>
+              </div>
+              )}
+              {/* Any later edit to the faces retires the note, so Undo never wipes that edit */}
+              {listNote && listNote.after === dice.customFaces && (
+                <p className={styles.listNote} role="status">
+                  <span>{listNote.text}</span>
+                  {listNote.canUndo && (
+                    <button type="button" className={styles.listUndo} onClick={undoList}>Undo</button>
+                  )}
+                </p>
+              )}
+            </div>
+          )}
+
           <input
             ref={fileInputRef}
             type="file"
@@ -408,24 +551,9 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
           />
           {pictureError && <p className={styles.pictureError} role="alert">{pictureError}</p>}
 
-          <label className={styles.sublabel}>Or add an icon:</label>
-          <div className={styles.iconGrid} style={{ maxHeight: showAllIcons ? '150px' : 'auto', overflowY: showAllIcons ? 'auto' : 'visible' }}>
-            {(showAllIcons ? ALL_ICONS : COMMON_ICONS).map(icon => (
-              <button 
-                key={icon.name} 
-                onClick={() => addCustomFace(`${FACE_ICON_PREFIX}${icon.name}`)}
-                className={styles.iconBtn}
-              >
-                <icon.icon size={18} strokeWidth={2.5} />
-              </button>
-            ))}
-            {!showAllIcons && (
-              <button onClick={() => setShowAllIcons(true)} className={styles.iconBtnMore}>
-                <Plus size={18} strokeWidth={2.5} />
-              </button>
-            )}
-          </div>
         </div>
+
+        </div>)}
 
         {/* Footer Actions */}
         <div className={styles.footerActions}>
@@ -448,40 +576,6 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
             <Check size={20} strokeWidth={2.5} /> Done
           </button>
         </div>
-
-        {/* Color Picker Popover */}
-        {activeColorPicker && (
-          <>
-            <div onClick={() => setActiveColorPicker(null)} className={styles.popoverBackdrop} />
-            <div className={styles.colorPopover} style={{ top: `${activeColorPicker.top}px` }}>
-              <div className={styles.popoverHeader}>
-                <span className={styles.popoverTitle}>Choose Color</span>
-                <button onClick={() => setActiveColorPicker(null)} className={styles.popoverClose}><X size={18} /></button>
-              </div>
-              <div className={styles.colorGrid}>
-                {COLORS.map(c => (
-                  <button 
-                    key={c}
-                    className={styles.colorDot}
-                    style={{ backgroundColor: c, border: 'none' }}
-                    onClick={() => handleColorSelect(c)}
-                    aria-label={COLOR_NAMES[c] ?? c}
-                    aria-pressed={c.toUpperCase() === dice.color.toUpperCase()}
-                  />
-                ))}
-                <label className={styles.colorDotCustom}>
-                  <Plus size={16} color="#fff" strokeWidth={2.5} />
-                  <input 
-                    type="color" 
-                    value={activeColorPicker.type === 'base' ? dice.color : '#ffffff'}
-                    onChange={(e) => handleColorSelect(e.target.value)}
-                    className={styles.hiddenInput}
-                  />
-                </label>
-              </div>
-            </div>
-          </>
-        )}
 
       </div>
     </Modal>

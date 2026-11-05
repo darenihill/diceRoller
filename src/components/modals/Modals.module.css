@@ -1,6 +1,6 @@
 .sectionHeader {
   margin: 16px 0 8px 0;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   border-top: 1px solid var(--md-sys-color-outline-variant);
   padding-top: 16px;
@@ -8,10 +8,25 @@
 
 .sectionHeaderFirst {
   margin: 0 0 12px 0;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   padding-top: 0;
   border-top: none;
+}
+
+/* A section heading with an action beside it (Roll Log + Clear History) */
+.sectionHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+  padding-top: 16px;
+}
+
+/* In a column that already spaces its sections, a heading that starts its
+   section needs no top margin of its own (Usage Stats) */
+.sectionHeader:first-child {
+  margin-top: 0;
 }
 
 .formGroup {
@@ -21,7 +36,7 @@
 }
 
 .formLabel {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--md-sys-color-on-surface-variant);
 }
 
@@ -31,7 +46,7 @@
   border: 1px solid var(--md-sys-color-outline, rgba(255, 255, 255, 0.2));
   background: transparent;
   color: var(--md-sys-color-on-surface);
-  font-size: 16px;
+  font-size: 1rem;
   outline: none;
   transition: border-color 0.2s;
 }
@@ -42,7 +57,7 @@
 
 .formInputReadOnly {
   background: var(--md-sys-color-surface-variant);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .formInputInvalid,
@@ -52,7 +67,7 @@
 
 .fieldNote {
   margin: 6px 0 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.4;
   color: var(--md-sys-color-on-surface-variant);
   text-align: left;
@@ -84,11 +99,11 @@
 
 .toggleTitle {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 
 .toggleDesc {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--md-sys-color-on-surface-variant);
 }
 
@@ -97,6 +112,13 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 12px;
+}
+
+/* Phones: two numbers per row, so Usage Stats needs less scrolling */
+@media (max-width: 600px) {
+  .metricsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .metricCard {
@@ -112,14 +134,15 @@
 }
 
 .metricValue {
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--md-sys-color-primary);
   line-height: 1.1;
 }
 
 .metricLabel {
-  font-size: 12px;
+  overflow-wrap: anywhere;
+  font-size: 0.75rem;
   font-weight: 500;
   color: var(--md-sys-color-on-surface-variant);
   text-transform: uppercase;
@@ -139,7 +162,7 @@
   padding: 8px 12px;
   background-color: var(--md-sys-color-surface-variant);
   border-radius: var(--shape-small);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .presetName {
@@ -165,11 +188,12 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 .freqLabel {
-  width: 48px;
+  min-width: 66px;
+  white-space: nowrap;
   font-weight: 700;
   text-align: right;
   color: var(--md-sys-color-on-surface-variant);
@@ -189,6 +213,34 @@
   background-color: var(--md-sys-color-primary);
   border-radius: 4px;
   transition: width 0.3s ease;
+}
+
+.freqFairMark {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background-color: var(--md-sys-color-on-surface);
+  opacity: 0.85;
+}
+
+.freqFairKey {
+  display: inline-block;
+  width: 3px;
+  height: 12px;
+  margin-right: 6px;
+  vertical-align: -2px;
+  border-radius: 2px;
+  background-color: var(--md-sys-color-on-surface);
+}
+
+.freqNote {
+  margin: 0 0 4px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--md-sys-color-on-surface-variant);
 }
 
 .freqCount {
@@ -216,5 +268,82 @@
 .slider {
   flex: 1;
   min-width: 0;
+  min-height: 44px;
   accent-color: var(--md-sys-color-primary);
+}
+
+/* Install how-to: two numbered steps with the Safari icons beside them */
+.installLead {
+  margin: 0 0 8px;
+  color: var(--md-sys-color-on-surface);
+}
+
+.installSteps {
+  margin: 0 0 16px;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--md-sys-color-on-surface);
+}
+
+.installSteps li > svg {
+  vertical-align: -4px;
+  margin-right: 8px;
+  color: var(--md-sys-color-primary);
+}
+
+.installNote {
+  margin: 0 0 16px;
+  font-size: 0.8125rem;
+  opacity: 0.8;
+  color: var(--md-sys-color-on-surface);
+}
+
+/* History by game: a line where the log switches game, and chips in Frequency */
+.gameDivider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.gameDivider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: var(--md-sys-color-outline-variant, rgba(127, 127, 127, 0.35));
+}
+
+.gameChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.gameChip {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--md-sys-color-outline);
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gameChip[aria-pressed='true'] {
+  border-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-primary);
+  background-color: var(--md-sys-color-surface-hover);
 }

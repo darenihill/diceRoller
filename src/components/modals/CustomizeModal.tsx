@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from '../Modal';
-import { Volume2, VolumeX, BarChart2, Smartphone } from 'lucide-react';
+import { Volume2, VolumeX, BarChart2, Smartphone, Minus, Plus, Vibrate, VibrateOff, CircleDot, Circle } from 'lucide-react';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
 import { targetNote } from '../../utils/targets';
@@ -24,6 +24,13 @@ interface CustomizeModalProps {
   onChangeDiceScale: (scale: number) => void;
   shakeEnabled: boolean;
   onToggleShake: () => void;
+  /** Bright ring round the bottom-bar buttons, easier to find in sun */
+  brightRings?: boolean;
+  onToggleBrightRings?: () => void;
+  /** Buzz when dice land: shown only after its private link was opened */
+  buzzShown?: boolean;
+  buzzEnabled?: boolean;
+  onToggleBuzz?: () => void;
 }
 
 export const CustomizeModal: React.FC<CustomizeModalProps> = ({
@@ -41,16 +48,21 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
   onChangeDiceScale,
   shakeEnabled,
   onToggleShake,
+  brightRings = false,
+  onToggleBrightRings,
+  buzzShown = false,
+  buzzEnabled = false,
+  onToggleBuzz,
 }) => {
   const note = targetNote(targetHighlight);
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Customize App">
-      <div className={modalStyles.formGroup}>
+      <div>
         <h3 className={modalStyles.sectionHeaderFirst}>Visual Themes</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <button 
             className={`md-card ${styles.setCard}`} 
-            style={{ margin: 0, padding: '16px 8px', backgroundColor: '#1E1E1E', color: '#FFF', outline: theme === 'theme-dark' ? SELECTED_OUTLINE : 'none', outlineOffset: 2 }}
+            style={{ margin: 0, padding: '16px 8px', backgroundColor: '#1E1E1E', color: '#FFF', outline: theme === 'theme-dark' ? SELECTED_OUTLINE : undefined, outlineOffset: 2 }}
             onClick={() => onSelectTheme('theme-dark')}
             aria-pressed={theme === 'theme-dark'}
           >
@@ -58,7 +70,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           </button>
           <button 
             className={`md-card ${styles.setCard}`} 
-            style={{ margin: 0, padding: '16px 8px', backgroundColor: '#F0F0F0', color: '#000', outline: theme === 'theme-light' ? SELECTED_OUTLINE : 'none', outlineOffset: 2 }}
+            style={{ margin: 0, padding: '16px 8px', backgroundColor: '#F0F0F0', color: '#000', outline: theme === 'theme-light' ? SELECTED_OUTLINE : undefined, outlineOffset: 2 }}
             onClick={() => onSelectTheme('theme-light')}
             aria-pressed={theme === 'theme-light'}
           >
@@ -66,7 +78,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           </button>
           <button 
             className={`md-card ${styles.setCard}`} 
-            style={{ margin: 0, padding: '16px 8px', backgroundColor: '#1B4D3E', color: '#FFF', outline: theme === 'theme-felt' ? SELECTED_OUTLINE : 'none', outlineOffset: 2 }}
+            style={{ margin: 0, padding: '16px 8px', backgroundColor: '#1B4D3E', color: '#FFF', outline: theme === 'theme-felt' ? SELECTED_OUTLINE : undefined, outlineOffset: 2 }}
             onClick={() => onSelectTheme('theme-felt')}
             aria-pressed={theme === 'theme-felt'}
           >
@@ -74,7 +86,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           </button>
           <button 
             className={`md-card ${styles.setCard}`} 
-            style={{ margin: 0, padding: '16px 8px', backgroundColor: '#090B10', color: '#DFE0FF', outline: theme === 'theme-midnight' ? SELECTED_OUTLINE : 'none', outlineOffset: 2 }}
+            style={{ margin: 0, padding: '16px 8px', backgroundColor: '#090B10', color: '#DFE0FF', outline: theme === 'theme-midnight' ? SELECTED_OUTLINE : undefined, outlineOffset: 2 }}
             onClick={() => onSelectTheme('theme-midnight')}
             aria-pressed={theme === 'theme-midnight'}
           >
@@ -95,7 +107,15 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
               )}
             </div>
             <div className={modalStyles.sliderRow}>
-              <span className={modalStyles.toggleDesc} aria-hidden="true">Smaller</span>
+              <button
+                type="button"
+                className="md-icon-button"
+                aria-label="Smaller dice"
+                disabled={diceScale <= DICE_SCALE_MIN}
+                onClick={() => onChangeDiceScale(Math.max(DICE_SCALE_MIN, Math.round((diceScale - 0.1) * 10) / 10))}
+              >
+                <Minus size={20} />
+              </button>
               <input
                 type="range"
                 min={DICE_SCALE_MIN}
@@ -107,7 +127,15 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
                 aria-labelledby="dice-size-label"
                 aria-valuetext={`${Math.round(diceScale * 100)}%`}
               />
-              <span className={modalStyles.toggleDesc} aria-hidden="true">Bigger</span>
+              <button
+                type="button"
+                className="md-icon-button"
+                aria-label="Bigger dice"
+                disabled={diceScale >= DICE_SCALE_MAX}
+                onClick={() => onChangeDiceScale(Math.min(DICE_SCALE_MAX, Math.round((diceScale + 0.1) * 10) / 10))}
+              >
+                <Plus size={20} />
+              </button>
             </div>
           </div>
 
@@ -144,6 +172,44 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
               <Smartphone size={20} />
             </button>
           </div>
+
+          {/* Bright rings: off until turned on (owner, 2026-11-02) */}
+          {onToggleBrightRings && (
+            <div className={modalStyles.toggleRow}>
+              <div className={modalStyles.toggleLabelCol}>
+                <span className={modalStyles.toggleTitle}>Bright Rings</span>
+                <span className={modalStyles.toggleDesc}>A bright ring round the bottom buttons, easier to find in sunlight</span>
+              </div>
+              <button
+                className="md-icon-button"
+                onClick={onToggleBrightRings}
+                title={brightRings ? "Turn off bright rings" : "Turn on bright rings"}
+                aria-label="Bright rings"
+                aria-pressed={brightRings}
+              >
+                {brightRings ? <CircleDot size={20} /> : <Circle size={20} />}
+              </button>
+            </div>
+          )}
+
+          {/* Buzz when dice land: hidden until its private link is opened (trial) */}
+          {buzzShown && onToggleBuzz && (
+            <div className={modalStyles.toggleRow}>
+              <div className={modalStyles.toggleLabelCol}>
+                <span className={modalStyles.toggleTitle}>Buzz When Dice Land</span>
+                <span className={modalStyles.toggleDesc}>One short buzz when the dice land, even with sound off (Android)</span>
+              </div>
+              <button
+                className="md-icon-button"
+                onClick={onToggleBuzz}
+                title={buzzEnabled ? "Turn off buzz when dice land" : "Turn on buzz when dice land"}
+                aria-label="Buzz when dice land"
+                aria-pressed={buzzEnabled}
+              >
+                {buzzEnabled ? <Vibrate size={20} /> : <VibrateOff size={20} />}
+              </button>
+            </div>
+          )}
 
           {/* Target Total Highlight: a gentle note names any part that isn't a whole number */}
           <div>

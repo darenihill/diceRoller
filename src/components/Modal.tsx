@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import styles from './Modal.module.css';
+import { useBackToClose } from '../hooks/useBackToClose';
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), textarea, input:not([disabled]), select, [tabindex]:not([tabindex="-1"])';
@@ -10,11 +11,15 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
+  /** Shown in the title bar in place of the title, e.g. tabs; the title still names the dialog */
+  header?: React.ReactNode;
   children: React.ReactNode;
 }
 
-export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
+export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, header, children }) => {
   const panelRef = useRef<HTMLDivElement>(null);
+  // Phone Back closes the dialog instead of leaving the app
+  useBackToClose(isOpen, onClose);
 
   // Close on Escape, and keep Tab inside the dialog while it is open
   useEffect(() => {
@@ -86,8 +91,8 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
             onClick={(e) => e.stopPropagation()}
           >
             <div className={styles.header}>
-              <h2 className={styles.title}>{title}</h2>
-              <button className="md-icon-button" onClick={onClose} aria-label="Close dialog" style={{ width: 40, height: 40 }}>
+              {header ?? <h2 className={styles.title}>{title}</h2>}
+              <button className="md-icon-button" onClick={onClose} aria-label="Close dialog" style={{ width: 48, height: 48 }}>
                 <X size={20} />
               </button>
             </div>

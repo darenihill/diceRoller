@@ -6,6 +6,8 @@
   align-items: flex-end;
   gap: 16px;
   z-index: 100;
+  /* The + button's width and the gap after it: an open RPG chip spans + and Roll */
+  --add-span: calc(72px + 16px);
 }
 
 .actionBtn {
@@ -37,6 +39,15 @@
   line-height: 1;
 }
 
+/* An old total, from before the dice changed: still readable, clearly faint */
+.rollBtnLabel {
+  transition: opacity 0.2s ease;
+}
+
+.rollBtnLabelStale {
+  opacity: 0.45;
+}
+
 /* Modifier rides along small so the total keeps the space */
 .rollBtnModSuffix {
   font-size: 14px;
@@ -47,6 +58,7 @@
 }
 
 .rollGroup {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -54,49 +66,10 @@
   align-items: flex-end;
 }
 
-.rpgColumns {
-  display: flex;
-  gap: 12px;
-  align-items: flex-end;
-}
 
-.verticalColumn {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: center;
-}
 
-.rpgFabBtn {
-  width: 72px;
-  height: 72px;
-  background-color: var(--md-sys-color-surface-variant);
-  color: var(--md-sys-color-on-surface);
-  box-shadow: var(--elevation-3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  font-weight: 700;
-  border-radius: 50%;
-  transition: opacity 0.2s, background-color 0.2s, color 0.2s, transform 0.2s;
-}
 
-.rpgFabBtn:hover {
-  background-color: var(--md-sys-color-surface-hover);
-  transform: scale(1.05);
-}
 
-.rpgFabActive {
-  background-color: var(--md-sys-color-primary-container) !important;
-  color: var(--md-sys-color-on-primary-container) !important;
-  border: 2px solid var(--md-sys-color-primary);
-}
-
-.modifierBtnDisabled {
-  opacity: 0.4;
-  pointer-events: none;
-}
 
 /* Quick D&D Dice Add Popover */
 .addPopoverContainer {
@@ -115,8 +88,10 @@
 .addPopover {
   position: absolute;
   bottom: 84px;
-  right: 0;
-  left: auto;
+  /* Opens rightward from the + button: anchored right, the card ran off the
+     left edge of a 390px phone. */
+  left: 0;
+  right: auto;
   background-color: var(--md-sys-color-surface);
   border-radius: var(--shape-large);
   padding: 12px;
@@ -147,6 +122,7 @@
   background-color: var(--md-sys-color-surface-variant);
   color: var(--md-sys-color-on-surface);
   border-radius: var(--shape-small);
+  min-height: 44px;
   padding: 10px 8px;
   font-size: 14px;
   font-weight: 700;
@@ -169,8 +145,8 @@
   border: 1px solid var(--md-sys-color-primary);
   border-radius: var(--shape-small);
   padding: 12px 8px;
-  font-size: 15px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -184,48 +160,222 @@
   transform: scale(1.02);
 }
 
-@media (max-width: 768px) {
-  /* Float the RPG controls above the roll button rather than leaving them in
-     the flow. In flow, the 232px-wide block widens the roll group and shoves
-     the add-dice button 76px left the instant RPG mode is switched on. */
-  .rollGroup {
-    position: relative;
-  }
+@media (max-width: 468px) {
 
-  /* Rotate the controls: two rows of three instead of three rows of two.
-     Same buttons, ~80px shorter, and that height goes back to the dice.
-     column-reverse lifts the modifier stepper to the top row, so its "+" is
-     no longer sitting directly above the add-dice "+". */
-  .rpgColumns {
-    position: absolute;
-    bottom: calc(100% + 10px);
-    right: 0;
-    flex-direction: column-reverse;
-    align-items: flex-end;
-    gap: 8px;
-  }
-
-  .verticalColumn {
-    flex-direction: row;
-  }
-
-  /* Minus on the left, plus on the right — the usual reading order for a
-     horizontal stepper, and the reverse of how it sits stacked vertically. */
-  .modifierColumn {
-    flex-direction: row-reverse;
+  :global(.menu-open) .rpgChips {
+    display: none !important;
   }
 }
 
-@media (max-width: 468px) {
-  .lockBtn {
-    position: fixed !important;
-    bottom: 24px !important;
-    left: 24px !important;
-    right: auto !important;
-    z-index: 101 !important;
+/* Narrow phones, and phones with a larger display size or zoom: at 72 px the
+   Hold All button (pinned left) ran under the add button below about 380 px
+   wide (4 px of overlap at 360, half the button at 320). Smaller buttons and
+   edges keep all three apart. */
+@media (max-width: 379px) {
+  .actionBar {
+    right: 16px;
+    bottom: 16px;
+    gap: 10px;
+    --add-span: calc(60px + 10px);
   }
 
-  :global(.menu-open) .rpgColumns {
-    display: none !important;
+
+  .actionBtn {
+    width: 60px;
+    height: 60px;
+  }
+
+  .rollBtn {
+    height: 60px;
+    min-width: 136px;
+    padding: 0 20px;
+    gap: 12px;
+  }
+
+  .rollGroup {
+    min-width: 136px;
+  }
+
+}
+
+/* Very narrow (about 150% zoom or more): drop the dice icon from Roll so its
+   word and total keep their room. */
+@media (max-width: 299px) {
+  .actionBar {
+    right: 12px;
+    bottom: 12px;
+    gap: 8px;
+    --add-span: calc(52px + 8px);
+  }
+
+  .actionBtn {
+    width: 52px;
+    height: 52px;
+  }
+
+  .rollBtn {
+    height: 52px;
+    min-width: 100px;
+    padding: 0 16px;
+  }
+
+  .rollBtnIcon {
+    display: none;
+  }
+
+  .rollGroup {
+    min-width: 100px;
+  }
+
+}
+
+/* RPG Mode: two chips above Roll that say what is set ("ADV", "+2"). A tap
+   opens one into its buttons; a roll shrinks it back (owner, 2026-11-05).
+   They float above Roll, so switching RPG Mode on never moves the + button. */
+.rpgChips {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  right: 0;
+  /* As wide as + and Roll together, so an open chip never reaches past them */
+  width: calc(100% + var(--add-span));
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.rpgChips > * {
+  pointer-events: auto;
+}
+
+.rpgChip {
+  flex: none;
+  min-width: 64px;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 999px;
+  background-color: var(--md-sys-color-surface-variant);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: var(--elevation-3);
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+/* Release: gold, the colour held dice wear */
+.releaseChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-color: var(--color-gold);
+  color: var(--color-gold-ink);
+}
+
+/* Smaller than the RPG chips, so it reads as a note on the held dice, not a
+   main button (owner, 2026-11-05: "a bit too large"). Its tap area stays 44px. */
+.rpgChip.releaseChip {
+  position: relative;
+  min-width: 0;
+  height: 32px;
+  padding: 0 12px 0 10px;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rpgChip.releaseChip::before {
+  content: '';
+  position: absolute;
+  inset: -6px -2px;
+}
+
+/* Something other than plain: the chip says so in the accent */
+.rpgChipSet {
+  border-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-primary);
+}
+
+.rpgPill {
+  /* Open, it takes the room the other chip leaves */
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background-color: var(--md-sys-color-surface-variant);
+  box-shadow: var(--elevation-3);
+}
+
+.rpgSeg {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 4px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rpgSeg:hover {
+  background-color: var(--md-sys-color-surface-hover);
+}
+
+/* The chosen roll type: a blue ring and blue text, no fill, so the big Roll
+   button stays the only filled blue button */
+.rpgSegOn {
+  border-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-primary);
+  background-color: var(--md-sys-color-surface);
+}
+
+.modifierValue {
+  gap: 4px;
+  flex-grow: 1.4;
+}
+
+.modifierNumber {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.modifierBtnDisabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Narrow phones: the open chips keep to the + and Roll width, so their words
+   shrink a little (after the chip rules above, so these win) */
+@media (max-width: 379px) {
+  .rpgChip {
+    min-width: 56px;
+    padding: 0 12px;
+  }
+
+  .rpgChips {
+    gap: 6px;
+  }
+
+  .rpgPill {
+    gap: 0;
+  }
+
+  .rpgSeg {
+    padding: 0 2px;
+    font-size: 12px;
   }
 }

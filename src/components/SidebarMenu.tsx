@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import styles from './SidebarMenu.module.css';
-import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Share2, Palette, Pin, ToggleLeft, ToggleRight, BarChart2 } from 'lucide-react';
+import { useBackToClose } from '../hooks/useBackToClose';
+import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Share2, Palette, Pin, ToggleLeft, ToggleRight, BarChart2, Download } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 // Material 3 "emphasized" easing for the menu icon turning into a close icon
@@ -35,15 +36,35 @@ interface SidebarMenuProps {
   onSetDefault: () => void;
   rpgMode: boolean;
   onToggleRpgMode: () => void;
+  tableView: boolean;
+  onToggleTableView: () => void;
+  /** Install app tile; left out once the app runs from the home screen */
+  onInstall?: () => void;
 }
 
 export const SidebarMenu: React.FC<SidebarMenuProps> = ({
-  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onStats, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, rpgMode, onToggleRpgMode
+  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onStats, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, rpgMode, onToggleRpgMode, tableView, onToggleTableView, onInstall
 }) => {
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  // Escape closes the menu, as it does every dialog, and focus goes back to the menu button
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      // A dialog opened from the menu takes Escape first
+      if (e.key !== 'Escape' || document.querySelector('[aria-modal="true"]')) return;
+      onToggle();
+      toggleRef.current?.focus();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isOpen, onToggle]);
+
+  // Phone Back closes the menu instead of leaving the app
+  useBackToClose(isOpen, onToggle);
   return (
     <>
       <div className={styles.toggleContainer}>
-        <button className={`md-icon-button ${styles.toggleBtn} ${isOpen ? styles.toggleBtnOpen : ''}`} onClick={onToggle}
+        <button ref={toggleRef} className={`md-icon-button control-ring ${styles.toggleBtn} ${isOpen ? styles.toggleBtnOpen : ''}`} onClick={onToggle}
           title="Menu"
           aria-label={isOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={isOpen}
@@ -67,40 +88,56 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
               exit={{ y: 20, opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
+              {/* Three groups of four, so the columns line up (owner, 2026-11-02).
+                  Most used sits far right (owner, 2026-11-02): Saves is the right-hand
+                  group, and each group ends with its most used tile, which is the
+                  right-hand tile of its row on a phone */}
               <div className={styles.menuColumn}>
                 <div className={styles.menuColumnHeader}>App</div>
-                <button className={styles.menuItem} onClick={onIdeas}><Lightbulb size={18} /> <span>Feedback</span></button>
                 <button className={styles.menuItem} onClick={onDonate}><Coffee size={18} /> <span>Donate</span></button>
+                <button className={styles.menuItem} onClick={onIdeas}><Lightbulb size={18} /> <span>Feedback</span></button>
                 <button className={styles.menuItem} onClick={onShare}><Share2 size={18} /> <span>Share</span></button>
                 <button className={styles.menuItem} onClick={onHelp}><HelpCircle size={18} /> <span>Help</span></button>
               </div>
 
               <div className={styles.menuColumn}>
-                <div className={styles.menuColumnHeader}>Saves</div>
-                <button className={styles.menuItem} onClick={onSets}><Dice6 size={18} /> <span>Games</span></button>
-                <button className={styles.menuItem} onClick={onSave}><Save size={18} /> <span>Save</span></button>
-                <button className={styles.menuItem} onClick={onSetDefault} title="Pin as startup default"><Pin size={18} /> <span>Set Default</span></button>
-              </div>
-
-              <div className={styles.menuColumn}>
-                <div className={styles.menuColumnHeader}>Tools</div>
-                <button className={styles.menuItem} onClick={onHistory}><History size={18} /> <span>History</span></button>
+                <div className={styles.menuColumnHeader}>Settings</div>
                 <button className={styles.menuItem} onClick={onStats}><BarChart2 size={18} /> <span>Usage Stats</span></button>
                 <button className={styles.menuItem} onClick={onCustomize}><Palette size={18} /> <span>Customize</span></button>
-                <button className={styles.menuItem} onClick={onToggleRpgMode} title="Toggle RPG Mode (Advantage & Modifiers)">
+                <button className={styles.menuItem} onClick={onToggleTableView} aria-pressed={tableView}
+                  title="Show each roll's total big for the whole table">
+                  {tableView ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
+                  <span>Table view</span>
+                </button>
+                <button className={styles.menuItem} onClick={onToggleRpgMode} title="Toggle RPG Mode (Advantage & Modifiers)" aria-pressed={rpgMode}>
                   {rpgMode ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
                   <span>RPG Mode</span>
                 </button>
               </div>
 
-              {/* Destructive action gets its own full-width row so the three
-                  columns stay even at four items each. */}
-              <button
-                className={`${styles.menuItem} ${styles.menuFooterItem}`}
-                onClick={onDeleteAll}
-              >
-                <Trash2 size={18} /> <span>Clear All</span>
-              </button>
+              <div className={styles.menuColumn}>
+                <div className={styles.menuColumnHeader}>Saves</div>
+                <button className={styles.menuItem} onClick={onSetDefault} title="Pin as startup default"><Pin size={18} /> <span>Set Default</span></button>
+                <button className={styles.menuItem} onClick={onSave}><Save size={18} /> <span>Save</span></button>
+                <button className={styles.menuItem} onClick={onHistory}><History size={18} /> <span>History</span></button>
+                <button className={styles.menuItem} onClick={onSets}><Dice6 size={18} /> <span>Games</span></button>
+              </div>
+
+              {/* Full-width bottom row: Install app (until the app is on the home
+                  screen) beside Clear All, so the groups above stay four each */}
+              <div className={styles.menuFooterRow}>
+                {onInstall && (
+                  <button className={`${styles.menuItem} ${styles.menuFooterItem} ${styles.menuInstallItem}`} onClick={onInstall} title="Put Dice Roller on your home screen">
+                    <Download size={18} /> <span>Install app</span>
+                  </button>
+                )}
+                <button
+                  className={`${styles.menuItem} ${styles.menuFooterItem}`}
+                  onClick={onDeleteAll}
+                >
+                  <Trash2 size={18} /> <span>Clear All</span>
+                </button>
+              </div>
             </motion.div>
           </>
         )}

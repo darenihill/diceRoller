@@ -1,4 +1,6 @@
-const CACHE_NAME = 'diceroller-v2';
+const CACHE_NAME = 'diceroller-v4';
+// How long opening the app waits for the network before using the saved copy
+const NAV_TIMEOUT_MS = 3000;
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -11,7 +13,16 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+      return cache.addAll(ASSETS_TO_CACHE).then(() =>
+        // The app's own script and styles have hashed names, so read them off
+        // the page: without them a first-visit-then-offline open is blank.
+        fetch('/index.html').then((r) => r.text()).then((html) => {
+          const built = [...new Set(html.match(/\/assets\/[\w.-]+\.(?:js|css)/g) || [])];
+          return cache.addAll(built);
+        }).catch(() => {
+          // A failed fetch mid-deploy mustn't stop the worker installing
+        })
+      );
     }).then(() => self.skipWaiting())
   );
 });
@@ -46,6 +57,10 @@ self.addEventListener('fetch', (e) => {
   
   if (!isLocal && !isGoogleFont) return;
 
+  // The page's "is there a new version?" check must reach the network, never a
+  // saved copy (src/hooks/useNewVersion.ts)
+  if (isLocal && url.searchParams.has('version-check')) return;
+
   // Navigation requests (the HTML shell) use network-first. Under
   // stale-while-revalidate a returning visitor would render the PREVIOUS
   // deploy's index.html on every visit — permanently one release behind,
@@ -54,31 +69,40 @@ self.addEventListener('fetch', (e) => {
   const isNavigation = e.request.mode === 'navigate' || e.request.destination === 'document';
 
   if (isNavigation) {
+    const cachedShell = () => caches.match(e.request).then((cached) => cached || caches.match('/index.html'));
+    const network = fetch(e.request);
+    // Save the fresh page on the side: a good signal shows it straight away, and
+    // after a slow network loses the race below it still saves, so the newer
+    // version opens next time
+    e.waitUntil(network.then((networkResponse) => {
+      if (networkResponse.status !== 200) return;
+      const copy = networkResponse.clone();
+      return caches.open(CACHE_NAME).then((cache) => cache.put(e.request, copy));
+    }).catch(() => {}));
+    // A weak signal: after NAV_TIMEOUT_MS open this page's copy on the phone
+    // instead of a blank screen. With no copy of it yet, keep waiting.
+    const slow = new Promise((resolve) => setTimeout(resolve, NAV_TIMEOUT_MS))
+      .then(() => caches.match(e.request))
+      .then((cached) => cached || network);
     e.respondWith(
-      fetch(e.request).then((networkResponse) => {
-        if (networkResponse.status === 200) {
-          const copy = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, copy));
-        }
-        return networkResponse;
-      }).catch(() => {
-        // Offline: fall back to the cached shell
-        return caches.match(e.request).then((cached) => cached || caches.match('/index.html'));
-      })
+      Promise.race([network, slow]).catch(() => cachedShell())
     );
     return;
   }
 
   e.respondWith(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.match(e.request).then((cachedResponse) => {
+      // ignoreVary: hashed files never change, and a server that adds "Vary: Origin"
+      // would otherwise hide the copy saved at install from the page's module request
+      return cache.match(e.request, { ignoreVary: true }).then((cachedResponse) => {
         const fetchPromise = fetch(e.request).then((networkResponse) => {
           if (networkResponse.status === 200) {
             cache.put(e.request, networkResponse.clone());
           }
           return networkResponse;
         }).catch(() => {
-          // Silent catch for network failures
+          // Offline: fall back to the cached copy, or a clean network error
+          return cachedResponse || Response.error();
         });
 
         // Return cached version if available, otherwise wait for network
