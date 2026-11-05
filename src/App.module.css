@@ -119,7 +119,9 @@
 /* On a phone the menu button sits above the lock on the left, so the bar
    lines up with Roll on the right and stays clear of the menu */
 @media (max-width: 468px) {
-  .toast:not(.toastAboveRpgBar) {
+  /* Doubled so it outranks the Undo bar's own screen-wide max-width, in
+     RPG Mode too (second read, 2026-11-05) */
+  .toast.toast {
     left: auto;
     right: max(16px, env(safe-area-inset-right, 0px));
     transform: none;
