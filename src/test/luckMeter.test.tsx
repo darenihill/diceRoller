@@ -113,6 +113,15 @@ describe('History modal', () => {
     expect(screen.queryByText('Roll Log (2)')).toBeNull();
   });
 
+  it('opens on History again after being closed on Frequency', () => {
+    const props = { onClose: () => {}, onClearHistory: () => {}, rollHistory: [roll(4)] };
+    const { rerender } = render(<HistoryModal isOpen {...props} />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Frequency' }));
+    rerender(<HistoryModal isOpen={false} {...props} />);
+    rerender(<HistoryModal isOpen {...props} />);
+    expect(screen.getByRole('tab', { name: 'History' })).toHaveAttribute('aria-selected', 'true');
+  });
+
   const dice = [die(6, 'a')];
   const set = luckSet(dice);
 

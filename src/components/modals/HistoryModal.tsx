@@ -52,6 +52,12 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
 
   // History and Frequency as tabs by the close button (owner, 2026-11-05)
   const [tab, setTab] = React.useState<'history' | 'frequency'>('history');
+  // Each opening starts on History, wherever it was left
+  const [wasOpen, setWasOpen] = React.useState(isOpen);
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
+    if (isOpen) setTab('history');
+  }
   const tabsId = React.useId();
   const tabsHeader = (
     <div className={tabStyles.tabs} role="tablist" aria-label="Roll history">

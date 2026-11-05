@@ -85,11 +85,27 @@ const DiceComponent: React.FC<DiceProps> = ({
     // While it flies in from outside the dice area, the area would count it as
     // overflow and flash a scroll bar it doesn't need (owner, 2026-11-05). If the
     // dice fit without scrolling, the area hides overflow until the die lands.
+    // Several dice can be in flight at once, so the area counts them and gives
+    // its scroll bar back only when the last one lands.
     const area = el.parentElement;
-    const hideBar = !!area && area.scrollHeight <= area.clientHeight && area.scrollWidth <= area.clientWidth;
-    const before = area?.style.overflow ?? '';
-    if (hideBar && area) area.style.overflow = 'hidden';
-    const restore = () => { if (hideBar && area) area.style.overflow = before; };
+    const inFlight = () => Number(area?.dataset.gliding ?? 0);
+    const hideBar = !!area && (inFlight() > 0 || (area.scrollHeight <= area.clientHeight && area.scrollWidth <= area.clientWidth));
+    if (hideBar && area) {
+      area.dataset.gliding = String(inFlight() + 1);
+      area.style.overflow = 'hidden';
+    }
+    let restored = false;
+    const restore = () => {
+      if (!hideBar || !area || restored) return;
+      restored = true;
+      const left = inFlight() - 1;
+      if (left > 0) {
+        area.dataset.gliding = String(left);
+      } else {
+        delete area.dataset.gliding;
+        area.style.removeProperty('overflow');
+      }
+    };
     const glide = el.animate(
       [{ transform: `translate(${dx}px, ${dy}px) scale(0.3)`, opacity: 0.4 }, { transform: 'none', opacity: 1 }],
       { duration: 450, easing: 'cubic-bezier(0.2, 0, 0, 1)' }

@@ -60,4 +60,18 @@ describe('A new die glides out of the + button', () => {
     listeners.finish();
     expect(area.style.overflow).toBe('');
   });
+
+  it('two dice in flight at once: the scroll bar comes back only after both land', () => {
+    const finishes: Array<() => void> = [];
+    animate.mockImplementation(() => ({ cancel: vi.fn(), addEventListener: (t: string, f: () => void) => { if (t === 'finish') finishes.push(f); } }));
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Add Dice' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add Dice' }));
+    const area = document.querySelector('[data-dice-id]')!.parentElement as HTMLElement;
+    expect(finishes.length).toBeGreaterThanOrEqual(2);
+    finishes[0]();
+    expect(area.style.overflow).toBe('hidden');
+    finishes.slice(1).forEach(f => f());
+    expect(area.style.overflow).toBe('');
+  });
 });
