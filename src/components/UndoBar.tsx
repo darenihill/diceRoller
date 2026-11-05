@@ -25,7 +25,7 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
     role="status"
     data-testid="undo-bar"
     onPointerDown={onPause}
-    onPointerUp={onResume}
+    onPointerUp={(e) => { if (!e.currentTarget.contains(document.activeElement)) onResume(); }}
     onPointerCancel={onResume}
     onPointerLeave={onResume}
     onFocus={onPause}

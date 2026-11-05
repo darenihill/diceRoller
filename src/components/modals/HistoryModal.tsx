@@ -3,7 +3,7 @@ import { Modal } from '../Modal';
 import type { RollHistoryItem, RollAdvantageMode } from '../../hooks/useDiceState';
 import type { DiceData } from '../../types';
 import { fairOdds, luckRows, furthestFromFair, luckSet } from '../../utils/fairOdds';
-import { gameKeyFor, gameKeyOf, recentGroups, groupLabel } from '../../utils/rollGroups';
+import { gameKeyFor, gameKeyOf, recentGroups, groupLabel, diceSummary } from '../../utils/rollGroups';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
 // The same tabs as Dice Settings / Custom faces, so the two dialogs match
@@ -37,7 +37,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   // History by game (owner, 2026-11-05): Frequency counts the game on the table
   // now, with chips for the last few games before it and All
   const currentKey = gameKeyFor(dice);
-  const groups = recentGroups(rollHistory, currentKey);
+  const groups = React.useMemo(() => (isOpen ? recentGroups(rollHistory, currentKey) : []), [isOpen, rollHistory, currentKey]);
   const [picked, setPicked] = React.useState<string | null>(null);
   const shownKey = picked === 'all' || groups.length === 0
     ? null
@@ -77,27 +77,32 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   const currentHasRolls = groups.some(g => g.key === currentKey);
   // A line at the top of each run of rolls from one game, once more than one
   // game is in the log: "Catan · from 3:42 PM"
-  const runStarts = new Map<string, string>();
-  {
+  // Worked out once per change to the log, and only while History is open
+  const runStarts = React.useMemo(() => {
+    const starts = new Map<string, string>();
+    if (!isOpen) return starts;
     const keys = rollHistory.map(gameKeyOf);
-    if (new Set(keys.filter(Boolean)).size > 1) {
-      let i = 0;
-      while (i < rollHistory.length) {
-        const key = keys[i];
-        if (!key) { i++; continue; }
-        // The run: this roll and the older ones of the same game, singles in between included
-        let j = i;
-        let oldest = i;
-        while (j < rollHistory.length && (keys[j] === key || keys[j] === null)) {
-          if (keys[j] === key) oldest = j;
-          j++;
-        }
-        const from = rollHistory[oldest].at;
-        runStarts.set(rollHistory[i].id, `${groupLabel(rollHistory, key)}${from ? ` · from ${new Date(from).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` : ''}`);
-        i = oldest + 1;
+    if (new Set(keys.filter(Boolean)).size < 2) return starts;
+    // Each game's name, from its newest roll that recorded one
+    const names = new Map<string, string>();
+    rollHistory.forEach((item, k) => { const key = keys[k]; if (key && item.game && !names.has(key)) names.set(key, item.game); });
+    let i = 0;
+    while (i < rollHistory.length) {
+      const key = keys[i];
+      if (!key) { i++; continue; }
+      // The run: this roll and the older ones of the same game, singles in between included
+      let j = i;
+      let oldest = i;
+      while (j < rollHistory.length && (keys[j] === key || keys[j] === null)) {
+        if (keys[j] === key) oldest = j;
+        j++;
       }
+      const from = rollHistory[oldest].at;
+      starts.set(rollHistory[i].id, `${names.get(key) ?? diceSummary(key)}${from ? ` · from ${new Date(from).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` : ''}`);
+      i = oldest + 1;
     }
-  }
+    return starts;
+  }, [isOpen, rollHistory]);
   const tabsId = React.useId();
   const tabsHeader = (
     <div className={tabStyles.tabs} role="tablist" aria-label="Roll history">

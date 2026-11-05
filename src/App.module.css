@@ -112,7 +112,8 @@
 
 /* In RPG mode the bottom bar is taller (modifier and ADV / NORM / DIS rows) */
 .toastAboveRpgBar {
-  bottom: calc(270px + env(safe-area-inset-bottom, 0px));
+  /* Above RPG Mode's chip row: 24 + Roll 72 + 10 + chips 44 = 150, plus a gap */
+  bottom: calc(162px + env(safe-area-inset-bottom, 0px));
 }
 
 /* On a phone the menu button sits above the lock on the left, so the bar

@@ -7,8 +7,13 @@
   padding: 6px 6px 6px 20px;
   pointer-events: auto;
   white-space: nowrap;
-  max-width: calc(100vw - 32px); /* a long name never pushes Undo off screen */
   touch-action: manipulation;
+}
+
+/* Single class on purpose: a phone's narrower limit, which keeps the bar clear
+   of the menu button (App.module.css .toast), wins over this one */
+.bar {
+  max-width: calc(100vw - 32px); /* a long name never pushes Undo off screen */
 }
 
 .message {

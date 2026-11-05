@@ -88,7 +88,7 @@ export function sanitizeRollHistory(input: unknown): RollHistoryItem[] {
     if (typeof r.modifier === 'number' && Number.isFinite(r.modifier)) item.modifier = r.modifier;
     if (typeof r.typed === 'string' && r.typed) item.typed = r.typed.slice(0, 40);
     // Kept across reloads, so the Luck Meter and the per-game history still know the dice
-    if (typeof r.set === 'string' && r.set.length <= 50000) item.set = r.set;
+    if (typeof r.set === 'string' && r.set.length <= 20000) item.set = r.set;
     if (typeof r.game === 'string' && r.game) item.game = r.game.slice(0, MAX_NAME_LENGTH);
     if (typeof r.at === 'number' && Number.isFinite(r.at) && r.at > 0) item.at = r.at;
     out.push(item);

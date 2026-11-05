@@ -12,7 +12,7 @@ describe('Undo bar and messages sit at the bottom, above the Roll button', () =>
   });
 
   it('in RPG mode it sits above the taller bottom bar', () => {
-    expect(rule('.toastAboveRpgBar')).toMatch(/bottom:\s*calc\(270px/);
+    expect(rule('.toastAboveRpgBar')).toMatch(/bottom:\s*calc\(162px/);
   });
 
   it('on a phone it lines up with Roll, clear of the menu button', () => {
