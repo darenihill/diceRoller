@@ -62,6 +62,36 @@ export const ActionBar: React.FC<ActionBarProps> = ({
     setWasRolling(rolling);
     if (rolling) setOpen(null);
   }
+  // Keyboard: opening a chip moves focus into its buttons (the chip itself is
+  // gone), and Escape shrinks it back with focus on the chip again
+  const chipsRef = useRef<HTMLDivElement>(null);
+  const focusAfter = useRef<'pill' | 'type' | 'mod' | null>(null);
+  const openChip = (which: 'type' | 'mod') => { focusAfter.current = 'pill'; setOpen(which); };
+  useEffect(() => {
+    const want = focusAfter.current;
+    focusAfter.current = null;
+    const box = chipsRef.current;
+    if (!want || !box) return;
+    const target = want === 'pill'
+      ? box.querySelector<HTMLButtonElement>('[aria-pressed="true"], [data-pill-focus]')
+      : box.querySelector<HTMLButtonElement>(`[data-testid="${want === 'type' ? 'roll-type-chip' : 'modifier-chip'}"]`);
+    target?.focus();
+  }, [open]);
+  // A tap anywhere outside the chips shrinks an open one back
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: PointerEvent) => {
+      if (!chipsRef.current?.contains(e.target as Node)) setOpen(null);
+    };
+    document.addEventListener('pointerdown', onDown);
+    return () => document.removeEventListener('pointerdown', onDown);
+  }, [open]);
+  const onPillKey = (e: React.KeyboardEvent) => {
+    if (e.key !== 'Escape' || !open) return;
+    e.stopPropagation();
+    focusAfter.current = open;
+    setOpen(null);
+  };
 
   // The total pops once per newly landed main roll: not for a single-die roll,
   // which keeps the same total, and not when Undo brings an older roll back
@@ -126,8 +156,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
 
   return (
     <div className={styles.actionBar}>
-      {/* In RPG Mode Hold All lives in the menu, which gives the chips the room */}
-      {!rpgMode && <motion.button
+      <motion.button
         className={`md-icon-button control-ring ${styles.actionBtn} ${styles.lockBtn}`}
         onClick={onHoldAll}
         title="Toggle Hold All"
@@ -137,7 +166,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
         style={{ color: allHeld ? 'var(--color-gold-ink)' : undefined }}
       >
         {allHeld ? <Unlock size={24} strokeWidth={2.5} /> : <Lock size={24} strokeWidth={2.5} />}
-      </motion.button>}
+      </motion.button>
 
       {/* Add Button & Quick D&D Popover */}
       <div className={styles.addPopoverContainer}>
@@ -193,7 +222,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
         {/* RPG controls as two chips that show what is set ("ADV", "+2"); a tap
             opens one into its buttons, and a roll shrinks it back (owner, 2026-11-05) */}
         {rpgMode && (
-          <div className={styles.rpgChips}>
+          <div className={styles.rpgChips} ref={chipsRef} onKeyDown={onPillKey}>
             {open === 'type' ? (
               <div className={styles.rpgPill} role="group" aria-label="Roll type">
                 {ROLL_TYPES.map(([mode, label, title]) => (
@@ -215,7 +244,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
                 className={`control-ring ${styles.rpgChip} ${rollAdvantage !== 'normal' ? styles.rpgChipSet : ''}`}
                 aria-expanded={false}
                 aria-label={`Roll type: ${ROLL_TYPE_NAMES[rollAdvantage]}. Change`}
-                onClick={() => setOpen('type')}
+                onClick={() => openChip('type')}
                 data-testid="roll-type-chip"
               >
                 {ROLL_TYPES.find(([mode]) => mode === rollAdvantage)![1]}
@@ -240,7 +269,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
                   <span className={styles.modifierNumber}>{signed(modifier)}</span>
                   {modifier !== 0 && <RotateCcw size={12} strokeWidth={2.5} aria-hidden="true" />}
                 </button>
-                <button type="button" className={`md-icon-button control-ring ${styles.rpgSeg}`} onClick={() => onChangeModifier(modifier + 1)} title="Increase modifier">
+                <button type="button" className={`md-icon-button control-ring ${styles.rpgSeg}`} onClick={() => onChangeModifier(modifier + 1)} title="Increase modifier" data-pill-focus>
                   <Plus size={20} strokeWidth={2.5} />
                 </button>
               </div>
@@ -250,7 +279,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
                 className={`control-ring ${styles.rpgChip} ${modifier !== 0 ? styles.rpgChipSet : ''}`}
                 aria-expanded={false}
                 aria-label={`Modifier ${signed(modifier)}. Change`}
-                onClick={() => setOpen('mod')}
+                onClick={() => openChip('mod')}
                 data-testid="modifier-chip"
               >
                 {modifier === 0 ? '±0' : signed(modifier)}

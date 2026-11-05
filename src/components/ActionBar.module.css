@@ -6,6 +6,8 @@
   align-items: flex-end;
   gap: 16px;
   z-index: 100;
+  /* The + button's width and the gap after it: an open RPG chip spans + and Roll */
+  --add-span: calc(72px + 16px);
 }
 
 .actionBtn {
@@ -181,7 +183,9 @@
     right: 16px;
     bottom: 16px;
     gap: 10px;
+    --add-span: calc(60px + 10px);
   }
+
 
   .actionBtn {
     width: 60px;
@@ -212,6 +216,7 @@
     right: 12px;
     bottom: 12px;
     gap: 8px;
+    --add-span: calc(52px + 8px);
   }
 
   .actionBtn {
@@ -246,6 +251,9 @@
   position: absolute;
   bottom: calc(100% + 10px);
   right: 0;
+  /* As wide as + and Roll together, so an open chip never reaches past them */
+  width: calc(100% + var(--add-span));
+  pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -253,7 +261,12 @@
   white-space: nowrap;
 }
 
+.rpgChips > * {
+  pointer-events: auto;
+}
+
 .rpgChip {
+  flex: none;
   min-width: 64px;
   height: 44px;
   padding: 0 16px;
@@ -275,6 +288,9 @@
 }
 
 .rpgPill {
+  /* Open, it takes the room the other chip leaves */
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 2px;
@@ -285,12 +301,13 @@
 }
 
 .rpgSeg {
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 48px;
   height: 44px;
-  padding: 0 12px;
+  padding: 0 4px;
   border: 2px solid transparent;
   border-radius: 999px;
   background: transparent;
@@ -314,7 +331,7 @@
 
 .modifierValue {
   gap: 4px;
-  min-width: 60px;
+  flex-grow: 1.4;
 }
 
 .modifierNumber {
@@ -327,4 +344,26 @@
 .modifierBtnDisabled {
   opacity: 0.4;
   pointer-events: none;
+}
+
+/* Narrow phones: the open chips keep to the + and Roll width, so their words
+   shrink a little (after the chip rules above, so these win) */
+@media (max-width: 379px) {
+  .rpgChip {
+    min-width: 56px;
+    padding: 0 12px;
+  }
+
+  .rpgChips {
+    gap: 6px;
+  }
+
+  .rpgPill {
+    gap: 0;
+  }
+
+  .rpgSeg {
+    padding: 0 2px;
+    font-size: 12px;
+  }
 }

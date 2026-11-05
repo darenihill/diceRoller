@@ -69,15 +69,19 @@
   stroke: currentColor;
   stroke-width: var(--line);
   stroke-linecap: round;
-  stroke-dasharray: 1 1;
-  stroke-dashoffset: 0;
+  /* One dash that shrinks from the whole line to nothing, its start moved to
+     the top middle (--start, the share of the line before that point) */
+  --start: 0;
+  stroke-dasharray: 1 0;
+  stroke-dashoffset: calc(var(--start) * -1px);
   animation-name: undoDrain;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
 }
 
 @keyframes undoDrain {
-  to { stroke-dashoffset: -1; }
+  from { stroke-dasharray: 1px 0px; stroke-dashoffset: calc(var(--start) * -1px); }
+  to { stroke-dasharray: 0px 1px; stroke-dashoffset: calc(-1px - var(--start) * 1px); }
 }
 
 .close {

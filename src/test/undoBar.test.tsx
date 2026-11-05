@@ -36,8 +36,10 @@ describe('The Undo bar follows the standard', () => {
     expect((container.querySelector('rect') as SVGRectElement).style.animationPlayState).toBe('paused');
   });
 
-  it('the line drains clockwise from the top, 2px on a phone and 3px on a computer, with no track', () => {
-    expect(css).toMatch(/@keyframes undoDrain\s*{\s*to\s*{\s*stroke-dashoffset:\s*-1;/);
+  it('the line drains clockwise from the top middle, 2px on a phone and 3px on a computer, with no track', () => {
+    // One dash shrinking from the whole line to nothing, its gap growing clockwise from the top middle
+    expect(css).toMatch(/from\s*{\s*stroke-dasharray:\s*1px 0px;\s*stroke-dashoffset:\s*calc\(var\(--start\) \* -1px\);/);
+    expect(css).toMatch(/to\s*{\s*stroke-dasharray:\s*0px 1px;\s*stroke-dashoffset:\s*calc\(-1px - var\(--start\) \* 1px\);/);
     expect(css).toMatch(/--line:\s*2px/);
     expect(css).toMatch(/@media \(min-width: 769px\)\s*{\s*\.undo\s*{\s*--line:\s*3px/);
     expect(css).toMatch(/stroke:\s*currentColor/);

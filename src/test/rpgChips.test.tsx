@@ -34,12 +34,32 @@ describe('RPG roll type and modifier as chips that open', () => {
     vi.useRealTimers();
   });
 
-  it('Hold All moves into the menu in RPG Mode', () => {
+  it('Hold All stays on the bar in RPG Mode (owner, 2026-11-05)', () => {
     render(<App />);
-    expect(screen.queryByTitle('Toggle Hold All')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Hold all' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
-    expect(screen.getByRole('button', { name: 'Release all' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTitle('Toggle Hold All')).toBeInTheDocument();
+  });
+
+  it('a tap outside the chips shrinks an open one back', () => {
+    render(<App />);
+    fireEvent.click(screen.getByTestId('modifier-chip'));
+    fireEvent.pointerDown(screen.getByTitle('Increase modifier'));
+    expect(screen.getByRole('group', { name: 'Modifier' })).toBeInTheDocument();
+    fireEvent.pointerDown(document.body);
+    expect(screen.queryByRole('group', { name: 'Modifier' })).toBeNull();
+    expect(screen.getByTestId('modifier-chip')).toBeInTheDocument();
+  });
+
+  it('opening a chip moves focus into it, and Escape shrinks it back to the chip', () => {
+    render(<App />);
+    fireEvent.click(screen.getByTestId('roll-type-chip'));
+    expect(document.activeElement).toHaveTextContent('NORM');
+    fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
+    expect(screen.queryByRole('group', { name: 'Roll type' })).toBeNull();
+    expect(document.activeElement).toBe(screen.getByTestId('roll-type-chip'));
+
+    fireEvent.click(screen.getByTestId('modifier-chip'));
+    expect(document.activeElement).toBe(screen.getByTitle('Increase modifier'));
+    fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
+    expect(document.activeElement).toBe(screen.getByTestId('modifier-chip'));
   });
 });
