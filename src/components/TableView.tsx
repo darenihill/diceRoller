@@ -10,6 +10,8 @@ interface TableViewProps {
   onShowDice: () => void;
   /** Turns table view off from here, without a trip to the menu */
   onTurnOff?: () => void;
+  /** The dice are rolling: the last numbers stay, dimmed, until they land */
+  rolling?: boolean;
 }
 
 /** A number, underlined when it would read as another number upside down. */
@@ -21,19 +23,21 @@ const Num: React.FC<{ text: string; className?: string }> = ({ text, className }
  * Table view: the last total huge in the dice area, its math under it, the
  * dice as small tiles, and an upside-down copy for the people across the table.
  */
-export const TableView: React.FC<TableViewProps> = ({ total, math, tiles, onShowDice, onTurnOff }) => {
+export const TableView: React.FC<TableViewProps> = ({ total, math, tiles, onShowDice, onTurnOff, rolling = false }) => {
   const shown = String(total);
   return (
-    <div className={styles.tableView} data-testid="table-view">
+    <div className={`${styles.tableView} ${rolling ? styles.rolling : ''}`} data-testid="table-view" aria-busy={rolling}>
       <div className={styles.flipped} aria-hidden="true">
         <Num text={shown} className={styles.flippedTotal} />
-        {math && <span className={styles.math}>{math}</span>}
+        {math && <span className={styles.math}>{rolling ? '\u00a0' : math}</span>}
       </div>
 
-      <button className={styles.bigTotal} onClick={onShowDice} aria-label={`Total ${shown}. Show the dice`}>
+      <button className={styles.bigTotal} onClick={onShowDice} disabled={rolling} aria-label={rolling ? 'Rolling' : `Total ${shown}. Show the dice`}>
         <Num text={shown} />
       </button>
-      {math && <p className={styles.math}>{math}</p>}
+      {/* The dice already know their new faces while they tumble, so the math and
+          tiles wait for the landing rather than give the roll away */}
+      {math && <p className={styles.math}>{rolling ? '\u00a0' : math}</p>}
 
       <ul className={styles.tiles} aria-label="Dice">
         {tiles.map(t => (
@@ -42,7 +46,7 @@ export const TableView: React.FC<TableViewProps> = ({ total, math, tiles, onShow
             className={`${styles.tile} ${t.dropped ? styles.tileDropped : ''} ${t.held ? styles.tileHeld : ''}`}
             title={t.dropped ? 'Dropped' : t.held ? 'Held' : undefined}
           >
-            <Num text={t.text} />
+            {rolling ? '–' : <Num text={t.text} />}
           </li>
         ))}
       </ul>

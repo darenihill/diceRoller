@@ -24,6 +24,8 @@
 }
 
 .flippedTotal {
+  display: inline-block;
+  padding-bottom: 0.14em;
   font-size: clamp(56px, 14vh, 140px);
   font-weight: 700;
   line-height: 1;
@@ -37,7 +39,9 @@
   background: none;
   border: none;
   border-radius: var(--shape-large);
-  padding: 0 16px;
+  /* Room under the digits for a 6's or 9's underline, so the math line below
+     never runs into it (owner's phone, 2026-11-05) */
+  padding: 0 16px 0.14em;
   min-width: 48px;
   min-height: 48px;
   cursor: pointer;
@@ -129,5 +133,32 @@
 
   :global(body.rpg-mode) .tableView {
     padding-bottom: 270px;
+  }
+}
+
+/* Rolling from the table: the last numbers stay, dimmed and breathing, until the dice land */
+.rolling .bigTotal,
+.rolling .flipped,
+.rolling .math,
+.rolling .tiles {
+  opacity: 0.35;
+  animation: tableRoll 0.6s ease-in-out infinite alternate;
+}
+
+.rolling .bigTotal {
+  cursor: default;
+}
+
+@keyframes tableRoll {
+  from { opacity: 0.2; }
+  to { opacity: 0.45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rolling .bigTotal,
+  .rolling .flipped,
+  .rolling .math,
+  .rolling .tiles {
+    animation: none;
   }
 }

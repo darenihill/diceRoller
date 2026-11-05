@@ -93,6 +93,21 @@ describe('Table view switch and big total', () => {
     expect(screen.getByTestId('table-view')).toBeInTheDocument();
   });
 
+  it('a roll from the table stays on the table, numbers hidden until the dice land (owner, 2026-11-05)', () => {
+    localStorage.setItem('tableView', 'true');
+    render(<App />);
+    roll();
+    fireEvent.click(screen.getByRole('button', { name: /^Roll dice|roll again$/ }));
+    act(() => { vi.advanceTimersByTime(50); });
+    const view = screen.getByTestId('table-view');
+    expect(view).toHaveAttribute('aria-busy', 'true');
+    expect(within(view).getByRole('button', { name: 'Rolling' })).toBeDisabled();
+    within(view).getAllByRole('listitem').forEach(li => expect(li).toHaveTextContent('–'));
+    act(() => { vi.advanceTimersByTime(ROLL_DURATION_MS + 50); });
+    expect(screen.getByTestId('table-view')).toHaveAttribute('aria-busy', 'false');
+    expect(within(screen.getByTestId('table-view')).getByRole('button', { name: /^Total \d+\. Show the dice$/ })).toBeEnabled();
+  });
+
   it('after showing the dice, a Table button goes back to the table (owner, 2026-11-05)', () => {
     localStorage.setItem('tableView', 'true');
     render(<App />);

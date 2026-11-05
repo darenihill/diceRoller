@@ -74,6 +74,22 @@ function App() {
   useEffect(() => onSaveRefused(() => setStorageFull(true)), []);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  // A roll shakes the dice past the edge of their area, which flashed a scroll
+  // bar on and off (owner, 2026-11-05). When the dice fit without scrolling,
+  // the area hides overflow until they land; it shares the count the glide uses.
+  useLayoutEffect(() => {
+    const area = containerRef.current;
+    if (!isRolling || !area) return;
+    const inFlight = () => Number(area.dataset.gliding ?? 0);
+    if (!(inFlight() > 0 || (area.scrollHeight <= area.clientHeight && area.scrollWidth <= area.clientWidth))) return;
+    area.dataset.gliding = String(inFlight() + 1);
+    area.style.overflow = 'hidden';
+    return () => {
+      const left = inFlight() - 1;
+      if (left > 0) area.dataset.gliding = String(left);
+      else { delete area.dataset.gliding; area.style.removeProperty('overflow'); }
+    };
+  }, [isRolling]);
   // A search landing page opens with its own dice; null on the home page
   const [landing] = useState(readLandingStart);
   const [landingAbout] = useState(readLandingAbout);
@@ -374,7 +390,12 @@ function App() {
   useEffect(() => { gameNameRef.current = setName; }, [setName, gameNameRef]);
   const tableReady = tableView && totalVisible && !isRolling && !!lastMainRoll
     && diceList.length > 0 && diceList.map(d => d.id).join() === tableRolledIds;
-  const showTable = tableReady && lastMainRoll.id !== tableDismissedId;
+  // A roll from the table stays on the table, the numbers dimmed until the
+  // dice land, instead of flashing back to the dice (owner, 2026-11-05)
+  const tableRolling = tableView && isRolling && rollingId === null && !!lastMainRoll
+    && lastMainRoll.id !== tableDismissedId && diceList.length > 0
+    && diceList.map(d => d.id).join() === tableRolledIds;
+  const showTable = (tableReady && lastMainRoll.id !== tableDismissedId) || tableRolling;
   // After "Show the dice", a button goes back to the table (owner, 2026-11-05)
   const canReturnToTable = tableReady && !showTable;
   const toggleTableView = () => {
@@ -847,6 +868,7 @@ function App() {
           total={lastTotal}
           math={tableMath(tiles, lastModifier)}
           tiles={tiles}
+          rolling={tableRolling}
           onShowDice={() => setTableDismissedId(lastMainRoll.id)}
           onTurnOff={toggleTableView}
         />
