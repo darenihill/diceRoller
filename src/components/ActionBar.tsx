@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { totalMath } from '../utils/totalMath';
 import styles from './ActionBar.module.css';
-import { Plus, Minus, Dice5, Lock, Unlock, RotateCcw } from 'lucide-react';
+import { Plus, Minus, Dice5, Unlock, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence, useAnimationControls, useReducedMotion } from 'framer-motion';
 import type { RollAdvantageMode } from '../hooks/useDiceState';
 import type { DiceData } from '../types';
@@ -10,8 +10,9 @@ import { DndShapeIcon } from './DndShapeIcon';
 interface ActionBarProps {
   onAdd: (template?: Partial<DiceData>) => void;
   onRoll: () => void;
-  onHoldAll: () => void;
-  allHeld: boolean;
+  /** How many dice are held; above 0 a Release chip shows above the bar */
+  heldCount: number;
+  onReleaseAll: () => void;
   totalVisible: boolean;
   /** The dice changed since the total was rolled: show it faint */
   totalStale?: boolean;
@@ -50,7 +51,7 @@ const ROLL_TYPE_NAMES: Record<RollAdvantageMode, string> = { advantage: 'Advanta
 const signed = (n: number) => `${n > 0 ? '+' : ''}${n}`;
 
 export const ActionBar: React.FC<ActionBarProps> = ({ 
-  onAdd, onRoll, onHoldAll, allHeld, totalVisible, totalStale = false, lastTotal, totalKey, rolling = false, lastModifier = 0, modifier, onChangeModifier,
+  onAdd, onRoll, heldCount, onReleaseAll, totalVisible, totalStale = false, lastTotal, totalKey, rolling = false, lastModifier = 0, modifier, onChangeModifier,
   rpgMode, rollAdvantage, onChangeRollAdvantage
 }) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -109,27 +110,6 @@ export const ActionBar: React.FC<ActionBarProps> = ({
     totalControls.start({ scale: [1, 1.18, 1], transition: { duration: 0.35, ease: [0.2, 0, 0, 1] } });
   }, [totalKey, rolling, calm, totalControls]);
 
-  // Wiggle the lock only when allHeld actually changes — not on initial page load.
-  // Imperative controls replace the old keyed-remount pattern so the mount render
-  // stays static. NOTE: the mount-flag effect must be declared AFTER this one so
-  // the first run of this effect sees mountedRef=false and skips the wiggle.
-  const lockControls = useAnimationControls();
-  const mountedRef = useRef(false);
-  useEffect(() => {
-    if (!mountedRef.current) return;
-    lockControls.start({
-      rotate: [0, -45, 10, 0],
-      color: allHeld ? 'var(--color-gold-ink)' : 'var(--md-sys-color-on-surface)',
-      transition: { duration: 0.5, ease: 'easeInOut' }
-    });
-  }, [allHeld, lockControls]);
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
-
   const handleAddClick = () => {
     if (rpgMode) {
       setPopoverOpen(prev => !prev);
@@ -156,17 +136,6 @@ export const ActionBar: React.FC<ActionBarProps> = ({
 
   return (
     <div className={styles.actionBar}>
-      <motion.button
-        className={`md-icon-button control-ring ${styles.actionBtn} ${styles.lockBtn}`}
-        onClick={onHoldAll}
-        title="Toggle Hold All"
-        aria-pressed={allHeld}
-        initial={{ rotate: 0 }}
-        animate={lockControls}
-        style={{ color: allHeld ? 'var(--color-gold-ink)' : undefined }}
-      >
-        {allHeld ? <Unlock size={24} strokeWidth={2.5} /> : <Lock size={24} strokeWidth={2.5} />}
-      </motion.button>
 
       {/* Add Button & Quick D&D Popover */}
       <div className={styles.addPopoverContainer}>
@@ -221,8 +190,25 @@ export const ActionBar: React.FC<ActionBarProps> = ({
       <div className={styles.rollGroup}>
         {/* RPG controls as two chips that show what is set ("ADV", "+2"); a tap
             opens one into its buttons, and a roll shrinks it back (owner, 2026-11-05) */}
-        {rpgMode && (
-          <div className={styles.rpgChips} ref={chipsRef} onKeyDown={onPillKey}>
+        {(rpgMode || heldCount > 0) && (
+          <div className={`${styles.rpgChips} ${rpgMode ? '' : styles.chipsPlain}`} ref={chipsRef} onKeyDown={onPillKey}>
+            {/* Held dice: one chip clears them all, shown only while any are held.
+                It replaced the always-on Hold All button (owner, 2026-11-05: option B) */}
+            {/* In RPG Mode it is the lock and the count, so three chips fit beside +,
+                and it steps aside while a chip is open */}
+            {heldCount > 0 && !(rpgMode && open) && (
+              <button
+                type="button"
+                className={`control-ring ${styles.rpgChip} ${styles.releaseChip}`}
+                onClick={onReleaseAll}
+                aria-label={`Release ${heldCount} held ${heldCount === 1 ? 'die' : 'dice'}`}
+                data-testid="release-chip"
+              >
+                <Unlock size={16} strokeWidth={2.5} aria-hidden="true" />
+                {rpgMode ? heldCount : `Release ${heldCount}`}
+              </button>
+            )}
+            {rpgMode && (<>
             {open === 'type' ? (
               <div className={styles.rpgPill} role="group" aria-label="Roll type">
                 {ROLL_TYPES.map(([mode, label, title]) => (
@@ -285,6 +271,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
                 {modifier === 0 ? '±0' : signed(modifier)}
               </button>
             )}
+            </>)}
           </div>
         )}
 

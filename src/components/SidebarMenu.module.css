@@ -92,8 +92,10 @@
 }
 
 @media (max-width: 468px) {
+  /* No Hold All button below it any more (owner, 2026-11-05), so the menu
+     button sits in the bottom corner, level with + and Roll */
   .toggleContainer {
-    bottom: 112px;
+    bottom: 24px;
     left: 24px;
     right: auto;
   }
@@ -107,7 +109,7 @@
   }
   
   .menu {
-    bottom: 192px;
+    bottom: 104px;
     left: 16px;
     right: 16px;
     width: auto;
@@ -169,8 +171,12 @@
 /* Matches the smaller bottom row on narrow screens (ActionBar.module.css) */
 @media (max-width: 379px) {
   .toggleContainer {
-    bottom: 86px;
+    bottom: 16px;
     left: 16px;
+  }
+
+  .menu {
+    bottom: 84px;
   }
 
   .toggleBtn {
@@ -181,8 +187,12 @@
 
 @media (max-width: 299px) {
   .toggleContainer {
-    bottom: 72px;
+    bottom: 12px;
     left: 12px;
+  }
+
+  .menu {
+    bottom: 72px;
   }
 
   .toggleBtn {

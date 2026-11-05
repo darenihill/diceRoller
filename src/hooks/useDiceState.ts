@@ -192,6 +192,10 @@ export const useDiceState = () => {
     });
   }, []);
 
+  const releaseAll = useCallback(() => {
+    setDiceList(prev => prev.map(d => (d.held ? { ...d, held: false } : d)));
+  }, []);
+
   const clearAllDice = useCallback(() => {
     setDiceList([]);
   }, []);
@@ -453,6 +457,7 @@ export const useDiceState = () => {
     updateDice,
     toggleHold,
     toggleHoldAll,
+    releaseAll,
     clearAllDice,
     rollDice,
     clearHistory,

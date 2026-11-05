@@ -68,7 +68,7 @@ describe('Screen readers reach every die and its buttons', () => {
 });
 
 describe('Bottom buttons on narrow screens', () => {
-  it('shrinks below 380 px wide so Hold All and Add stop overlapping', () => {
+  it('shrinks below 380 px wide so the menu button and Add stop overlapping', () => {
     const css = fs.readFileSync(path.resolve(__dirname, '../components/ActionBar.module.css'), 'utf-8');
     const menuCss = fs.readFileSync(path.resolve(__dirname, '../components/SidebarMenu.module.css'), 'utf-8');
     // Left button (16 + 60) must end before the bar starts: width - 16 - (60 + 10 + 136)

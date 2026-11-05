@@ -34,9 +34,32 @@ describe('RPG roll type and modifier as chips that open', () => {
     vi.useRealTimers();
   });
 
-  it('Hold All stays on the bar in RPG Mode (owner, 2026-11-05)', () => {
-    render(<App />);
-    expect(screen.getByTitle('Toggle Hold All')).toBeInTheDocument();
+  it('no Hold All button; a Release chip shows only while dice are held, in both modes (owner, 2026-11-05: B)', () => {
+    for (const rpg of ['true', 'false']) {
+      localStorage.setItem('rpgMode', rpg);
+      const { unmount } = render(<App />);
+      expect(screen.queryByTitle('Toggle Hold All')).toBeNull();
+      expect(screen.queryByTestId('release-chip')).toBeNull();
+      const holds = screen.getAllByRole('button', { name: /^Hold / });
+      fireEvent.click(holds[0]);
+      expect(screen.getByTestId('release-chip')).toHaveTextContent(rpg === 'true' ? /^1$/ : 'Release 1');
+      expect(screen.getByTestId('release-chip')).toHaveAccessibleName('Release 1 held die');
+      if (holds[1]) {
+        fireEvent.click(screen.getAllByRole('button', { name: /^Hold / })[1]);
+        expect(screen.getByTestId('release-chip')).toHaveAccessibleName('Release 2 held dice');
+        if (rpg === 'true') {
+          // Steps aside while a chip is open, back when it closes
+          fireEvent.click(screen.getByTestId('roll-type-chip'));
+          expect(screen.queryByTestId('release-chip')).toBeNull();
+          fireEvent.keyDown(screen.getByRole('button', { name: 'NORM' }), { key: 'Escape' });
+          expect(screen.getByTestId('release-chip')).toBeInTheDocument();
+        }
+      }
+      fireEvent.click(screen.getByTestId('release-chip'));
+      expect(screen.queryByTestId('release-chip')).toBeNull();
+      screen.getAllByRole('button', { name: /^Hold / }).forEach(b => expect(b).toHaveAttribute('aria-pressed', 'false'));
+      unmount();
+    }
   });
 
   it('a tap outside the chips shrinks an open one back', () => {

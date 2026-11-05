@@ -161,13 +161,6 @@
 }
 
 @media (max-width: 468px) {
-  .lockBtn {
-    position: fixed !important;
-    bottom: 24px !important;
-    left: 24px !important;
-    right: auto !important;
-    z-index: 101 !important;
-  }
 
   :global(.menu-open) .rpgChips {
     display: none !important;
@@ -203,10 +196,6 @@
     min-width: 136px;
   }
 
-  .lockBtn {
-    bottom: 16px !important;
-    left: 16px !important;
-  }
 }
 
 /* Very narrow (about 150% zoom or more): drop the dice icon from Roll so its
@@ -238,10 +227,6 @@
     min-width: 100px;
   }
 
-  .lockBtn {
-    bottom: 12px !important;
-    left: 12px !important;
-  }
 }
 
 /* RPG Mode: two chips above Roll that say what is set ("ADV", "+2"). A tap
@@ -279,6 +264,20 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
+}
+
+/* Outside RPG Mode the Release chip sits over + */
+.chipsPlain {
+  justify-content: flex-start;
+}
+
+/* Release: gold, the colour held dice wear */
+.releaseChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-color: var(--color-gold);
+  color: var(--color-gold-ink);
 }
 
 /* Something other than plain: the chip says so in the accent */

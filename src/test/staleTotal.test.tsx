@@ -33,7 +33,7 @@ describe("The Roll button's old total fades once you change the dice", () => {
     localStorage.clear();
     render(<App />);
     await roll();
-    fireEvent.click(screen.getByTitle('Toggle Hold All'));
+    fireEvent.click(screen.getAllByRole('button', { name: /^Hold / })[0]);
     expect(isFaint()).toBe(false);
   });
 });

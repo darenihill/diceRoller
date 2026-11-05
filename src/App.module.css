@@ -223,14 +223,14 @@
      24px offset = 214. The app already keeps 120px clear at the bottom, so the grid
      adds the other 94 plus a little. Reserving all 258 again left a d20 6px
      tall on a small phone once the Type a roll box took its row. */
-  :global(body.rpg-mode) .diceContainer {
+  :global(body.chip-row) .diceContainer {
     padding-bottom: 52px !important;
   }
 }
 
-/* RPG Mode's chips sit in one short row above Roll; keep it clear of the dice */
+/* RPG Mode's chips, or the Release chip, sit in one short row above Roll; keep it clear of the dice */
 @media (min-width: 769px) {
-  :global(body.rpg-mode) .diceContainer {
+  :global(body.chip-row) .diceContainer {
     padding-bottom: 52px;
   }
 }

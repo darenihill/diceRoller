@@ -59,7 +59,7 @@ function App() {
     diceList, setDiceList, rollHistory, isRolling, rollingId, modifier, setModifier,
     rpgMode, toggleRpgMode, rollAdvantage, setRollAdvantage,
     targetHighlight, setTargetHighlight,
-    addDice, removeDice, updateDice, toggleHold, toggleHoldAll,
+    addDice, removeDice, updateDice, toggleHold, releaseAll,
     clearAllDice, rollDice, clearHistory, restoreHistory, toast, showToast, insertDiceAt, restoreDice, gameNameRef
   } = useDiceState();
   const { offer: undoOffer, offerUndo, runUndo: takeBack, dismiss: dismissUndo, pause: pauseUndo, resume: resumeUndo, paused: undoPaused } = useUndo();
@@ -354,7 +354,12 @@ function App() {
   }, [diceList, saveConfig]);
 
   // Derived state
-  const allHeld = diceList.length > 0 && diceList.every(d => d.held);
+  const heldCount = diceList.filter(d => d.held).length;
+  // A row of chips sits above Roll: RPG Mode's, or Release when dice are held
+  const chipRow = rpgMode || heldCount > 0;
+  useEffect(() => {
+    document.body.classList.toggle('chip-row', chipRow);
+  }, [chipRow]);
   // Word-only dice (Yes/No, a compass) have no total, so the button keeps
   // saying Roll rather than showing a 0 nobody rolled
   const anyDieScores = diceList.some(d => d.customFaces.length === 0 || d.customFaces.some(faceScores));
@@ -933,8 +938,8 @@ function App() {
       <ActionBar
         onAdd={handleAddFromBar}
         onRoll={handleRoll}
-        onHoldAll={toggleHoldAll}
-        allHeld={allHeld}
+        heldCount={heldCount}
+        onReleaseAll={releaseAll}
         totalVisible={totalVisible}
         totalStale={totalStale}
         lastTotal={lastTotal}
@@ -1032,7 +1037,7 @@ function App() {
 
       {/* Toast Notification */}
       {storageFull ? (
-        <div className={`${styles.toast} ${styles.undoToast} ${styles.storageToast} ${rpgMode ? styles.toastAboveRpgBar : ''}`} role="alert">
+        <div className={`${styles.toast} ${styles.undoToast} ${styles.storageToast} ${chipRow ? styles.toastAboveRpgBar : ''}`} role="alert">
           <span>Storage is full, so your last change wasn't saved.</span>
           <button className={styles.undoButton} onClick={() => { setStorageFull(false); handleExportData(); }}>Export backup</button>
           <button className={styles.undoButton} onClick={() => setStorageFull(false)} aria-label="Close storage message" style={{ minWidth: 44 }}>✕</button>
@@ -1046,16 +1051,16 @@ function App() {
           onDismiss={dismissUndo}
           onPause={pauseUndo}
           onResume={resumeUndo}
-          className={`${styles.toast} ${rpgMode ? styles.toastAboveRpgBar : ''}`}
+          className={`${styles.toast} ${chipRow ? styles.toastAboveRpgBar : ''}`}
         />
       ) : toast ? (
         // role="status" so a screen reader hears "Saved!" and the rest, as it does the Undo offer
-        <div className={`${styles.toast} ${rpgMode ? styles.toastAboveRpgBar : ''}`} role="status">
+        <div className={`${styles.toast} ${chipRow ? styles.toastAboveRpgBar : ''}`} role="status">
           {toast}
         </div>
       ) : newVersion.ready && (
         // An app left open hears about a new version; Refresh loads it (owner's pick, 2026-11-03)
-        <div className={`${styles.toast} ${styles.undoToast} ${rpgMode ? styles.toastAboveRpgBar : ''}`} role="status" data-testid="new-version-bar">
+        <div className={`${styles.toast} ${styles.undoToast} ${chipRow ? styles.toastAboveRpgBar : ''}`} role="status" data-testid="new-version-bar">
           <span style={{ flexShrink: 0 }}>New version</span>
           <button className={styles.undoButton} onClick={() => window.location.reload()}>Refresh</button>
           <button className={styles.undoButton} onClick={newVersion.later} aria-label="Later" title="Later" style={{ minWidth: 44 }}>✕</button>
