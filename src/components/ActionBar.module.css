@@ -105,6 +105,18 @@
   outline-color: var(--md-sys-color-primary) !important;
 }
 
+.modifierValue {
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modifierNumber {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
 .modifierBtnDisabled {
   opacity: 0.4;
   pointer-events: none;

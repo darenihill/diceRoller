@@ -273,11 +273,35 @@
 
 .topLine {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 8px 12px;
   min-height: 32px;
   padding: 0;
   flex-shrink: 0;
+}
+
+/* RPG mode's Type a roll box, beside the name. The box starts at the top of its
+   cell so its Save link and saved rolls grow downwards, not round the name. */
+.topRoll {
+  flex: 1 1 280px;
+  min-width: 0;
+  max-width: 520px;
+  align-self: flex-start;
+}
+
+.topRoll > * {
+  margin: 0;
+  max-width: none;
+}
+
+/* A phone: the name and About keep the first line, the box takes the next */
+@media (max-width: 600px) {
+  .topRoll {
+    order: 10;
+    flex-basis: 100%;
+    max-width: none;
+  }
 }
 
 .appName {

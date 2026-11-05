@@ -297,7 +297,8 @@
   /* The dialog's 24px padding would leave a strip of faces showing under it */
   position: sticky;
   bottom: -24px;
-  z-index: 1;
+  /* Above the pinned face-colour row (5): a tap on Done always lands on Done */
+  z-index: 6;
   padding: 8px 0 32px;
   margin-bottom: -24px;
   background-color: var(--md-sys-color-surface);
@@ -491,6 +492,13 @@
      apply and paint it over the Remove / Clone / Done row */
   display: block;
   margin-bottom: 4px;
+}
+
+/* The colour panel draws no box of its own, so the pinned colour row sticks
+   within the whole faces card, as before, and stays above Remove / Clone / Done.
+   Inside a short box of its own it rode down over them (second read, 2026-11-05). */
+.panelBodyColour {
+  display: contents;
 }
 
 /* Settings tab: Name and Standard Faces share the top row, wrapping on a narrow phone */

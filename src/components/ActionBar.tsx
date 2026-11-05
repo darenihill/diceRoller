@@ -218,13 +218,18 @@ export const ActionBar: React.FC<ActionBarProps> = ({
               >
                 <Plus size={28} strokeWidth={2.5} />
               </button>
+              {/* Shows the modifier set now, so it can be read even when the Roll
+                  button is showing the last total (owner, 2026-11-05). Tap resets it. */}
               <button
-                className={`md-icon-button control-ring ${styles.rpgFabBtn} ${modifier === 0 ? styles.modifierBtnDisabled : ''}`}
+                className={`md-icon-button control-ring ${styles.rpgFabBtn} ${styles.modifierValue} ${modifier === 0 ? styles.modifierBtnDisabled : ''}`}
                 onClick={() => onChangeModifier(0)}
                 title="Reset modifier"
+                aria-label={modifier === 0 ? 'Modifier 0' : `Modifier ${modifier > 0 ? '+' : ''}${modifier}, reset to 0`}
                 disabled={modifier === 0}
+                data-testid="modifier-value"
               >
-                <RotateCcw size={22} />
+                <span className={styles.modifierNumber}>{modifier > 0 ? '+' : ''}{modifier}</span>
+                {modifier !== 0 && <RotateCcw size={12} strokeWidth={2.5} aria-hidden="true" />}
               </button>
               <button
                 className={`md-icon-button control-ring ${styles.rpgFabBtn}`}

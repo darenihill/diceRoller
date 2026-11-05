@@ -95,13 +95,15 @@ describe('Type a roll box', () => {
     expect(history[0]).toMatchObject({ typed: '2d6+3', modifier: 3 });
     expect(screen.getAllByLabelText(/^d6 showing/)).toHaveLength(2);
     expect(screen.queryAllByLabelText(/^d4 showing/)).toHaveLength(0);
-    expect(screen.getByRole('button', { name: /Reset modifier/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /^Modifier/ })).toBeEnabled();
+    // The modifier set now stays readable while Roll shows the last total
+    expect(screen.getByTestId('modifier-value')).toHaveTextContent('+3');
     expect(screen.getByText('Rolled 2d6+3')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
     expect(screen.getAllByLabelText(/^d4 showing/)).toHaveLength(1);
     expect(screen.queryAllByLabelText(/^d6 showing/)).toHaveLength(0);
-    expect(screen.getByRole('button', { name: /Reset modifier/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /^Modifier/ })).toBeDisabled();
   });
 
   it('says what it could not read and does not roll', () => {

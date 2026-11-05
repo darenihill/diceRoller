@@ -204,8 +204,10 @@ const DiceComponent: React.FC<DiceProps> = ({
 
   const extraClass = [
     sunk ? styles.dropped : '',
-    dice.isCrit20 ? styles.crit20 : '',
-    dice.isCrit1 ? styles.crit1 : ''
+    // The natural 20 / natural 1 glow waits for the die to land: the result is
+    // known when the roll starts, but showing it then gave it away (owner, 2026-11-05)
+    dice.isCrit20 && !rollingNow ? styles.crit20 : '',
+    dice.isCrit1 && !rollingNow ? styles.crit1 : ''
   ].filter(Boolean).join(' ');
 
   return (

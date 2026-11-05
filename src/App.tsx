@@ -785,6 +785,19 @@ function App() {
             <span className={styles.srOnly}>Loaded game: </span>{setName}
           </span>
         )}
+        {/* RPG mode's Type a roll box sits up here by the name, not as a row of its
+            own over the dice (owner, 2026-11-05). A phone gives it the next line. */}
+        {rpgMode && (
+          <div className={styles.topRoll}>
+            <TypeRollBox
+              onRoll={handleTypedRoll}
+              disabled={isRolling}
+              savedRolls={savedRolls}
+              onSaveRoll={handleSaveRoll}
+              onRemoveSavedRoll={handleRemoveSavedRoll}
+            />
+          </div>
+        )}
         {landingAbout && (
           <button className={styles.aboutButton} onClick={() => setModalOpen('about')} aria-label="About" title="About">
             <Info size={20} aria-hidden="true" />
@@ -792,16 +805,6 @@ function App() {
           </button>
         )}
       </header>
-
-      {rpgMode && (
-        <TypeRollBox
-          onRoll={handleTypedRoll}
-          disabled={isRolling}
-          savedRolls={savedRolls}
-          onSaveRoll={handleSaveRoll}
-          onRemoveSavedRoll={handleRemoveSavedRoll}
-        />
-      )}
 
       {showTable && lastMainRoll && (
         <TableView

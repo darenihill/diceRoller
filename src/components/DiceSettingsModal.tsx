@@ -379,7 +379,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
           </div>
 
           {openPanel === 'colour' && (
-            <div id={`${fieldId}-panel-colour`} className={styles.panelBody}>
+            <div id={`${fieldId}-panel-colour`} className={`${styles.panelBody} ${styles.panelBodyColour}`}>
               {dice.customFaces.length > 0 && (
                 <div className={`${styles.faceColourRow} ${colourPinned ? '' : styles.faceColourRowLoose}`} data-pinned={colourPinned}>
                   <span className={styles.sublabel}>Colour for face {activeFace + 1}</span>
