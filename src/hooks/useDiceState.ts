@@ -185,13 +185,6 @@ export const useDiceState = () => {
     setDiceList(prev => prev.map(d => d.id === id ? { ...d, held: !d.held } : d));
   }, []);
 
-  const toggleHoldAll = useCallback(() => {
-    setDiceList(prev => {
-      const allHeld = prev.length > 0 && prev.every(d => d.held);
-      return prev.map(d => ({ ...d, held: !allHeld }));
-    });
-  }, []);
-
   const releaseAll = useCallback(() => {
     setDiceList(prev => prev.map(d => (d.held ? { ...d, held: false } : d)));
   }, []);
@@ -456,7 +449,6 @@ export const useDiceState = () => {
     removeDice,
     updateDice,
     toggleHold,
-    toggleHoldAll,
     releaseAll,
     clearAllDice,
     rollDice,

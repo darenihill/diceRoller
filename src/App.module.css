@@ -213,24 +213,18 @@
 }
 
 @media (max-width: 768px) {
+  /* Room for the chip row above Roll (RPG Mode's chips, or Release while dice
+     are held); the app already keeps Roll's own row clear. Kept the same in
+     both modes and whether or not anything is held, so holding the first die
+     never moves the dice under your finger (second read, 2026-11-05) */
   .diceContainer {
-    padding-bottom: 96px !important; /* Reserve spacing for bottom action buttons on mobile */
-  }
-
-  /* RPG mode stacks its controls above the bottom edge; reserve that space so the
-     dice grid never sizes itself underneath them. Here the controls are two slim
-     pills: 2 rows of 50 + gap 8 (108) + gap (10) + roll button (72) + the bar's own
-     24px offset = 214. The app already keeps 120px clear at the bottom, so the grid
-     adds the other 94 plus a little. Reserving all 258 again left a d20 6px
-     tall on a small phone once the Type a roll box took its row. */
-  :global(body.chip-row) .diceContainer {
     padding-bottom: 52px !important;
   }
 }
 
-/* RPG Mode's chips, or the Release chip, sit in one short row above Roll; keep it clear of the dice */
+/* The same chip-row room on wider screens */
 @media (min-width: 769px) {
-  :global(body.chip-row) .diceContainer {
+  .diceContainer {
     padding-bottom: 52px;
   }
 }

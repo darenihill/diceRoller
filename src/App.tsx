@@ -357,9 +357,6 @@ function App() {
   const heldCount = diceList.filter(d => d.held).length;
   // A row of chips sits above Roll: RPG Mode's, or Release when dice are held
   const chipRow = rpgMode || heldCount > 0;
-  useEffect(() => {
-    document.body.classList.toggle('chip-row', chipRow);
-  }, [chipRow]);
   // Word-only dice (Yes/No, a compass) have no total, so the button keeps
   // saying Roll rather than showing a 0 nobody rolled
   const anyDieScores = diceList.some(d => d.customFaces.length === 0 || d.customFaces.some(faceScores));
@@ -877,7 +874,7 @@ function App() {
       {revealedDie && (
         <DieActionStrip
           die={revealedDie}
-          rpgMode={rpgMode}
+          rpgMode={chipRow}
           onRollOne={isRolling ? undefined : handleRollOne}
           onToggleHold={toggleHold}
           onClone={handleAddDice}

@@ -42,7 +42,7 @@ export const DieActionStrip: React.FC<DieActionStripProps> = ({ die, rpgMode, on
     if (!strip || !dieEl) return;
     const below = strip.classList.contains(styles.top) ? null : strip.getBoundingClientRect();
     const d = dieEl.getBoundingClientRect();
-    const bottomTop = below ? below.top : window.innerHeight - strip.offsetHeight - (rpgMode ? 270 : 108);
+    const bottomTop = below ? below.top : window.innerHeight - strip.offsetHeight - (rpgMode ? 162 : 108);
     setAtTop(d.bottom > bottomTop);
   }, [die.id, rpgMode]);
   return (

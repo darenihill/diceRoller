@@ -17,9 +17,10 @@
   box-shadow: var(--elevation-3);
 }
 
-/* RPG Mode's bottom bar is three rows tall */
+/* A row of chips sits above Roll (RPG Mode's, or Release while dice are
+   held): the strip goes above it, level with the Undo bar */
 .strip.rpg {
-  bottom: calc(270px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(162px + env(safe-area-inset-bottom, 0px));
 }
 
 /* The tapped die sits where the strip would go, so the strip opens at the top instead */
