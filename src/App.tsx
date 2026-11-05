@@ -684,6 +684,8 @@ function App() {
   };
 
   const handleRollOne = (id: string) => {
+    // A held die stays put until it is released (owner, 2026-11-05)
+    if (diceList.find(d => d.id === id)?.held) return;
     rollDice(({ natural20Ids }) => {
       void celebrateNatural20(natural20Ids);
       trackEvent('roll_one_die');

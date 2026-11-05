@@ -191,7 +191,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
         {/* RPG controls as two chips that show what is set ("ADV", "+2"); a tap
             opens one into its buttons, and a roll shrinks it back (owner, 2026-11-05) */}
         {(rpgMode || heldCount > 0) && (
-          <div className={`${styles.rpgChips} ${rpgMode ? '' : styles.chipsPlain}`} ref={chipsRef} onKeyDown={onPillKey}>
+          <div className={styles.rpgChips} ref={chipsRef} onKeyDown={onPillKey}>
             {/* Held dice: one chip clears them all, shown only while any are held.
                 It replaced the always-on Hold All button (owner, 2026-11-05: option B) */}
             {/* In RPG Mode it is the lock and the count, so three chips fit beside +,

@@ -56,7 +56,7 @@ export const DieActionStrip: React.FC<DieActionStripProps> = ({ die, rpgMode, on
     >
       <div className={styles.heading}>{name} showing {showing(die)}{die.held ? ', held' : ''}</div>
       <div className={styles.row}>
-        <button type="button" className={`${styles.btn} ${styles.primary}`} onClick={() => onRollOne?.(die.id)} disabled={!onRollOne}>
+        <button type="button" className={`${styles.btn} ${styles.primary}`} onClick={() => onRollOne?.(die.id)} disabled={!onRollOne || die.held} title={die.held ? 'Release it to roll it' : undefined}>
           <span className={styles.circle}><Dices size={22} aria-hidden="true" /></span>
           <span className={styles.label}>Roll one</span>
         </button>

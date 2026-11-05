@@ -266,11 +266,6 @@
   cursor: pointer;
 }
 
-/* Outside RPG Mode the Release chip sits over + */
-.chipsPlain {
-  justify-content: flex-start;
-}
-
 /* Release: gold, the colour held dice wear */
 .releaseChip {
   display: inline-flex;

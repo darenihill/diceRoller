@@ -12,16 +12,24 @@ describe('Buttons for a tapped die with many dice out', () => {
     const fns = { onRollOne: vi.fn(), onToggleHold: vi.fn(), onClone: vi.fn(), onOpenSettings: vi.fn(), onRemove: vi.fn() };
     render(<DieActionStrip die={die} rpgMode={false} {...fns} />);
     expect(screen.getByRole('group', { name: 'Actions for d6' })).toHaveTextContent('d6 showing 4, held');
-    fireEvent.click(screen.getByRole('button', { name: 'Roll one' }));
+    // A held die can't be rolled on its own until it is released (owner, 2026-11-05)
+    expect(screen.getByRole('button', { name: 'Roll one' })).toBeDisabled();
     fireEvent.click(screen.getByRole('button', { name: 'Release' }));
     fireEvent.click(screen.getByRole('button', { name: 'Clone' }));
     fireEvent.click(screen.getByRole('button', { name: 'Settings' }));
     fireEvent.click(screen.getByRole('button', { name: 'Remove' }));
-    expect(fns.onRollOne).toHaveBeenCalledWith('d1');
+    expect(fns.onRollOne).not.toHaveBeenCalled();
     expect(fns.onToggleHold).toHaveBeenCalledWith('d1');
     expect(fns.onClone).toHaveBeenCalledWith(die);
     expect(fns.onOpenSettings).toHaveBeenCalledWith('d1');
     expect(fns.onRemove).toHaveBeenCalledWith('d1');
+  });
+
+  it('rolls a die that is not held', () => {
+    const onRollOne = vi.fn();
+    render(<DieActionStrip die={{ ...die, held: false }} rpgMode={false} onRollOne={onRollOne} onToggleHold={vi.fn()} onClone={vi.fn()} onOpenSettings={vi.fn()} onRemove={vi.fn()} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Roll one' }));
+    expect(onRollOne).toHaveBeenCalledWith('d1');
   });
 
   it('keeps the buttons round the die when dice are big, and drops them when compact', () => {

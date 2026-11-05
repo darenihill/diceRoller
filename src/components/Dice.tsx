@@ -349,8 +349,8 @@ const DiceComponent: React.FC<DiceProps> = ({
         </button>
       )}
 
-      {/* Roll This Die (Bottom-Centre) */}
-      {onRollOne && (
+      {/* Roll This Die (Bottom-Centre); a held die stays put until it is released (owner, 2026-11-05) */}
+      {onRollOne && !dice.held && (
         <button 
           className={`${styles.actionBtn} ${styles.rollOneBtn}`} 
           onClick={(e) => { e.stopPropagation(); onRollOne(dice.id); }}
