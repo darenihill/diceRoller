@@ -18,6 +18,10 @@
   min-height: 0;
   width: 100%;
   padding: 16px;
+  /* Room above the top row for a held die's lift and its HELD tag, which
+     were cut off when the area scrolled (fresh eyes, 2026-11-05) */
+  /* A fixed size, since the dice are sized from this area's inner height */
+  padding-top: 32px;
 }
 
 .historyList {

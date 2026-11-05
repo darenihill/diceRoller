@@ -97,12 +97,20 @@ export function withoutFaceImages(dice: DiceData[]): DiceData[] {
     : d);
 }
 
+/** A face's text when it is just a whole number ("5", "-1", "+2"); words like
+ *  "2+5" or "3 Gold" aren't, so they count 0 unless Counts as is set
+ *  (fresh eyes, 2026-11-05: "2+5" counted as 2) */
+function plainNumber(content: string): number | undefined {
+  const t = content.trim();
+  return /^[+-]?\d+$/.test(t) ? parseInt(t, 10) : undefined;
+}
+
 /** Whether a face adds anything to a total: a Counts as number or number text */
 export function faceScores(faceStr: string): boolean {
   const parsed = parseFaceContent(faceStr);
   if (parsed.value !== undefined) return true;
   if (parsed.content.startsWith(FACE_ICON_PREFIX)) return false;
-  return !isNaN(parseInt(parsed.content));
+  return plainNumber(parsed.content) !== undefined;
 }
 
 /** What a face adds to a total: its Counts as number, else its number text, else 0. */
@@ -110,8 +118,7 @@ export function faceNumericValue(faceStr: string): number {
   const parsed = parseFaceContent(faceStr);
   if (parsed.value !== undefined) return parsed.value;
   if (parsed.content.startsWith(FACE_ICON_PREFIX)) return 0;
-  const num = parseInt(parsed.content);
-  return isNaN(num) ? 0 : num;
+  return plainNumber(parsed.content) ?? 0;
 }
 
 /** Parse a hex color string and return its perceived brightness (0-255). */

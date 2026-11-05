@@ -31,16 +31,22 @@ export function parseRollNotation(input: string): ParseResult {
   if (!s) return { ok: false, note: `Type a roll first. ${EXAMPLES}` };
 
   let advantage: RollAdvantageMode = 'normal';
-  const advMatch = s.match(/\s*\b(adv|advantage|dis|disadv|disadvantage)\s*$/);
-  if (advMatch) {
-    advantage = advMatch[1].startsWith('adv') ? 'advantage' : 'disadvantage';
-    s = s.slice(0, advMatch.index).trim();
+  // adv or dis can go anywhere: "d20 adv +3" and "d20+3 adv" both read
+  // (fresh eyes, 2026-11-05: "d20 dis +3" was refused)
+  const advWords = [...s.matchAll(/\b(adv|advantage|dis|disadv|disadvantage)\b/g)];
+  if (advWords.length > 1) return { ok: false, note: 'Use adv or dis once, like d20 adv.' };
+  if (advWords.length === 1) {
+    const m = advWords[0];
+    advantage = m[1].startsWith('adv') ? 'advantage' : 'disadvantage';
+    s = (s.slice(0, m.index) + ' ' + s.slice(m.index! + m[0].length)).trim();
   }
 
   const compact = s.replace(/\s+/g, '');
   if (!compact) return { ok: false, note: `Add the dice too, like d20 adv.` };
   if (!/^[+-]?[0-9d]+([+-][0-9d]+)*$/.test(compact)) {
-    return { ok: false, note: `That roll has something the app can't read. ${EXAMPLES}` };
+    // Name the part it can't read, so it's clear what to change
+    const bad = compact.match(/[^0-9d+-]+/)?.[0];
+    return { ok: false, note: bad ? `The app can't read "${bad}". ${EXAMPLES}` : `That roll has something the app can't read. ${EXAMPLES}` };
   }
 
   const groups: DiceGroup[] = [];

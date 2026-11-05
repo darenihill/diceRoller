@@ -567,7 +567,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
             className={`md-button md-button-surface ${styles.footerBtnClone}`}
             onClick={() => onClone(dice)}
           >
-            <Copy size={18} strokeWidth={2.5} /> Clone
+            <Copy size={18} strokeWidth={2.5} /> Copy
           </button>
           <button 
             className={`md-button md-button-filled ${styles.footerBtnDone}`}

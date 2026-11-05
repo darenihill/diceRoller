@@ -215,6 +215,12 @@ function App() {
   useEffect(() => {
     document.body.classList.toggle('menu-open', menuOpen);
   }, [menuOpen]);
+  // The Undo bar sat over the open menu's tiles: it steps aside while the
+  // menu is open, its countdown paused, and comes back when it closes
+  // (fresh eyes, 2026-11-05)
+  useEffect(() => {
+    if (menuOpen) pauseUndo(); else resumeUndo();
+  }, [menuOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Bright ring round the bottom-bar buttons for glare: a Customize switch, off until turned on
   const [brightRings, setBrightRings] = useState(() => readItem(SAVED.brightRings) === 'true');
@@ -1099,7 +1105,7 @@ function App() {
           <button className={styles.undoButton} onClick={() => { setStorageFull(false); handleExportData(); }}>Export backup</button>
           <button className={styles.undoButton} onClick={() => setStorageFull(false)} aria-label="Close storage message" style={{ minWidth: 44 }}>✕</button>
         </div>
-      ) : undoOffer ? (
+      ) : undoOffer && !menuOpen ? (
         <UndoBar
           offer={undoOffer}
           windowMs={UNDO_WINDOW_MS}

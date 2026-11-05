@@ -358,12 +358,12 @@ const DiceComponent: React.FC<DiceProps> = ({
         <Settings size={20} strokeWidth={2.5} color="currentColor" />
       </button>
 
-      {/* Clone Button (Bottom-Left) */}
+      {/* Copy button (bottom left), one word for it everywhere (fresh eyes, 2026-11-05) */}
       {onClone && (
         <button 
           className={`${styles.actionBtn} ${styles.cloneBtn}`} 
           onClick={(e) => { e.stopPropagation(); onClone(dice); }}
-          title="Clone Die"
+          title="Copy this die"
           aria-label={`Copy ${dieName}`}
         >
           <Copy size={20} strokeWidth={2.5} color="currentColor" />

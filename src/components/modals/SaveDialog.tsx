@@ -30,6 +30,7 @@ export const SaveDialog: React.FC<SaveDialogProps> = ({
         <input 
           id="save-game-name"
           autoFocus
+          data-autofocus
           autoComplete="off"
           enterKeyHint="done"
           type="text" 

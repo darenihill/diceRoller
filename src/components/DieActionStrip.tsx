@@ -66,7 +66,7 @@ export const DieActionStrip: React.FC<DieActionStripProps> = ({ die, rpgMode, on
         </button>
         <button type="button" className={styles.btn} onClick={() => onClone(die)}>
           <span className={styles.circle}><Copy size={22} aria-hidden="true" /></span>
-          <span className={styles.label}>Clone</span>
+          <span className={styles.label}>Copy</span>
         </button>
         <button type="button" className={styles.btn} onClick={() => onOpenSettings(die.id)}>
           <span className={styles.circle}><Settings size={22} aria-hidden="true" /></span>
