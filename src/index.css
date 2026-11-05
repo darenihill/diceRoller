@@ -12,11 +12,10 @@
   --md-sys-color-on-primary: #062E6F;
   --md-sys-color-primary-container: #004A77;
   --md-sys-color-on-primary-container: #C2E7FF;
-  /* Delete red is a vermilion (orange-red): with red-green colour blindness
-     the old pale pink turned grey, and on Felt it matched the cream Roll
-     button. Vermilion stays a clear warm colour beside the blue (owner, 2026-11-02). */
-  --md-sys-color-error: #FF7A3D;
-  --md-sys-color-on-error: #1F0A00;
+  /* Delete red: a strong red, picked by the owner from swatches (2026-11-05,
+     option C). The vermilion before it read as orange to his colour vision. */
+  --md-sys-color-error: #FF6155;
+  --md-sys-color-on-error: #2D0001;
   /* Secondary text and dividers: used across the dialogs, never defined until now */
   --md-sys-color-on-surface-variant: #C4C7C5;
   --md-sys-color-outline: #8E918F;
@@ -60,8 +59,8 @@ body.theme-light {
   --md-sys-color-on-primary-container: #001B3F;
   /* Light theme's own error pair (M3 light). Without it the dark theme's pale
      pink showed through, and Clear All read at 1.3:1 on the light menu.
-     A deep vermilion, for colour blindness like the dark themes' one. */
-  --md-sys-color-error: #AE3000;
+     A deep strong red, matching the dark themes' one (owner, 2026-11-05). */
+  --md-sys-color-error: #BA1A1A;
   --md-sys-color-on-error: #FFFFFF;
   --md-sys-color-on-surface-variant: #444746;
   --md-sys-color-outline: #747775;
@@ -85,7 +84,9 @@ body.theme-felt {
   --md-sys-color-primary-container: #EFE6D2;
   --md-sys-color-on-primary-container: #13382D;
   --md-sys-color-on-surface-variant: #D3E4DC;
-  /* Lighter vermilion so warning text reads on the mid-green felt */
+  /* Felt keeps its lighter vermilion: no red is both readable on the green
+     and, with red-green colour blindness, apart from the cream Roll one button
+     (checked 2026-11-05 when the other themes went strong red) */
   --md-sys-color-error: #FF9F6B;
   --md-sys-color-on-error: #1F0A00;
   --md-sys-color-outline: #8FA89E;
