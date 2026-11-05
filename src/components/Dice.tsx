@@ -82,12 +82,21 @@ const DiceComponent: React.FC<DiceProps> = ({
     const box = el.getBoundingClientRect();
     const dx = glided.x - (box.left + box.width / 2);
     const dy = glided.y - (box.top + box.height / 2);
+    // While it flies in from outside the dice area, the area would count it as
+    // overflow and flash a scroll bar it doesn't need (owner, 2026-11-05). If the
+    // dice fit without scrolling, the area hides overflow until the die lands.
+    const area = el.parentElement;
+    const hideBar = !!area && area.scrollHeight <= area.clientHeight && area.scrollWidth <= area.clientWidth;
+    const before = area?.style.overflow ?? '';
+    if (hideBar && area) area.style.overflow = 'hidden';
+    const restore = () => { if (hideBar && area) area.style.overflow = before; };
     const glide = el.animate(
       [{ transform: `translate(${dx}px, ${dy}px) scale(0.3)`, opacity: 0.4 }, { transform: 'none', opacity: 1 }],
       { duration: 450, easing: 'cubic-bezier(0.2, 0, 0, 1)' }
     );
+    glide.addEventListener?.('finish', restore);
     // Strict mode runs this twice: stop the first so the second measures the settled slot
-    return () => glide.cancel();
+    return () => { glide.cancel(); restore(); };
   }, [glided, calm]);
 
   useEffect(() => {

@@ -215,13 +215,13 @@
   }
 
   /* RPG mode stacks its controls above the bottom edge; reserve that space so the
-     dice grid never sizes itself underneath them. Since the controls rotate to two
-     rows here: 2 rows of FABs (152) + gap (10) + roll button (72) + the bar's own
-     24px offset = 258. The app already keeps 120px clear at the bottom, so the grid
-     adds the other 138 plus its usual 16. Reserving all 258 again left a d20 6px
+     dice grid never sizes itself underneath them. Here the controls are two slim
+     pills: 2 rows of 50 + gap 8 (108) + gap (10) + roll button (72) + the bar's own
+     24px offset = 214. The app already keeps 120px clear at the bottom, so the grid
+     adds the other 94 plus a little. Reserving all 258 again left a d20 6px
      tall on a small phone once the Type a roll box took its row. */
   :global(body.rpg-mode) .diceContainer {
-    padding-bottom: 154px !important;
+    padding-bottom: 106px !important;
   }
 }
 
@@ -274,7 +274,9 @@
 .topLine {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  /* Top, not centre: with RPG saved rolls under the box, the name and About
+     stay level with the box's first line instead of sliding down */
+  align-items: flex-start;
   gap: 8px 12px;
   min-height: 32px;
   padding: 0;
@@ -305,6 +307,8 @@
 }
 
 .appName {
+  /* Same height as the About button and the roll box, so the three line up */
+  line-height: 44px;
   font-size: 16px;
   font-weight: 500;
   color: var(--md-sys-color-on-surface);
@@ -312,6 +316,7 @@
 }
 
 .setChip {
+  margin-top: 6px;
   display: inline-flex;
   align-items: center;
   height: 32px;
@@ -339,6 +344,28 @@
   font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
+}
+
+.tableButton {
+  order: 5;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--md-sys-color-outline);
+  background: transparent;
+  color: var(--md-sys-color-on-surface);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tableButton:hover {
+  background-color: var(--md-sys-color-surface-hover);
 }
 
 .aboutButton:hover {

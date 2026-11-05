@@ -93,6 +93,29 @@ describe('Table view switch and big total', () => {
     expect(screen.getByTestId('table-view')).toBeInTheDocument();
   });
 
+  it('after showing the dice, a Table button goes back to the table (owner, 2026-11-05)', () => {
+    localStorage.setItem('tableView', 'true');
+    render(<App />);
+    roll();
+    expect(screen.queryByRole('button', { name: /^Show table/ })).toBeNull();
+    fireEvent.click(within(screen.getByTestId('table-view')).getByRole('button', { name: /Show the dice$/ }));
+    expect(screen.queryByTestId('table-view')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /^Show table, total \d+$/ }));
+    expect(screen.getByTestId('table-view')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Show table/ })).toBeNull();
+  });
+
+  it('table view can be turned off from the table itself', () => {
+    localStorage.setItem('tableView', 'true');
+    render(<App />);
+    roll();
+    fireEvent.click(within(screen.getByTestId('table-view')).getByRole('button', { name: 'Turn off table view' }));
+    expect(screen.queryByTestId('table-view')).toBeNull();
+    expect(localStorage.getItem('tableView')).toBe('false');
+    roll();
+    expect(screen.queryByTestId('table-view')).toBeNull();
+  });
+
   it('goes back to the dice when a die is added after the roll, so the math never disagrees', () => {
     localStorage.setItem('tableView', 'true');
     render(<App />);

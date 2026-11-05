@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { fairOdds, luckRows, furthestFromFair, luckSet } from '../utils/fairOdds';
 import { performance } from 'node:perf_hooks';
 import { HistoryModal } from '../components/modals/HistoryModal';
@@ -103,6 +103,16 @@ const roll = (total: number, set?: string): RollHistoryItem =>
   ({ id: String(Math.random()), total, details: [String(total)], set });
 
 describe('History modal', () => {
+  it('opens on History, with Frequency one tab over', () => {
+    render(<HistoryModal isOpen onClose={() => {}} onClearHistory={() => {}} rollHistory={[roll(4), roll(5)]} />);
+    expect(screen.getByRole('tab', { name: 'History' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByText('Roll Log (2)')).toBeInTheDocument();
+    expect(screen.queryByText('Luck Meter')).toBeNull();
+    fireEvent.click(screen.getByRole('tab', { name: 'Frequency' }));
+    expect(screen.getByText('Luck Meter')).toBeInTheDocument();
+    expect(screen.queryByText('Roll Log (2)')).toBeNull();
+  });
+
   const dice = [die(6, 'a')];
   const set = luckSet(dice);
 
@@ -111,6 +121,7 @@ describe('History modal', () => {
       <HistoryModal isOpen onClose={() => {}} onClearHistory={() => {}} dice={dice}
         rollHistory={[roll(6, set), roll(6, set), roll(6, set), roll(2, set)]} />,
     );
+    fireEvent.click(screen.getByRole('tab', { name: 'Frequency' }));
     expect(container.ownerDocument.querySelectorAll('[data-fair]').length).toBe(6);
     expect(container.ownerDocument.querySelector('[data-furthest]')?.getAttribute('data-furthest')).toBe('6');
     expect(container.ownerDocument.body.textContent).not.toContain('they changed');
@@ -121,6 +132,7 @@ describe('History modal', () => {
       <HistoryModal isOpen onClose={() => {}} onClearHistory={() => {}} dice={dice}
         rollHistory={[roll(9, luckSet([die(6), die(6)])), roll(3, set)]} />,
     );
+    fireEvent.click(screen.getByRole('tab', { name: 'Frequency' }));
     expect(container.ownerDocument.body.textContent).toContain('they changed since some of these rolls');
   });
 });

@@ -325,3 +325,62 @@
     left: 12px !important;
   }
 }
+
+/* Phones and small tablets: the six round RPG buttons become two slim pills,
+   roll type [ADV | NORM | DIS] and modifier [− +2 +], stacked above Roll.
+   About 48px shorter than two rows of 72px circles, and that height goes back
+   to the dice (owner, 2026-11-05: "mobile rpg mode is feeling cluttered").
+   Last in the file so it wins over the narrow-phone circle sizes above. */
+@media (max-width: 768px) {
+  .rpgColumns {
+    gap: 8px;
+  }
+
+  .verticalColumn {
+    gap: 2px;
+    padding: 3px;
+    border-radius: 999px;
+    background-color: var(--md-sys-color-surface-variant);
+    box-shadow: var(--elevation-3);
+  }
+
+  .verticalColumn .rpgFabBtn {
+    width: auto;
+    min-width: 52px;
+    height: 44px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  .verticalColumn .rpgFabBtn:hover {
+    transform: none;
+  }
+
+  /* The chosen roll type fills its segment; still blue text, so the big Roll
+     button stays the only filled blue button */
+  .verticalColumn .rpgFabActive {
+    border-width: 2px;
+    background-color: var(--md-sys-color-surface);
+  }
+
+  .modifierColumn .rpgFabBtn {
+    min-width: 44px;
+    padding: 0 8px;
+  }
+
+  .modifierColumn .modifierValue {
+    min-width: 56px;
+  }
+
+  /* In the pill the number says enough; the reset arrow sits beside it */
+  .modifierColumn .modifierValue {
+    flex-direction: row;
+    gap: 4px;
+  }
+
+  .modifierColumn .modifierNumber {
+    font-size: 17px;
+  }
+}

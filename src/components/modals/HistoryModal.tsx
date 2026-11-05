@@ -5,6 +5,8 @@ import type { DiceData } from '../../types';
 import { fairOdds, luckRows, furthestFromFair, luckSet } from '../../utils/fairOdds';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
+// The same tabs as Dice Settings / Custom faces, so the two dialogs match
+import tabStyles from '../DiceSettingsModal.module.css';
 
 interface HistoryModalProps {
   isOpen: boolean;
@@ -48,74 +50,105 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   const diceChanged = showFair && counted.some(item => item.set !== undefined && item.set !== nowSet);
   const times = (n: number) => `${n} ${n === 1 ? 'time' : 'times'}`;
 
+  // History and Frequency as tabs by the close button (owner, 2026-11-05)
+  const [tab, setTab] = React.useState<'history' | 'frequency'>('history');
+  const tabsId = React.useId();
+  const tabsHeader = (
+    <div className={tabStyles.tabs} role="tablist" aria-label="Roll history">
+      {([['history', 'History'], ['frequency', 'Frequency']] as const).map(([key, label]) => (
+        <button
+          key={key}
+          type="button"
+          role="tab"
+          id={`${tabsId}-tab-${key}`}
+          aria-selected={tab === key}
+          aria-controls={`${tabsId}-panel-${key}`}
+          className={`${tabStyles.tab} ${tab === key ? tabStyles.tabActive : ''}`}
+          onClick={() => setTab(key)}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Roll History & Frequency">
+    <Modal isOpen={isOpen} onClose={onClose} title="Roll History & Frequency" header={tabsHeader}>
       {rollHistory.length === 0 ? (
         <p style={{ color: 'var(--md-sys-color-on-surface-variant)', textAlign: 'center', padding: '16px 0' }}>No rolls yet. Each roll shows here.</p>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {/* Clear History sits at the top, where it is seen without scrolling (owner, 2026-11-02) */}
-          <div className={modalStyles.sectionHeaderRow} style={{ borderTop: 'none', paddingTop: 0 }}>
-            <span className={modalStyles.toggleDesc}>{rollHistory.length} {rollHistory.length === 1 ? 'roll' : 'rolls'} saved</span>
-            <button className="md-button md-button-surface md-button-compact" onClick={onClearHistory}>
-              Clear History
-            </button>
-          </div>
-          {/* Session Frequency Histogram */}
-          <div>
-            <h3 className={modalStyles.sectionHeaderFirst}>Roll Frequency ("Luck Meter")</h3>
-            <div className={modalStyles.freqCard}>
-              {showFair && (
-                <p className={modalStyles.freqNote}>
-                  <span className={modalStyles.freqFairKey} aria-hidden="true" /> marks what fair dice would give
-                  {diceChanged ? ', using the dice and settings now (they changed since some of these rolls)' : ''}.
-                </p>
-              )}
-              {odd && (
-                <p className={modalStyles.freqNote} data-furthest={odd.total}>
-                  Furthest from fair: {odd.total} came up {times(odd.count)}; fair dice would give about {Math.round(odd.fair * 10) / 10}.
-                </p>
-              )}
-              {rows.map(row => (
-                <div key={row.total} className={modalStyles.freqRow}>
-                  <span className={modalStyles.freqLabel}>
-                    Total {row.total}:
-                  </span>
-                  <div className={modalStyles.freqBarContainer}>
-                    <div
-                      className={modalStyles.freqBarFill}
-                      style={{ width: `${(row.count / scale) * 100}%` }}
-                    />
-                    {showFair && row.fair > 0 && (
-                      <div
-                        className={modalStyles.freqFairMark}
-                        style={{ left: `${(row.fair / scale) * 100}%` }}
-                        data-fair={row.fair.toFixed(2)}
-                        title={`Fair dice: about ${Math.round(row.fair * 10) / 10}`}
-                      />
-                    )}
+        <div
+          role="tabpanel"
+          id={`${tabsId}-panel-${tab}`}
+          aria-labelledby={`${tabsId}-tab-${tab}`}
+          style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+        >
+          {tab === 'history' && (<>
+            {/* Clear History sits at the top, where it is seen without scrolling (owner, 2026-11-02) */}
+            <div className={modalStyles.sectionHeaderRow} style={{ borderTop: 'none', paddingTop: 0 }}>
+              <span className={modalStyles.toggleDesc}>{rollHistory.length} {rollHistory.length === 1 ? 'roll' : 'rolls'} saved</span>
+              <button className="md-button md-button-surface md-button-compact" onClick={onClearHistory}>
+                Clear History
+              </button>
+            </div>
+            <div className={styles.historyList}>
+              <h3 className={modalStyles.sectionHeader}>Roll Log ({rollHistory.length})</h3>
+              {rollHistory.map((roll, i) => (
+                <div key={roll.id} className={styles.historyItem} style={{ borderLeft: roll.isTargetHit ? '4px solid var(--color-gold)' : 'none' }}>
+                  <div className={styles.historyIndex}>Roll {rollHistory.length - i}{roll.single ? ' · one die' : ''}{roll.typed ? ` · ${roll.typed}` : ''}</div>
+                  <div className={styles.historyDetails}>{roll.details.join(', ')}</div>
+                  <div className={styles.historyTotal}>
+                    Total: {roll.total}
+                    {roll.isTargetHit && <span style={{ marginLeft: 6, color: 'var(--color-gold-ink)', fontSize: '0.75rem' }}>🎯 HIT!</span>}
                   </div>
-                  <span className={modalStyles.freqCount}>
-                    {row.count}x
-                  </span>
                 </div>
               ))}
             </div>
-          </div>
-
-          <div className={styles.historyList}>
-            <h3 className={modalStyles.sectionHeader}>Roll Log ({rollHistory.length})</h3>
-            {rollHistory.map((roll, i) => (
-              <div key={roll.id} className={styles.historyItem} style={{ borderLeft: roll.isTargetHit ? '4px solid var(--color-gold)' : 'none' }}>
-                <div className={styles.historyIndex}>Roll {rollHistory.length - i}{roll.single ? ' · one die' : ''}{roll.typed ? ` · ${roll.typed}` : ''}</div>
-                <div className={styles.historyDetails}>{roll.details.join(', ')}</div>
-                <div className={styles.historyTotal}>
-                  Total: {roll.total}
-                  {roll.isTargetHit && <span style={{ marginLeft: 6, color: 'var(--color-gold-ink)', fontSize: '0.75rem' }}>🎯 HIT!</span>}
-                </div>
+          </>)}
+          {tab === 'frequency' && (<>
+            {/* Session Frequency Histogram */}
+            <div>
+              <h3 className={modalStyles.sectionHeaderFirst}>Luck Meter</h3>
+              <div className={modalStyles.freqCard}>
+                {showFair && (
+                  <p className={modalStyles.freqNote}>
+                    <span className={modalStyles.freqFairKey} aria-hidden="true" /> marks what fair dice would give
+                    {diceChanged ? ', using the dice and settings now (they changed since some of these rolls)' : ''}.
+                  </p>
+                )}
+                {odd && (
+                  <p className={modalStyles.freqNote} data-furthest={odd.total}>
+                    Furthest from fair: {odd.total} came up {times(odd.count)}; fair dice would give about {Math.round(odd.fair * 10) / 10}.
+                  </p>
+                )}
+                {rows.map(row => (
+                  <div key={row.total} className={modalStyles.freqRow}>
+                    <span className={modalStyles.freqLabel}>
+                      Total {row.total}:
+                    </span>
+                    <div className={modalStyles.freqBarContainer}>
+                      <div
+                        className={modalStyles.freqBarFill}
+                        style={{ width: `${(row.count / scale) * 100}%` }}
+                      />
+                      {showFair && row.fair > 0 && (
+                        <div
+                          className={modalStyles.freqFairMark}
+                          style={{ left: `${(row.fair / scale) * 100}%` }}
+                          data-fair={row.fair.toFixed(2)}
+                          title={`Fair dice: about ${Math.round(row.fair * 10) / 10}`}
+                        />
+                      )}
+                    </div>
+                    <span className={modalStyles.freqCount}>
+                      {row.count}x
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+
+          </>)}
         </div>
       )}
     </Modal>

@@ -21,7 +21,7 @@ import { COMPACT_DIE_SIZE } from './utils/constants';
 import { dicePresets } from './utils/presets';
 import { currentSetName, diceSignature, rollSignature, readShareLink, nextFreeSaveName, type LoadedSet } from './utils/setName';
 import { readLandingStart, readLandingAbout } from './utils/landing';
-import { Info, Plus, Dice6 } from 'lucide-react';
+import { Info, Plus, Dice6, Table2 } from 'lucide-react';
 import { Modal } from './components/Modal';
 import type { DiceData } from './types';
 
@@ -361,9 +361,16 @@ function App() {
   const diceNow = rollSignature(diceList);
   const totalStale = totalVisible && rolledSignature !== null && rolledSignature !== diceNow;
   const setName = currentSetName(diceList, loadedSet);
-  const showTable = tableView && totalVisible && !isRolling && !!lastMainRoll
-    && lastMainRoll.id !== tableDismissedId && diceList.length > 0
-    && diceList.map(d => d.id).join() === tableRolledIds;
+  const tableReady = tableView && totalVisible && !isRolling && !!lastMainRoll
+    && diceList.length > 0 && diceList.map(d => d.id).join() === tableRolledIds;
+  const showTable = tableReady && lastMainRoll.id !== tableDismissedId;
+  // After "Show the dice", a button goes back to the table (owner, 2026-11-05)
+  const canReturnToTable = tableReady && !showTable;
+  const toggleTableView = () => {
+    const next = !tableView;
+    setTableView(next);
+    trackEvent('table_view_toggled', { enabled: next });
+  };
   const tiles = showTable ? tableTiles(diceList) : [];
 
   // Dice Size & Grid layout calculations
@@ -798,6 +805,12 @@ function App() {
             />
           </div>
         )}
+        {canReturnToTable && (
+          <button className={styles.tableButton} onClick={() => setTableDismissedId(null)} aria-label={`Show table, total ${lastTotal}`} title="Show table">
+            <Table2 size={18} aria-hidden="true" />
+            <span>Table</span>
+          </button>
+        )}
         {landingAbout && (
           <button className={styles.aboutButton} onClick={() => setModalOpen('about')} aria-label="About" title="About">
             <Info size={20} aria-hidden="true" />
@@ -812,6 +825,7 @@ function App() {
           math={tableMath(tiles, lastModifier)}
           tiles={tiles}
           onShowDice={() => setTableDismissedId(lastMainRoll.id)}
+          onTurnOff={toggleTableView}
         />
       )}
 
@@ -881,11 +895,7 @@ function App() {
         rpgMode={rpgMode}
         onToggleRpgMode={toggleRpgMode}
         tableView={tableView}
-        onToggleTableView={() => {
-          const next = !tableView;
-          setTableView(next);
-          trackEvent('table_view_toggled', { enabled: next });
-        }}
+        onToggleTableView={toggleTableView}
         onInstall={installed ? undefined : handleInstall}
       />
 

@@ -48,4 +48,16 @@ describe('A new die glides out of the + button', () => {
     expect(animate.mock.results[0].value.cancel).toHaveBeenCalledTimes(all.length - 1);
     vi.restoreAllMocks();
   });
+
+  it('the dice area hides its scroll bar while the die flies in, then gives it back', () => {
+    const listeners: Record<string, () => void> = {};
+    animate.mockImplementation(() => ({ cancel: vi.fn(), addEventListener: (t: string, f: () => void) => { listeners[t] = f; } }));
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Add Dice' }));
+    const area = document.querySelector('[data-dice-id]')!.parentElement as HTMLElement;
+    // jsdom has no layout, so everything "fits": the bar is hidden during the glide
+    expect(area.style.overflow).toBe('hidden');
+    listeners.finish();
+    expect(area.style.overflow).toBe('');
+  });
 });

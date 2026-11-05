@@ -8,6 +8,8 @@ interface TableViewProps {
   tiles: TableTile[];
   /** Tapping the big number goes back to the dice */
   onShowDice: () => void;
+  /** Turns table view off from here, without a trip to the menu */
+  onTurnOff?: () => void;
 }
 
 /** A number, underlined when it would read as another number upside down. */
@@ -19,7 +21,7 @@ const Num: React.FC<{ text: string; className?: string }> = ({ text, className }
  * Table view: the last total huge in the dice area, its math under it, the
  * dice as small tiles, and an upside-down copy for the people across the table.
  */
-export const TableView: React.FC<TableViewProps> = ({ total, math, tiles, onShowDice }) => {
+export const TableView: React.FC<TableViewProps> = ({ total, math, tiles, onShowDice, onTurnOff }) => {
   const shown = String(total);
   return (
     <div className={styles.tableView} data-testid="table-view">
@@ -45,6 +47,12 @@ export const TableView: React.FC<TableViewProps> = ({ total, math, tiles, onShow
         ))}
       </ul>
       <p className={styles.hint}>Tap the number to see the dice</p>
+      {/* Off from the main screen, not only the menu (owner, 2026-11-05) */}
+      {onTurnOff && (
+        <button type="button" className={styles.turnOff} onClick={onTurnOff}>
+          Turn off table view
+        </button>
+      )}
     </div>
   );
 };
