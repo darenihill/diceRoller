@@ -4,7 +4,7 @@ Customizable dice for board games and tabletop RPGs, live at
 customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
-- 3D dice tray (Daren 2026-11-02, Build: "3D dice tumble across a tray and
+- ~~Done 2026-11-05~~ 3D dice tray (Daren 2026-11-02, Build: "3D dice tumble across a tray and
   land, instead of flat dice shaking", way: "A 3D Dice switch in Customize").
   Done when: with 3D Dice on, plain d4 to d20 dice tumble across a tray and
   land, the dice and total then show the faces they landed on (holds,
