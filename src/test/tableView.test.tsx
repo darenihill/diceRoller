@@ -72,7 +72,7 @@ describe('Table view switch and big total', () => {
     expect(screen.getByRole('button', { name: 'Table view' })).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('shows a roll big with its math and a flipped copy; tapping it shows the dice; the next roll is big again', () => {
+  it('shows a roll big with its math and a flipped copy; tapping it shows the dice, and the dice stay through the next roll (owner, 2026-11-05)', () => {
     localStorage.setItem('tableView', 'true');
     render(<App />);
     expect(screen.queryByTestId('table-view')).toBeNull();
@@ -90,7 +90,7 @@ describe('Table view switch and big total', () => {
     fireEvent.click(big);
     expect(screen.queryByTestId('table-view')).toBeNull();
     roll();
-    expect(screen.getByTestId('table-view')).toBeInTheDocument();
+    expect(screen.queryByTestId('table-view')).toBeNull();
   });
 
   it('a roll from the table stays on the table, numbers hidden until the dice land (owner, 2026-11-05)', () => {
@@ -108,27 +108,47 @@ describe('Table view switch and big total', () => {
     expect(within(screen.getByTestId('table-view')).getByRole('button', { name: /^Total \d+\. Show the dice$/ })).toBeEnabled();
   });
 
-  it('one Table | Dice switch flips between the two, in the same place both ways (owner, 2026-11-05)', () => {
+  it('one Table | Dice switch picks the view, and the pick lasts through new rolls (owner, 2026-11-05)', () => {
     localStorage.setItem('tableView', 'true');
     render(<App />);
-    expect(screen.queryByRole('group', { name: 'Show' })).toBeNull();
-    roll();
     const sw = () => within(screen.getByRole('group', { name: 'Show' }));
+    // The switch is there as soon as table view is on, set to Table
+    expect(sw().getByRole('button', { name: 'Table' })).toHaveAttribute('aria-pressed', 'true');
+    roll();
     expect(sw().getByRole('button', { name: /^Table, total \d+$/ })).toHaveAttribute('aria-pressed', 'true');
     fireEvent.click(sw().getByRole('button', { name: 'Dice' }));
     expect(screen.queryByTestId('table-view')).toBeNull();
     expect(sw().getByRole('button', { name: 'Dice' })).toHaveAttribute('aria-pressed', 'true');
+    roll();
+    expect(screen.queryByTestId('table-view')).toBeNull();
+    expect(sw().getByRole('button', { name: 'Dice' })).toHaveAttribute('aria-pressed', 'true');
     fireEvent.click(sw().getByRole('button', { name: /^Table, total \d+$/ }));
+    expect(screen.getByTestId('table-view')).toBeInTheDocument();
+    roll();
     expect(screen.getByTestId('table-view')).toBeInTheDocument();
   });
 
-  it('table view can be turned off from the table itself', () => {
+  it('turning table view on switches back to the table', () => {
     localStorage.setItem('tableView', 'true');
     render(<App />);
     roll();
-    fireEvent.click(within(screen.getByTestId('table-view')).getByRole('button', { name: 'Turn off table view' }));
+    fireEvent.click(within(screen.getByRole('group', { name: 'Show' })).getByRole('button', { name: 'Dice' }));
+    expect(screen.queryByTestId('table-view')).toBeNull();
+    // Off and on again from the menu: back on the table
+    openMenu();
+    fireEvent.click(screen.getByRole('button', { name: 'Table view' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Table view' }));
+    expect(screen.getByTestId('table-view')).toBeInTheDocument();
+  });
+
+  it('table view turns off from the × beside the switch (owner, 2026-11-05)', () => {
+    localStorage.setItem('tableView', 'true');
+    render(<App />);
+    roll();
+    fireEvent.click(screen.getByRole('button', { name: 'Turn off table view' }));
     expect(screen.queryByTestId('table-view')).toBeNull();
     expect(localStorage.getItem('tableView')).toBe('false');
+    expect(screen.queryByRole('group', { name: 'Show' })).toBeNull();
     roll();
     expect(screen.queryByTestId('table-view')).toBeNull();
   });

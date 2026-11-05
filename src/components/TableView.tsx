@@ -9,7 +9,6 @@ interface TableViewProps {
   /** Tapping the big number goes back to the dice */
   onShowDice: () => void;
   /** Turns table view off from here, without a trip to the menu */
-  onTurnOff?: () => void;
   /** The dice are rolling: the last numbers stay, dimmed, until they land */
   rolling?: boolean;
 }
@@ -23,7 +22,7 @@ const Num: React.FC<{ text: string; className?: string }> = ({ text, className }
  * Table view: the last total huge in the dice area, its math under it, the
  * dice as small tiles, and an upside-down copy for the people across the table.
  */
-export const TableView: React.FC<TableViewProps> = ({ total, math, tiles, onShowDice, onTurnOff, rolling = false }) => {
+export const TableView: React.FC<TableViewProps> = ({ total, math, tiles, onShowDice, rolling = false }) => {
   const shown = String(total);
   return (
     <div className={`${styles.tableView} ${rolling ? styles.rolling : ''}`} data-testid="table-view" aria-busy={rolling}>
@@ -50,12 +49,6 @@ export const TableView: React.FC<TableViewProps> = ({ total, math, tiles, onShow
           </li>
         ))}
       </ul>
-      {/* Off from the main screen, not only the menu (owner, 2026-11-05) */}
-      {onTurnOff && (
-        <button type="button" className={styles.turnOff} onClick={onTurnOff}>
-          Turn off table view
-        </button>
-      )}
     </div>
   );
 };

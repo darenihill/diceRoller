@@ -339,9 +339,32 @@
   white-space: nowrap;
 }
 
-.viewSwitch {
+.viewControls {
   order: 5;
   margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+}
+
+.viewOff {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+  cursor: pointer;
+}
+
+.viewOff:hover {
+  background-color: var(--md-sys-color-surface-hover);
+}
+
+.viewSwitch {
   display: inline-flex;
   height: 44px;
   padding: 3px;
@@ -354,7 +377,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 0 12px;
+  padding: 0 10px;
   border: none;
   border-radius: 999px;
   background: transparent;
@@ -380,6 +403,14 @@
   opacity: 0.6;
 }
 
+/* Below about 390px the switch shows icons only, so the × and the switch
+   stay on the header row */
+@media (max-width: 389px) {
+  .viewSwitchBtn span {
+    display: none;
+  }
+}
+
 /* Small phones: a tighter switch so it stays on the header row, clear of the table */
 @media (max-width: 379px) {
   .topLine {
@@ -392,7 +423,7 @@
 
   .viewSwitchBtn {
     gap: 4px;
-    padding: 0 6px;
+    padding: 0 10px;
     font-size: 13px;
   }
 
@@ -408,6 +439,10 @@
 
 /* On a phone the game's name gets the room; the About button keeps its icon */
 @media (max-width: 468px) {
+  .topLine {
+    column-gap: 8px;
+  }
+
   .aboutLabel {
     display: none;
   }

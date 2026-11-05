@@ -21,7 +21,7 @@ import { COMPACT_DIE_SIZE } from './utils/constants';
 import { dicePresets } from './utils/presets';
 import { currentSetName, diceSignature, rollSignature, readShareLink, nextFreeSaveName, type LoadedSet } from './utils/setName';
 import { readLandingStart, readLandingAbout } from './utils/landing';
-import { Info, Plus, Dice6, Table2, Swords } from 'lucide-react';
+import { Info, Plus, Dice6, Table2, Swords, X } from 'lucide-react';
 import { Modal } from './components/Modal';
 import type { DiceData } from './types';
 
@@ -162,8 +162,9 @@ function App() {
   useEffect(() => {
     saveItem(SAVED.tableView, String(tableView));
   }, [tableView]);
-  // The roll whose big view was tapped away; the next roll shows big again
-  const [tableDismissedId, setTableDismissedId] = useState<string | null>(null);
+  // With table view on, the header switch picks Table or Dice, and the pick
+  // stays through new rolls until it's switched back (owner, 2026-11-05)
+  const [onDice, setOnDice] = useState(false);
   // The dice a roll was made with; adding, removing or loading dice hides the big view
   const [tableRolledIds, setTableRolledIds] = useState('');
   // Buzz when dice land: hidden and off until the private link turns it on (trial, 2026-10-28)
@@ -393,14 +394,14 @@ function App() {
   // A roll from the table stays on the table, the numbers dimmed until the
   // dice land, instead of flashing back to the dice (owner, 2026-11-05)
   const tableRolling = tableView && isRolling && rollingId === null && !!lastMainRoll
-    && lastMainRoll.id !== tableDismissedId && diceList.length > 0
+    && !onDice && diceList.length > 0
     && diceList.map(d => d.id).join() === tableRolledIds;
-  const showTable = (tableReady && lastMainRoll.id !== tableDismissedId) || tableRolling;
-  // After "Show the dice", a button goes back to the table (owner, 2026-11-05)
-  const canReturnToTable = tableReady && !showTable;
+  const showTable = (tableReady && !onDice) || tableRolling;
   const toggleTableView = () => {
     const next = !tableView;
     setTableView(next);
+    // Turning table view on switches to the table
+    if (next) setOnDice(false);
     trackEvent('table_view_toggled', { enabled: next });
   };
   const tiles = showTable ? tableTiles(diceList) : [];
@@ -849,17 +850,28 @@ function App() {
             />
           </div>
         )}
-        {/* One Table | Dice switch in the same place both ways, whenever a roll
-            can show on the table (owner, 2026-11-05: "consistent button") */}
-        {(showTable || canReturnToTable) && lastMainRoll && (
+        {/* One Table | Dice switch whenever table view is on; the pick lasts
+            through new rolls (owner, 2026-11-05) */}
+        {tableView && (
+          <div className={styles.viewControls}>
+          {/* Off right here, beside the switch (owner, 2026-11-05) */}
+          <button
+            type="button"
+            className={styles.viewOff}
+            onClick={toggleTableView}
+            aria-label="Turn off table view"
+            title="Turn off table view"
+          >
+            <X size={20} aria-hidden="true" />
+          </button>
           <div className={styles.viewSwitch} role="group" aria-label="Show">
             <button
               type="button"
               className={styles.viewSwitchBtn}
-              aria-pressed={showTable}
+              aria-pressed={!onDice}
               disabled={tableRolling}
-              onClick={() => setTableDismissedId(null)}
-              aria-label={`Table, total ${lastTotal}`}
+              onClick={() => setOnDice(false)}
+              aria-label={tableReady ? `Table, total ${lastTotal}` : 'Table'}
             >
               <Table2 size={18} aria-hidden="true" />
               <span>Table</span>
@@ -867,13 +879,15 @@ function App() {
             <button
               type="button"
               className={styles.viewSwitchBtn}
-              aria-pressed={!showTable}
+              aria-pressed={onDice}
               disabled={tableRolling}
-              onClick={() => setTableDismissedId(lastMainRoll.id)}
+              onClick={() => setOnDice(true)}
+              aria-label="Dice"
             >
               <Dice6 size={18} aria-hidden="true" />
               <span>Dice</span>
             </button>
+          </div>
           </div>
         )}
         {landingAbout && (
@@ -890,8 +904,7 @@ function App() {
           math={tableMath(tiles, lastModifier)}
           tiles={tiles}
           rolling={tableRolling}
-          onShowDice={() => setTableDismissedId(lastMainRoll.id)}
-          onTurnOff={toggleTableView}
+          onShowDice={() => setOnDice(true)}
         />
       )}
 

@@ -275,6 +275,24 @@
   color: var(--color-gold-ink);
 }
 
+/* Smaller than the RPG chips, so it reads as a note on the held dice, not a
+   main button (owner, 2026-11-05: "a bit too large"). Its tap area stays 44px. */
+.rpgChip.releaseChip {
+  position: relative;
+  min-width: 0;
+  height: 32px;
+  padding: 0 12px 0 10px;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rpgChip.releaseChip::before {
+  content: '';
+  position: absolute;
+  inset: -6px -2px;
+}
+
 /* Something other than plain: the chip says so in the accent */
 .rpgChipSet {
   border-color: var(--md-sys-color-primary);

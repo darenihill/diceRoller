@@ -204,7 +204,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
                 aria-label={`Release ${heldCount} held ${heldCount === 1 ? 'die' : 'dice'}`}
                 data-testid="release-chip"
               >
-                <Unlock size={16} strokeWidth={2.5} aria-hidden="true" />
+                <Unlock size={14} strokeWidth={2.5} aria-hidden="true" />
                 {rpgMode ? heldCount : `Release ${heldCount}`}
               </button>
             )}
