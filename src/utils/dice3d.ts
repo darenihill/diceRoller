@@ -31,6 +31,9 @@ function assetPath(): string {
 /** Loads the 3D library into the tray element once, the first time it is needed */
 export function loadTray(selector: string): Promise<DiceBoxLike> {
   if (!trayPromise) {
+    // Without WebGL the library quietly rolls invisible dice, so stop here and roll flat
+    const probe = document.createElement('canvas');
+    if (!(probe.getContext('webgl2') ?? probe.getContext('webgl'))) return Promise.reject(new Error('no WebGL'));
     trayPromise = import('@3d-dice/dice-box')
       .then(async ({ default: DiceBox }) => {
         const box = new DiceBox({

@@ -64,7 +64,7 @@ describe('3D Dice (owner, 2026-11-02)', () => {
     fireEvent.click(rollButton());
     act(() => { vi.advanceTimersByTime(2000); });
     expect(tray.rollInTray).not.toHaveBeenCalled();
-    expect(screen.queryByTestId('dice-tray')).toBeNull();
+    expect(screen.getByTestId('dice-tray')).not.toBeVisible();
     expect(history()).toHaveLength(1);
     vi.useRealTimers();
   });
@@ -113,6 +113,42 @@ describe('3D Dice (owner, 2026-11-02)', () => {
     await act(async () => { land({ [tray.rollInTray.mock.calls[0][1][0].id]: 4 }); });
     expect(history()).toHaveLength(1);
     expect(history()[0].total).toBe(4);
+  });
+
+  it('a die added while the dice tumble is still there when they land', async () => {
+    localStorage.setItem('dice3D', 'true');
+    putOut([die({})]);
+    let land: (r: Record<string, number>) => void = () => {};
+    tray.rollInTray.mockReturnValue(new Promise(resolve => { land = resolve; }));
+    render(<App />);
+    fireEvent.click(rollButton());
+    await waitFor(() => expect(tray.rollInTray).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByTitle(/add/i));
+    const count = () => document.querySelectorAll('[data-dice-id]').length;
+    expect(count()).toBe(2);
+    await act(async () => { land({ [tray.rollInTray.mock.calls[0][1][0].id]: 6 }); });
+    expect(count()).toBe(2);
+    expect(history()[0].details).toContain('d6 #1: 6');
+  });
+
+  it('turning 3D off mid-roll drops that roll, and 3D works again once back on', async () => {
+    localStorage.setItem('dice3D', 'true');
+    tray.rollInTray.mockReturnValue(new Promise(() => {}));
+    render(<App />);
+    fireEvent.click(rollButton());
+    await waitFor(() => expect(tray.rollInTray).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getAllByRole('button', { name: /menu/i })[0]);
+    fireEvent.click(screen.getByText('Customize'));
+    const sw = screen.getByRole('button', { name: '3D dice' });
+    fireEvent.click(sw);
+    expect(screen.getByTestId('dice-tray')).not.toBeVisible();
+    fireEvent.click(sw);
+    tray.rollInTray.mockImplementation(async (_: string, dice: DiceData[]) => Object.fromEntries(dice.map(d => [d.id, 1])));
+    fireEvent.keyDown(document, { key: 'Escape' });
+    await waitFor(() => expect(screen.queryByRole('button', { name: '3D dice' })).toBeNull());
+    fireEvent.click(rollButton());
+    await waitFor(() => expect(history()).toHaveLength(1));
+    expect(history()[0].total).toBe(2);
   });
 
   it('a typed roll tumbles in the tray too, with its modifier added', async () => {

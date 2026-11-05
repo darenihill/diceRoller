@@ -222,6 +222,8 @@ export const useDiceState = () => {
     const advantageMode = typed ? typed.advantage : rollAdvantage;
     // With no dice there is nothing to roll; a modifier alone used to log a phantom total
     if (list.length === 0) return 'none';
+    // A die removed while 3D dice tumbled has nothing left to roll
+    if (onlyId !== undefined && !list.some(d => d.id === onlyId)) return 'none';
     // A second tap during the tumble lands the dice at once. The result was
     // picked when the roll started, so it stays the same and History gets one entry
     if (tumbleRef.current) {

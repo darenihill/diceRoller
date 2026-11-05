@@ -55,6 +55,7 @@ const THEMES = ['theme-dark', 'theme-light', 'theme-felt', 'theme-midnight'];
 /** The 3D tray's element, and how long its dice stay after they land */
 const TRAY_ID = 'dice-tray-3d';
 const TRAY_LINGER_MS = 1600;
+const TRAY_GIVE_UP_MS = 15000;
 
 function App() {
   // A phone on the game table stays awake between turns
@@ -171,12 +172,21 @@ function App() {
   const [dice3D, setDice3D] = useState(() => readItem(SAVED.dice3D) === 'true');
   useEffect(() => {
     saveItem(SAVED.dice3D, String(dice3D));
-    if (!dice3D) clearTray();
+    if (!dice3D) {
+      // Turned off mid-roll: that roll is dropped and the next one rolls flat
+      trayRun.current += 1;
+      trayBusy.current = false;
+      window.clearTimeout(trayTimer.current);
+      setTray(null);
+      clearTray();
+    }
   }, [dice3D]);
   // The tray shows while its dice tumble, then for a moment after they land
   const [tray, setTray] = useState<null | { phase: 'rolling' | 'landed'; top: number; bottom: number }>(null);
   const trayBusy = useRef(false);
   const trayTimer = useRef<number | undefined>(undefined);
+  // Counts tray throws, so a throw that was cancelled never lands late
+  const trayRun = useRef(0);
   const calmMotion = !!useReducedMotion();
 
   // With table view on, the header switch picks Table or Dice, and the pick
@@ -666,6 +676,10 @@ function App() {
     reader.readAsText(file);
   };
 
+  // The latest roll step, for a 3D roll that lands after the dice have changed
+  const rollDiceRef = useRef(rollDice);
+  useEffect(() => { rollDiceRef.current = rollDice; });
+
   /** With 3D Dice on, the plain dice about to roll tumble in the tray first,
    *  then `go` rolls with what they landed on. False when the roll stays flat. */
   const throwInTray = (rolling: DiceData[], go: (landed?: TrayResults) => void): boolean => {
@@ -675,6 +689,7 @@ function App() {
     // A tap while they tumble waits for them to land
     if (trayBusy.current) return true;
     trayBusy.current = true;
+    const run = ++trayRun.current;
     window.clearTimeout(trayTimer.current);
     // The tray fills the space between the top line and the bottom bar
     const top = document.querySelector('header')?.getBoundingClientRect().bottom ?? 0;
@@ -687,8 +702,11 @@ function App() {
     if (soundEnabled) playRattleSound();
     // Next turn, once the tray is on screen with its size, the dice are thrown
     window.setTimeout(() => {
-      rollInTray(`#${TRAY_ID}`, plain)
+      // A tray that never settles (lost graphics, a tab put to sleep) gives up and rolls flat
+      const giveUp = new Promise<never>((_, reject) => { window.setTimeout(() => reject(new Error('tray timed out')), TRAY_GIVE_UP_MS); });
+      Promise.race([rollInTray(`#${TRAY_ID}`, plain), giveUp])
         .then(landed => {
+          if (run !== trayRun.current) return;
           go(landed);
           if (soundEnabled) playThudSound();
           else if (buzzEnabled) buzzLanding();
@@ -696,11 +714,14 @@ function App() {
           trayTimer.current = window.setTimeout(() => { setTray(null); clearTray(); }, TRAY_LINGER_MS);
         })
         .catch(() => {
+          if (run !== trayRun.current) return;
           setTray(null);
+          clearTray();
           showToast("3D dice couldn't start on this device, so these rolled flat.");
           go();
+          rollFeedback();
         })
-        .finally(() => { trayBusy.current = false; });
+        .finally(() => { if (run === trayRun.current) trayBusy.current = false; });
     }, 0);
     return true;
   };
@@ -715,6 +736,8 @@ function App() {
   // A typed roll swaps in its own dice, modifier and advantage and rolls them;
   // Undo puts back the dice and settings that were out before
   const handleTypedRoll = (roll: TypedRoll) => {
+    // While 3D dice tumble, a typed roll waits like a second tap on Roll
+    if (trayBusy.current) return;
     const before = { dice: diceList, modifier, advantage: rollAdvantage };
     const dice = roll.groups.flatMap(g => Array.from({ length: g.count }, () => ({
       id: generateId(),
@@ -730,22 +753,25 @@ function App() {
     setRollAdvantage(roll.advantage);
     // A typed roll puts out new dice, so Table view shows big for these
     setTableRolledIds(dice.map(d => d.id).join());
-    const go = (landed?: TrayResults) => rollDice(({ total, diceCount, natural20Ids }) => {
-      setHasRolledThisSession(true);
-      setRolledSignature(rollSignature(latestDiceRef.current));
-      void celebrateNatural20(natural20Ids);
-      trackEvent('roll_dice', { diceCount, sum: total, modifier: roll.modifier, rpgMode, rollAdvantage: roll.advantage, typed: true, ...(landed ? { dice3D: true } : {}) });
-    }, undefined, { text: roll.text, dice, modifier: roll.modifier, advantage: roll.advantage }, landed);
+    // Undo is offered once the typed dice are out, so with 3D on it waits for them to land
+    const go = (landed?: TrayResults) => {
+      rollDiceRef.current(({ total, diceCount, natural20Ids }) => {
+        setHasRolledThisSession(true);
+        setRolledSignature(rollSignature(latestDiceRef.current));
+        void celebrateNatural20(natural20Ids);
+        trackEvent('roll_dice', { diceCount, sum: total, modifier: roll.modifier, rpgMode, rollAdvantage: roll.advantage, typed: true, ...(landed ? { dice3D: true } : {}) });
+      }, undefined, { text: roll.text, dice, modifier: roll.modifier, advantage: roll.advantage }, landed);
+      if (before.dice.length > 0) {
+        offerUndo(`Rolled ${roll.text}`, () => {
+          restoreDice(before.dice);
+          setModifier(before.modifier);
+          setRollAdvantage(before.advantage);
+        });
+      }
+    };
     if (!throwInTray(dice, go)) {
       go();
       rollFeedback();
-    }
-    if (before.dice.length > 0) {
-      offerUndo(`Rolled ${roll.text}`, () => {
-        restoreDice(before.dice);
-        setModifier(before.modifier);
-        setRollAdvantage(before.advantage);
-      });
     }
   };
 
@@ -783,7 +809,7 @@ function App() {
     // A held die stays put until it is released (owner, 2026-11-05)
     const die = diceList.find(d => d.id === id);
     if (!die || die.held) return;
-    const go = (landed?: TrayResults) => rollDice(({ natural20Ids }) => {
+    const go = (landed?: TrayResults) => rollDiceRef.current(({ natural20Ids }) => {
       void celebrateNatural20(natural20Ids);
       trackEvent('roll_one_die');
     }, id, undefined, landed);
@@ -835,7 +861,9 @@ function App() {
       return;
     }
     setTableRolledIds(diceList.map(d => d.id).join());
-    const go = (landed?: TrayResults) => rollDice(({ total, diceCount, natural20Ids }) => {
+    // Rolls with the dice out when the tray lands, not the ones out at the tap,
+    // so a die added or removed while they tumble is kept that way
+    const go = (landed?: TrayResults) => rollDiceRef.current(({ total, diceCount, natural20Ids }) => {
       // Fires when the roll resolves, so the actual total reaches analytics
       setHasRolledThisSession(true);
       setRolledSignature(rollSignature(latestDiceRef.current));
@@ -990,19 +1018,18 @@ function App() {
         />
       )}
 
-      {/* The 3D tray: always in the page once 3D Dice is on, shown only for a roll */}
-      {dice3D && (
-        <div
-          id={TRAY_ID}
-          className={styles.tray3d}
-          data-phase={tray?.phase}
-          hidden={!tray}
-          style={tray ? { top: tray.top, bottom: tray.bottom } : undefined}
-          onClick={closeTray}
-          aria-hidden="true"
-          data-testid="dice-tray"
-        />
-      )}
+      {/* The 3D tray: always in the page, since the 3D library keeps drawing
+          into the first one it was given; shown only for a roll */}
+      <div
+        id={TRAY_ID}
+        className={styles.tray3d}
+        data-phase={tray?.phase}
+        hidden={!tray}
+        style={tray ? { top: tray.top, bottom: tray.bottom } : undefined}
+        onClick={closeTray}
+        aria-hidden="true"
+        data-testid="dice-tray"
+      />
 
       <div ref={containerRef} className={`${styles.diceContainer} ${showTable ? styles.diceHidden : ''}`} style={diceStyles}>
         {diceList.map((dice) => (
