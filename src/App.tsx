@@ -522,8 +522,10 @@ function App() {
   const handleUpdateDie = (id: string, updates: Partial<DiceData>) => {
     const die = diceList.find(d => d.id === id);
     if (die && updates.customFaces) {
+      // Same number of faces: a face was edited in place (its words or icon), not lost
+      const sameCount = updates.customFaces.length === die.customFaces.length;
       const kept = new Set(updates.customFaces.map(f => parseFaceContent(f).content));
-      const lost = die.customFaces.filter(f => !kept.has(parseFaceContent(f).content));
+      const lost = sameCount ? [] : die.customFaces.filter(f => !kept.has(parseFaceContent(f).content));
       if (lost.length > 0) {
         const before = { faces: die.faces, customFaces: die.customFaces, currentFaceIndex: die.currentFaceIndex };
         offerUndo(

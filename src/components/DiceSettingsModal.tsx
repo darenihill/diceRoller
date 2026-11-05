@@ -45,6 +45,8 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   const [selectedFace, setSelectedFace] = useState(0);
   /** The face Icons and Text change, once one is tapped; none means they add new faces */
   const [editFace, setEditFace] = useState<{ die: string; index: number } | null>(null);
+  // What's typed in a face's words box, while it differs from the saved words
+  const [textDraft, setTextDraft] = useState<{ index: number; text: string } | null>(null);
   /** The color row pins to the bottom only after a face is tapped, so the faces show first on open */
   const [colourPinnedFor, setColourPinnedFor] = useState<string | null>(null);
   const colourPinned = colourPinnedFor === dice.id;
@@ -138,6 +140,10 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     const newFaces = [...dice.customFaces];
     const parsed = parseFaceContent(newFaces[index], '');
     const parts = faceParts(parsed.content);
+    // A words-only face is never saved blank: the box can be emptied while
+    // typing, and the old words stay on the die until new ones go in
+    setTextDraft({ index, text });
+    if (!text.trim() && !parts.icon && !parsed.image) return;
     const room = MAX_FACE_TEXT_LENGTH - (parts.icon ? joinFace(parts.icon, 'x').length - 1 : 0);
     newFaces[index] = buildFace(joinFace(parts.icon, text.slice(0, room)), parsed.bgColor || undefined, parsed.value, parsed.image);
     onUpdate(dice.id, { customFaces: newFaces });
@@ -490,8 +496,9 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                   <div className={styles.addFaceRow}>
                     <input
                       type="text"
-                      value={editingParts.text}
+                      value={textDraft?.index === editing ? textDraft.text : editingParts.text}
                       onChange={(e) => setFaceText(editing, e.target.value)}
+                      onBlur={() => setTextDraft(null)}
                       onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
                       placeholder={editingParts.icon ? 'Add words under the icon' : 'Face text'}
                       aria-label={`Words on face ${editing + 1}`}

@@ -28,18 +28,27 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
   const [line, setLine] = React.useState('');
   React.useLayoutEffect(() => {
     const svg = svgRef.current;
-    const box = svg?.getBoundingClientRect();
-    if (!svg || !box || !box.width || !box.height) return;
-    const lw = parseFloat(getComputedStyle(svg).getPropertyValue('--line')) || 2;
-    const i = lw / 2 + 1;
-    const w = box.width - 2 * i, h = box.height - 2 * i;
-    const r = Math.min(h / 2, w / 2);
-    const x0 = i, y0 = i, cx = i + w / 2;
-    setLine(
-      `M ${cx} ${y0} H ${x0 + w - r} A ${r} ${r} 0 0 1 ${x0 + w} ${y0 + r} V ${y0 + h - r} ` +
-      `A ${r} ${r} 0 0 1 ${x0 + w - r} ${y0 + h} H ${x0 + r} A ${r} ${r} 0 0 1 ${x0} ${y0 + h - r} ` +
-      `V ${y0 + r} A ${r} ${r} 0 0 1 ${x0 + r} ${y0} Z`,
-    );
+    if (!svg) return;
+    const measure = () => {
+      const box = svg.getBoundingClientRect();
+      if (!box.width || !box.height) return;
+      const lw = parseFloat(getComputedStyle(svg).getPropertyValue('--line')) || 2;
+      const i = lw / 2 + 1;
+      const w = box.width - 2 * i, h = box.height - 2 * i;
+      const r = Math.min(h / 2, w / 2);
+      const x0 = i, y0 = i, cx = i + w / 2;
+      setLine(
+        `M ${cx} ${y0} H ${x0 + w - r} A ${r} ${r} 0 0 1 ${x0 + w} ${y0 + r} V ${y0 + h - r} ` +
+        `A ${r} ${r} 0 0 1 ${x0 + w - r} ${y0 + h} H ${x0 + r} A ${r} ${r} 0 0 1 ${x0} ${y0 + h - r} ` +
+        `V ${y0 + r} A ${r} ${r} 0 0 1 ${x0 + r} ${y0} Z`,
+      );
+    };
+    measure();
+    // Turning the phone or resizing the window changes the pill's size
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(svg);
+    return () => ro.disconnect();
   }, [offer.key]);
   return (
   <div

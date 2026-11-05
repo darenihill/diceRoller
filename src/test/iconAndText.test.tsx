@@ -50,6 +50,23 @@ describe('A face can hold a color, an icon and words together (owner, 2026-11-05
     expect(onUpdate).not.toHaveBeenCalled();
   });
 
+  it('typing words is an edit, not a lost face, and a words-only face is never saved blank (second read, 2026-11-05)', () => {
+    const onUpdate = vi.fn();
+    const { rerender } = render(<DiceSettingsModal dice={die} allDice={[die]} onUpdate={onUpdate} {...props} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Text' }));
+    fireEvent.click(screen.getByRole('button', { name: /^Face 2:/ }));
+    const box = screen.getByLabelText('Words on face 2');
+    fireEvent.change(box, { target: { value: '' } });
+    expect(onUpdate).not.toHaveBeenCalled();
+    expect(box).toHaveValue('');
+    fireEvent.change(box, { target: { value: 'Go' } });
+    expect(onUpdate).toHaveBeenLastCalledWith('d1', { customFaces: [':icon:Sword:bg:#E32227', 'Go'] });
+    // Leaving the box shows the saved words again
+    rerender(<DiceSettingsModal dice={{ ...die, customFaces: [':icon:Sword:bg:#E32227', 'Go'] }} allDice={[die]} onUpdate={onUpdate} {...props} />);
+    fireEvent.blur(box);
+    expect(screen.getByLabelText('Words on face 2')).toHaveValue('Go');
+  });
+
   it('"Add a new face instead" goes back to adding', () => {
     render(<DiceSettingsModal dice={die} allDice={[die]} onUpdate={() => {}} {...props} />);
     fireEvent.click(screen.getByRole('button', { name: 'Text' }));
