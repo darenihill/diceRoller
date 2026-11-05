@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useUndo, dieLabel, UNDO_WINDOW_MS } from '../hooks/useUndo';
+import { useUndo, dieLabel, UNDO_WINDOW_MS, backMessage } from '../hooks/useUndo';
 import { useDiceState } from '../hooks/useDiceState';
 import { useStorage } from '../hooks/useStorage';
 
@@ -17,7 +17,7 @@ describe('Undo offer', () => {
     expect(result.current.offer).toBeNull();
   });
 
-  it('goes away by itself after five seconds', () => {
+  it('goes away by itself after seven seconds', () => {
     vi.useFakeTimers();
     const { result } = renderHook(() => useUndo());
     act(() => result.current.offerUndo('Removed d6', () => {}));
@@ -25,6 +25,34 @@ describe('Undo offer', () => {
     expect(result.current.offer).not.toBeNull();
     act(() => { vi.advanceTimersByTime(1); });
     expect(result.current.offer).toBeNull();
+  });
+
+  it('is seven seconds, pauses while touched and picks up where it left off', () => {
+    vi.useFakeTimers();
+    expect(UNDO_WINDOW_MS).toBe(7000);
+    const { result } = renderHook(() => useUndo());
+    act(() => result.current.offerUndo('Removed d6', () => {}));
+    act(() => { vi.advanceTimersByTime(3000); });
+    act(() => result.current.pause());
+    act(() => { vi.advanceTimersByTime(20000); });
+    expect(result.current.offer).not.toBeNull();
+    act(() => result.current.resume());
+    act(() => { vi.advanceTimersByTime(3999); });
+    expect(result.current.offer).not.toBeNull();
+    act(() => { vi.advanceTimersByTime(1); });
+    expect(result.current.offer).toBeNull();
+  });
+
+  it('says what came back', () => {
+    const { result } = renderHook(() => useUndo());
+    act(() => result.current.offerUndo('Removed d20', () => {}));
+    let back: string | null = null;
+    act(() => { back = result.current.runUndo(); });
+    expect(back).toBe('d20 is back');
+    expect(backMessage('Cleared 4 rolls')).toBe('4 rolls are back');
+    expect(backMessage('Cleared 1 die')).toBe('1 die is back');
+    expect(backMessage('Deleted Catan')).toBe('Catan is back');
+    expect(backMessage('Loaded Catan')).toBe('Your dice are back');
   });
 
   it('names a die by its name, else by its faces', () => {

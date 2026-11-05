@@ -1,0 +1,101 @@
+/* The one Undo bar: words, a filled Undo pill with its countdown, then × */
+/* Doubled class: wins over the shared message box's own padding */
+.bar.bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 6px 6px 20px;
+  pointer-events: auto;
+  white-space: nowrap;
+  max-width: calc(100vw - 32px); /* a long name never pushes Undo off screen */
+  touch-action: manipulation;
+}
+
+.message {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.undo {
+  position: relative;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 16px 0 14px;
+  border: none;
+  border-radius: 999px;
+  /* Filled, the reverse of the bar: the bar's text colour as the fill */
+  background-color: var(--md-sys-color-on-primary);
+  color: var(--md-sys-color-primary);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  /* About one eighteenth of the pill's height: 2px on a phone */
+  --line: 2px;
+}
+
+.undo:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* The countdown: a line in the words' colour, inside the pill, starting at the
+   top and running clockwise, draining away. No track under it. */
+.ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ringLine {
+  x: calc(var(--line) / 2 + 1px);
+  y: calc(var(--line) / 2 + 1px);
+  width: calc(100% - var(--line) - 2px);
+  height: calc(100% - var(--line) - 2px);
+  rx: 20px;
+  ry: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--line);
+  stroke-linecap: round;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 0;
+  animation-name: undoDrain;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes undoDrain {
+  to { stroke-dashoffset: -1; }
+}
+
+.close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.close:hover {
+  background-color: rgba(127, 127, 127, 0.18);
+}
+
+/* Tablet or computer: 3px */
+@media (min-width: 769px) {
+  .undo {
+    --line: 3px;
+  }
+}

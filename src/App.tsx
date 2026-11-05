@@ -34,7 +34,8 @@ import { createShakeDetector, requestMotionPermission, sampleFromEvent } from '.
 import { SaveDialog } from './components/modals/SaveDialog';
 import { InstallModal } from './components/modals/InstallModal';
 import { useInstallApp } from './hooks/useInstallApp';
-import { useUndo, dieLabel } from './hooks/useUndo';
+import { useUndo, dieLabel, UNDO_WINDOW_MS } from './hooks/useUndo';
+import { UndoBar } from './components/UndoBar';
 import { spokenTotal } from './utils/totalMath';
 import { ShareModal } from './components/modals/ShareModal';
 import { StatsModal } from './components/modals/StatsModal';
@@ -61,7 +62,12 @@ function App() {
     addDice, removeDice, updateDice, toggleHold, toggleHoldAll,
     clearAllDice, rollDice, clearHistory, restoreHistory, toast, showToast, insertDiceAt, restoreDice, gameNameRef
   } = useDiceState();
-  const { offer: undoOffer, offerUndo, runUndo } = useUndo();
+  const { offer: undoOffer, offerUndo, runUndo: takeBack, dismiss: dismissUndo, pause: pauseUndo, resume: resumeUndo, paused: undoPaused } = useUndo();
+  // Undo says what came back ("d20 is back"), as the standard asks
+  const runUndo = () => {
+    const back = takeBack();
+    if (back) showToast(back);
+  };
 
   // Storage full: a save was refused, so say so and offer a backup
   const [storageFull, setStorageFull] = useState(false);
@@ -258,7 +264,7 @@ function App() {
         const mine = autosaved ? sanitizeDiceList(autosaved.config) : [];
         setDiceList(shared);
         if (mine.length > 0 && diceSignature(mine) !== diceSignature(shared)) {
-          offerUndo('Opened shared dice', () => restoreDice(mine));
+          offerUndo('Opened shared dice', () => restoreDice(mine), { big: true });
         }
         return;
       }
@@ -284,7 +290,7 @@ function App() {
           const last = autosaved ? sanitizeDiceList(autosaved.config) : [];
           setDiceList(parsed);
           if (last.length > 0 && diceSignature(last) !== diceSignature(parsed)) {
-            offerUndo('Opened your default dice', () => restoreDice(last));
+            offerUndo('Opened your default dice', () => restoreDice(last), { big: true });
           }
           return;
         }
@@ -431,7 +437,7 @@ function App() {
     }
     // Say which set just loaded; Undo puts back the dice that were out
     const changed = before.length > 0 && diceSignature(before) !== diceSignature(loaded);
-    if (changed) offerUndo(setName ? `Loaded ${setName}` : 'Loaded dice', () => restoreDice(before));
+    if (changed) offerUndo(setName ? `Loaded ${setName}` : 'Loaded dice', () => restoreDice(before), { big: true });
     else if (setName) showToast(`Loaded ${setName}`);
     setModalOpen(null);
     setMenuOpen(false);
@@ -443,7 +449,7 @@ function App() {
     setModalOpen(which);
   };
 
-  // Set Default can be undone for five seconds: Undo puts back the startup dice it replaced (or none)
+  // Set Default can be undone for seven seconds: Undo puts back the startup dice it replaced (or none)
   const handleSetDefault = () => {
     const previous = readItem(SAVED.defaultSet);
     setMenuOpen(false);
@@ -452,7 +458,7 @@ function App() {
     offerUndo('Startup dice set', () => {
       if (previous === null) { try { localStorage.removeItem(SAVED.defaultSet); } catch { /* storage blocked */ } }
       else saveItem(SAVED.defaultSet, previous);
-    });
+    }, { back: previous === null ? 'No startup dice again' : 'Old startup dice are back' });
   };
 
   // Clear All needs no confirm: Undo brings every die back for five seconds
@@ -471,7 +477,7 @@ function App() {
     } catch (e) {
       console.error(e);
     }
-    offerUndo(`Cleared ${removed.length} ${removed.length === 1 ? 'die' : 'dice'}`, () => restoreDice(removed));
+    offerUndo(`Cleared ${removed.length} ${removed.length === 1 ? 'die' : 'dice'}`, () => restoreDice(removed), { big: removed.length > 1 });
   };
 
   const handleRemoveDie = (id: string) => {
@@ -509,7 +515,7 @@ function App() {
     const before = rollHistory;
     if (before.length === 0) return;
     clearHistory();
-    offerUndo(`Cleared ${before.length} ${before.length === 1 ? 'roll' : 'rolls'}`, () => restoreHistory(before));
+    offerUndo(`Cleared ${before.length} ${before.length === 1 ? 'roll' : 'rolls'}`, () => restoreHistory(before), { big: before.length > 1 });
   };
 
   // Clears one game's rolls and keeps the rest (owner, 2026-11-05)
@@ -519,7 +525,7 @@ function App() {
     const removed = before.length - kept.length;
     if (removed === 0) return;
     restoreHistory(kept);
-    offerUndo(`Cleared ${removed} ${label} ${removed === 1 ? 'roll' : 'rolls'}`, () => restoreHistory(before));
+    offerUndo(`Cleared ${removed} ${label} ${removed === 1 ? 'roll' : 'rolls'}`, () => restoreHistory(before), { big: removed > 1 });
   };
 
   const handleShare = () => {
@@ -1032,10 +1038,16 @@ function App() {
           <button className={styles.undoButton} onClick={() => setStorageFull(false)} aria-label="Close storage message" style={{ minWidth: 44 }}>✕</button>
         </div>
       ) : undoOffer ? (
-        <div className={`${styles.toast} ${styles.undoToast} ${rpgMode ? styles.toastAboveRpgBar : ''}`} role="status">
-          <span>{undoOffer.message}</span>
-          <button className={styles.undoButton} onClick={runUndo}>Undo</button>
-        </div>
+        <UndoBar
+          offer={undoOffer}
+          windowMs={UNDO_WINDOW_MS}
+          paused={undoPaused}
+          onUndo={runUndo}
+          onDismiss={dismissUndo}
+          onPause={pauseUndo}
+          onResume={resumeUndo}
+          className={`${styles.toast} ${rpgMode ? styles.toastAboveRpgBar : ''}`}
+        />
       ) : toast ? (
         // role="status" so a screen reader hears "Saved!" and the rest, as it does the Undo offer
         <div className={`${styles.toast} ${rpgMode ? styles.toastAboveRpgBar : ''}`} role="status">
