@@ -170,9 +170,17 @@ function App() {
   }, [tableView]);
   // 3D Dice: plain dice tumble across a tray before they land (owner, 2026-11-02)
   const [dice3D, setDice3D] = useState(() => readItem(SAVED.dice3D) === 'true');
+  // The tray shows while its dice tumble, then for a moment after they land
+  const [tray, setTray] = useState<null | { phase: 'rolling' | 'landed'; top: number; bottom: number }>(null);
+  const trayBusy = useRef(false);
+  const trayTimer = useRef<number | undefined>(undefined);
+  // Counts tray throws, so a throw that was cancelled never lands late
+  const trayRun = useRef(0);
   useEffect(() => {
     saveItem(SAVED.dice3D, String(dice3D));
-    if (!dice3D) {
+  }, [dice3D]);
+  const toggleDice3D = () => {
+    if (dice3D) {
       // Turned off mid-roll: that roll is dropped and the next one rolls flat
       trayRun.current += 1;
       trayBusy.current = false;
@@ -180,13 +188,9 @@ function App() {
       setTray(null);
       clearTray();
     }
-  }, [dice3D]);
-  // The tray shows while its dice tumble, then for a moment after they land
-  const [tray, setTray] = useState<null | { phase: 'rolling' | 'landed'; top: number; bottom: number }>(null);
-  const trayBusy = useRef(false);
-  const trayTimer = useRef<number | undefined>(undefined);
-  // Counts tray throws, so a throw that was cancelled never lands late
-  const trayRun = useRef(0);
+    setDice3D(!dice3D);
+    trackEvent('dice_3d_toggled', { enabled: !dice3D });
+  };
   const calmMotion = !!useReducedMotion();
 
   // With table view on, the header switch picks Table or Dice, and the pick
@@ -1194,7 +1198,7 @@ function App() {
         onToggleBuzz={() => setBuzzEnabled(on => !on)}
         dice3D={dice3D}
         dice3DCalm={calmMotion}
-        onToggleDice3D={() => { setDice3D(on => !on); trackEvent('dice_3d_toggled', { enabled: !dice3D }); }}
+        onToggleDice3D={toggleDice3D}
       />
 
       <SaveDialog 
