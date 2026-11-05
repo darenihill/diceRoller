@@ -1,4 +1,4 @@
-Next: new-version bar built on top of release 68 (draft pull request), waits for 68 to merge, 2026-11-04.
+Next: 3D dice tray, step 1 of 4 (switch, tray, test copy, pull request), 2026-11-05.
 
 # State
 

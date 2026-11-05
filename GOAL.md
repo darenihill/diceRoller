@@ -4,7 +4,14 @@ Customizable dice for board games and tabletop RPGs, live at
 customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
-
+- 3D dice tray (Daren 2026-11-02, Build: "3D dice tumble across a tray and
+  land, instead of flat dice shaking", way: "A 3D Dice switch in Customize").
+  Done when: with 3D Dice on, plain d4 to d20 dice tumble across a tray and
+  land, the dice and total then show the faces they landed on (holds,
+  advantage and the modifier work as today), dice with custom text, picture
+  or symbol faces stay flat, the 3D code loads only once the switch is on,
+  and with it off nothing changes (src/test/dice3d.test.tsx, plus a 390 px
+  browser check).
 - ~~Done 2026-11-03~~ Lift and tag lock (Daren 2026-11-03: "For lock I like
   the lift and held tag"). Done when: a held die lifts with a deeper shadow
   and a gold HELD tag drops onto its top edge; a die loaded already held shows
