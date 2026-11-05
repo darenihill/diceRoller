@@ -30,3 +30,6 @@ dist-ssr
 /.claude/
 /agent-system/
 # END sync-agents untrackAgentFiles
+
+# dice-box files for the 3D tray, copied in by vite.config.ts
+/public/assets/

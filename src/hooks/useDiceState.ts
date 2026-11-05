@@ -211,8 +211,10 @@ export const useDiceState = () => {
   // The roll that is tumbling now: its timer and the step that lands it
   const tumbleRef = useRef<{ timer: ReturnType<typeof setTimeout>; land: () => void } | null>(null);
 
-  /** Rolls the dice; returns 'landed' when the tap only landed a tumbling roll. */
-  const rollDice = useCallback((onComplete?: (summary: RollSummary) => void, onlyId?: string, typed?: TypedRollSetup): 'rolled' | 'landed' | 'none' => {
+  /** Rolls the dice; returns 'landed' when the tap only landed a tumbling roll.
+   *  `landed` holds what the 3D tray's dice came to rest on: those dice take
+   *  that value and the roll lands at once, since the tray already tumbled it. */
+  const rollDice = useCallback((onComplete?: (summary: RollSummary) => void, onlyId?: string, typed?: TypedRollSetup, landed?: Record<string, number>): 'rolled' | 'landed' | 'none' => {
     // A typed roll brings its own dice, modifier and advantage, so it rolls
     // what was typed now rather than waiting a render for the state to catch up
     const list = typed?.dice ?? diceList;
@@ -220,6 +222,8 @@ export const useDiceState = () => {
     const advantageMode = typed ? typed.advantage : rollAdvantage;
     // With no dice there is nothing to roll; a modifier alone used to log a phantom total
     if (list.length === 0) return 'none';
+    // A die removed while 3D dice tumbled has nothing left to roll
+    if (onlyId !== undefined && !list.some(d => d.id === onlyId)) return 'none';
     // A second tap during the tumble lands the dice at once. The result was
     // picked when the roll started, so it stays the same and History gets one entry
     if (tumbleRef.current) {
@@ -253,7 +257,7 @@ export const useDiceState = () => {
         };
       }
 
-      let val = randomBelow(d.faces) + 1;
+      let val = landed?.[d.id] ?? randomBelow(d.faces) + 1;
       let idx = 0;
       if (d.customFaces.length > 0) {
         idx = randomBelow(d.customFaces.length);
@@ -415,6 +419,10 @@ export const useDiceState = () => {
         natural20Ids
       });
     };
+    if (landed) {
+      land();
+      return 'rolled';
+    }
     tumbleRef.current = { timer: setTimeout(land, ROLL_DURATION_MS), land };
     return 'rolled';
   }, [diceList, modifier, rpgMode, rollAdvantage, targetHighlight, showToast]);

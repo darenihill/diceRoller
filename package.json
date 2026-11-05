@@ -17,6 +17,7 @@
     "prepare": "git config core.hooksPath .githooks || true"
   },
   "dependencies": {
+    "@3d-dice/dice-box": "1.1.4",
     "canvas-confetti": "1.9.4",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.14.0",

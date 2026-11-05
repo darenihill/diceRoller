@@ -13,8 +13,10 @@ import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages, parseFaceContent, faceScores } from './utils/diceUtils';
 import { DieActionStrip } from './components/DieActionStrip';
-import { playRollSequence, playLandNow, scheduleLandingBuzz } from './utils/soundEffects';
-import { BUZZ_KEY, BUZZ_SHOWN_KEY, canBuzz, isBuzzLink } from './utils/buzz';
+import { playRollSequence, playLandNow, scheduleLandingBuzz, playRattleSound, playThudSound } from './utils/soundEffects';
+import { BUZZ_KEY, BUZZ_SHOWN_KEY, buzzLanding, canBuzz, isBuzzLink } from './utils/buzz';
+import { canRoll3D, clearTray, rollInTray, type TrayResults } from './utils/dice3d';
+import { useReducedMotion } from 'framer-motion';
 import { celebrateNatural20 } from './utils/confetti';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { COMPACT_DIE_SIZE } from './utils/constants';
@@ -50,6 +52,10 @@ import { buildBackup, restoreBackup } from './utils/backup';
 
 /** The themes the app ships; anything else in storage falls back to dark. */
 const THEMES = ['theme-dark', 'theme-light', 'theme-felt', 'theme-midnight'];
+/** The 3D tray's element, and how long its dice stay after they land */
+const TRAY_ID = 'dice-tray-3d';
+const TRAY_LINGER_MS = 1600;
+const TRAY_GIVE_UP_MS = 15000;
 
 function App() {
   // A phone on the game table stays awake between turns
@@ -162,6 +168,31 @@ function App() {
   useEffect(() => {
     saveItem(SAVED.tableView, String(tableView));
   }, [tableView]);
+  // 3D Dice: plain dice tumble across a tray before they land (owner, 2026-11-02)
+  const [dice3D, setDice3D] = useState(() => readItem(SAVED.dice3D) === 'true');
+  // The tray shows while its dice tumble, then for a moment after they land
+  const [tray, setTray] = useState<null | { phase: 'rolling' | 'landed'; top: number; bottom: number }>(null);
+  const trayBusy = useRef(false);
+  const trayTimer = useRef<number | undefined>(undefined);
+  // Counts tray throws, so a throw that was cancelled never lands late
+  const trayRun = useRef(0);
+  useEffect(() => {
+    saveItem(SAVED.dice3D, String(dice3D));
+  }, [dice3D]);
+  const toggleDice3D = () => {
+    if (dice3D) {
+      // Turned off mid-roll: that roll is dropped and the next one rolls flat
+      trayRun.current += 1;
+      trayBusy.current = false;
+      window.clearTimeout(trayTimer.current);
+      setTray(null);
+      clearTray();
+    }
+    setDice3D(!dice3D);
+    trackEvent('dice_3d_toggled', { enabled: !dice3D });
+  };
+  const calmMotion = !!useReducedMotion();
+
   // With table view on, the header switch picks Table or Dice, and the pick
   // stays through new rolls until it's switched back (owner, 2026-11-05)
   const [onDice, setOnDice] = useState(false);
@@ -649,9 +680,68 @@ function App() {
     reader.readAsText(file);
   };
 
+  // The latest roll step, for a 3D roll that lands after the dice have changed
+  const rollDiceRef = useRef(rollDice);
+  useEffect(() => { rollDiceRef.current = rollDice; });
+
+  /** With 3D Dice on, the plain dice about to roll tumble in the tray first,
+   *  then `go` rolls with what they landed on. False when the roll stays flat. */
+  const throwInTray = (rolling: DiceData[], go: (landed?: TrayResults) => void): boolean => {
+    if (!dice3D || calmMotion) return false;
+    const plain = rolling.filter(canRoll3D);
+    if (plain.length === 0) return false;
+    // A tap while they tumble waits for them to land
+    if (trayBusy.current) return true;
+    trayBusy.current = true;
+    const run = ++trayRun.current;
+    window.clearTimeout(trayTimer.current);
+    // The tray fills the space between the top line and the bottom bar
+    const top = document.querySelector('header')?.getBoundingClientRect().bottom ?? 0;
+    // and stops above the bottom bar's chips too (advantage, modifier), so no die lands under them
+    const bar = document.querySelector('[data-action-bar]');
+    const barTop = bar
+      ? Math.min(...[bar, ...bar.querySelectorAll('*')].map(el => el.getBoundingClientRect()).filter(r => r.height > 0).map(r => r.top))
+      : window.innerHeight;
+    setTray({ phase: 'rolling', top, bottom: Math.max(0, window.innerHeight - barTop) });
+    if (soundEnabled) playRattleSound();
+    // Next turn, once the tray is on screen with its size, the dice are thrown
+    window.setTimeout(() => {
+      // A tray that never settles (lost graphics, a tab put to sleep) gives up and rolls flat
+      const giveUp = new Promise<never>((_, reject) => { window.setTimeout(() => reject(new Error('tray timed out')), TRAY_GIVE_UP_MS); });
+      Promise.race([rollInTray(`#${TRAY_ID}`, plain), giveUp])
+        .then(landed => {
+          if (run !== trayRun.current) return;
+          go(landed);
+          if (soundEnabled) playThudSound();
+          else if (buzzEnabled) buzzLanding();
+          setTray(t => t && { ...t, phase: 'landed' });
+          trayTimer.current = window.setTimeout(() => { setTray(null); clearTray(); }, TRAY_LINGER_MS);
+        })
+        .catch(() => {
+          if (run !== trayRun.current) return;
+          setTray(null);
+          clearTray();
+          showToast("3D dice couldn't start on this device, so these rolled flat.");
+          go();
+          rollFeedback();
+        })
+        .finally(() => { if (run === trayRun.current) trayBusy.current = false; });
+    }, 0);
+    return true;
+  };
+  // Tapping the tray after the dice land puts the flat dice back at once
+  const closeTray = () => {
+    if (tray?.phase !== 'landed') return;
+    window.clearTimeout(trayTimer.current);
+    setTray(null);
+    clearTray();
+  };
+
   // A typed roll swaps in its own dice, modifier and advantage and rolls them;
   // Undo puts back the dice and settings that were out before
   const handleTypedRoll = (roll: TypedRoll) => {
+    // While 3D dice tumble, a typed roll waits like a second tap on Roll
+    if (trayBusy.current) return;
     const before = { dice: diceList, modifier, advantage: rollAdvantage };
     const dice = roll.groups.flatMap(g => Array.from({ length: g.count }, () => ({
       id: generateId(),
@@ -667,19 +757,25 @@ function App() {
     setRollAdvantage(roll.advantage);
     // A typed roll puts out new dice, so Table view shows big for these
     setTableRolledIds(dice.map(d => d.id).join());
-    rollDice(({ total, diceCount, natural20Ids }) => {
-      setHasRolledThisSession(true);
-      setRolledSignature(rollSignature(latestDiceRef.current));
-      void celebrateNatural20(natural20Ids);
-      trackEvent('roll_dice', { diceCount, sum: total, modifier: roll.modifier, rpgMode, rollAdvantage: roll.advantage, typed: true });
-    }, undefined, { text: roll.text, dice, modifier: roll.modifier, advantage: roll.advantage });
-    rollFeedback();
-    if (before.dice.length > 0) {
-      offerUndo(`Rolled ${roll.text}`, () => {
-        restoreDice(before.dice);
-        setModifier(before.modifier);
-        setRollAdvantage(before.advantage);
-      });
+    // Undo is offered once the typed dice are out, so with 3D on it waits for them to land
+    const go = (landed?: TrayResults) => {
+      rollDiceRef.current(({ total, diceCount, natural20Ids }) => {
+        setHasRolledThisSession(true);
+        setRolledSignature(rollSignature(latestDiceRef.current));
+        void celebrateNatural20(natural20Ids);
+        trackEvent('roll_dice', { diceCount, sum: total, modifier: roll.modifier, rpgMode, rollAdvantage: roll.advantage, typed: true, ...(landed ? { dice3D: true } : {}) });
+      }, undefined, { text: roll.text, dice, modifier: roll.modifier, advantage: roll.advantage }, landed);
+      if (before.dice.length > 0) {
+        offerUndo(`Rolled ${roll.text}`, () => {
+          restoreDice(before.dice);
+          setModifier(before.modifier);
+          setRollAdvantage(before.advantage);
+        });
+      }
+    };
+    if (!throwInTray(dice, go)) {
+      go();
+      rollFeedback();
     }
   };
 
@@ -715,12 +811,16 @@ function App() {
 
   const handleRollOne = (id: string) => {
     // A held die stays put until it is released (owner, 2026-11-05)
-    if (diceList.find(d => d.id === id)?.held) return;
-    rollDice(({ natural20Ids }) => {
+    const die = diceList.find(d => d.id === id);
+    if (!die || die.held) return;
+    const go = (landed?: TrayResults) => rollDiceRef.current(({ natural20Ids }) => {
       void celebrateNatural20(natural20Ids);
       trackEvent('roll_one_die');
-    }, id);
-    rollFeedback();
+    }, id, undefined, landed);
+    if (!throwInTray([die], go)) {
+      go();
+      rollFeedback();
+    }
   };
 
   const handleAddDice = (template?: Partial<DiceData>) => {
@@ -765,15 +865,21 @@ function App() {
       return;
     }
     setTableRolledIds(diceList.map(d => d.id).join());
-    const outcome = rollDice(({ total, diceCount, natural20Ids }) => {
+    // Rolls with the dice out when the tray lands, not the ones out at the tap,
+    // so a die added or removed while they tumble is kept that way
+    const go = (landed?: TrayResults) => rollDiceRef.current(({ total, diceCount, natural20Ids }) => {
       // Fires when the roll resolves, so the actual total reaches analytics
       setHasRolledThisSession(true);
       setRolledSignature(rollSignature(latestDiceRef.current));
       void celebrateNatural20(natural20Ids);
       if (diceCount > 0) {
-        trackEvent('roll_dice', { diceCount, sum: total, modifier, rpgMode, rollAdvantage });
+        trackEvent('roll_dice', { diceCount, sum: total, modifier, rpgMode, rollAdvantage, ...(landed ? { dice3D: true } : {}) });
       }
-    });
+    }, undefined, undefined, landed);
+    // 3D Dice: the unheld plain dice tumble in the tray, then the roll lands
+    // with their faces (a tap during a flat tumble still lands it at once)
+    if (!isRolling && throwInTray(diceList.filter(d => !d.held), go)) return;
+    const outcome = go();
 
     // A tap during the tumble only lands the dice: the thud plays now, the rattle doesn't start again
     if (outcome === 'landed') {
@@ -915,6 +1021,19 @@ function App() {
           onShowDice={() => setOnDice(true)}
         />
       )}
+
+      {/* The 3D tray: always in the page, since the 3D library keeps drawing
+          into the first one it was given; shown only for a roll */}
+      <div
+        id={TRAY_ID}
+        className={styles.tray3d}
+        data-phase={tray?.phase}
+        hidden={!tray}
+        style={tray ? { top: tray.top, bottom: tray.bottom } : undefined}
+        onClick={closeTray}
+        aria-hidden="true"
+        data-testid="dice-tray"
+      />
 
       <div ref={containerRef} className={`${styles.diceContainer} ${showTable ? styles.diceHidden : ''}`} style={diceStyles}>
         {diceList.map((dice) => (
@@ -1077,6 +1196,9 @@ function App() {
         buzzShown={buzzShown}
         buzzEnabled={buzzEnabled}
         onToggleBuzz={() => setBuzzEnabled(on => !on)}
+        dice3D={dice3D}
+        dice3DCalm={calmMotion}
+        onToggleDice3D={toggleDice3D}
       />
 
       <SaveDialog 

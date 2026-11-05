@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from '../Modal';
-import { Volume2, VolumeX, BarChart2, Smartphone, Minus, Plus, Vibrate, VibrateOff, CircleDot, Circle } from 'lucide-react';
+import { Volume2, VolumeX, BarChart2, Smartphone, Minus, Plus, Vibrate, VibrateOff, CircleDot, Circle, Box, Square } from 'lucide-react';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
 import { targetNote } from '../../utils/targets';
@@ -31,6 +31,11 @@ interface CustomizeModalProps {
   buzzShown?: boolean;
   buzzEnabled?: boolean;
   onToggleBuzz?: () => void;
+  /** 3D Dice: plain dice tumble across a tray (owner, 2026-11-02) */
+  dice3D?: boolean;
+  /** The device asks for less motion, so dice stay flat even with 3D on */
+  dice3DCalm?: boolean;
+  onToggleDice3D?: () => void;
 }
 
 export const CustomizeModal: React.FC<CustomizeModalProps> = ({
@@ -53,6 +58,9 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
   buzzShown = false,
   buzzEnabled = false,
   onToggleBuzz,
+  dice3D = false,
+  dice3DCalm = false,
+  onToggleDice3D,
 }) => {
   const note = targetNote(targetHighlight);
   return (
@@ -172,6 +180,29 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
               <Smartphone size={20} />
             </button>
           </div>
+
+          {/* 3D Dice: off until turned on; its code loads only once it is used (owner, 2026-11-02) */}
+          {onToggleDice3D && (
+            <div className={modalStyles.toggleRow}>
+              <div className={modalStyles.toggleLabelCol}>
+                <span className={modalStyles.toggleTitle}>3D Dice</span>
+                <span className={modalStyles.toggleDesc}>
+                  {dice3DCalm && dice3D
+                    ? 'Your device asks for less motion, so dice roll flat for now'
+                    : 'Plain dice tumble across a tray and land. Dice with your own faces stay flat'}
+                </span>
+              </div>
+              <button
+                className="md-icon-button"
+                onClick={onToggleDice3D}
+                title={dice3D ? "Turn off 3D dice" : "Turn on 3D dice"}
+                aria-label="3D dice"
+                aria-pressed={dice3D}
+              >
+                {dice3D ? <Box size={20} /> : <Square size={20} />}
+              </button>
+            </div>
+          )}
 
           {/* Bright rings: off until turned on (owner, 2026-11-02) */}
           {onToggleBrightRings && (
