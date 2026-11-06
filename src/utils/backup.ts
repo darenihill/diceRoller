@@ -77,7 +77,7 @@ export function restoreBackup(input: unknown): RestoreResult {
   // Added in 1.1: older backups leave these settings as they are
   if (typeof data.rpgMode === 'boolean') keep(SAVED.rpgMode, String(data.rpgMode));
   if (typeof data.shakeToRoll === 'boolean') keep(SAVED.shakeToRoll, String(data.shakeToRoll));
-  if (typeof data.targetHighlight === 'string') keep(SAVED.targetHighlight, data.targetHighlight);
+  if (typeof data.targetHighlight === 'string') keep(SAVED.targetHighlight, data.targetHighlight.slice(0, 200));
   if (typeof data.telemetryEnabled === 'boolean') keep(SAVED.telemetry, String(data.telemetryEnabled));
   if (isObject(data.usageStats)) keep(SAVED.usageStats, JSON.stringify(data.usageStats));
   // Older backups have no buzz settings; they keep this phone's own
