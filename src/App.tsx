@@ -231,9 +231,11 @@ function App() {
     saveItem(SAVED.brightRings, String(brightRings));
   }, [brightRings]);
 
+  const rpgModeRef = useRef(rpgMode);
   // Expose RPG mode to CSS so mobile layout can reserve room for the taller FAB stack
   useEffect(() => {
     document.body.classList.toggle('rpg-mode', rpgMode);
+    rpgModeRef.current = rpgMode;
   }, [rpgMode]);
 
   // Each tap in the die's button strip restarts the timer below, so it doesn't close mid-use
@@ -302,14 +304,15 @@ function App() {
       const mine = autosaved ? sanitizeDiceList(autosaved.config) : [];
       setDiceList(landing.dice);
       // Match the page either way, so a D&D visit doesn't leave RPG mode on for Catan
-      const switched = landing.rpg !== rpgMode;
-      if (switched) toggleRpgMode();
+      const before = rpgMode;
+      if (landing.rpg !== before) toggleRpgMode();
       // Like a share link, the page's dice replace yours; Undo brings them, and
       // RPG Mode as it was, back (app standards 1 and 2, review 2026-11-06)
       if (mine.length > 0 && diceSignature(mine) !== diceSignature(landing.dice)) {
         offerUndo(`Opened ${landing.name ?? 'these dice'}`, () => {
           restoreDice(mine);
-          if (switched) toggleRpgMode();
+          // Back to the mode from before the page, even if it was changed since
+          if (rpgModeRef.current !== before) toggleRpgMode();
         }, { big: true });
       }
       return;
