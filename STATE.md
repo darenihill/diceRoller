@@ -1,4 +1,4 @@
-Next: new-version bar built on top of release 68 (draft pull request), waits for 68 to merge, 2026-11-04.
+Next: deep review (stories walk, STRIDE security, top apps) started, 2026-11-06.
 
 # State
 
