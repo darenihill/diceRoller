@@ -1,6 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { readFileSync } from 'node:fs';
 import { Dice } from '../components/Dice';
 import type { DiceData } from '../types';
 
@@ -59,5 +60,10 @@ describe('Held die: lift and tag', () => {
     expect(screen.getAllByRole('button', { name: /^Hold / })).toHaveLength(1);
     rerender(<Dice dice={{ ...base, held: true }} {...props} />);
     expect(screen.getAllByRole('button', { name: /^Hold / })).toHaveLength(1);
+  });
+
+  it('a mouse can press the lock once it shows on hover', () => {
+    const css = readFileSync('src/components/Dice.module.css', 'utf8');
+    expect(css).toMatch(/\.dice:hover \.unlockIcon,\s*\.dice:focus-within \.unlockIcon \{[^}]*pointer-events: auto/);
   });
 });

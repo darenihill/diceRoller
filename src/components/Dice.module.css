@@ -165,6 +165,8 @@
 .dice:hover .unlockIcon,
 .dice:focus-within .unlockIcon {
   opacity: 1;
+  /* It is a real button now, so a mouse can press it (owner, 2026-11-06) */
+  pointer-events: auto;
 }
 
 .settingsBtn {
