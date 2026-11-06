@@ -141,6 +141,13 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     setTextDraft(null);
   };
 
+  /** A face by its words, or its icon, so the note says which face moved */
+  const faceName = (face: string, index: number) => {
+    const parts = faceParts(parseFaceContent(face).content);
+    const words = parts.text || parts.icon;
+    return words ? `"${words}"` : `Face ${index + 1}`;
+  };
+
   const moveFace = (fromIndex: number, toIndex: number) => {
     const count = dice.customFaces.length;
     if (toIndex < 0 || toIndex >= count || toIndex === fromIndex) return;
@@ -152,7 +159,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     // A run of moves undoes in one tap, back to the order before the first
     const chained = moveNote && moveNote.after === dice.customFaces;
     setMoveNote({
-      text: `Face ${fromIndex + 1} moved to place ${toIndex + 1} of ${count}.`,
+      text: `${faceName(dice.customFaces[fromIndex], fromIndex)} moved to place ${toIndex + 1} of ${count}.`,
       before: chained ? moveNote.before : dice.customFaces,
       after: newFaces,
       from: chained ? order.map(i => moveNote.from[i]) : order,

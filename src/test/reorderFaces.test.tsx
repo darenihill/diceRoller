@@ -58,7 +58,7 @@ describe('reordering custom faces', () => {
     expect(latest.held).toBe(true);
     expect(document.activeElement).toBe(screen.getByRole('button', { name: /^Move face 2,/ }));
     expect(faceNames()[1]).toBe('Face 2: YES');
-    expect(screen.getByRole('status')).toHaveTextContent('Face 1 moved to place 2 of 3.');
+    expect(screen.getByRole('status')).toHaveTextContent('"YES" moved to place 2 of 3.');
     // the ends stop the face
     fireEvent.keyDown(screen.getByRole('button', { name: /^Move face 1,/ }), { key: 'ArrowUp' });
     expect(latest.customFaces).toEqual(['NO', 'YES:bg:#ff0000', 'MAYBE']);
