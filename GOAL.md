@@ -5,7 +5,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- Reorder custom faces (Daren 2026-11-05, Build: "Drag a die's custom faces
+- ~~Done 2026-11-06~~ Reorder custom faces (Daren 2026-11-05, Build: "Drag a die's custom faces
   into a new order"): each face in Custom faces gets a grip; dragging it
   moves the face with its color, picture and number, the arrow keys move it
   too, and Undo puts the old order back. Rolls don't change, only the list
