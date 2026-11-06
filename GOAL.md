@@ -5,6 +5,14 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- Reorder custom faces (Daren 2026-11-05, Build: "Drag a die's custom faces
+  into a new order"): each face in Custom faces gets a grip; dragging it
+  moves the face with its color, picture and number, the arrow keys move it
+  too, and Undo puts the old order back. Rolls don't change, only the list
+  order, which is also the order a shared die shows. Done when: a drag or an
+  arrow key moves a face, the face showing on the die stays the same, and
+  Undo restores the order (src/test/reorderFaces.test.tsx).
+
 - ~~Done 2026-11-03~~ Lift and tag lock (Daren 2026-11-03: "For lock I like
   the lift and held tag"). Done when: a held die lifts with a deeper shadow
   and a gold HELD tag drops onto its top edge; a die loaded already held shows
