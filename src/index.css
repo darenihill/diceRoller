@@ -156,7 +156,6 @@ button {
    buttons gave no sign they'd been touched. */
 button:not(:disabled):active {
   opacity: 0.72;
-  transition: opacity 0s;
 }
 
 /* Taps show no ring; the keyboard always shows where it is */

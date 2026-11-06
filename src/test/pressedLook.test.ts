@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { describe, it, expect } from 'vitest';
 
 // Feedback polish, 2026-11-06 (reviews/2026-11-06-ui-feedback.md)
-const cssFiles = ['src/index.css', 'src/App.module.css', ...readdirSync('src/components').filter(f => f.endsWith('.module.css')).map(f => `src/components/${f}`)];
+const cssFiles = ['src/index.css', 'src/App.module.css', ...['src/components', 'src/components/modals'].flatMap(d => readdirSync(d).filter(f => f.endsWith('.module.css')).map(f => `${d}/${f}`))];
 
 describe('every tap answers at once', () => {
   it('a pressed button dims until the finger lifts', () => {
