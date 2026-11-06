@@ -53,13 +53,19 @@ export function splitShareHash(hash: string): { data: string; name: string | nul
   return { data: body.slice(0, at), name };
 }
 
+/** Longest unpacked share link read, in characters */
+export const MAX_SHARE_JSON = 1_000_000;
+
 // A share link is a hand-craftable URL, so its dice are treated as untrusted.
 // Returns no dice when the link cannot be read.
 export function readShareLink(hash: string): { dice: DiceData[]; name: string | null } {
   const { data, name } = splitShareHash(hash);
   try {
     const json = LZString.decompressFromEncodedURIComponent(data);
-    return { dice: json ? sanitizeDiceList(JSON.parse(json)) : [], name };
+    // A tiny link can unpack to megabytes and freeze the page; the biggest
+    // real set is about half this (review 2026-11-06)
+    if (!json || json.length > MAX_SHARE_JSON) return { dice: [], name };
+    return { dice: sanitizeDiceList(JSON.parse(json)), name };
   } catch (e) {
     console.error("Failed to load shared dice set from URL", e);
     return { dice: [], name };
