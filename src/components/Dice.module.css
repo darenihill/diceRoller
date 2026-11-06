@@ -158,13 +158,15 @@
   right: calc(var(--dice-size) * -0.04);
   background-color: var(--md-sys-color-surface-variant);
   color: var(--md-sys-color-on-surface);
-  opacity: 0;
+  /* !important: the flight back from the HELD tag leaves an opacity on the
+     button itself, which kept the lock showing (owner, 2026-11-06) */
+  opacity: 0 !important;
   transition: opacity 0.2s;
 }
 
 .dice:hover .unlockIcon,
 .dice:focus-within .unlockIcon {
-  opacity: 1;
+  opacity: 1 !important;
   /* It is a real button now, so a mouse can press it (owner, 2026-11-06) */
   pointer-events: auto;
 }
@@ -232,6 +234,9 @@
 }
 
 @media (hover: none) {
+  .dice.revealed .unlockIcon {
+    opacity: 1 !important;
+  }
   .dice.revealed .unlockIcon,
   .dice.revealed .settingsBtn,
   .dice.revealed .removeBtn,

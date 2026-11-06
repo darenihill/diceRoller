@@ -313,6 +313,8 @@ const DiceComponent: React.FC<DiceProps> = ({
         key={dice.held ? 'held' : 'free'}
         type="button"
         layoutId={calm ? undefined : `hold-${dice.id}`}
+        // No fade between the two: the lock's own show-on-hover rule decides when it shows
+        layoutCrossfade={false}
         className={dice.held ? `${styles.heldTag} ${styles.holdBtn}` : `${styles.actionBtn} ${styles.unlockIcon} ${styles.holdBtn}`}
         data-testid={dice.held ? 'held-tag' : undefined}
         aria-pressed={!!dice.held}
