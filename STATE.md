@@ -1,4 +1,4 @@
-Next: deep review done 2026-11-06; its fixes wait on Daren's Land tap.
+Next: stories, remix and plain-words review (2026-11-06), on top of pull request 78.
 
 # State
 
