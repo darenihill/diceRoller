@@ -5,6 +5,10 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-06~~ Feedback polish (reviews/2026-11-06-ui-feedback.md).
+  Done when: every button dims while pressed on a phone, iPhone included, and
+  a tapped button no longer stays lit from hover (src/test/pressedLook.test.ts).
+
 - ~~Done 2026-11-03~~ Lift and tag lock (Daren 2026-11-03: "For lock I like
   the lift and held tag"). Done when: a held die lifts with a deeper shadow
   and a gold HELD tag drops onto its top edge; a die loaded already held shows

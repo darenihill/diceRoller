@@ -82,8 +82,10 @@
   justify-content: center;
 }
 
-.stepperBtn:hover {
-  background-color: var(--md-sys-color-surface-hover);
+@media (hover: hover) {
+  .stepperBtn:hover {
+    background-color: var(--md-sys-color-surface-hover);
+  }
 }
 
 .stepperInput {
@@ -273,8 +275,10 @@
   cursor: pointer;
 }
 
-.iconBtn:hover {
-  background-color: var(--md-sys-color-surface-hover);
+@media (hover: hover) {
+  .iconBtn:hover {
+    background-color: var(--md-sys-color-surface-hover);
+  }
 }
 
 .iconBtnMore {
@@ -464,8 +468,10 @@
   }
 }
 
-.panelBtn:hover {
-  background-color: var(--md-sys-color-surface-hover);
+@media (hover: hover) {
+  .panelBtn:hover {
+    background-color: var(--md-sys-color-surface-hover);
+  }
 }
 
 .panelBtnOpen {
