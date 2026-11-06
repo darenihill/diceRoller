@@ -60,7 +60,7 @@ export function parseRollNotation(input: string): ParseResult {
       const count = dice[1] === '' ? 1 : parseInt(dice[1], 10);
       const faces = parseInt(dice[2], 10);
       if (count < 1) return { ok: false, note: 'Roll at least one die.' };
-      if (faces < 2 || faces > MAX_FACES) return { ok: false, note: `Dice can have 2 to ${MAX_FACES} sides.` };
+      if (faces < 2 || faces > MAX_FACES) return { ok: false, note: `Dice can have 2 to ${MAX_FACES} faces.` };
       const same = groups.find(g => g.faces === faces);
       if (same) same.count += count;
       else groups.push({ count, faces });
@@ -74,24 +74,29 @@ export function parseRollNotation(input: string): ParseResult {
   if (groups.length === 0) return { ok: false, note: `Add some dice, like 2d6+3.` };
   if (Math.abs(modifier) > MAX_MODIFIER) return { ok: false, note: `Keep the plus or minus under ${MAX_MODIFIER + 1}.` };
 
+  let doubled = false;
   if (advantage !== 'normal') {
     // Advantage keeps the best of one kind of die, so "d20 adv" means two d20
     if (groups.length > 1) {
       return { ok: false, note: 'Advantage works with one kind of die, like d20 adv.' };
     }
-    if (groups[0].count === 1) groups[0].count = 2;
+    if (groups[0].count === 1) {
+      groups[0].count = 2;
+      doubled = true;
+    }
   }
 
   const total = groups.reduce((n, g) => n + g.count, 0);
-  if (total > MAX_DICE_LIMIT) return { ok: false, note: `That's ${total} dice; the most is ${MAX_DICE_LIMIT}.` };
+  if (total > MAX_DICE_LIMIT) return { ok: false, note: `That's ${total} dice. The most is ${MAX_DICE_LIMIT}.` };
 
-  return { ok: true, roll: { groups, modifier, advantage, text: formatRoll(groups, modifier, advantage) } };
+  return { ok: true, roll: { groups, modifier, advantage, text: formatRoll(groups, modifier, advantage, doubled) } };
 }
 
-function formatRoll(groups: DiceGroup[], modifier: number, advantage: RollAdvantageMode): string {
-  // "d20 adv" reads better than "2d20 adv", since the second die is implied
+function formatRoll(groups: DiceGroup[], modifier: number, advantage: RollAdvantageMode, doubled: boolean): string {
+  // "d20 adv" reads better than "2d20 adv" when the second die was added for
+  // advantage; a typed "2d6 adv" stays 2d6, so the roll reads back as typed
   const dice = groups
-    .map(g => (advantage !== 'normal' && g.count === 2 ? `d${g.faces}` : `${g.count}d${g.faces}`))
+    .map(g => (doubled ? `d${g.faces}` : `${g.count}d${g.faces}`))
     .join('+');
   const mod = modifier > 0 ? `+${modifier}` : modifier < 0 ? `-${Math.abs(modifier)}` : '';
   const adv = advantage === 'advantage' ? ' adv' : advantage === 'disadvantage' ? ' dis' : '';

@@ -16,10 +16,16 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   replaces, and Undo puts back today's history, dice and settings.
 - Same-name typed roll asks (S6). Done when: saving a typed roll under a name
   already used asks Keep both / Replace it, like Save Game.
-- Messages show over Undo (S8). Done when: "Saved!", "Share link copied" and
+- Messages show over Undo (S8). Done when: "Saved", "Link copied" and
   "Saved Attack" show while an Undo bar is up, and the Undo stays reachable.
 - Loading text on a slow link (S14). Done when: the page shows "Loading
   dice…" before the app script arrives.
+- ~~Done 2026-11-06~~ Plain-words fixes and a typed-roll read-back fix from
+  the stories, remix and words review (reviews/2026-11-06-copy.md): backup and
+  share messages drop "successfully", "parse" and exclamation marks, two
+  landing-page lines point to Games instead of menu items that don't exist,
+  typed-roll notes say faces, and "2d6+3 adv" reads back as typed
+  (src/test/typeRoll.test.tsx). Word list in DESIGN.md section 12.
 - ~~Done 2026-11-06~~ Fixes from the 2026-11-06 review
   (reviews/2026-11-06-combined.md): Import Backup keeps the imported games, a
   file that isn't a backup is refused, search pages offer Undo, Add custom text

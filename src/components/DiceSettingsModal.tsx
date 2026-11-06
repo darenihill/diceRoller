@@ -327,7 +327,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
           
           {dice.customFaces.length > 0 && (
             <p className={styles.sublabel} style={{ margin: '0 0 6px' }}>
-              The number box sets what a face counts as in totals, e.g. a star as 6.
+              The number box sets what a face counts as in totals, like a star as 6.
             </p>
           )}
           {dice.customFaces.some(f => parseFaceContent(f).image) && (
@@ -336,7 +336,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
             </p>
           )}
           <div className={styles.facesGrid}>
-            {dice.customFaces.length === 0 && <span className={styles.emptyText}>No custom faces added</span>}
+            {dice.customFaces.length === 0 && <span className={styles.emptyText}>No custom faces yet</span>}
             {dice.customFaces.map((f, i) => {
               const parsed = parseFaceContent(f);
               const content = parsed.content;

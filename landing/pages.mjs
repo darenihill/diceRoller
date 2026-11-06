@@ -49,7 +49,7 @@ export const landingPages = [
   <li>The chance of at least one natural 20 nearly doubles, from 5% to 9.75%.</li>
 </ul>
 <h2>Modifiers and more dice</h2>
-<p>Set your modifier once and every total includes it. Need damage dice too? Use the + button to add a d6, d8 or any die you like, or open the D&amp;D set from the menu. Roll history shows your last rolls if anyone asks what you got.</p>
+<p>Set your modifier once and every total includes it. Need damage dice too? Use the + button to add a d6, d8 or any die you like, or load Dungeons &amp; Dragons from Games. Roll history shows your last rolls if anyone asks what you got.</p>
 `,
   },
   {
@@ -109,7 +109,7 @@ export const landingPages = [
   <li>Tap Share. A link to exactly those dice is copied, set name included.</li>
   <li>Paste it into Google Classroom, an email or a slide. Students open the same dice, named at the top, with no sign-in.</li>
 </ol>
-<p>Saved sets stay on that device under Load, ready for the next lesson. On a classroom computer, Set Default opens your set every time. Anonymous page statistics can be switched off under Customize.</p>
+<p>Saved sets stay on that device under Games, ready for the next lesson. On a classroom computer, Set Default opens your set every time. Anonymous page statistics can be switched off under Customize.</p>
 `,
   },
 ];

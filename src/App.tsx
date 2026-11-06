@@ -467,7 +467,7 @@ function App() {
     setLoadedSet({ name, signature: diceSignature(diceList) });
     // The save's name is the user's own text, so only the dice count goes to analytics
     trackEvent('preset_saved', { diceCount: diceList.length });
-    showToast(name === typed ? (mode === 'replace' ? `Replaced ${name}` : 'Saved!') : `Saved as ${name}`);
+    showToast(name === typed ? (mode === 'replace' ? `Replaced ${name}` : 'Saved') : `Saved as ${name}`);
     setSaveName('');
     setSavePromptOpen(false);
   };
@@ -592,7 +592,7 @@ function App() {
     const copyLink = () => {
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(url).then(() => {
-          showToast("Share link copied to clipboard!");
+          showToast("Link copied");
         }).catch(err => {
           console.error("Failed to copy link: ", err);
           setShareFallbackUrl(url);
@@ -628,10 +628,10 @@ function App() {
       // Revoking in the same tick can cancel the download in Safari and Firefox
       setTimeout(() => URL.revokeObjectURL(url), 0);
       trackEvent('backup_exported');
-      showToast('Exported backup successfully!');
+      showToast('Backup exported');
     } catch (e) {
       console.error(e);
-      showToast('Failed to export backup.');
+      showToast("Couldn't export the backup");
     }
   };
 
@@ -644,7 +644,7 @@ function App() {
       try {
         const result = restoreBackup(JSON.parse(event.target?.result as string));
         if (result === 'invalid') {
-          showToast('Invalid backup file structure.');
+          showToast("That file isn't a Dice Roller backup");
           return;
         }
         // Storage full: the storage message is already up, so no reload
@@ -652,18 +652,18 @@ function App() {
         // From here the backup is what's saved; this page must not save over it
         freezeSaves();
         if (result === 'pictures') {
-          showToast('Imported, but some pictures did not fit on this device. Reloading...');
+          showToast("Imported. Some pictures didn't fit on this device. Reloading…");
           setTimeout(() => window.location.reload(), 1500);
           return;
         }
         trackEvent('backup_imported');
-        showToast('Imported backup successfully! Reloading...');
+        showToast('Backup imported. Reloading…');
         setTimeout(() => {
           window.location.reload();
         }, 1000);
       } catch (err) {
         console.error(err);
-        showToast('Failed to parse backup file.');
+        showToast("Couldn't read that backup file");
       }
     };
     reader.readAsText(file);
@@ -844,7 +844,7 @@ function App() {
       trackEvent('shake_toggled', { enabled: true });
       showToast('Shake to roll is on. Shake your phone to roll.');
     } else if (permission === 'denied') {
-      showToast('Motion access was turned down, so shake to roll stays off.');
+      showToast('Motion access is blocked, so shake to roll stays off.');
     } else {
       showToast("This device can't sense shaking, so shake to roll stays off.");
     }
@@ -1138,7 +1138,7 @@ function App() {
           className={`${styles.toast} ${chipRow ? styles.toastAboveRpgBar : ''}`}
         />
       ) : toast ? (
-        // role="status" so a screen reader hears "Saved!" and the rest, as it does the Undo offer
+        // role="status" so a screen reader hears "Saved" and the rest, as it does the Undo offer
         <div className={`${styles.toast} ${chipRow ? styles.toastAboveRpgBar : ''}`} role="status">
           {toast}
         </div>

@@ -46,7 +46,7 @@ describe('Share', () => {
     await act(async () => {});
     expect(writeText).not.toHaveBeenCalled();
     expect(screen.queryByText('Share Link')).toBeNull();
-    expect(screen.queryByText(/copied to clipboard/)).toBeNull();
+    expect(screen.queryByText(/Link copied/)).toBeNull();
   });
 
   it('copies the link when there is no share sheet', async () => {
@@ -54,7 +54,7 @@ describe('Share', () => {
     Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
     Object.defineProperty(window, 'isSecureContext', { value: true, configurable: true });
     openShare();
-    await waitFor(() => expect(screen.getByText(/copied to clipboard/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/Link copied/)).toBeInTheDocument());
     expect(writeText.mock.calls[0][0]).toMatch(/#share=/);
   });
 
