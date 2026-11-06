@@ -55,6 +55,9 @@ const isObject = (v: unknown): v is Record<string, unknown> => !!v && typeof v =
 export function restoreBackup(input: unknown): RestoreResult {
   if (!isObject(input)) return 'invalid';
   const data = input;
+  // Any other JSON file (notes.json) is not a backup: it used to "import" and
+  // reset the dice size (review 2026-11-06). Every backup carries one of these.
+  if (data.version === undefined && !isObject(data.configs)) return 'invalid';
 
   // A backup that doesn't fit stops here: no reload, no false "Imported"
   let fits = true;

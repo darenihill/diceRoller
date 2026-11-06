@@ -1,4 +1,4 @@
-Next: deep review (stories walk, STRIDE security, top apps) started, 2026-11-06.
+Next: deep review done 2026-11-06; its fixes wait on Daren's Land tap.
 
 # State
 
@@ -10,3 +10,4 @@ Next: deep review (stories walk, STRIDE security, top apps) started, 2026-11-06.
 - 2026-10-22: goal check, jobs + HEART + working backwards (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-1). Goal stays.
 - 2026-10-23: goal check again after the seven builds (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-1). Goal stays.
 - 2026-10-24: big table view, a Table view switch in the menu (Dispatch-Item custom-dice-roller/ask-2026-10-24-build-owner-2026-ab85e3).
+- 2026-11-06: deep review, stories walk + STRIDE security + top apps, with fixes (Dispatch-Item custom-dice-roller/lens-stories+security+top-apps-30).

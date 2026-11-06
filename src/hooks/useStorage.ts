@@ -23,6 +23,14 @@ export function sanitizeSavedConfigs(input: unknown): Record<string, DiceConfig>
   return out;
 }
 
+// Set once a backup has been put back and the page is about to reload: the
+// leaving page's autosave used to write its old games over the imported ones
+// (review 2026-11-06), so nothing more is saved from this page.
+let savesFrozen = false;
+export function freezeSaves(): void { savesFrozen = true; }
+/** For tests */
+export function unfreezeSavesForTests(): void { savesFrozen = false; }
+
 export function useStorage() {
   const [savedConfigs, setSavedConfigs] = useState<Record<string, DiceConfig>>({});
 
@@ -43,6 +51,7 @@ export function useStorage() {
 
   const saveConfig = useCallback((name: string, config: DiceData[]) => {
     setSavedConfigs((prev) => {
+      if (savesFrozen) return prev;
       const updated = { ...prev, [name]: { name, config } };
       saveItem(SAVED.games, JSON.stringify(updated));
       return updated;
@@ -51,6 +60,7 @@ export function useStorage() {
 
   const deleteConfig = useCallback((name: string) => {
     setSavedConfigs((prev) => {
+      if (savesFrozen) return prev;
       const updated = { ...prev };
       delete updated[name];
       saveItem(SAVED.games, JSON.stringify(updated));
