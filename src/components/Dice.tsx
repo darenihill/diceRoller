@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import type { DiceData } from '../types';
 import styles from './Dice.module.css';
 import { Lock, Unlock, Settings, Trash2, Copy, Dices } from 'lucide-react';
-import { motion, useAnimationControls, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ALL_ICONS } from '../utils/iconUtils';
 import { parseFaceContent, FACE_ICON_PREFIX, getContrastColor, faceParts, faceLabel } from '../utils/diceUtils';
 import { useFaceImage } from '../utils/faceImages';
@@ -17,6 +17,8 @@ const EMPHASIZED = [0.2, 0, 0, 1] as const;
 const DROPPED_SCALE = 0.88;
 /** How far a held die lifts, as a share of its size */
 const HELD_LIFT = '-5%';
+/** How the lock flies up into the HELD tag (owner, 2026-11-06) */
+const HOLD_FLIGHT = { type: 'spring', stiffness: 320, damping: 26 } as const;
 
 interface DiceProps {
   dice: DiceData;
@@ -47,26 +49,6 @@ const DiceComponent: React.FC<DiceProps> = ({
 
   const [tempValue, setTempValue] = useState<number | null>(null);
   const [tempFaceIndex, setTempFaceIndex] = useState<number | null>(null);
-
-  // The HELD tag drops onto the die only when held actually changes — not when
-  // the die mounts (page load, preset load). NOTE: the mount-flag effect must be
-  // declared AFTER this one so the first run sees lockMountedRef=false and skips it.
-  const lockControls = useAnimationControls();
-  const lockMountedRef = useRef(false);
-  useEffect(() => {
-    if (!lockMountedRef.current || !dice.held) return;
-    lockControls.start({
-      y: ['-180%', '0%'],
-      opacity: [0, 1],
-      transition: { type: 'spring', stiffness: 520, damping: 22 }
-    });
-  }, [dice.held, lockControls]);
-  useEffect(() => {
-    lockMountedRef.current = true;
-    return () => {
-      lockMountedRef.current = false;
-    };
-  }, []);
 
   const rollingNow = isRolling && (!dice.held || !!rollingAlone);
   // A dropped die sinks back, dims and gets its stamp once it lands, not mid-tumble
@@ -266,10 +248,11 @@ const DiceComponent: React.FC<DiceProps> = ({
       // Holding moves to its own (visually hidden) button below.
       role="group"
       aria-label={`${dieName} showing ${spokenFace}${dice.held ? ', held' : ''}`}
+      // A tap shows the die's buttons; only the lock button holds it, so
+      // Settings and Roll this die are easy to reach on a phone (owner, 2026-11-06)
       onClick={(e) => {
         if ((e.target as HTMLElement).closest('button')) return;
         onReveal();
-        onToggleHold(dice.id);
       }}
       onTouchStart={() => onReveal()}
       layout
@@ -280,14 +263,6 @@ const DiceComponent: React.FC<DiceProps> = ({
       transition={sunk ? { duration: 0.4, ease: EMPHASIZED } : undefined}
       exit={{ scale: 0 }}
     >
-      {/* Keyboard and screen-reader way to hold; a tap on the die does the same */}
-      <button
-        className={styles.holdBtn}
-        aria-pressed={!!dice.held}
-        aria-label={`Hold ${dieName}`}
-        onClick={() => { onReveal(); onToggleHold(dice.id); }}
-      />
-
       {/* Background shape container so clip-path does NOT clip action buttons */}
       <div className={`${styles.diceShapeBg} ${shapeClass}`} style={{ backgroundColor }}>
         {/* 3D Wireframe Facet Lines Overlay - placed INSIDE diceShapeBg to match silhouette bounds perfectly */}
@@ -331,23 +306,30 @@ const DiceComponent: React.FC<DiceProps> = ({
         </div>
       )}
 
-      {dice.held ? (
-        // Held: a gold HELD tag sits on the top edge (it drops in when you hold the die)
-        <motion.div
-          className={styles.heldTag}
-          data-testid="held-tag"
-          aria-hidden="true"
-          initial={false}
-          animate={calm ? { y: '0%', opacity: 1 } : lockControls}
-        >
-          <Lock size="1em" strokeWidth={3} />
-          HELD
-        </motion.div>
-      ) : (
-        <div className={`${styles.actionBtn} ${styles.unlockIcon}`} aria-hidden="true">
-          <Unlock size={20} strokeWidth={2.5} color="currentColor" />
-        </div>
-      )}
+      {/* One hold button: the lock in the corner, which flies up to the top
+          edge and becomes the gold HELD tag as the die lifts; tapping the tag
+          releases it (owner, 2026-11-06) */}
+      <motion.button
+        key={dice.held ? 'held' : 'free'}
+        type="button"
+        layoutId={calm ? undefined : `hold-${dice.id}`}
+        className={dice.held ? `${styles.heldTag} ${styles.holdBtn}` : `${styles.actionBtn} ${styles.unlockIcon} ${styles.holdBtn}`}
+        data-testid={dice.held ? 'held-tag' : undefined}
+        aria-pressed={!!dice.held}
+        aria-label={`Hold ${dieName}`}
+        title={dice.held ? 'Release this die' : 'Hold this die'}
+        onClick={(e) => { e.stopPropagation(); onReveal(); onToggleHold(dice.id); }}
+        transition={{ layout: HOLD_FLIGHT }}
+      >
+        {/* Its own layout, so the lock and HELD don't stretch as the button grows */}
+        <motion.span layout={calm ? false : 'position'} transition={{ layout: HOLD_FLIGHT }} className={styles.holdFace}>
+          {dice.held ? (
+            <><Lock size="1em" strokeWidth={3} aria-hidden="true" />HELD</>
+          ) : (
+            <Unlock size={20} strokeWidth={2.5} color="currentColor" aria-hidden="true" />
+          )}
+        </motion.span>
+      </motion.button>
 
       {!compactActions && (<>
       {/* Settings Button (Bottom-Right) */}

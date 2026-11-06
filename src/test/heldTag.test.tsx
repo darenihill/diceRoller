@@ -1,6 +1,6 @@
 import React from 'react';
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Dice } from '../components/Dice';
 import type { DiceData } from '../types';
 
@@ -27,6 +27,37 @@ describe('Held die: lift and tag', () => {
   it('screen readers still hear "held" from the die itself', () => {
     render(<Dice dice={{ ...base, held: true }} {...props} />);
     expect(screen.getByRole('group')).toHaveAccessibleName(/held/);
-    expect(screen.getByTestId('held-tag')).toHaveAttribute('aria-hidden', 'true');
+    // The tag is the hold button now, pressed, so it reads "Hold d6, pressed"
+    expect(screen.getByTestId('held-tag')).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  // Owner, 2026-11-06: a tap anywhere held the die, which got in the way of
+  // Settings and Roll this die on a phone. Only the lock holds now.
+  it('a tap on the die shows its buttons but does not hold it', () => {
+    const onToggleHold = vi.fn();
+    const onReveal = vi.fn();
+    render(<Dice dice={base} {...props} onToggleHold={onToggleHold} onReveal={onReveal} />);
+    fireEvent.click(screen.getByRole('group'));
+    expect(onReveal).toHaveBeenCalled();
+    expect(onToggleHold).not.toHaveBeenCalled();
+  });
+
+  it('the lock button holds the die, and the HELD tag releases it', () => {
+    const onToggleHold = vi.fn();
+    const { rerender } = render(<Dice dice={base} {...props} onToggleHold={onToggleHold} />);
+    const lock = screen.getByRole('button', { name: 'Hold d6' });
+    expect(lock).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(lock);
+    expect(onToggleHold).toHaveBeenCalledWith('d1');
+    rerender(<Dice dice={{ ...base, held: true }} {...props} onToggleHold={onToggleHold} />);
+    fireEvent.click(screen.getByTestId('held-tag'));
+    expect(onToggleHold).toHaveBeenCalledTimes(2);
+  });
+
+  it('the lock and the tag are one button, so the lock can fly up into the tag', () => {
+    const { rerender } = render(<Dice dice={base} {...props} />);
+    expect(screen.getAllByRole('button', { name: /^Hold / })).toHaveLength(1);
+    rerender(<Dice dice={{ ...base, held: true }} {...props} />);
+    expect(screen.getAllByRole('button', { name: /^Hold / })).toHaveLength(1);
   });
 });
