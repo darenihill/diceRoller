@@ -178,7 +178,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
             <div className={modalStyles.toggleRow}>
               <div className={modalStyles.toggleLabelCol}>
                 <span className={modalStyles.toggleTitle}>Bright Rings</span>
-                <span className={modalStyles.toggleDesc}>A bright ring around the bottom buttons, easier to find in sunlight</span>
+                <span className={modalStyles.toggleDesc}>A bright ring round the bottom buttons, easier to find in sunlight</span>
               </div>
               <button
                 className="md-icon-button"
@@ -216,7 +216,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
             <div className={modalStyles.toggleRow}>
               <div className={modalStyles.toggleLabelCol}>
                 <span className={modalStyles.toggleTitle}>Target Highlight</span>
-                <span className={modalStyles.toggleDesc}>Celebrate when a total hits one of these, like 7, 11</span>
+                <span className={modalStyles.toggleDesc}>Celebrate when the roll total hits these numbers (comma-separated, e.g. 7, 11)</span>
               </div>
               <input
                 type="text"

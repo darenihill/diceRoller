@@ -73,30 +73,3 @@ their state with `aria-pressed`. Dialogs trap focus and close on Esc.
 ## 11. Verification
 
 `npm run precommit` (lint, tests, type check and build, CSS guard).
-
-## 12. Words (2026-11-06)
-
-One word per thing, from reviews/2026-11-06-copy.md. Sentence case for every
-label and title; no "successfully", "simply" or "failed to"; no exclamation
-marks in messages; "and", not "&", in titles; "…" not "..."; US spelling.
-
-| Use | Not | Note |
-|---|---|---|
-| game | save (noun), preset, set, configuration | "Save" is the verb. Landing prose may say "dice set" |
-| ready-made game | preset, predefined | Built-in games |
-| die (one), dice (more) | dice for one | Die settings, Remove die, Add a die |
-| hold, held / release | lock, keep, unheld | The lock icon is fine. "Keep" is only advantage keeping the highest |
-| RPG mode | D&D mode | D&D only for the Dungeons & Dragons game and page |
-| Customize | Settings (for the app) | App options |
-| die settings | dice settings, gear menu | One die's options |
-| History, Frequency | roll log, Luck Meter | Menu item and tabs |
-| clear | wipe, delete all | Emptying a list |
-| delete | remove (for games) | A saved game; Undo brings it back |
-| remove | delete, clear | One die, face, picture or saved roll |
-| default dice | startup dice, usual dice | What opens each time |
-| faces | sides (in the app) | Landing may say "six-sided" |
-| copy | clone, duplicate | Copy a die. Share uses "Copy link" |
-| tap | click, click/tap | "Press Space or R" stays for keyboards |
-| Usage stats | telemetry | Counts kept on the device |
-| anonymous page metrics | telemetry, usage stats | The analytics setting |
-| like 7, 11 | e.g. | Hints and placeholders |

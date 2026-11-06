@@ -156,7 +156,7 @@ export const useDiceState = () => {
   const addDice = useCallback((template?: Partial<DiceData>) => {
     setDiceList(prev => {
       if (prev.length >= MAX_DICE_LIMIT) {
-        showToast(`You can have up to ${MAX_DICE_LIMIT} dice`);
+        showToast(`Maximum of ${MAX_DICE_LIMIT} dice reached.`);
         return prev;
       }
       const newDice: DiceData = {

@@ -60,7 +60,7 @@ export function parseRollNotation(input: string): ParseResult {
       const count = dice[1] === '' ? 1 : parseInt(dice[1], 10);
       const faces = parseInt(dice[2], 10);
       if (count < 1) return { ok: false, note: 'Roll at least one die.' };
-      if (faces < 2 || faces > MAX_FACES) return { ok: false, note: `Dice can have 2 to ${MAX_FACES} faces.` };
+      if (faces < 2 || faces > MAX_FACES) return { ok: false, note: `Dice can have 2 to ${MAX_FACES} sides.` };
       const same = groups.find(g => g.faces === faces);
       if (same) same.count += count;
       else groups.push({ count, faces });
@@ -87,7 +87,7 @@ export function parseRollNotation(input: string): ParseResult {
   }
 
   const total = groups.reduce((n, g) => n + g.count, 0);
-  if (total > MAX_DICE_LIMIT) return { ok: false, note: `That's ${total} dice. The most is ${MAX_DICE_LIMIT}.` };
+  if (total > MAX_DICE_LIMIT) return { ok: false, note: `That's ${total} dice; the most is ${MAX_DICE_LIMIT}.` };
 
   return { ok: true, roll: { groups, modifier, advantage, text: formatRoll(groups, modifier, advantage, doubled) } };
 }
