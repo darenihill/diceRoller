@@ -1,4 +1,4 @@
-Next: new-version bar built on top of release 68 (draft pull request), waits for 68 to merge, 2026-11-04.
+Next: feedback polish done 2026-11-06; waits on Daren's Land tap.
 
 # State
 
@@ -10,3 +10,4 @@ Next: new-version bar built on top of release 68 (draft pull request), waits for
 - 2026-10-22: goal check, jobs + HEART + working backwards (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-1). Goal stays.
 - 2026-10-23: goal check again after the seven builds (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-1). Goal stays.
 - 2026-10-24: big table view, a Table view switch in the menu (Dispatch-Item custom-dice-roller/ask-2026-10-24-build-owner-2026-ab85e3).
+- 2026-11-06: feedback and motion polish, pressed look on every button (Dispatch-Item custom-dice-roller/polish-ui-feedback-9).

@@ -133,9 +133,11 @@
   transition: background-color 0.2s, transform 0.1s;
 }
 
-.dndOptionBtn:hover {
-  background-color: var(--md-sys-color-surface-hover);
-  transform: scale(1.03);
+@media (hover: hover) {
+  .dndOptionBtn:hover {
+    background-color: var(--md-sys-color-surface-hover);
+    transform: scale(1.03);
+  }
 }
 
 .d20OptionBtn {
@@ -155,9 +157,11 @@
   transition: background-color 0.2s, transform 0.1s, filter 0.2s;
 }
 
-.d20OptionBtn:hover {
-  filter: brightness(1.1);
-  transform: scale(1.02);
+@media (hover: hover) {
+  .d20OptionBtn:hover {
+    filter: brightness(1.1);
+    transform: scale(1.02);
+  }
 }
 
 @media (max-width: 468px) {
@@ -329,8 +333,10 @@
   cursor: pointer;
 }
 
-.rpgSeg:hover {
-  background-color: var(--md-sys-color-surface-hover);
+@media (hover: hover) {
+  .rpgSeg:hover {
+    background-color: var(--md-sys-color-surface-hover);
+  }
 }
 
 /* The chosen roll type: a blue ring and blue text, no fill, so the big Roll

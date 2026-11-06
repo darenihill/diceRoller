@@ -151,6 +151,13 @@ button {
   outline-offset: -2px;
 }
 
+/* Every tap answers at once: a pressed button dims until the finger lifts
+   (polish review 2026-11-06). Phones show no hover, so without this most
+   buttons gave no sign they'd been touched. */
+button:not(:disabled):active {
+  opacity: 0.72;
+}
+
 /* Taps show no ring; the keyboard always shows where it is */
 button:focus-visible {
   outline: 2px solid var(--md-sys-color-primary);
@@ -178,9 +185,11 @@ button:focus-visible {
   box-shadow: var(--elevation-1);
 }
 
-.md-button-filled:hover {
-  filter: brightness(1.1);
-  box-shadow: var(--elevation-2);
+@media (hover: hover) {
+  .md-button-filled:hover {
+    filter: brightness(1.1);
+    box-shadow: var(--elevation-2);
+  }
 }
 
 .md-button-surface {
@@ -189,9 +198,11 @@ button:focus-visible {
   box-shadow: var(--elevation-1);
 }
 
-.md-button-surface:hover {
-  background-color: var(--md-sys-color-surface-hover);
-  box-shadow: var(--elevation-2);
+@media (hover: hover) {
+  .md-button-surface:hover {
+    background-color: var(--md-sys-color-surface-hover);
+    box-shadow: var(--elevation-2);
+  }
 }
 
 /* Compact button: in-dialog secondary actions and template chips */
@@ -207,8 +218,10 @@ button:focus-visible {
   color: var(--md-sys-color-on-error);
 }
 
-.md-button-danger:hover {
-  filter: brightness(1.1);
+@media (hover: hover) {
+  .md-button-danger:hover {
+    filter: brightness(1.1);
+  }
 }
 
 .md-icon-button {
@@ -223,9 +236,11 @@ button:focus-visible {
   transition: background-color 0.2s, box-shadow 0.2s;
 }
 
-.md-icon-button:hover {
-  background-color: var(--md-sys-color-surface-hover);
-  box-shadow: var(--elevation-1);
+@media (hover: hover) {
+  .md-icon-button:hover {
+    background-color: var(--md-sys-color-surface-hover);
+    box-shadow: var(--elevation-1);
+  }
 }
 
 /* On/off icon button (M3 icon toggle): the on state uses the primary container */
