@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import LZString from 'lz-string';
-import { currentSetName, diceSignature, splitShareHash } from '../utils/setName';
+import { currentSetName, diceSignature, splitShareHash, readShareLink } from '../utils/setName';
 import { sanitizeDiceList } from '../utils/diceUtils';
 import { dicePresets } from '../utils/presets';
 
@@ -58,5 +58,25 @@ describe('share link name', () => {
 
   it('compressed dice never contain the name marker', () => {
     expect(data.includes('&')).toBe(false);
+  });
+  const link = (dice: unknown[], name: string) =>
+    `#share=${LZString.compressToEncodedURIComponent(JSON.stringify(dice))}&name=${encodeURIComponent(name)}`;
+
+  it("keeps a built-in game's name when the dice are that game", () => {
+    expect(readShareLink(link(catan.dice, 'Catan')).name).toBe('Catan');
+  });
+
+  it("drops a built-in game's name, in any letter case, from other dice", () => {
+    const other = [{ faces: 20, color: '#384050' }];
+    expect(readShareLink(link(other, 'Catan')).name).toBeNull();
+    expect(readShareLink(link(other, ' catan ')).name).toBeNull();
+    const houseRule = catan.dice.map((d, i) => i === 0 ? { ...d, color: '#123456' } : d);
+    const opened = readShareLink(link(houseRule, 'Catan'));
+    expect(opened.name).toBeNull();
+    expect(opened.dice).toHaveLength(catan.dice.length);
+  });
+
+  it('leaves your own names alone', () => {
+    expect(readShareLink(link([{ faces: 20 }], 'Catan night')).name).toBe('Catan night');
   });
 });
