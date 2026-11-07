@@ -5,6 +5,11 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-07~~ Color names in the picker (Daren 2026-11-06, Build: "Color picker writes
+  the color's name, like \"Die color · White\""). Done when: the title above
+  the color dots in Dice Settings and in Custom faces Color names the picked
+  color in words, using the names screen readers hear; a custom color reads
+  "Custom" and its code (src/test/colorPicker.test.tsx).
 - ~~Done 2026-11-03~~ Lift and tag lock (Daren 2026-11-03: "For lock I like
   the lift and held tag"). Done when: a held die lifts with a deeper shadow
   and a gold HELD tag drops onto its top edge; a die loaded already held shows

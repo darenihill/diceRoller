@@ -1,4 +1,4 @@
-Next: new-version bar built on top of release 68 (draft pull request), waits for 68 to merge, 2026-11-04.
+Next: color names in the picker (draft pull request, waits on checks and the Land tap), 2026-11-07.
 
 # State
 
