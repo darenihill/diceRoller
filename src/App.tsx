@@ -778,7 +778,7 @@ function App() {
     // Every die held: nothing would change, so say why instead of logging a
     // repeat of the last roll
     if (diceList.length > 0 && !hasUnheldDice) {
-      showToast('All dice are held. Tap a die to let it roll again.');
+      showToast('All dice are held. Tap a HELD tag to let that die roll again.');
       return;
     }
     setTableRolledIds(diceList.map(d => d.id).join());
