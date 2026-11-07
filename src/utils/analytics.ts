@@ -45,12 +45,40 @@ function getDefaultStats(): LocalAnalyticsStats {
   };
 }
 
+/**
+ * Keeps only values of the right kind from saved stats, so a hand-edited or
+ * damaged backup can't blank the Usage Stats screen (security review,
+ * 2026-11-07): a missing or wrong-typed value falls back to its default.
+ */
+export function cleanStats(parsed: unknown): LocalAnalyticsStats {
+  const stats = getDefaultStats();
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return stats;
+  const src = parsed as Record<string, unknown>;
+  const out = stats as unknown as Record<string, unknown>;
+  for (const [key, fallback] of Object.entries(stats)) {
+    const value = src[key];
+    if (key === 'presetsLoadedCount') {
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        const counts: Record<string, number> = {};
+        for (const [name, n] of Object.entries(value)) {
+          if (typeof n === 'number' && Number.isFinite(n)) counts[name] = n;
+        }
+        out[key] = counts;
+      }
+    } else if (typeof fallback === 'number') {
+      if (typeof value === 'number' && Number.isFinite(value)) out[key] = value;
+    } else if (typeof value === typeof fallback) {
+      out[key] = value;
+    }
+  }
+  return stats;
+}
+
 export function getLocalStats(): LocalAnalyticsStats {
   try {
     const raw = readItem(STORAGE_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw);
-      return { ...getDefaultStats(), ...parsed };
+      return cleanStats(JSON.parse(raw));
     }
   } catch (e) {
     console.error('Failed to load analytics stats', e);

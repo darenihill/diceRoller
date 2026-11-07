@@ -5,6 +5,15 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-07~~ Backup keeps the newest switches (review 2026-11-07,
+  standard 1, no lost work). Done when: Export backup carries Table view,
+  Bright Rings and Sort dice after each roll, Import brings them back, and the
+  round-trip test fails if any saved value is left unseeded
+  (src/test/backup.test.tsx).
+- ~~Done 2026-11-07~~ Usage Stats survives a damaged backup (review
+  2026-11-07, security). Done when: stats of the wrong kind fall back to their
+  defaults on load, so Usage Stats opens instead of blanking the app
+  (src/test/statsSafe.test.tsx).
 - ~~Done 2026-11-07~~ Share box wording (Daren 2026-11-06, Build with
   comment: '"Share with this link" instead'). Done when: the copy-link box
   that shows when the phone's share sheet isn't available is labeled "Share
