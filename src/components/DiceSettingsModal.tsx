@@ -119,6 +119,13 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     }
   };
 
+  // Words typed in Add custom text and not yet added count as a face when the
+  // settings close, so Done never throws them away (app standard 1, review 2026-11-06)
+  const finish = () => {
+    if (customInput.trim()) addCustomFace(customInput);
+    onClose();
+  };
+
   const undoList = () => {
     if (!listNote) return;
     onUpdate(dice.id, { customFaces: listNote.before });
@@ -350,7 +357,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Dice Settings" header={tabsHeader}>
+    <Modal isOpen={isOpen} onClose={finish} title="Dice Settings" header={tabsHeader}>
       <div className={styles.container} ref={containerRef}>
 
         {tab === 'settings' && (
@@ -716,7 +723,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
           </button>
           <button 
             className={`md-button md-button-filled ${styles.footerBtnDone}`}
-            onClick={onClose}
+            onClick={finish}
           >
             <Check size={20} strokeWidth={2.5} /> Done
           </button>
