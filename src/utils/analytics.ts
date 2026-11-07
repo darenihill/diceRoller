@@ -121,6 +121,7 @@ export type AnalyticsEventName =
   | 'sound_toggled'
   | 'shake_toggled'
   | 'bright_rings_toggled'
+  | 'sort_dice_toggled'
   | 'shake_roll'
   | 'table_view_toggled'
   | 'modifier_toggled'

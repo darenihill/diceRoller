@@ -10,6 +10,13 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   the color dots in Dice Settings and in Custom faces Color names the picked
   color in words, using the names screen readers hear; a custom color reads
   "Custom" and its code (src/test/colorPicker.test.tsx).
+- ~~Done 2026-11-07~~ Sort dice after each roll (Daren 2026-11-06, Build: "A Sort button lines
+  up the dice from low to high after a roll"; card: no button on the main
+  screen, a "Sort dice after each roll" switch in Customize, off by default
+  and kept on this device). Done when: with the switch on, the dice slide
+  into low-to-high order each time a roll lands, only where they sit changes
+  (never what they rolled, the saved dice order or History), and turning it
+  off puts them back in their own order (src/test/sortDice.test.tsx).
 - ~~Done 2026-11-03~~ Lift and tag lock (Daren 2026-11-03: "For lock I like
   the lift and held tag"). Done when: a held die lifts with a deeper shadow
   and a gold HELD tag drops onto its top edge; a die loaded already held shows
