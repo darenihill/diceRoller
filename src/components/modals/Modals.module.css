@@ -347,3 +347,19 @@
   color: var(--md-sys-color-primary);
   background-color: var(--md-sys-color-surface-hover);
 }
+
+/* On or Off in words under each Customize switch, so its state never rests on color alone */
+.switchCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+}
+
+.switchWord {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface-variant);
+  line-height: 1;
+}

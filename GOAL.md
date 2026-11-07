@@ -5,6 +5,10 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-07~~ Switches say On or Off (app standards: accessibility;
+  deep review 2026-11-07). Done when: every Customize switch shows On or Off
+  in words under it, so its state never rests on color alone
+  (src/test/switchWords.test.tsx).
 - ~~Done 2026-11-07~~ Backup keeps the newest switches (review 2026-11-07,
   standard 1, no lost work). Done when: Export backup carries Table view,
   Bright Rings and Sort dice after each roll, Import brings them back, and the
