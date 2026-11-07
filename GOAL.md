@@ -14,6 +14,14 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   2026-11-07, security). Done when: stats of the wrong kind fall back to their
   defaults on load, so Usage Stats opens instead of blanking the app
   (src/test/statsSafe.test.tsx).
+- ~~Done 2026-11-07~~ Metrics switch says where data goes (review
+  2026-11-07, standard 15, privacy). Done when: Customize's Anonymous Page
+  Metrics line names Google Analytics and what is never sent
+  (src/test/privacyWording.test.tsx).
+- Recently deleted (review 2026-11-07, standard 2, Undo › get it back later).
+  Done when: a deleted saved game and a cleared History go to a Recently
+  deleted list for 30 days, each row with its name, how long ago and Restore,
+  after the Undo bar has gone.
 - ~~Done 2026-11-07~~ Share box wording (Daren 2026-11-06, Build with
   comment: '"Share with this link" instead'). Done when: the copy-link box
   that shows when the phone's share sheet isn't available is labeled "Share

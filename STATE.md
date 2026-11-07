@@ -1,4 +1,4 @@
-Next: review pass (stories, security, SCAMPER) in progress, 2026-11-07.
+Next: review pass (stories, security, SCAMPER) in a draft pull request waiting on Daren's Land tap; Recently deleted queued in GOAL.md, 2026-11-07.
 
 # State
 
@@ -11,3 +11,4 @@ Next: review pass (stories, security, SCAMPER) in progress, 2026-11-07.
 - 2026-10-23: goal check again after the seven builds (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-1). Goal stays.
 - 2026-10-24: big table view, a Table view switch in the menu (Dispatch-Item custom-dice-roller/ask-2026-10-24-build-owner-2026-ab85e3).
 - 2026-11-07: Sort dice after each roll, a Customize switch, off by default (Dispatch-Item custom-dice-roller/ask-2026-11-06-build-owner-2026-1cdb93).
+- 2026-11-07: stories, security and SCAMPER review; backup keeps the newest switches, Usage Stats survives a damaged backup, metrics switch names Google Analytics (Dispatch-Item custom-dice-roller/lens-stories+security+scamper-30).

@@ -266,7 +266,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           <div className={modalStyles.toggleRow}>
             <div className={modalStyles.toggleLabelCol}>
               <span className={modalStyles.toggleTitle}>Anonymous Page Metrics</span>
-              <span className={modalStyles.toggleDesc}>Allow recording anonymous usage stats & session telemetry</span>
+              <span className={modalStyles.toggleDesc}>Sends page visits, rolls and button taps to Google Analytics. Never your own face words, pictures or saved game names</span>
             </div>
             <button 
               className="md-icon-button"
