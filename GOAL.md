@@ -5,6 +5,13 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-06~~ Reorder custom faces (Daren 2026-11-05, Build: "Drag a die's custom faces
+  into a new order"): each face in Custom faces gets a grip; dragging it
+  moves the face with its color, picture and number, the arrow keys move it
+  too, and Undo puts the old order back. Rolls don't change, only the list
+  order, which is also the order a shared die shows. Done when: a drag or an
+  arrow key moves a face, the face showing on the die stays the same, and
+  Undo restores the order (src/test/reorderFaces.test.tsx).
 - ~~Done 2026-11-07~~ Share box wording (Daren 2026-11-06, Build with
   comment: '"Share with this link" instead'). Done when: the copy-link box
   that shows when the phone's share sheet isn't available is labeled "Share
