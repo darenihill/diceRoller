@@ -5,6 +5,14 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-07~~ Share links can't use a built-in game's name for other
+  dice (Daren 2026-11-06, Build: "Share links: built-in game names checked
+  against the dice"; "Only built-in game names are checked. A save with your
+  own name is untouched."). Done when: a share link named after a built-in
+  game, in any letter case, opens with that name only if its dice are that
+  game's dice; otherwise it opens unnamed, and other names pass unchanged
+  (src/test/setName.test.ts).
+
 - ~~Done 2026-11-03~~ Lift and tag lock (Daren 2026-11-03: "For lock I like
   the lift and held tag"). Done when: a held die lifts with a deeper shadow
   and a gold HELD tag drops onto its top edge; a die loaded already held shows
