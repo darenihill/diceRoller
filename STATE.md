@@ -1,4 +1,4 @@
-Next: share box says "Share with this link" landing on Daren's Land tap; color names in the picker landed (Dice Roller 81), 2026-11-07.
+Next: review pass (stories, security, SCAMPER) in progress, 2026-11-07.
 
 # State
 
