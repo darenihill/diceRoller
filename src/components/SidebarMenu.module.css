@@ -15,8 +15,10 @@
   transition: transform 0.2s, background-color 0.2s;
 }
 
-.toggleBtn:hover {
-  background-color: var(--md-sys-color-surface-hover);
+@media (hover: hover) {
+  .toggleBtn:hover {
+    background-color: var(--md-sys-color-surface-hover);
+  }
 }
 
 .toggleBtn:active {
@@ -51,8 +53,10 @@
   justify-content: flex-start;
 }
 
-.menuItem:hover {
-  background-color: var(--md-sys-color-surface-hover);
+@media (hover: hover) {
+  .menuItem:hover {
+    background-color: var(--md-sys-color-surface-hover);
+  }
 }
 
 .menuItem:active {

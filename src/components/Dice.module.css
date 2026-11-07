@@ -407,3 +407,9 @@
   white-space: nowrap;
   font-weight: 700;
 }
+
+/* A die's own buttons dim when pressed too (the rule in index.css loses to
+   the reveal rules above; polish review 2026-11-06) */
+.dice button.actionBtn:not(:disabled):active {
+  opacity: 0.72;
+}
