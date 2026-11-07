@@ -5,6 +5,18 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-07~~ Games in two columns (Daren 2026-11-07: "Include
+  that", after the two-column try-out). Done when: Games & Saves shows saves,
+  presets and backup buttons two to a row at every width (src/App.module.css,
+  checked at 390 px).
+- ~~Done 2026-11-07~~ A sentence stays one face (player feedback 2026-11-06:
+  "if the sentence is more than 2-3 words it's being separated into similar
+  faces"; Daren 2026-11-07: "can we make sure all of this is addressed?").
+  Done when: Add custom text splits on commas only when every piece is one or
+  two words, a pasted list of sentences adds one face per line with Undo, a
+  face keeps its first 60 letters, and a long word face wraps onto up to four
+  lines instead of shrinking to one (src/test/pasteFaceList.test.tsx).
+
 - ~~Done 2026-11-06~~ Reorder custom faces (Daren 2026-11-05, Build: "Drag a die's custom faces
   into a new order"): each face in Custom faces gets a grip; dragging it
   moves the face with its color, picture and number, the arrow keys move it

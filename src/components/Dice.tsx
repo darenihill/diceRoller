@@ -174,7 +174,10 @@ const DiceComponent: React.FC<DiceProps> = ({
     longestFace = dice.numberValue.toString().length;
   }
   
-  const fontScale = `min(calc(var(--dice-size) * 0.7), calc(var(--dice-size) * ${wordFaces ? 1.3 : 1.66} / ${longestFace || 1}))`;
+  // A sentence face wraps onto up to four lines instead of shrinking to fit
+  // one, so "Go back two spaces" stays readable (player feedback 2026-11-06)
+  const faceLines = wordFaces && longestFace > 12 ? Math.min(4, Math.ceil(Math.sqrt(longestFace / 6))) : 1;
+  const fontScale = `min(calc(var(--dice-size) * 0.7), calc(var(--dice-size) * ${wordFaces ? 1.3 : 1.66} * ${faceLines} / ${longestFace || 1}))`;
 
   const renderFace = (faceStr: string) => {
     if (!faceStr) return null;

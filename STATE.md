@@ -1,4 +1,4 @@
-Next: reorder custom faces landing on Daren's Land tap (Dice Roller 77); share box wording, color names (81) and sort dice (80) landed, 2026-11-07.
+Next: release of 76, 78, 79, 83, two columns and sentence faces on Daren's "Land all" tap, 2026-11-07.
 
 # State
 
@@ -12,3 +12,4 @@ Next: reorder custom faces landing on Daren's Land tap (Dice Roller 77); share b
 - 2026-10-24: big table view, a Table view switch in the menu (Dispatch-Item custom-dice-roller/ask-2026-10-24-build-owner-2026-ab85e3).
 - 2026-11-06: reorder custom faces: grip, drag, arrow keys, Undo (Dispatch-Item custom-dice-roller/ask-2026-11-05-build-owner-2026-152784).
 - 2026-11-07: Sort dice after each roll, a Customize switch, off by default (Dispatch-Item custom-dice-roller/ask-2026-11-06-build-owner-2026-1cdb93).
+- 2026-11-07: games in two columns; a sentence stays one face (Dispatch-Item custom-dice-roller/ask-2026-11-06-build-owner-2026-f8cad3).

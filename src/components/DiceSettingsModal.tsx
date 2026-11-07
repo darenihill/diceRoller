@@ -6,7 +6,7 @@ import { X, Plus, Minus, Star, Check, Copy, Trash2, ImagePlus, ImageOff, Rainbow
 import { addFaceImage, useFaceImages, shrinkImage } from '../utils/faceImages';
 import { ALL_ICONS, COMMON_ICONS } from '../utils/iconUtils';
 import { MAX_CUSTOM_FACES, MAX_FACE_TEXT_LENGTH } from '../utils/constants';
-import { splitFaceList, pastedListForBox } from '../utils/faceList';
+import { splitFaceList, pastedListForBox, listFitsBox } from '../utils/faceList';
 import { ColorPicker } from './ColorPicker';
 import styles from './DiceSettingsModal.module.css';
 
@@ -95,7 +95,8 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   };
 
   const addCustomFace = (text: string) => {
-    const faces = splitFaceList(text);
+    // A face keeps its first 60 letters, as it would after a reload or a share link
+    const faces = splitFaceList(text).map(f => f.slice(0, MAX_FACE_TEXT_LENGTH));
     if (faces.length === 0) return;
     const before = dice.customFaces;
     const room = Math.max(0, MAX_CUSTOM_FACES - before.length);
@@ -216,11 +217,19 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     return order;
   })();
 
-  // A pasted list keeps its lines: they show as commas, which + splits on
+  // A pasted list keeps its lines: they show as commas, which + splits on.
+  // Lines with commas or several words would not split back the same way, so
+  // they become faces straight away, with the usual note and Undo.
   const handleListPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     const pasted = e.clipboardData.getData('text');
     if (!/[\r\n]/.test(pasted)) return;
     e.preventDefault();
+    if (!listFitsBox(pasted)) {
+      const typed = customInput;
+      addCustomFace(pasted);
+      setCustomInput(typed);
+      return;
+    }
     const input = e.currentTarget;
     const start = input.selectionStart ?? customInput.length;
     const end = input.selectionEnd ?? customInput.length;

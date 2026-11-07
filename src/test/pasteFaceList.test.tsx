@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import React, { useState, useEffect } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DiceSettingsModal } from '../components/DiceSettingsModal';
-import { splitFaceList, pastedListForBox } from '../utils/faceList';
+import { splitFaceList, pastedListForBox, listFitsBox } from '../utils/faceList';
 import type { DiceData } from '../types';
 
 const seen: { dice: DiceData | null } = { dice: null };
@@ -44,6 +44,19 @@ describe('splitting a list into faces', () => {
     expect(splitFaceList('Anna, Ben,,Cleo ,')).toEqual(['Anna', 'Ben', 'Cleo']);
     expect(splitFaceList('  Dev  ')).toEqual(['Dev']);
     expect(pastedListForBox('Anna\nBen\n')).toBe('Anna, Ben');
+  });
+
+  it('keeps a sentence with commas as one face (player feedback 2026-11-06)', () => {
+    expect(splitFaceList('Go back, then roll again')).toEqual(['Go back, then roll again']);
+    expect(splitFaceList('Name a fruit, a color and an animal')).toEqual(['Name a fruit, a color and an animal']);
+    expect(splitFaceList('Mary Jane, Peter Parker, May')).toEqual(['Mary Jane', 'Peter Parker', 'May']);
+    expect(splitFaceList('Tell a story, then pass\nSing a song')).toEqual(['Tell a story, then pass', 'Sing a song']);
+  });
+
+  it('only short single lines can show in the box as a comma list', () => {
+    expect(listFitsBox('Anna\nBen Lee')).toBe(true);
+    expect(listFitsBox('Anna\nRoll again, then skip')).toBe(false);
+    expect(listFitsBox('Anna\nSing a song')).toBe(false);
   });
 });
 
@@ -93,6 +106,33 @@ describe('Add custom text takes a list', () => {
     expect(latest.customFaces).toHaveLength(100);
     expect(latest.customFaces.slice(-2)).toEqual(['X', 'Y']);
     expect(screen.getByRole('status')).toHaveTextContent('Added 2 faces; 2 left out, a die holds 100.');
+  });
+
+  it('a typed sentence with commas becomes one face', () => {
+    render(<Harness />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom faces' }));
+    fireEvent.change(box(), { target: { value: 'Go back two spaces, then roll again' } });
+    add();
+    expect(latest.customFaces).toEqual(['Go back two spaces, then roll again']);
+    expect(screen.queryByRole('status')).toBeNull();
+  });
+
+  it('a pasted list of sentences adds one face per line straight away, with Undo', () => {
+    render(<Harness faces={['Old']} />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom faces' }));
+    paste('Tell a story, then pass\nSing a song');
+    expect(latest.customFaces).toEqual(['Old', 'Tell a story, then pass', 'Sing a song']);
+    expect(screen.getByRole('status')).toHaveTextContent('Added 2 faces.');
+    fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+    expect(latest.customFaces).toEqual(['Old']);
+  });
+
+  it('a face longer than 60 letters keeps its first 60', () => {
+    render(<Harness />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom faces' }));
+    fireEvent.change(box(), { target: { value: 'x'.repeat(70) } });
+    add();
+    expect(latest.customFaces).toEqual(['x'.repeat(60)]);
   });
 
   it('one typed face works as before, with no note', () => {
