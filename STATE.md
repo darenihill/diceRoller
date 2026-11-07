@@ -1,4 +1,4 @@
-Next: share-link game names, draft pull request waits on checks and Daren's Land tap, 2026-11-07.
+Next: reorder custom faces landing on Daren's Land tap (Dice Roller 77); share box wording, color names (81) and sort dice (80) landed, 2026-11-07.
 
 # State
 
@@ -10,4 +10,5 @@ Next: share-link game names, draft pull request waits on checks and Daren's Land
 - 2026-10-22: goal check, jobs + HEART + working backwards (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-1). Goal stays.
 - 2026-10-23: goal check again after the seven builds (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-1). Goal stays.
 - 2026-10-24: big table view, a Table view switch in the menu (Dispatch-Item custom-dice-roller/ask-2026-10-24-build-owner-2026-ab85e3).
-- 2026-11-07: share links keep a built-in game's name only when the dice match that game (Dispatch-Item custom-dice-roller/ask-2026-11-06-build-owner-2026-f8cad3).
+- 2026-11-06: reorder custom faces: grip, drag, arrow keys, Undo (Dispatch-Item custom-dice-roller/ask-2026-11-05-build-owner-2026-152784).
+- 2026-11-07: Sort dice after each roll, a Customize switch, off by default (Dispatch-Item custom-dice-roller/ask-2026-11-06-build-owner-2026-1cdb93).

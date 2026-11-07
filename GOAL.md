@@ -5,14 +5,29 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- ~~Done 2026-11-07~~ Share links can't use a built-in game's name for other
-  dice (Daren 2026-11-06, Build: "Share links: built-in game names checked
-  against the dice"; "Only built-in game names are checked. A save with your
-  own name is untouched."). Done when: a share link named after a built-in
-  game, in any letter case, opens with that name only if its dice are that
-  game's dice; otherwise it opens unnamed, and other names pass unchanged
-  (src/test/setName.test.ts).
-
+- ~~Done 2026-11-06~~ Reorder custom faces (Daren 2026-11-05, Build: "Drag a die's custom faces
+  into a new order"): each face in Custom faces gets a grip; dragging it
+  moves the face with its color, picture and number, the arrow keys move it
+  too, and Undo puts the old order back. Rolls don't change, only the list
+  order, which is also the order a shared die shows. Done when: a drag or an
+  arrow key moves a face, the face showing on the die stays the same, and
+  Undo restores the order (src/test/reorderFaces.test.tsx).
+- ~~Done 2026-11-07~~ Share box wording (Daren 2026-11-06, Build with
+  comment: '"Share with this link" instead'). Done when: the copy-link box
+  that shows when the phone's share sheet isn't available is labeled "Share
+  with this link" (src/test/shareSheet.test.tsx).
+- ~~Done 2026-11-07~~ Color names in the picker (Daren 2026-11-06, Build: "Color picker writes
+  the color's name, like \"Die color · White\""). Done when: the title above
+  the color dots in Dice Settings and in Custom faces Color names the picked
+  color in words, using the names screen readers hear; a custom color reads
+  "Custom" and its code (src/test/colorPicker.test.tsx).
+- ~~Done 2026-11-07~~ Sort dice after each roll (Daren 2026-11-06, Build: "A Sort button lines
+  up the dice from low to high after a roll"; card: no button on the main
+  screen, a "Sort dice after each roll" switch in Customize, off by default
+  and kept on this device). Done when: with the switch on, the dice slide
+  into low-to-high order each time a roll lands, only where they sit changes
+  (never what they rolled, the saved dice order or History), and turning it
+  off puts them back in their own order (src/test/sortDice.test.tsx).
 - ~~Done 2026-11-03~~ Lift and tag lock (Daren 2026-11-03: "For lock I like
   the lift and held tag"). Done when: a held die lifts with a deeper shadow
   and a gold HELD tag drops onto its top edge; a die loaded already held shows

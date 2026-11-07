@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from '../Modal';
-import { Volume2, VolumeX, BarChart2, Smartphone, Minus, Plus, Vibrate, VibrateOff, CircleDot, Circle } from 'lucide-react';
+import { Volume2, VolumeX, BarChart2, Smartphone, Minus, Plus, Vibrate, VibrateOff, CircleDot, Circle, ArrowDown01, ArrowDownUp } from 'lucide-react';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
 import { targetNote } from '../../utils/targets';
@@ -31,6 +31,9 @@ interface CustomizeModalProps {
   buzzShown?: boolean;
   buzzEnabled?: boolean;
   onToggleBuzz?: () => void;
+  /** Dice take low-to-high places each time a roll lands */
+  sortDice?: boolean;
+  onToggleSortDice?: () => void;
 }
 
 export const CustomizeModal: React.FC<CustomizeModalProps> = ({
@@ -53,6 +56,8 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
   buzzShown = false,
   buzzEnabled = false,
   onToggleBuzz,
+  sortDice = false,
+  onToggleSortDice,
 }) => {
   const note = targetNote(targetHighlight);
   return (
@@ -172,6 +177,25 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
               <Smartphone size={20} />
             </button>
           </div>
+
+          {/* Sort dice after each roll: off until turned on (owner, 2026-11-06) */}
+          {onToggleSortDice && (
+            <div className={modalStyles.toggleRow}>
+              <div className={modalStyles.toggleLabelCol}>
+                <span className={modalStyles.toggleTitle}>Sort Dice After Each Roll</span>
+                <span className={modalStyles.toggleDesc}>Dice line up from lowest to highest when they land. What they rolled stays the same</span>
+              </div>
+              <button
+                className="md-icon-button"
+                onClick={onToggleSortDice}
+                title={sortDice ? "Turn off sort dice after each roll" : "Turn on sort dice after each roll"}
+                aria-label="Sort dice after each roll"
+                aria-pressed={sortDice}
+              >
+                {sortDice ? <ArrowDown01 size={20} /> : <ArrowDownUp size={20} />}
+              </button>
+            </div>
+          )}
 
           {/* Bright rings: off until turned on (owner, 2026-11-02) */}
           {onToggleBrightRings && (
