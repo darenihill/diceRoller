@@ -5,7 +5,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- Sort dice after each roll (Daren 2026-11-06, Build: "A Sort button lines
+- ~~Done 2026-11-07~~ Sort dice after each roll (Daren 2026-11-06, Build: "A Sort button lines
   up the dice from low to high after a roll"; card: no button on the main
   screen, a "Sort dice after each roll" switch in Customize, off by default
   and kept on this device). Done when: with the switch on, the dice slide
