@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useId } from 'react';
 import type { DiceData } from '../types';
 import { Modal } from './Modal';
-import { FACE_ICON_PREFIX, parseFaceContent, buildFace, faceNumericValue, getContrastColor, colourEveryFace, faceParts, joinFace } from '../utils/diceUtils';
+import { FACE_ICON_PREFIX, parseFaceContent, buildFace, faceNumericValue, getContrastColor, colourEveryFace, faceParts, joinFace, colorName } from '../utils/diceUtils';
 import { X, Plus, Minus, Star, Check, Copy, Trash2, ImagePlus, ImageOff, Rainbow, Palette, Smile, Type, ChevronDown, GripVertical } from 'lucide-react';
 import { addFaceImage, useFaceImages, shrinkImage } from '../utils/faceImages';
 import { ALL_ICONS, COMMON_ICONS } from '../utils/iconUtils';
@@ -406,7 +406,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
           </div>
 
           <div className={styles.fieldBlock}>
-            <span className={styles.label} aria-hidden="true">Die color</span>
+            <span className={styles.label} aria-hidden="true">Die color · {colorName(dice.color)}</span>
             <ColorPicker key={dice.id} label="Die color" value={dice.color} onChange={(color) => onUpdate(dice.id, { color })} />
           </div>
         </div>
@@ -570,7 +570,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
             <div id={`${fieldId}-panel-color`} className={`${styles.panelBody} ${styles.panelBodyColour}`}>
               {dice.customFaces.length > 0 && (
                 <div className={`${styles.faceColourRow} ${colourPinned ? '' : styles.faceColourRowLoose}`} data-pinned={colourPinned}>
-                  <span className={styles.sublabel}>Color for face {activeFace + 1}</span>
+                  <span className={styles.sublabel}>Color for face {activeFace + 1} · {colorName(activeFaceColour)}</span>
                   <ColorPicker
                     key={`${dice.id}-${activeFace}`}
                     label={`Color for face ${activeFace + 1}`}

@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ColorPicker } from '../components/ColorPicker';
 import { DiceSettingsModal } from '../components/DiceSettingsModal';
-import { COLORS } from '../utils/diceUtils';
+import { COLORS, colorName } from '../utils/diceUtils';
 import type { DiceData } from '../types';
 
 // One picker for die and face colors (owner, 2026-11-03)
@@ -74,5 +74,34 @@ describe('Dice settings use the same picker for die and face colors', () => {
     const face = screen.getByRole('group', { name: 'Color for face 1' });
     expect(face.querySelectorAll('[aria-label="Custom color"]')).toHaveLength(1);
     expect(face.querySelectorAll('button')).toHaveLength(COLORS.length + 2);
+  });
+});
+
+// Daren is colorblind: the picked color is named in words (owner, 2026-11-06)
+describe('The picked color is named in words', () => {
+  it('names ready colors, custom colors and "Same as the die"', () => {
+    expect(colorName('#E9EAEC')).toBe('White');
+    expect(colorName('#e32227')).toBe('Red');
+    expect(colorName('#12ab34')).toBe('Custom #12AB34');
+    expect(colorName('transparent')).toBe('Same as the die');
+  });
+
+  it('Dice settings title reads "Die color · White" and follows a new pick', () => {
+    const d: DiceData = { id: 'd1', numberValue: 1, faces: 6, customFaces: [], color: '#E9EAEC', held: false };
+    function Live() {
+      const [die, setDie] = useState(d);
+      return <DiceSettingsModal dice={die} onUpdate={(_, u) => setDie(x => ({ ...x, ...u }))} isOpen onClose={() => {}} onRemove={() => {}} onClone={() => {}} allDice={[die]} />;
+    }
+    render(<Live />);
+    expect(screen.getByText('Die color · White')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Blue' }));
+    expect(screen.getByText('Die color · Blue')).toBeInTheDocument();
+  });
+
+  it('Custom faces color title names the face color', () => {
+    const d: DiceData = { id: 'd1', numberValue: 1, faces: 3, customFaces: ['A', 'B', 'C'], color: '#6750A4', held: false };
+    render(<DiceSettingsModal dice={d} onUpdate={() => {}} isOpen onClose={() => {}} onRemove={() => {}} onClone={() => {}} allDice={[d]} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Color' }));
+    expect(screen.getByText('Color for face 1 · Same as the die')).toBeInTheDocument();
   });
 });

@@ -46,6 +46,7 @@ import { saveItem, onSaveRefused, readItem } from './utils/safeStorage';
 import { useWakeLock } from './hooks/useWakeLock';
 import { useNewVersion } from './hooks/useNewVersion';
 import { SAVED } from './utils/savedValues';
+import { arrangeDice, lowToHigh } from './utils/sortDice';
 import { buildBackup, restoreBackup } from './utils/backup';
 
 /** The themes the app ships; anything else in storage falls back to dark. */
@@ -228,6 +229,22 @@ function App() {
     document.body.classList.toggle('bright-rings', brightRings);
     saveItem(SAVED.brightRings, String(brightRings));
   }, [brightRings]);
+
+  // Sort dice after each roll: a Customize switch, off until turned on
+  // (owner, 2026-11-06). It changes only where the dice sit: each time a roll
+  // lands they take low-to-high places; what they rolled and their saved
+  // order stay as they are.
+  const [sortDice, setSortDice] = useState(() => readItem(SAVED.sortDice) === 'true');
+  const [sitOrder, setSitOrder] = useState<string[] | null>(null);
+  useEffect(() => {
+    saveItem(SAVED.sortDice, String(sortDice));
+  }, [sortDice]);
+  const wasRolling = useRef(isRolling);
+  useEffect(() => {
+    if (wasRolling.current && !isRolling && sortDice) setSitOrder(lowToHigh(diceList));
+    wasRolling.current = isRolling;
+  }, [isRolling]); // eslint-disable-line react-hooks/exhaustive-deps
+  const shownDice = sortDice ? arrangeDice(diceList, sitOrder ?? lowToHigh(diceList)) : diceList;
 
   // Expose RPG mode to CSS so mobile layout can reserve room for the taller FAB stack
   useEffect(() => {
@@ -917,7 +934,7 @@ function App() {
       )}
 
       <div ref={containerRef} className={`${styles.diceContainer} ${showTable ? styles.diceHidden : ''}`} style={diceStyles}>
-        {diceList.map((dice) => (
+        {shownDice.map((dice) => (
           <Dice
             key={dice.id}
             dice={dice}
@@ -1077,6 +1094,12 @@ function App() {
         buzzShown={buzzShown}
         buzzEnabled={buzzEnabled}
         onToggleBuzz={() => setBuzzEnabled(on => !on)}
+        sortDice={sortDice}
+        onToggleSortDice={() => {
+          setSitOrder(sortDice ? null : lowToHigh(diceList));
+          setSortDice(!sortDice);
+          trackEvent('sort_dice_toggled', { enabled: !sortDice });
+        }}
       />
 
       <SaveDialog 

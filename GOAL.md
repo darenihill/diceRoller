@@ -12,7 +12,18 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   order, which is also the order a shared die shows. Done when: a drag or an
   arrow key moves a face, the face showing on the die stays the same, and
   Undo restores the order (src/test/reorderFaces.test.tsx).
-
+- ~~Done 2026-11-07~~ Color names in the picker (Daren 2026-11-06, Build: "Color picker writes
+  the color's name, like \"Die color · White\""). Done when: the title above
+  the color dots in Dice Settings and in Custom faces Color names the picked
+  color in words, using the names screen readers hear; a custom color reads
+  "Custom" and its code (src/test/colorPicker.test.tsx).
+- ~~Done 2026-11-07~~ Sort dice after each roll (Daren 2026-11-06, Build: "A Sort button lines
+  up the dice from low to high after a roll"; card: no button on the main
+  screen, a "Sort dice after each roll" switch in Customize, off by default
+  and kept on this device). Done when: with the switch on, the dice slide
+  into low-to-high order each time a roll lands, only where they sit changes
+  (never what they rolled, the saved dice order or History), and turning it
+  off puts them back in their own order (src/test/sortDice.test.tsx).
 - ~~Done 2026-11-03~~ Lift and tag lock (Daren 2026-11-03: "For lock I like
   the lift and held tag"). Done when: a held die lifts with a deeper shadow
   and a gold HELD tag drops onto its top edge; a die loaded already held shows
