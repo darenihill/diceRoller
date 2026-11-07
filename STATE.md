@@ -1,4 +1,4 @@
-Next: new-version bar built on top of release 68 (draft pull request), waits for 68 to merge, 2026-11-04.
+Next: share box says "Share with this link" (Daren's Build, 2026-11-06), 2026-11-07.
 
 # State
 
