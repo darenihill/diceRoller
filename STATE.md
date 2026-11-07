@@ -1,4 +1,4 @@
-Next: reorder custom faces landing on Daren's Land tap (Dice Roller 77); color names (Dice Roller 81) and sort dice after each roll (Dice Roller 80) landed, 2026-11-07.
+Next: reorder custom faces landing on Daren's Land tap (Dice Roller 77); share box wording, color names (81) and sort dice (80) landed, 2026-11-07.
 
 # State
 
