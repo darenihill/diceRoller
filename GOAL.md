@@ -9,6 +9,11 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   comment: '"Share with this link" instead'). Done when: the copy-link box
   that shows when the phone's share sheet isn't available is labeled "Share
   with this link" (src/test/shareSheet.test.tsx).
+- ~~Done 2026-11-07~~ Color names in the picker (Daren 2026-11-06, Build: "Color picker writes
+  the color's name, like \"Die color · White\""). Done when: the title above
+  the color dots in Dice Settings and in Custom faces Color names the picked
+  color in words, using the names screen readers hear; a custom color reads
+  "Custom" and its code (src/test/colorPicker.test.tsx).
 - ~~Done 2026-11-07~~ Sort dice after each roll (Daren 2026-11-06, Build: "A Sort button lines
   up the dice from low to high after a roll"; card: no button on the main
   screen, a "Sort dice after each roll" switch in Customize, off by default
