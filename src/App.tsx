@@ -3,7 +3,7 @@ import LZString from 'lz-string';
 import styles from './App.module.css';
 import { useDiceState } from './hooks/useDiceState';
 import { useRollKeys } from './hooks/useRollKeys';
-import { useStorage } from './hooks/useStorage';
+import { useStorage, freezeSaves } from './hooks/useStorage';
 import { Dice, type GlideOrigin } from './components/Dice';
 import { ActionBar } from './components/ActionBar';
 import { TypeRollBox } from './components/TypeRollBox';
@@ -121,6 +121,8 @@ function App() {
   const { savedConfigs, saveConfig, deleteConfig, getSystemAutosave } = useStorage();
 
   const [menuOpen, setMenuOpen] = useState(false);
+  // The Add D&D Die menu; the Undo bar steps aside for it too (review 2026-11-06)
+  const [addMenuOpen, setAddMenuOpen] = useState(false);
   // The set last loaded by name (a save or a named share link); built-in games are also recognised by their dice
   const [loadedSet, setLoadedSet] = useState<LoadedSet | null>(() => {
     // A named share link opens with its name; read before the mount effect clears the hash
@@ -220,8 +222,8 @@ function App() {
   // menu is open, its countdown paused, and comes back when it closes
   // (fresh eyes, 2026-11-05)
   useEffect(() => {
-    if (menuOpen) pauseUndo(); else resumeUndo();
-  }, [menuOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (menuOpen || addMenuOpen) pauseUndo(); else resumeUndo();
+  }, [menuOpen, addMenuOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Bright ring round the bottom-bar buttons for glare: a Customize switch, off until turned on
   const [brightRings, setBrightRings] = useState(() => readItem(SAVED.brightRings) === 'true');
@@ -246,9 +248,11 @@ function App() {
   }, [isRolling]); // eslint-disable-line react-hooks/exhaustive-deps
   const shownDice = sortDice ? arrangeDice(diceList, sitOrder ?? lowToHigh(diceList)) : diceList;
 
+  const rpgModeRef = useRef(rpgMode);
   // Expose RPG mode to CSS so mobile layout can reserve room for the taller FAB stack
   useEffect(() => {
     document.body.classList.toggle('rpg-mode', rpgMode);
+    rpgModeRef.current = rpgMode;
   }, [rpgMode]);
 
   // Each tap in the die's button strip restarts the timer below, so it doesn't close mid-use
@@ -313,9 +317,21 @@ function App() {
 
     // A landing page opens with its game, ahead of the visitor's usual dice
     if (landing) {
+      const autosaved = getSystemAutosave();
+      const mine = autosaved ? sanitizeDiceList(autosaved.config) : [];
       setDiceList(landing.dice);
       // Match the page either way, so a D&D visit doesn't leave RPG mode on for Catan
-      if (landing.rpg !== rpgMode) toggleRpgMode();
+      const before = rpgMode;
+      if (landing.rpg !== before) toggleRpgMode();
+      // Like a share link, the page's dice replace yours; Undo brings them, and
+      // RPG Mode as it was, back (app standards 1 and 2, review 2026-11-06)
+      if (mine.length > 0 && diceSignature(mine) !== diceSignature(landing.dice)) {
+        offerUndo(`Opened ${landing.name ?? 'these dice'}`, () => {
+          restoreDice(mine);
+          // Back to the mode from before the page, even if it was changed since
+          if (rpgModeRef.current !== before) toggleRpgMode();
+        }, { big: true });
+      }
       return;
     }
 
@@ -464,6 +480,8 @@ function App() {
       ? nextFreeSaveName(typed, userSaveNames)
       : typed;
     saveConfig(name, diceList);
+    // The top line now names the save, not the game it was made from (review 2026-11-06)
+    setLoadedSet({ name, signature: diceSignature(diceList) });
     // The save's name is the user's own text, so only the dice count goes to analytics
     trackEvent('preset_saved', { diceCount: diceList.length });
     showToast(name === typed ? (mode === 'replace' ? `Replaced ${name}` : 'Saved!') : `Saved as ${name}`);
@@ -648,6 +666,8 @@ function App() {
         }
         // Storage full: the storage message is already up, so no reload
         if (result === 'full') return;
+        // From here the backup is what's saved; this page must not save over it
+        freezeSaves();
         if (result === 'pictures') {
           showToast('Imported, but some pictures did not fit on this device. Reloading...');
           setTimeout(() => window.location.reload(), 1500);
@@ -778,7 +798,7 @@ function App() {
     // Every die held: nothing would change, so say why instead of logging a
     // repeat of the last roll
     if (diceList.length > 0 && !hasUnheldDice) {
-      showToast('All dice are held. Tap a die to let it roll again.');
+      showToast('All dice are held. Tap a HELD tag to let that die roll again.');
       return;
     }
     setTableRolledIds(diceList.map(d => d.id).join());
@@ -1017,6 +1037,7 @@ function App() {
 
       <ActionBar
         onAdd={handleAddFromBar}
+        onAddMenuChange={setAddMenuOpen}
         onRoll={handleRoll}
         heldCount={heldCount}
         onReleaseAll={releaseAll}
@@ -1128,7 +1149,7 @@ function App() {
           <button className={styles.undoButton} onClick={() => { setStorageFull(false); handleExportData(); }}>Export backup</button>
           <button className={styles.undoButton} onClick={() => setStorageFull(false)} aria-label="Close storage message" style={{ minWidth: 44 }}>✕</button>
         </div>
-      ) : undoOffer && !menuOpen ? (
+      ) : undoOffer && !menuOpen && !addMenuOpen ? (
         <UndoBar
           offer={undoOffer}
           windowMs={UNDO_WINDOW_MS}

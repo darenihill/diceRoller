@@ -55,6 +55,9 @@ const isObject = (v: unknown): v is Record<string, unknown> => !!v && typeof v =
 export function restoreBackup(input: unknown): RestoreResult {
   if (!isObject(input)) return 'invalid';
   const data = input;
+  // Any other JSON file (notes.json) is not a backup: it used to "import" and
+  // reset the dice size (review 2026-11-06). Every backup carries one of these.
+  if (data.version === undefined && !isObject(data.configs)) return 'invalid';
 
   // A backup that doesn't fit stops here: no reload, no false "Imported"
   let fits = true;
@@ -77,7 +80,7 @@ export function restoreBackup(input: unknown): RestoreResult {
   // Added in 1.1: older backups leave these settings as they are
   if (typeof data.rpgMode === 'boolean') keep(SAVED.rpgMode, String(data.rpgMode));
   if (typeof data.shakeToRoll === 'boolean') keep(SAVED.shakeToRoll, String(data.shakeToRoll));
-  if (typeof data.targetHighlight === 'string') keep(SAVED.targetHighlight, data.targetHighlight);
+  if (typeof data.targetHighlight === 'string') keep(SAVED.targetHighlight, data.targetHighlight.slice(0, 200));
   if (typeof data.telemetryEnabled === 'boolean') keep(SAVED.telemetry, String(data.telemetryEnabled));
   if (isObject(data.usageStats)) keep(SAVED.usageStats, JSON.stringify(data.usageStats));
   // Older backups have no buzz settings; they keep this phone's own

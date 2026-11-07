@@ -10,6 +10,8 @@ import { DndShapeIcon } from './DndShapeIcon';
 
 interface ActionBarProps {
   onAdd: (template?: Partial<DiceData>) => void;
+  /** Told when the Add D&D Die menu opens or closes, so the Undo bar steps aside */
+  onAddMenuChange?: (open: boolean) => void;
   onRoll: () => void;
   /** How many dice are held; above 0 a Release chip shows above the bar */
   heldCount: number;
@@ -52,7 +54,7 @@ const ROLL_TYPE_NAMES: Record<RollAdvantageMode, string> = { advantage: 'Advanta
 const signed = (n: number) => `${n > 0 ? '+' : ''}${n}`;
 
 export const ActionBar: React.FC<ActionBarProps> = ({ 
-  onAdd, onRoll, heldCount, onReleaseAll, totalVisible, totalStale = false, lastTotal, totalKey, rolling = false, lastModifier = 0, modifier, onChangeModifier,
+  onAdd, onAddMenuChange, onRoll, heldCount, onReleaseAll, totalVisible, totalStale = false, lastTotal, totalKey, rolling = false, lastModifier = 0, modifier, onChangeModifier,
   rpgMode, rollAdvantage, onChangeRollAdvantage
 }) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -115,6 +117,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
   // (fresh eyes, 2026-11-05)
   const addMenuOpen = rpgMode && popoverOpen;
   useBackToClose(addMenuOpen, () => setPopoverOpen(false));
+  useEffect(() => { onAddMenuChange?.(addMenuOpen); }, [addMenuOpen, onAddMenuChange]);
   useEffect(() => {
     if (!addMenuOpen) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setPopoverOpen(false); };

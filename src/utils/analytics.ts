@@ -49,8 +49,24 @@ export function getLocalStats(): LocalAnalyticsStats {
   try {
     const raw = readItem(STORAGE_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw);
-      return { ...getDefaultStats(), ...parsed };
+      const parsed: unknown = JSON.parse(raw);
+      const base = getDefaultStats();
+      // Stats can come from a hand-edited backup: keep only well-formed values
+      // (review 2026-11-06: a null count jammed the Games screen open)
+      const stats = { ...base, ...(parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {}) } as LocalAnalyticsStats;
+      const nums = ['totalSessions', 'totalRolls', 'totalDiceRolled', 'totalSumRolled', 'highestRoll',
+        'customDiceAddedCount', 'backupsExportedCount', 'backupsImportedCount', 'shareLinksGeneratedCount'] as const;
+      for (const k of nums) if (typeof stats[k] !== 'number' || !Number.isFinite(stats[k])) stats[k] = base[k];
+      const counts: unknown = stats.presetsLoadedCount;
+      stats.presetsLoadedCount = counts && typeof counts === 'object' && !Array.isArray(counts)
+        ? Object.fromEntries(Object.entries(counts).filter(([, n]) => typeof n === 'number' && Number.isFinite(n)))
+        : {};
+      for (const k of ['visitorId', 'firstSessionTime', 'lastSessionTime', 'favoriteTheme'] as const) {
+        if (typeof stats[k] !== 'string') stats[k] = base[k];
+      }
+      // The analytics switch alone decides; a backup's stats can't turn it back on
+      stats.telemetryEnabled = base.telemetryEnabled;
+      return stats;
     }
   } catch (e) {
     console.error('Failed to load analytics stats', e);

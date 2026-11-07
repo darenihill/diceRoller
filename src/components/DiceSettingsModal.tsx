@@ -6,7 +6,7 @@ import { X, Plus, Minus, Star, Check, Copy, Trash2, ImagePlus, ImageOff, Rainbow
 import { addFaceImage, useFaceImages, shrinkImage } from '../utils/faceImages';
 import { ALL_ICONS, COMMON_ICONS } from '../utils/iconUtils';
 import { MAX_CUSTOM_FACES, MAX_FACE_TEXT_LENGTH } from '../utils/constants';
-import { splitFaceList, pastedListForBox } from '../utils/faceList';
+import { splitFaceList, pastedListForBox, listFitsBox } from '../utils/faceList';
 import { ColorPicker } from './ColorPicker';
 import styles from './DiceSettingsModal.module.css';
 
@@ -95,7 +95,8 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   };
 
   const addCustomFace = (text: string) => {
-    const faces = splitFaceList(text);
+    // A face keeps its first 60 letters, as it would after a reload or a share link
+    const faces = splitFaceList(text).map(f => f.slice(0, MAX_FACE_TEXT_LENGTH));
     if (faces.length === 0) return;
     const before = dice.customFaces;
     const room = Math.max(0, MAX_CUSTOM_FACES - before.length);
@@ -117,6 +118,13 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     } else {
       setListNote(null);
     }
+  };
+
+  // Words typed in Add custom text and not yet added count as a face when the
+  // settings close, so Done never throws them away (app standard 1, review 2026-11-06)
+  const finish = () => {
+    if (customInput.trim()) addCustomFace(customInput);
+    onClose();
   };
 
   const undoList = () => {
@@ -209,7 +217,10 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     return order;
   })();
 
-  // A pasted list keeps its lines: they show as commas, which + splits on
+  // A pasted list keeps its lines: they show as commas, which + splits on.
+  // Lines with commas or several words would not split back the same way, so
+  // they become faces straight away, with the usual note and Undo; so does a
+  // short list pasted next to a sentence already typed.
   const handleListPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     const pasted = e.clipboardData.getData('text');
     if (!/[\r\n]/.test(pasted)) return;
@@ -217,8 +228,21 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     const input = e.currentTarget;
     const start = input.selectionStart ?? customInput.length;
     const end = input.selectionEnd ?? customInput.length;
+    // One line copied with its line break goes in the box like any paste
+    const pastedLines = pasted.split(/[\r\n]+/).map(l => l.trim()).filter(Boolean);
+    if (pastedLines.length <= 1) {
+      setCustomInput(customInput.slice(0, start) + (pastedLines[0] ?? '') + customInput.slice(end));
+      return;
+    }
     const head = customInput.slice(0, start).replace(/[,\s]*$/, '');
     const tail = customInput.slice(end).replace(/^[,\s]*/, '');
+    const typedFits = listFitsBox([head, tail].join(',').replace(/,/g, '\n'));
+    if (!listFitsBox(pasted) || !typedFits) {
+      const typed = customInput;
+      addCustomFace(pasted);
+      setCustomInput(typed);
+      return;
+    }
     setCustomInput([head, pastedListForBox(pasted), tail].filter(Boolean).join(', '));
   };
 
@@ -350,7 +374,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Dice Settings" header={tabsHeader}>
+    <Modal isOpen={isOpen} onClose={finish} title="Dice Settings" header={tabsHeader}>
       <div className={styles.container} ref={containerRef}>
 
         {tab === 'settings' && (
@@ -716,7 +740,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
           </button>
           <button 
             className={`md-button md-button-filled ${styles.footerBtnDone}`}
-            onClick={onClose}
+            onClick={finish}
           >
             <Check size={20} strokeWidth={2.5} /> Done
           </button>
