@@ -376,3 +376,16 @@ export function percentileBonus(dice: (Pick<DiceData, 'customFaces' | 'dropped'>
   const units = live.filter(d => faceTexts(d) === UNITS_FACES);
   return tens.length === 1 && units.length === 1 && tens[0].value === 0 && units[0].value === 0 ? 100 : 0;
 }
+
+/**
+ * The picked color in words, shown next to the picker's title, e.g.
+ * "Die color · White" (owner, 2026-11-06). Uses the same names screen
+ * readers hear on the dots; a custom color gives "Custom" and its code.
+ */
+export function colorName(value: string): string {
+  if (value === 'transparent') return 'Same as the die';
+  const upper = value.toUpperCase();
+  const preset = COLORS.find(c => c.toUpperCase() === upper);
+  if (preset) return COLOR_NAMES[preset] ?? preset;
+  return /^#[0-9a-fA-F]{6}$/.test(value) ? `Custom ${upper}` : 'Custom';
+}

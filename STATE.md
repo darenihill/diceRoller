@@ -1,4 +1,4 @@
-Next: Sort dice after each roll built (draft pull request), waits on its second read and Daren's Land tap, 2026-11-07.
+Next: color names in the picker landing on Daren's Land tap; sort dice after each roll landed (Dice Roller 80), 2026-11-07.
 
 # State
 
