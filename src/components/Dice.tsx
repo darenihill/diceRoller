@@ -177,7 +177,12 @@ const DiceComponent: React.FC<DiceProps> = ({
   // A sentence face wraps onto up to four lines instead of shrinking to fit
   // one, so "Go back two spaces" stays readable (player feedback 2026-11-06)
   const faceLines = wordFaces && longestFace > 12 ? Math.min(4, Math.ceil(Math.sqrt(longestFace / 6))) : 1;
-  const fontScale = `min(calc(var(--dice-size) * 0.7), calc(var(--dice-size) * ${wordFaces ? 1.3 : 1.66} * ${faceLines} / ${longestFace || 1}))`;
+  // ...but never so big that its longest word has to break
+  const longestWord = faceLines > 1 && dice.customFaces.length > 0
+    ? Math.max(1, ...dice.customFaces.map(f => parseFaceContent(f).content).filter(f => !f.startsWith(FACE_ICON_PREFIX)).flatMap(f => f.split(/\s+/)).map(w => w.length))
+    : 0;
+  const wordCap = longestWord > 0 ? `, calc(var(--dice-size) * 1.3 / ${longestWord})` : '';
+  const fontScale = `min(calc(var(--dice-size) * 0.7), calc(var(--dice-size) * ${wordFaces ? 1.3 : 1.66} * ${faceLines} / ${longestFace || 1})${wordCap})`;
 
   const renderFace = (faceStr: string) => {
     if (!faceStr) return null;

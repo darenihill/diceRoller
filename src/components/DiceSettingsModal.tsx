@@ -219,22 +219,30 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
 
   // A pasted list keeps its lines: they show as commas, which + splits on.
   // Lines with commas or several words would not split back the same way, so
-  // they become faces straight away, with the usual note and Undo.
+  // they become faces straight away, with the usual note and Undo; so does a
+  // short list pasted next to a sentence already typed.
   const handleListPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     const pasted = e.clipboardData.getData('text');
     if (!/[\r\n]/.test(pasted)) return;
     e.preventDefault();
-    if (!listFitsBox(pasted)) {
+    const input = e.currentTarget;
+    const start = input.selectionStart ?? customInput.length;
+    const end = input.selectionEnd ?? customInput.length;
+    // One line copied with its line break goes in the box like any paste
+    const pastedLines = pasted.split(/[\r\n]+/).map(l => l.trim()).filter(Boolean);
+    if (pastedLines.length <= 1) {
+      setCustomInput(customInput.slice(0, start) + (pastedLines[0] ?? '') + customInput.slice(end));
+      return;
+    }
+    const head = customInput.slice(0, start).replace(/[,\s]*$/, '');
+    const tail = customInput.slice(end).replace(/^[,\s]*/, '');
+    const typedFits = listFitsBox([head, tail].join(',').replace(/,/g, '\n'));
+    if (!listFitsBox(pasted) || !typedFits) {
       const typed = customInput;
       addCustomFace(pasted);
       setCustomInput(typed);
       return;
     }
-    const input = e.currentTarget;
-    const start = input.selectionStart ?? customInput.length;
-    const end = input.selectionEnd ?? customInput.length;
-    const head = customInput.slice(0, start).replace(/[,\s]*$/, '');
-    const tail = customInput.slice(end).replace(/^[,\s]*/, '');
     setCustomInput([head, pastedListForBox(pasted), tail].filter(Boolean).join(', '));
   };
 

@@ -5,6 +5,32 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- Large text, zoom and keyboard pass (reviews/2026-11-06-stories.md, S3, S9,
+  S10, S12). Done when: at 200% page zoom (195 px wide) the menu button can be
+  reached; with 32 px text the Dice Settings tabs, the Color/Icons/Text row and
+  menu tiles don't overlap or split words; Enter on + moves focus into the Add
+  D&D Die menu and + reports aria-expanded; face-row buttons are 44 px tap
+  areas.
+- Older backup asks first (reviews/2026-11-06-stories.md, S4). Done when:
+  importing a backup with less history than the device says how many rolls it
+  replaces, and Undo puts back today's history, dice and settings.
+- Same-name typed roll asks (S6). Done when: saving a typed roll under a name
+  already used asks Keep both / Replace it, like Save Game.
+- Messages show over Undo (S8). Done when: "Saved!", "Share link copied" and
+  "Saved Attack" show while an Undo bar is up, and the Undo stays reachable.
+- Loading text on a slow link (S14). Done when: the page shows "Loading
+  dice…" before the app script arrives.
+- ~~Done 2026-11-06~~ Fixes from the 2026-11-06 review
+  (reviews/2026-11-06-combined.md): Import Backup keeps the imported games, a
+  file that isn't a backup is refused, search pages offer Undo, Add custom text
+  is kept on Done, the Undo bar waits for the Add D&D Die menu, saving under a
+  new name updates the header, Table view no longer overlaps in RPG Mode, the
+  typed-roll Undo message wraps, and a backup can't break stats or turn
+  analytics back on (src/test/reviewWalk20261106.test.tsx,
+  src/test/review20261106.test.ts).
+- ~~Done 2026-11-06~~ Feedback polish (reviews/2026-11-06-ui-feedback.md).
+  Done when: every button dims while pressed on a phone, iPhone included, and
+  a tapped button no longer stays lit from hover (src/test/pressedLook.test.ts).
 - ~~Done 2026-11-07~~ Games in two columns (Daren 2026-11-07: "Include
   that", after the two-column try-out). Done when: Games & Saves shows saves,
   presets and backup buttons two to a row at every width (src/App.module.css,

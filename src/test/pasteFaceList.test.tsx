@@ -127,6 +127,23 @@ describe('Add custom text takes a list', () => {
     expect(latest.customFaces).toEqual(['Old']);
   });
 
+  it('a short list pasted next to a typed sentence adds its lines straight away', () => {
+    render(<Harness />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom faces' }));
+    fireEvent.change(box(), { target: { value: 'Go back two spaces' } });
+    paste('Anna\nBen');
+    expect(latest.customFaces).toEqual(['Anna', 'Ben']);
+    expect(box().value).toBe('Go back two spaces');
+  });
+
+  it('one line copied with its line break goes in the box', () => {
+    render(<Harness />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom faces' }));
+    paste('Go back two spaces\n');
+    expect(box().value).toBe('Go back two spaces');
+    expect(latest.customFaces).toEqual([]);
+  });
+
   it('a face longer than 60 letters keeps its first 60', () => {
     render(<Harness />);
     fireEvent.click(screen.getByRole('tab', { name: 'Custom faces' }));
