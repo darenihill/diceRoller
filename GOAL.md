@@ -5,6 +5,10 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-07~~ Share box wording (Daren 2026-11-06, Build with
+  comment: '"Share with this link" instead'). Done when: the copy-link box
+  that shows when the phone's share sheet isn't available is labeled "Share
+  with this link" (src/test/shareSheet.test.tsx).
 - ~~Done 2026-11-07~~ Color names in the picker (Daren 2026-11-06, Build: "Color picker writes
   the color's name, like \"Die color · White\""). Done when: the title above
   the color dots in Dice Settings and in Custom faces Color names the picked

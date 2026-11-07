@@ -1,4 +1,4 @@
-Next: color names in the picker landing on Daren's Land tap; sort dice after each roll landed (Dice Roller 80), 2026-11-07.
+Next: share box says "Share with this link" landing on Daren's Land tap; color names in the picker landed (Dice Roller 81), 2026-11-07.
 
 # State
 
