@@ -1,4 +1,4 @@
-Next: review pass (stories, security, SCAMPER) landing on Daren's Land tap; phone menu groups landed 2026-11-08; Recently deleted queued in GOAL.md.
+Next: stories, remix, plain-words and first-run reviews (2026-11-06) with the typed-roll read-back fix, waiting on Daren's Land tap. Earlier: review pass (stories, security, SCAMPER) landing on Daren's Land tap; phone menu groups landed 2026-11-08; Recently deleted queued in GOAL.md.
 
 # State
 
