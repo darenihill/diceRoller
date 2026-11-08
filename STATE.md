@@ -1,4 +1,4 @@
-Next: release of 76, 78, 79, 83, two columns and sentence faces on Daren's "Land all" tap, 2026-11-07.
+Next: phone menu groups done 2026-11-08; waits on Daren's Land tap.
 
 # State
 
@@ -15,3 +15,4 @@ Next: release of 76, 78, 79, 83, two columns and sentence faces on Daren's "Land
 - 2026-11-07: games in two columns; a sentence stays one face (Dispatch-Item custom-dice-roller/ask-2026-11-06-build-owner-2026-f8cad3).
 - 2026-11-06: deep review, stories walk + STRIDE security + top apps, with fixes (Dispatch-Item custom-dice-roller/lens-stories+security+top-apps-30).
 - 2026-11-06: feedback and motion polish, pressed look on every button (Dispatch-Item custom-dice-roller/polish-ui-feedback-9).
+- 2026-11-08: phone menu groups with word, shape and tint (Dispatch-Item custom-dice-roller/ask-2026-11-02-build-owner-2026-66edb6).

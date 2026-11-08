@@ -93,6 +93,44 @@
   opacity: 0.6;
   padding-left: 4px;
   color: var(--md-sys-color-on-surface);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Each group has a word, a shape and a color (Okabe-Ito blue, orange and
+   reddish purple, told apart with red-green colorblindness), so none of
+   them relies on color alone (owner, 2026-11-07: way A) */
+.menu {
+  --group-app: #56B4E9;
+  --group-settings: #E69F00;
+  --group-saves: #CC79A7;
+}
+
+:global(body.theme-light) .menu {
+  --group-app: #0072B2;
+}
+
+.groupApp { --group: var(--group-app); }
+.groupSettings { --group: var(--group-settings); }
+.groupSaves { --group: var(--group-saves); }
+
+.groupMark {
+  width: 9px;
+  height: 9px;
+  flex: none;
+  background: var(--group);
+}
+
+.groupApp .groupMark { border-radius: 50%; }
+
+.groupSaves .groupMark {
+  width: 0;
+  height: 0;
+  background: none;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 9px solid var(--group);
 }
 
 @media (max-width: 468px) {
@@ -108,8 +146,19 @@
     display: contents;
   }
   
+  /* Each group's heading spans its row of four on a phone */
   .menuColumnHeader {
-    display: none !important;
+    grid-column: 1 / -1;
+    opacity: 0.85;
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 2px;
+  }
+
+  /* A light tint of the group's color over each tile in that row */
+  .menuColumn .menuItem {
+    background-image: linear-gradient(color-mix(in srgb, var(--group) 18%, transparent), color-mix(in srgb, var(--group) 18%, transparent));
   }
   
   .menu {

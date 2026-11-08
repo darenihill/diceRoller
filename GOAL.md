@@ -5,6 +5,15 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-08~~ Phone menu groups (Daren 2026-11-01, Build: "Phone menu
+  groups its tiles under App, Saves and Tools"; 2026-11-07: "I want to give
+  more of an indicator (especially on mobile) related topics like we have on
+  desktop"; way A from the mock-ups). Done when: on a phone the App, Settings
+  and Saves headings show above their rows, each with a shape (circle, square,
+  triangle) and its row of tiles lightly tinted in a colorblind-safe blue,
+  orange or pink-purple; the computer menu keeps its headings
+  (src/test/menuGroups.test.tsx).
+
 - Large text, zoom and keyboard pass (reviews/2026-11-06-stories.md, S3, S9,
   S10, S12). Done when: at 200% page zoom (195 px wide) the menu button can be
   reached; with 32 px text the Dice Settings tabs, the Color/Icons/Text row and
