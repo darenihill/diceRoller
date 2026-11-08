@@ -4,6 +4,7 @@ import type { RollHistoryItem, RollAdvantageMode } from '../../hooks/useDiceStat
 import type { DiceData } from '../../types';
 import { fairOdds, luckRows, furthestFromFair, luckSet } from '../../utils/fairOdds';
 import { gameKeyFor, gameKeyOf, recentGroups, groupLabel, diceSummary } from '../../utils/rollGroups';
+import { canReuse } from '../../utils/historyReuse';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
 // The same tabs as Dice Settings / Custom faces, so the two dialogs match
@@ -21,6 +22,8 @@ interface HistoryModalProps {
   rpgMode?: boolean;
   modifier?: number;
   rollAdvantage?: RollAdvantageMode;
+  /** A tapped row: put that roll's dice back out, or a typed roll back in the box */
+  onReuse?: (roll: RollHistoryItem) => void;
 }
 
 export const HistoryModal: React.FC<HistoryModalProps> = ({
@@ -33,6 +36,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   rpgMode = false,
   modifier = 0,
   rollAdvantage = 'normal',
+  onReuse,
 }) => {
   // History by game (owner, 2026-11-05): Frequency counts the game on the table
   // now, with chips for the last few games before it and All
@@ -152,6 +156,9 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
             </div>
             <div className={styles.historyList}>
               <h3 className={modalStyles.sectionHeader}>Roll Log ({rollHistory.length})</h3>
+              {onReuse && rollHistory.some(canReuse) && (
+                <p className={modalStyles.toggleDesc} style={{ margin: '0 0 4px' }}>Tap a roll to put its dice back out.</p>
+              )}
               {rollHistory.map((roll, i) => (
                 <React.Fragment key={roll.id}>
                 {runStarts.get(roll.id) && (
@@ -159,14 +166,31 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
                     {runStarts.get(roll.id)}
                   </div>
                 )}
-                <div className={styles.historyItem} style={{ borderLeft: roll.isTargetHit ? '4px solid var(--color-gold)' : 'none' }}>
-                  <div className={styles.historyIndex}>Roll {rollHistory.length - i}{roll.single ? ' · one die' : ''}{roll.typed ? ` · ${roll.typed}` : ''}</div>
-                  <div className={styles.historyDetails}>{roll.details.join(', ')}</div>
-                  <div className={styles.historyTotal}>
-                    Total: {roll.total}
-                    {roll.isTargetHit && <span style={{ marginLeft: 6, color: 'var(--color-gold-ink)', fontSize: '0.75rem' }}>🎯 HIT!</span>}
-                  </div>
-                </div>
+                {(() => {
+                  const rowStyle = { borderLeft: roll.isTargetHit ? '4px solid var(--color-gold)' : 'none' };
+                  const body = (<>
+                    <div className={styles.historyIndex}>Roll {rollHistory.length - i}{roll.single ? ' · one die' : ''}{roll.typed ? ` · ${roll.typed}` : ''}</div>
+                    <div className={styles.historyDetails}>{roll.details.join(', ')}</div>
+                    <div className={styles.historyTotal}>
+                      Total: {roll.total}
+                      {roll.isTargetHit && <span style={{ marginLeft: 6, color: 'var(--color-gold-ink)', fontSize: '0.75rem' }}>🎯 HIT!</span>}
+                    </div>
+                  </>);
+                  // Each row is a button that puts its dice back out (owner, 2026-11-07)
+                  return onReuse && canReuse(roll) ? (
+                    <button
+                      type="button"
+                      className={`${styles.historyItem} ${styles.historyReuse}`}
+                      style={rowStyle}
+                      onClick={() => onReuse(roll)}
+                      aria-label={`Roll ${rollHistory.length - i}, total ${roll.total}. ${roll.typed ? `Put ${roll.typed} back in the roll box` : 'Put these dice back out'}`}
+                    >
+                      {body}
+                    </button>
+                  ) : (
+                    <div className={styles.historyItem} style={rowStyle}>{body}</div>
+                  );
+                })()}
                 </React.Fragment>
               ))}
             </div>

@@ -5,7 +5,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- Tap a past roll in History to put those dice back out (Daren 2026-11-07,
+- ~~Done 2026-11-08~~ Tap a past roll in History to put those dice back out (Daren 2026-11-07,
   Build: "Tap a past roll in History to put those dice back out"). Done when:
   tapping a History row closes History and puts that roll's dice out, unrolled,
   with "Loaded dice from History · Undo"; a typed roll (2d6+3) goes back into
