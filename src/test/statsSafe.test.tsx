@@ -32,7 +32,7 @@ describe('Usage Stats from a damaged backup', () => {
   });
 
   it('Usage Stats still opens after importing a backup with broken stats', () => {
-    expect(restoreBackup({ usageStats: { totalRolls: null, presetsLoadedCount: null, highestRoll: {}, totalDiceRolled: 'lots' } })).toBe('ok');
+    expect(restoreBackup({ version: '1.1', usageStats: { totalRolls: null, presetsLoadedCount: null, highestRoll: {}, totalDiceRolled: 'lots' } })).toBe('ok');
     expect(localStorage.getItem(SAVED.usageStats)).not.toBeNull();
     expect(getLocalStats().totalDiceRolled).toBe(0);
     render(<StatsModal isOpen onClose={() => {}} />);

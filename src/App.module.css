@@ -55,10 +55,23 @@
   text-align: right;
 }
 
+/* Games and saves sit two to a row at every width, so the list is half as
+   long to scroll (owner, 2026-11-07) */
 .setsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.setsGrid .setCard {
+  min-height: 48px;
+  padding: 12px 8px;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.setsGrid .saveCard {
+  padding: 4px 4px 4px 12px;
 }
 
 .setCard {
@@ -73,9 +86,11 @@
   font-weight: 500;
 }
 
-.setCard:hover {
-  background-color: var(--md-sys-color-surface-hover);
-  box-shadow: var(--elevation-2);
+@media (hover: hover) {
+  .setCard:hover {
+    background-color: var(--md-sys-color-surface-hover);
+    box-shadow: var(--elevation-2);
+  }
 }
 
 .saveCard {
@@ -364,8 +379,10 @@
   cursor: pointer;
 }
 
-.viewOff:hover {
-  background-color: var(--md-sys-color-surface-hover);
+@media (hover: hover) {
+  .viewOff:hover {
+    background-color: var(--md-sys-color-surface-hover);
+  }
 }
 
 .viewSwitch {
@@ -392,8 +409,10 @@
   cursor: pointer;
 }
 
-.viewSwitchBtn:hover:not(:disabled) {
-  background-color: var(--md-sys-color-surface-hover);
+@media (hover: hover) {
+  .viewSwitchBtn:hover:not(:disabled) {
+    background-color: var(--md-sys-color-surface-hover);
+  }
 }
 
 /* The view showing now: the accent, no fill, so Roll stays the one filled button */
@@ -437,8 +456,10 @@
   }
 }
 
-.aboutButton:hover {
-  background-color: var(--md-sys-color-surface-hover);
+@media (hover: hover) {
+  .aboutButton:hover {
+    background-color: var(--md-sys-color-surface-hover);
+  }
 }
 
 /* On a phone the game's name gets the room; the About button keeps its icon */

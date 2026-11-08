@@ -56,6 +56,8 @@ export function cleanStats(parsed: unknown): LocalAnalyticsStats {
   const src = parsed as Record<string, unknown>;
   const out = stats as unknown as Record<string, unknown>;
   for (const [key, fallback] of Object.entries(stats)) {
+    // The analytics switch alone decides; a backup's stats can't turn it back on
+    if (key === 'telemetryEnabled') continue;
     const value = src[key];
     if (key === 'presetsLoadedCount') {
       if (value && typeof value === 'object' && !Array.isArray(value)) {

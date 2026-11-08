@@ -18,8 +18,16 @@
 
 .message {
   min-width: 0;
+  /* Up to two lines, so a typed roll's "Rolled 1d20+2d6+3" says what happened
+     in full (app standard 4, review 2026-11-06); longer still ends in … */
+  white-space: normal;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.25;
 }
 
 .undo {
@@ -91,8 +99,10 @@
   cursor: pointer;
 }
 
-.close:hover {
-  background-color: rgba(127, 127, 127, 0.18);
+@media (hover: hover) {
+  .close:hover {
+    background-color: rgba(127, 127, 127, 0.18);
+  }
 }
 
 /* Tablet or computer: 3px */
