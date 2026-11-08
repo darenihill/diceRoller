@@ -31,7 +31,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ url, onClose }) => {
   return (
     <Modal isOpen={!!url} onClose={handleClose} title="Share Link">
       <div className={modalStyles.formGroup}>
-        <label className={modalStyles.formLabel} htmlFor="share-link-url">Copy this link to share your dice configuration:</label>
+        <label className={modalStyles.formLabel} htmlFor="share-link-url">Share with this link</label>
         <input 
           id="share-link-url"
           ref={inputRef}

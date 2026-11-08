@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect, useId } from 'react';
 import type { DiceData } from '../types';
 import { Modal } from './Modal';
-import { FACE_ICON_PREFIX, parseFaceContent, buildFace, faceNumericValue, getContrastColor, colourEveryFace, faceParts, joinFace } from '../utils/diceUtils';
-import { X, Plus, Minus, Star, Check, Copy, Trash2, ImagePlus, ImageOff, Rainbow, Palette, Smile, Type, ChevronDown } from 'lucide-react';
+import { FACE_ICON_PREFIX, parseFaceContent, buildFace, faceNumericValue, getContrastColor, colourEveryFace, faceParts, joinFace, colorName } from '../utils/diceUtils';
+import { X, Plus, Minus, Star, Check, Copy, Trash2, ImagePlus, ImageOff, Rainbow, Palette, Smile, Type, ChevronDown, GripVertical } from 'lucide-react';
 import { addFaceImage, useFaceImages, shrinkImage } from '../utils/faceImages';
 import { ALL_ICONS, COMMON_ICONS } from '../utils/iconUtils';
 import { MAX_CUSTOM_FACES, MAX_FACE_TEXT_LENGTH } from '../utils/constants';
-import { splitFaceList, pastedListForBox } from '../utils/faceList';
+import { splitFaceList, pastedListForBox, listFitsBox } from '../utils/faceList';
 import { ColorPicker } from './ColorPicker';
 import styles from './DiceSettingsModal.module.css';
 
@@ -71,6 +71,21 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   /** After a list is added: what to say, and the faces to put back on Undo */
   const [listNote, setListNote] = useState<{ text: string; before: string[]; after: string[]; canUndo: boolean } | null>(null);
   const images = useFaceImages();
+  /** After faces are moved: the order to put back on Undo. `from[k]` is where
+   *  the face now in place k stood before the first move. */
+  const [moveNote, setMoveNote] = useState<{ text: string; before: string[]; after: string[]; from: number[] } | null>(null);
+  /** A face being dragged by its grip: where it started and where it would land */
+  const [drag, setDrag] = useState<{ from: number; over: number } | null>(null);
+  const faceCardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const gripRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  /** After an arrow-key move, focus follows the face to its new place */
+  const focusGrip = useRef<number | null>(null);
+  useEffect(() => {
+    if (focusGrip.current === null) return;
+    gripRefs.current[focusGrip.current]?.focus();
+    focusGrip.current = null;
+  });
+
   // The faces as they are now, for edits that finish after a picture is shrunk
   const latestDice = useRef(dice);
   useEffect(() => { latestDice.current = dice; }, [dice]);
@@ -80,7 +95,8 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   };
 
   const addCustomFace = (text: string) => {
-    const faces = splitFaceList(text);
+    // A face keeps its first 60 letters, as it would after a reload or a share link
+    const faces = splitFaceList(text).map(f => f.slice(0, MAX_FACE_TEXT_LENGTH));
     if (faces.length === 0) return;
     const before = dice.customFaces;
     const room = Math.max(0, MAX_CUSTOM_FACES - before.length);
@@ -117,7 +133,94 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     setListNote(null);
   };
 
-  // A pasted list keeps its lines: they show as commas, which + splits on
+  /** Moves a face, with its color, picture and number, to a new place in the
+   *  list (owner, 2026-11-05). Rolls don't change: the face showing on the die
+   *  and the face being edited stay the same faces. */
+  const applyOrder = (newFaces: string[], from: number[]) => {
+    // where each old place went
+    const to: number[] = [];
+    from.forEach((old, k) => { to[old] = k; });
+    const follow = (i: number | undefined) => (i === undefined ? undefined : to[i] ?? i);
+    const updates: Partial<DiceData> = { customFaces: newFaces, currentFaceIndex: follow(dice.currentFaceIndex ?? 0) };
+    if (dice.targetFaceIndex !== undefined) updates.targetFaceIndex = follow(dice.targetFaceIndex);
+    onUpdate(dice.id, updates);
+    setSelectedFace(follow(activeFace) ?? 0);
+    if (editing !== null) setEditFace({ die: dice.id, index: follow(editing) ?? editing });
+    setTextDraft(null);
+  };
+
+  /** A face by its words, or its icon, so the note says which face moved */
+  const faceName = (face: string, index: number) => {
+    const parts = faceParts(parseFaceContent(face).content);
+    const words = parts.text || parts.icon;
+    return words ? `"${words}"` : `Face ${index + 1}`;
+  };
+
+  const moveFace = (fromIndex: number, toIndex: number) => {
+    const count = dice.customFaces.length;
+    if (toIndex < 0 || toIndex >= count || toIndex === fromIndex) return;
+    const order = dice.customFaces.map((_, i) => i);
+    const [moved] = order.splice(fromIndex, 1);
+    order.splice(toIndex, 0, moved);
+    const newFaces = order.map(i => dice.customFaces[i]);
+    applyOrder(newFaces, order);
+    // A run of moves undoes in one tap, back to the order before the first
+    const chained = moveNote && moveNote.after === dice.customFaces;
+    setMoveNote({
+      text: `${faceName(dice.customFaces[fromIndex], fromIndex)} moved to place ${toIndex + 1} of ${count}.`,
+      before: chained ? moveNote.before : dice.customFaces,
+      after: newFaces,
+      from: chained ? order.map(i => moveNote.from[i]) : order,
+    });
+  };
+
+  const undoMove = () => {
+    if (!moveNote) return;
+    // The inverse order: the face now in place k goes back to place from[k]
+    const back: number[] = [];
+    moveNote.from.forEach((old, k) => { back[old] = k; });
+    applyOrder(moveNote.before, back);
+    setMoveNote(null);
+  };
+
+  /** The place nearest the pointer, among the face cards as laid out now */
+  const placeUnder = (x: number, y: number) => {
+    let best = -1;
+    let bestDist = Infinity;
+    faceCardRefs.current.slice(0, dice.customFaces.length).forEach((el, k) => {
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const dx = x - (r.left + r.width / 2);
+      const dy = y - (r.top + r.height / 2);
+      const d = dx * dx + dy * dy;
+      if (d < bestDist) { bestDist = d; best = k; }
+    });
+    return best;
+  };
+
+  const gripKeys = (e: React.KeyboardEvent, i: number) => {
+    const step = e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : 0;
+    if (!step) return;
+    e.preventDefault();
+    const target = i + step;
+    if (target < 0 || target >= dice.customFaces.length) return;
+    moveFace(i, target);
+    focusGrip.current = target;
+  };
+
+  // While dragging, the list shows where the face would land
+  const shownOrder = (() => {
+    const order = dice.customFaces.map((_, i) => i);
+    if (!drag || drag.over < 0 || drag.over === drag.from) return order;
+    const [moved] = order.splice(drag.from, 1);
+    order.splice(drag.over, 0, moved);
+    return order;
+  })();
+
+  // A pasted list keeps its lines: they show as commas, which + splits on.
+  // Lines with commas or several words would not split back the same way, so
+  // they become faces straight away, with the usual note and Undo; so does a
+  // short list pasted next to a sentence already typed.
   const handleListPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     const pasted = e.clipboardData.getData('text');
     if (!/[\r\n]/.test(pasted)) return;
@@ -125,8 +228,21 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
     const input = e.currentTarget;
     const start = input.selectionStart ?? customInput.length;
     const end = input.selectionEnd ?? customInput.length;
+    // One line copied with its line break goes in the box like any paste
+    const pastedLines = pasted.split(/[\r\n]+/).map(l => l.trim()).filter(Boolean);
+    if (pastedLines.length <= 1) {
+      setCustomInput(customInput.slice(0, start) + (pastedLines[0] ?? '') + customInput.slice(end));
+      return;
+    }
     const head = customInput.slice(0, start).replace(/[,\s]*$/, '');
     const tail = customInput.slice(end).replace(/^[,\s]*/, '');
+    const typedFits = listFitsBox([head, tail].join(',').replace(/,/g, '\n'));
+    if (!listFitsBox(pasted) || !typedFits) {
+      const typed = customInput;
+      addCustomFace(pasted);
+      setCustomInput(typed);
+      return;
+    }
     setCustomInput([head, pastedListForBox(pasted), tail].filter(Boolean).join(', '));
   };
 
@@ -314,7 +430,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
           </div>
 
           <div className={styles.fieldBlock}>
-            <span className={styles.label} aria-hidden="true">Die color</span>
+            <span className={styles.label} aria-hidden="true">Die color · {colorName(dice.color)}</span>
             <ColorPicker key={dice.id} label="Die color" value={dice.color} onChange={(color) => onUpdate(dice.id, { color })} />
           </div>
         </div>
@@ -335,9 +451,15 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               Pictures stay on this device and go into backups. Share links show the face's text instead.
             </p>
           )}
+          {dice.customFaces.length > 1 && (
+            <p id={`${fieldId}-grip-help`} className={styles.sublabel} style={{ margin: '0 0 6px' }}>
+              Drag a face by its grip to change the order. Rolls stay the same.
+            </p>
+          )}
           <div className={styles.facesGrid}>
             {dice.customFaces.length === 0 && <span className={styles.emptyText}>No custom faces added</span>}
-            {dice.customFaces.map((f, i) => {
+            {shownOrder.map((i, place) => {
+              const f = dice.customFaces[i];
               const parsed = parseFaceContent(f);
               const content = parsed.content;
               const bgColor = parsed.bgColor;
@@ -347,8 +469,41 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               const TileIcon = parts.icon ? (ALL_ICONS.find(icon => icon.name === parts.icon)?.icon || Star) : null;
               
               return (
-                <div key={i} className={`${styles.faceCard} ${i === activeFace ? styles.faceCardSelected : ''}`}>
+                <div
+                  key={place}
+                  ref={(el) => { faceCardRefs.current[place] = el; }}
+                  className={`${styles.faceCard} ${i === activeFace ? styles.faceCardSelected : ''} ${drag && drag.from === i ? styles.faceCardDragging : ''}`}
+                >
                   <div className={styles.faceCardRow}>
+                    <button
+                      type="button"
+                      ref={(el) => { gripRefs.current[place] = el; }}
+                      className={styles.faceGrip}
+                      aria-label={`Move face ${i + 1}, place ${i + 1} of ${dice.customFaces.length}`}
+                      aria-describedby={dice.customFaces.length > 1 ? `${fieldId}-grip-help` : undefined}
+                      title="Drag to move. Arrow keys move it too."
+                      disabled={dice.customFaces.length < 2}
+                      onKeyDown={(e) => gripKeys(e, i)}
+                      onPointerDown={(e) => {
+                        if (e.button !== 0 || dice.customFaces.length < 2) return;
+                        e.preventDefault();
+                        e.currentTarget.setPointerCapture?.(e.pointerId);
+                        setDrag({ from: i, over: i });
+                      }}
+                      onPointerMove={(e) => {
+                        if (!drag) return;
+                        const over = placeUnder(e.clientX, e.clientY);
+                        if (over >= 0 && over !== drag.over) setDrag({ ...drag, over });
+                      }}
+                      onPointerUp={() => {
+                        if (!drag) return;
+                        setDrag(null);
+                        if (drag.over >= 0 && drag.over !== drag.from) moveFace(drag.from, drag.over);
+                      }}
+                      onPointerCancel={() => setDrag(null)}
+                    >
+                      <GripVertical size={18} strokeWidth={2.5} aria-hidden="true" />
+                    </button>
                     <button
                       type="button"
                       className={styles.faceTile}
@@ -409,6 +564,13 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
             })}
           </div>
 
+          {moveNote && moveNote.after === dice.customFaces && (
+            <p className={styles.listNote} role="status">
+              <span>{moveNote.text}</span>
+              <button type="button" className={styles.listUndo} onClick={undoMove}>Undo</button>
+            </p>
+          )}
+
           {/* Color, icons and text fold into three buttons, so a long list of faces
               keeps the room (owner, 2026-11-05). One opens at a time. */}
           <div className={styles.panelButtons}>
@@ -432,7 +594,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
             <div id={`${fieldId}-panel-color`} className={`${styles.panelBody} ${styles.panelBodyColour}`}>
               {dice.customFaces.length > 0 && (
                 <div className={`${styles.faceColourRow} ${colourPinned ? '' : styles.faceColourRowLoose}`} data-pinned={colourPinned}>
-                  <span className={styles.sublabel}>Color for face {activeFace + 1}</span>
+                  <span className={styles.sublabel}>Color for face {activeFace + 1} · {colorName(activeFaceColour)}</span>
                   <ColorPicker
                     key={`${dice.id}-${activeFace}`}
                     label={`Color for face ${activeFace + 1}`}

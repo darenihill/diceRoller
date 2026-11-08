@@ -45,28 +45,42 @@ function getDefaultStats(): LocalAnalyticsStats {
   };
 }
 
+/**
+ * Keeps only values of the right kind from saved stats, so a hand-edited or
+ * damaged backup can't blank the Usage Stats screen (security review,
+ * 2026-11-07): a missing or wrong-typed value falls back to its default.
+ */
+export function cleanStats(parsed: unknown): LocalAnalyticsStats {
+  const stats = getDefaultStats();
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return stats;
+  const src = parsed as Record<string, unknown>;
+  const out = stats as unknown as Record<string, unknown>;
+  for (const [key, fallback] of Object.entries(stats)) {
+    // The analytics switch alone decides; a backup's stats can't turn it back on
+    if (key === 'telemetryEnabled') continue;
+    const value = src[key];
+    if (key === 'presetsLoadedCount') {
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        const counts: Record<string, number> = {};
+        for (const [name, n] of Object.entries(value)) {
+          if (typeof n === 'number' && Number.isFinite(n)) counts[name] = n;
+        }
+        out[key] = counts;
+      }
+    } else if (typeof fallback === 'number') {
+      if (typeof value === 'number' && Number.isFinite(value)) out[key] = value;
+    } else if (typeof value === typeof fallback) {
+      out[key] = value;
+    }
+  }
+  return stats;
+}
+
 export function getLocalStats(): LocalAnalyticsStats {
   try {
     const raw = readItem(STORAGE_KEY);
     if (raw) {
-      const parsed: unknown = JSON.parse(raw);
-      const base = getDefaultStats();
-      // Stats can come from a hand-edited backup: keep only well-formed values
-      // (review 2026-11-06: a null count jammed the Games screen open)
-      const stats = { ...base, ...(parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {}) } as LocalAnalyticsStats;
-      const nums = ['totalSessions', 'totalRolls', 'totalDiceRolled', 'totalSumRolled', 'highestRoll',
-        'customDiceAddedCount', 'backupsExportedCount', 'backupsImportedCount', 'shareLinksGeneratedCount'] as const;
-      for (const k of nums) if (typeof stats[k] !== 'number' || !Number.isFinite(stats[k])) stats[k] = base[k];
-      const counts: unknown = stats.presetsLoadedCount;
-      stats.presetsLoadedCount = counts && typeof counts === 'object' && !Array.isArray(counts)
-        ? Object.fromEntries(Object.entries(counts).filter(([, n]) => typeof n === 'number' && Number.isFinite(n)))
-        : {};
-      for (const k of ['visitorId', 'firstSessionTime', 'lastSessionTime', 'favoriteTheme'] as const) {
-        if (typeof stats[k] !== 'string') stats[k] = base[k];
-      }
-      // The analytics switch alone decides; a backup's stats can't turn it back on
-      stats.telemetryEnabled = base.telemetryEnabled;
-      return stats;
+      return cleanStats(JSON.parse(raw));
     }
   } catch (e) {
     console.error('Failed to load analytics stats', e);
@@ -137,6 +151,7 @@ export type AnalyticsEventName =
   | 'sound_toggled'
   | 'shake_toggled'
   | 'bright_rings_toggled'
+  | 'sort_dice_toggled'
   | 'shake_roll'
   | 'table_view_toggled'
   | 'modifier_toggled'

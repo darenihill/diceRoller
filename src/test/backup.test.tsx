@@ -23,6 +23,9 @@ function seedEverything() {
   localStorage.setItem(SAVED.targetHighlight, '7, 11');
   localStorage.setItem(SAVED.telemetry, 'false');
   localStorage.setItem(SAVED.usageStats, JSON.stringify({ totalRolls: 42 }));
+  localStorage.setItem(SAVED.tableView, 'true');
+  localStorage.setItem(SAVED.brightRings, 'true');
+  localStorage.setItem(SAVED.sortDice, 'true');
 }
 
 beforeEach(() => localStorage.clear());
@@ -31,10 +34,14 @@ afterEach(() => { vi.restoreAllMocks(); localStorage.clear(); });
 describe('Export backup', () => {
   it('round trip brings back games and every setting', () => {
     seedEverything();
+    // A new saved value must be seeded here too, or the round trip can't catch a backup that forgets it
+    for (const key of Object.values(SAVED)) {
+      if (key !== SAVED.faceImages) expect(localStorage.getItem(key), `seedEverything() sets ${key}`).not.toBeNull();
+    }
     const before = Object.fromEntries(Object.values(SAVED).map(k => [k, localStorage.getItem(k)]));
     const backup = JSON.parse(JSON.stringify(buildBackup()));
     expect(backup.version).toBe(BACKUP_VERSION);
-    expect(backup).toMatchObject({ rpgMode: true, shakeToRoll: true, targetHighlight: '7, 11', telemetryEnabled: false });
+    expect(backup).toMatchObject({ rpgMode: true, shakeToRoll: true, targetHighlight: '7, 11', telemetryEnabled: false, tableView: true, brightRings: true, sortDice: true });
 
     localStorage.clear();
     expect(restoreBackup(backup)).toBe('ok');

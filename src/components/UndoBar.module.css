@@ -99,8 +99,10 @@
   cursor: pointer;
 }
 
-.close:hover {
-  background-color: rgba(127, 127, 127, 0.18);
+@media (hover: hover) {
+  .close:hover {
+    background-color: rgba(127, 127, 127, 0.18);
+  }
 }
 
 /* Tablet or computer: 3px */

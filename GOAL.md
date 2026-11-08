@@ -5,6 +5,36 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-08~~ Phone menu groups (Daren 2026-11-01, Build: "Phone menu
+  groups its tiles under App, Saves and Tools"; 2026-11-07: "I want to give
+  more of an indicator (especially on mobile) related topics like we have on
+  desktop"; way A from the mock-ups). Done when: on a phone the App, Settings
+  and Saves headings show above their rows, each with a shape (circle, square,
+  triangle) and its row of tiles lightly tinted in a colorblind-safe blue,
+  orange or pink-purple; the computer menu keeps its headings
+  (src/test/menuGroups.test.tsx).
+
+- ~~Done 2026-11-07~~ Switches say On or Off (app standards: accessibility;
+  deep review 2026-11-07). Done when: every Customize switch shows On or Off
+  in words under it, so its state never rests on color alone
+  (src/test/switchWords.test.tsx).
+- ~~Done 2026-11-07~~ Backup keeps the newest switches (review 2026-11-07,
+  standard 1, no lost work). Done when: Export backup carries Table view,
+  Bright Rings and Sort dice after each roll, Import brings them back, and the
+  round-trip test fails if any saved value is left unseeded
+  (src/test/backup.test.tsx).
+- ~~Done 2026-11-07~~ Usage Stats survives a damaged backup (review
+  2026-11-07, security). Done when: stats of the wrong kind fall back to their
+  defaults on load, so Usage Stats opens instead of blanking the app
+  (src/test/statsSafe.test.tsx).
+- ~~Done 2026-11-07~~ Metrics switch says where data goes (review
+  2026-11-07, standard 15, privacy). Done when: Customize's Anonymous Page
+  Metrics line names Google Analytics and what is never sent
+  (src/test/privacyWording.test.tsx).
+- Recently deleted (review 2026-11-07, standard 2, Undo › get it back later).
+  Done when: a deleted saved game and a cleared History go to a Recently
+  deleted list for 30 days, each row with its name, how long ago and Restore,
+  after the Undo bar has gone.
 - Large text, zoom and keyboard pass (reviews/2026-11-06-stories.md, S3, S9,
   S10, S12). Done when: at 200% page zoom (195 px wide) the menu button can be
   reached; with 32 px text the Dice Settings tabs, the Color/Icons/Text row and
@@ -31,7 +61,44 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   typed-roll Undo message wraps, and a backup can't break stats or turn
   analytics back on (src/test/reviewWalk20261106.test.tsx,
   src/test/review20261106.test.ts).
+- ~~Done 2026-11-06~~ Feedback polish (reviews/2026-11-06-ui-feedback.md).
+  Done when: every button dims while pressed on a phone, iPhone included, and
+  a tapped button no longer stays lit from hover (src/test/pressedLook.test.ts).
+- ~~Done 2026-11-07~~ Games in two columns (Daren 2026-11-07: "Include
+  that", after the two-column try-out). Done when: Games & Saves shows saves,
+  presets and backup buttons two to a row at every width (src/App.module.css,
+  checked at 390 px).
+- ~~Done 2026-11-07~~ A sentence stays one face (player feedback 2026-11-06:
+  "if the sentence is more than 2-3 words it's being separated into similar
+  faces"; Daren 2026-11-07: "can we make sure all of this is addressed?").
+  Done when: Add custom text splits on commas only when every piece is one or
+  two words, a pasted list of sentences adds one face per line with Undo, a
+  face keeps its first 60 letters, and a long word face wraps onto up to four
+  lines instead of shrinking to one (src/test/pasteFaceList.test.tsx).
 
+- ~~Done 2026-11-06~~ Reorder custom faces (Daren 2026-11-05, Build: "Drag a die's custom faces
+  into a new order"): each face in Custom faces gets a grip; dragging it
+  moves the face with its color, picture and number, the arrow keys move it
+  too, and Undo puts the old order back. Rolls don't change, only the list
+  order, which is also the order a shared die shows. Done when: a drag or an
+  arrow key moves a face, the face showing on the die stays the same, and
+  Undo restores the order (src/test/reorderFaces.test.tsx).
+- ~~Done 2026-11-07~~ Share box wording (Daren 2026-11-06, Build with
+  comment: '"Share with this link" instead'). Done when: the copy-link box
+  that shows when the phone's share sheet isn't available is labeled "Share
+  with this link" (src/test/shareSheet.test.tsx).
+- ~~Done 2026-11-07~~ Color names in the picker (Daren 2026-11-06, Build: "Color picker writes
+  the color's name, like \"Die color · White\""). Done when: the title above
+  the color dots in Dice Settings and in Custom faces Color names the picked
+  color in words, using the names screen readers hear; a custom color reads
+  "Custom" and its code (src/test/colorPicker.test.tsx).
+- ~~Done 2026-11-07~~ Sort dice after each roll (Daren 2026-11-06, Build: "A Sort button lines
+  up the dice from low to high after a roll"; card: no button on the main
+  screen, a "Sort dice after each roll" switch in Customize, off by default
+  and kept on this device). Done when: with the switch on, the dice slide
+  into low-to-high order each time a roll lands, only where they sit changes
+  (never what they rolled, the saved dice order or History), and turning it
+  off puts them back in their own order (src/test/sortDice.test.tsx).
 - ~~Done 2026-11-03~~ Lift and tag lock (Daren 2026-11-03: "For lock I like
   the lift and held tag"). Done when: a held die lifts with a deeper shadow
   and a gold HELD tag drops onto its top edge; a die loaded already held shows

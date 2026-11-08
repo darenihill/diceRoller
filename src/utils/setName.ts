@@ -56,6 +56,15 @@ export function splitShareHash(hash: string): { data: string; name: string | nul
 /** Longest unpacked share link read, in characters */
 export const MAX_SHARE_JSON = 1_000_000;
 
+// A link may only carry a built-in game's name (any letter case) when its dice
+// are that game's dice, so other dice can't pose as "Catan". Other names pass.
+export function shareNameFor(dice: Partial<DiceData>[], name: string | null): string | null {
+  if (!name) return name;
+  const key = name.trim().toLowerCase();
+  const preset = dicePresets.find(p => p.name.toLowerCase() === key);
+  return !preset || diceSignature(preset.dice) === diceSignature(dice) ? name : null;
+}
+
 // A share link is a hand-craftable URL, so its dice are treated as untrusted.
 // Returns no dice when the link cannot be read.
 export function readShareLink(hash: string): { dice: DiceData[]; name: string | null } {
@@ -65,7 +74,8 @@ export function readShareLink(hash: string): { dice: DiceData[]; name: string | 
     // A tiny link can unpack to megabytes and freeze the page; the biggest
     // real set is about half this (review 2026-11-06)
     if (!json || json.length > MAX_SHARE_JSON) return { dice: [], name };
-    return { dice: sanitizeDiceList(JSON.parse(json)), name };
+    const dice = sanitizeDiceList(JSON.parse(json));
+    return { dice, name: shareNameFor(dice, name) };
   } catch (e) {
     console.error("Failed to load shared dice set from URL", e);
     return { dice: [], name };
