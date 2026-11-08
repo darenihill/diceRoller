@@ -513,6 +513,8 @@ function App() {
   // A History row tapped (owner, 2026-11-07): its dice come back out unrolled,
   // as loading a game does, with Undo; a typed roll goes back in the roll box
   const [rollPrefill, setRollPrefill] = useState<{ text: string; n: number } | undefined>();
+  // The roll box goes with RPG Mode; turning it on again later starts empty
+  if (!rpgMode && rollPrefill) setRollPrefill(undefined);
   const handleReuseRoll = (roll: RollHistoryItem) => {
     setModalOpen(null);
     if (roll.typed) {
@@ -527,7 +529,8 @@ function App() {
     const before = diceList;
     setDiceList(loaded);
     setLoadedSet(roll.game ? { name: roll.game, signature: diceSignature(loaded) } : null);
-    if (before.length > 0) offerUndo('Loaded dice from History', () => restoreDice(before), { big: true });
+    // As loading a game: Undo only when different dice were out
+    if (before.length > 0 && diceSignature(before) !== diceSignature(loaded)) offerUndo('Loaded dice from History', () => restoreDice(before), { big: true });
     else showToast('Loaded dice from History');
   };
 

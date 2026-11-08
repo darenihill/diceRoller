@@ -17,9 +17,9 @@ interface TypeRollBoxProps {
 
 /** RPG mode: type 2d6+3, d20 adv or 1d8+2d6 and roll it in one go. */
 export const TypeRollBox = ({ onRoll, disabled = false, savedRolls = [], onSaveRoll, onRemoveSavedRoll, prefill }: TypeRollBoxProps) => {
-  const [text, setText] = useState(prefill?.text ?? '');
+  const [text, setText] = useState('');
   // A roll tapped in History lands in the box, ready to roll
-  const [filledN, setFilledN] = useState(prefill?.n);
+  const [filledN, setFilledN] = useState<number | undefined>();
   if (prefill && prefill.n !== filledN) {
     setFilledN(prefill.n);
     setText(prefill.text);

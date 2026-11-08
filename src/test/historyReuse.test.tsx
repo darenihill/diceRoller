@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
-import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import App from '../App';
 import { HistoryModal } from '../components/modals/HistoryModal';
 import { sanitizeRollHistory, type RollHistoryItem } from '../hooks/useDiceState';
@@ -52,8 +52,10 @@ describe('putting a past roll back out', () => {
     const roll = rolled([die(6, '#E32227')]);
     render(<HistoryModal isOpen onClose={() => {}} rollHistory={[roll, { ...roll, id: 's', single: true }]} onClearHistory={() => {}} onReuse={onReuse} />);
     expect(screen.getByText('Tap a roll to put its dice back out.')).toBeTruthy();
-    const buttons = screen.getAllByRole('button', { name: /Put these dice back out/ });
+    const buttons = screen.getAllByRole('button', { description: /put its dice back out/ });
     expect(buttons).toHaveLength(1);
+    // The row's own words stay its name, so a screen reader still hears the faces
+    expect(buttons[0].textContent).toContain('a: 4, b: 5');
     fireEvent.click(buttons[0]);
     expect(onReuse).toHaveBeenCalledWith(roll);
   });
@@ -71,11 +73,11 @@ describe('in the app', () => {
     render(<App />);
     const before = screen.getAllByRole('group', { name: / showing / }).length;
     openHistory();
-    fireEvent.click(screen.getByRole('button', { name: /Put these dice back out/ }));
-    await waitFor(() => expect(screen.queryByRole('button', { name: /Put these dice back out/ })).toBeNull());
+    fireEvent.click(screen.getByRole('button', { description: /put its dice back out/ }));
+    await waitFor(() => expect(screen.queryByRole('button', { description: /put its dice back out/ })).toBeNull());
     expect(screen.getAllByRole('group', { name: / showing / })).toHaveLength(3);
-    const bar = screen.getByText('Loaded dice from History').closest('[role="status"], [role="alert"], div')!;
-    fireEvent.click(within(bar.parentElement!).getByRole('button', { name: /undo/i }));
+    expect(screen.getByText('Loaded dice from History')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /^undo/i }));
     expect(screen.getAllByRole('group', { name: / showing / })).toHaveLength(before);
   });
 
@@ -83,7 +85,19 @@ describe('in the app', () => {
     localStorage.setItem('rollHistory', JSON.stringify([rolled([die(6, '#384050'), die(6, '#384050')], { typed: '2d6+3' })]));
     render(<App />);
     openHistory();
-    fireEvent.click(screen.getByRole('button', { name: /Put 2d6\+3 back in the roll box/ }));
+    fireEvent.click(screen.getByRole('button', { name: /2d6\+3/, description: /typed roll back in the roll box/ }));
     expect((screen.getByRole('textbox', { name: /Type a roll, like/ }) as HTMLInputElement).value).toBe('2d6+3');
+  });
+
+  it('turning RPG Mode off and on again later starts the roll box empty', async () => {
+    localStorage.setItem('rollHistory', JSON.stringify([rolled([die(6, '#384050')], { typed: 'd6' })]));
+    render(<App />);
+    openHistory();
+    fireEvent.click(screen.getByRole('button', { description: /typed roll back in the roll box/ }));
+    expect((screen.getByRole('textbox', { name: /Type a roll, like/ }) as HTMLInputElement).value).toBe('d6');
+    fireEvent.click(screen.getAllByRole('button', { name: /menu/i })[0]);
+    fireEvent.click(screen.getByRole('button', { name: /RPG Mode/i }));
+    fireEvent.click(screen.getByRole('button', { name: /RPG Mode/i }));
+    await waitFor(() => expect((screen.getByRole('textbox', { name: /Type a roll, like/ }) as HTMLInputElement).value).toBe(''));
   });
 });
