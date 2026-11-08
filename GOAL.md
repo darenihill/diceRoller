@@ -5,6 +5,12 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- Tap a past roll in History to put those dice back out (Daren 2026-11-07,
+  Build: "Tap a past roll in History to put those dice back out"). Done when:
+  tapping a History row closes History and puts that roll's dice out, unrolled,
+  with "Loaded dice from History · Undo"; a typed roll (2d6+3) goes back into
+  the roll box ready to roll; new rolls keep each die's color and name, and
+  older rolls come back in the default color (src/test/historyReuse.test.tsx).
 - ~~Done 2026-11-08~~ Phone menu groups (Daren 2026-11-01, Build: "Phone menu
   groups its tiles under App, Saves and Tools"; 2026-11-07: "I want to give
   more of an indicator (especially on mobile) related topics like we have on

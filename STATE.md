@@ -1,4 +1,4 @@
-Next: review pass (stories, security, SCAMPER) landing on Daren's Land tap; phone menu groups landed 2026-11-08; Recently deleted queued in GOAL.md.
+Next: tap a History roll to put its dice back out (in progress 2026-11-08).
 
 # State
 
