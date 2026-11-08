@@ -5,6 +5,13 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-08~~ Save fills in a name for you (Daren 2026-11-07, Build:
+  "Save fills in a name for you, like “Catan 2” or “2 d6”"). Done when:
+  Save opens with a name already in the box and selected, so typing replaces
+  it: a loaded game's name ("Catan", or "Catan 2" when taken); dice named in
+  Dice Settings ("Lunch die + 2 d6"); plain dice counted by kind ("2 d6 + 1
+  d20"); unnamed custom-face dice "Custom dice". A taken name still asks Keep
+  both / Replace it (src/test/saveNameSuggest.test.tsx).
 - ~~Done 2026-11-08~~ Tap a past roll in History to put those dice back out (Daren 2026-11-07,
   Build: "Tap a past roll in History to put those dice back out"). Done when:
   tapping a History row closes History and puts that roll's dice out, unrolled,
@@ -95,7 +102,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   that shows when the phone's share sheet isn't available is labeled "Share
   with this link" (src/test/shareSheet.test.tsx).
 - ~~Done 2026-11-07~~ Color names in the picker (Daren 2026-11-06, Build: "Color picker writes
-  the color's name, like \"Die color · White\""). Done when: the title above
+  the color's name, like "Die color · White""). Done when: the title above
   the color dots in Dice Settings and in Custom faces Color names the picked
   color in words, using the names screen readers hear; a custom color reads
   "Custom" and its code (src/test/colorPicker.test.tsx).
