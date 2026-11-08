@@ -392,6 +392,33 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // A share link opened in the tab Dice Roller is already in changes only the
+  // part after #, so the page doesn't reload and the mount effect above never
+  // sees it (review 2026-11-08: a pasted link did nothing until a refresh).
+  // Read it here the same way, with Undo for the dice that were out.
+  useEffect(() => {
+    const onHashChange = () => {
+      const hash = window.location.hash;
+      if (!hash.startsWith('#share=')) return;
+      const { dice: shared, name } = readShareLink(hash);
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      if (shared.length === 0) {
+        showToast("That share link couldn't be read. Your dice stay as they are.");
+        return;
+      }
+      const mine = latestDiceRef.current;
+      setModalOpen(null);
+      setMenuOpen(false);
+      setDiceList(shared);
+      setLoadedSet(name ? { name, signature: diceSignature(shared) } : null);
+      if (mine.length > 0 && diceSignature(mine) !== diceSignature(shared)) {
+        offerUndo('Opened shared dice', () => restoreDice(mine), { big: true });
+      }
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, [offerUndo, restoreDice, setDiceList, showToast]);
+
   // Save autosave when the page is hidden or unloading. `pagehide` and
   // `visibilitychange` fire reliably on mobile where `beforeunload` often doesn't.
   useEffect(() => {
@@ -1042,7 +1069,7 @@ function App() {
                   handleAddDice({ numberValue: 1, faces: 20, name: 'd20', customFaces: [], color: '#384050' });
                 }}
               >
-                <Swords size={18} aria-hidden="true" /> RPG Mode
+                <Swords size={18} aria-hidden="true" /> RPG mode
               </button>
             )}
           </div>
