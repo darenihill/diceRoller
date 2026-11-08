@@ -1,4 +1,4 @@
-Next: Dice Roller 86 to 91 landed 2026-11-08 on Daren's "Land all" tap; Recently deleted queued in GOAL.md.
+Next: deep review (stories, security, inversion) under way, item lens-stories+security+inversion-39.
 
 # State
 
