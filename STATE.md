@@ -1,4 +1,4 @@
-Next: review pass (stories, security, SCAMPER) landing on Daren's Land tap; phone menu groups landed 2026-11-08; Recently deleted queued in GOAL.md.
+Next: Save fills in a name, done 2026-11-08; waits on Daren's Land tap (History tap is pull request 87).
 
 # State
 
@@ -17,3 +17,4 @@ Next: review pass (stories, security, SCAMPER) landing on Daren's Land tap; phon
 - 2026-11-06: feedback and motion polish, pressed look on every button (Dispatch-Item custom-dice-roller/polish-ui-feedback-9).
 - 2026-11-08: phone menu groups with word, shape and tint (Dispatch-Item custom-dice-roller/ask-2026-11-02-build-owner-2026-66edb6).
 - 2026-11-07: stories, security and SCAMPER review; backup keeps the newest switches, Usage Stats survives a damaged backup, metrics switch names Google Analytics (Dispatch-Item custom-dice-roller/lens-stories+security+scamper-30).
+- 2026-11-08: Save fills in a name, selected (Dispatch-Item custom-dice-roller/ask-2026-11-08-build-owner-2026-fa277a).

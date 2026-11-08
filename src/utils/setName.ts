@@ -90,3 +90,47 @@ export function nextFreeSaveName(name: string, taken: Iterable<string>): string 
   while (names.has(`${base} (${n})`)) n++;
   return `${base} (${n})`;
 }
+
+/** A die's own name from Dice Settings; the plain "d6" a die can carry doesn't count */
+const givenName = (d: Partial<DiceData>) => {
+  const n = (d.name ?? '').trim();
+  return n && !/^d\d+$/i.test(n) ? n : '';
+};
+
+/** `base`, or `base 2`, `base 3`… when that name is taken */
+function freeName(base: string, names: Set<string>): string {
+  if (!names.has(base)) return base;
+  let n = 2;
+  while (names.has(`${base} ${n}`)) n++;
+  return `${base} ${n}`;
+}
+
+/**
+ * The name Save fills in (owner, 2026-11-07: Save fills in a name for you,
+ * like "Catan 2" or "2 d6"). In order: the loaded game's name; dice named in
+ * Dice Settings ("Lunch die + 2 d6"); a count of each plain kind
+ * ("2 d6 + 1 d20"); custom-face dice with no name are "Custom dice". A taken
+ * name gets the next free number.
+ */
+export function suggestSaveName(dice: Partial<DiceData>[], loaded: LoadedSet | null, taken: Iterable<string>): string {
+  const names = new Set(taken);
+  if (dice.length === 0) return '';
+  const game = currentSetName(dice, loaded);
+  if (game) return freeName(game, names);
+  // Named dice first, then plain kinds smallest first, then unnamed custom dice
+  const named = new Map<string, number>();
+  const plain = new Map<number, number>();
+  let custom = 0;
+  for (const d of dice) {
+    const own = givenName(d);
+    if (own) named.set(own, (named.get(own) ?? 0) + 1);
+    else if ((d.customFaces?.length ?? 0) > 0) custom++;
+    else plain.set(Number(d.faces) || 6, (plain.get(Number(d.faces) || 6) ?? 0) + 1);
+  }
+  const parts = [
+    ...[...named].map(([n, c]) => (c > 1 ? `${c} ${n}` : n)),
+    ...[...plain].sort((a, b) => a[0] - b[0]).map(([f, c]) => `${c} d${f}`),
+    ...(custom > 0 ? ['Custom dice'] : []),
+  ];
+  return freeName(parts.join(' + ').slice(0, MAX_NAME_LENGTH), names);
+}

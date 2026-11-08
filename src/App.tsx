@@ -19,7 +19,7 @@ import { celebrateNatural20 } from './utils/confetti';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { COMPACT_DIE_SIZE } from './utils/constants';
 import { dicePresets } from './utils/presets';
-import { currentSetName, diceSignature, rollSignature, readShareLink, nextFreeSaveName, type LoadedSet } from './utils/setName';
+import { currentSetName, diceSignature, rollSignature, readShareLink, nextFreeSaveName, suggestSaveName, type LoadedSet } from './utils/setName';
 import { readLandingStart, readLandingAbout } from './utils/landing';
 import { Info, Plus, Dice6, Table2, Swords, X } from 'lucide-react';
 import { Modal } from './components/Modal';
@@ -464,13 +464,21 @@ function App() {
     '--dice-gap': `${dynamicGap}px`
   } as React.CSSProperties;
 
-  // The typed name stays until it is saved or cleared, so tapping away loses nothing
+  const userSaveNames = Object.keys(savedConfigs).filter(n => n !== 'systemAutosave');
+
+  // Save fills in a name, selected so typing replaces it (owner, 2026-11-07).
+  // A name the user typed stays until it is saved or cleared, so tapping away
+  // loses nothing; an untouched suggestion follows the dice.
+  const lastSuggestion = useRef('');
   const handleSave = () => {
+    if (!saveName.trim() || saveName === lastSuggestion.current) {
+      const suggestion = suggestSaveName(diceList, loadedSet, userSaveNames);
+      lastSuggestion.current = suggestion;
+      setSaveName(suggestion);
+    }
     setSavePromptOpen(true);
     setMenuOpen(false);
   };
-
-  const userSaveNames = Object.keys(savedConfigs).filter(n => n !== 'systemAutosave');
 
   const executeSave = (mode: 'new' | 'keepBoth' | 'replace') => {
     const typed = saveName.trim();
