@@ -1,4 +1,4 @@
-Next: review pass (stories, security, SCAMPER) landing on Daren's Land tap; phone menu groups landed 2026-11-08; Recently deleted queued in GOAL.md.
+Next: one name per thing (word list, about 40 labels, Help, landing pages), then Land tap.
 
 # State
 
