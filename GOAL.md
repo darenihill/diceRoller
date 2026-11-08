@@ -57,10 +57,16 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   2026-11-07, standard 15, privacy). Done when: Customize's Anonymous Page
   Metrics line names Google Analytics and what is never sent
   (src/test/privacyWording.test.tsx).
+- ~~Done 2026-11-08~~ Fixes from the 2026-11-08 review (stories, security,
+  inversion). Done when: a share link opened in the tab Dice Roller is
+  already in puts its dice out with Undo, as a fresh visit does; Help says
+  "Tap a die, then Hold" and "then Settings", not lock and gear; the empty
+  screen says "RPG mode" (src/test/review20261108.test.tsx).
 - Recently deleted (review 2026-11-07, standard 2, Undo › get it back later).
-  Done when: a deleted saved game and a cleared History go to a Recently
-  deleted list for 30 days, each row with its name, how long ago and Restore,
-  after the Undo bar has gone.
+  Done when: a deleted saved game, a cleared History and dice cleared with
+  Clear all (review 2026-11-08) go to a Recently deleted list for 30 days,
+  each row with its name, how long ago and Restore, after the Undo bar has
+  gone.
 - Large text, zoom and keyboard pass (reviews/2026-11-06-stories.md, S3, S9,
   S10, S12). Done when: at 200% page zoom (195 px wide) the menu button can be
   reached; with 32 px text the Dice Settings tabs, the Color/Icons/Text row and

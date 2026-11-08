@@ -77,3 +77,19 @@ describe('words match the buttons they point at (DESIGN.md §7)', () => {
     expect(empty.getByRole('button', { name: 'RPG mode' })).toBeInTheDocument();
   });
 });
+
+describe('a hand-edited History row, tapped (security, tampering)', () => {
+  it('puts out only safe dice: faces in range, hex colors, short names', async () => {
+    const { diceFromHistory } = await import('../utils/historyReuse');
+    const { sanitizeRollHistory } = await import('../hooks/useDiceState');
+    const { sanitizeDiceList } = await import('../utils/diceUtils');
+    const [row] = sanitizeRollHistory([{
+      total: 3, details: [], set: JSON.stringify([[[99999, []], [-4, []]]]),
+      colors: ['url(javascript:alert(1))', '#123456'], names: ['x'.repeat(500), 'ok'],
+    }]);
+    const dice = sanitizeDiceList(diceFromHistory(row));
+    expect(dice.map(d => d.faces)).toEqual([1000, 1]);
+    expect(dice.map(d => d.color)).toEqual(['#E9EAEC', '#123456']);
+    expect(dice[0].name.length).toBe(40);
+  });
+});
