@@ -36,6 +36,9 @@ export function buildBackup(onScreen: { customFaces: string[] }[] = []) {
     rpgMode: readItem(SAVED.rpgMode) === 'true',
     shakeToRoll: readItem(SAVED.shakeToRoll) === 'true',
     targetHighlight: readItem(SAVED.targetHighlight) || '',
+    tableView: readItem(SAVED.tableView) === 'true',
+    brightRings: readItem(SAVED.brightRings) === 'true',
+    sortDice: readItem(SAVED.sortDice) === 'true',
     telemetryEnabled: readItem(SAVED.telemetry) !== 'false',
     usageStats: readJson<Record<string, unknown> | null>(SAVED.usageStats, null),
     buzzOnLand: readItem(BUZZ_KEY) === 'true',
@@ -81,6 +84,10 @@ export function restoreBackup(input: unknown): RestoreResult {
   if (typeof data.rpgMode === 'boolean') keep(SAVED.rpgMode, String(data.rpgMode));
   if (typeof data.shakeToRoll === 'boolean') keep(SAVED.shakeToRoll, String(data.shakeToRoll));
   if (typeof data.targetHighlight === 'string') keep(SAVED.targetHighlight, data.targetHighlight.slice(0, 200));
+  // Added after 1.1 without a version change: older backups leave these as they are
+  if (typeof data.tableView === 'boolean') keep(SAVED.tableView, String(data.tableView));
+  if (typeof data.brightRings === 'boolean') keep(SAVED.brightRings, String(data.brightRings));
+  if (typeof data.sortDice === 'boolean') keep(SAVED.sortDice, String(data.sortDice));
   if (typeof data.telemetryEnabled === 'boolean') keep(SAVED.telemetry, String(data.telemetryEnabled));
   if (isObject(data.usageStats)) keep(SAVED.usageStats, JSON.stringify(data.usageStats));
   // Older backups have no buzz settings; they keep this phone's own
