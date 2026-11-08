@@ -19,7 +19,7 @@ import { celebrateNatural20 } from './utils/confetti';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { COMPACT_DIE_SIZE } from './utils/constants';
 import { dicePresets } from './utils/presets';
-import { currentSetName, diceSignature, rollSignature, readShareLink, nextFreeSaveName, type LoadedSet } from './utils/setName';
+import { currentSetName, diceSignature, rollSignature, readShareLink, nextFreeSaveName, suggestSaveName, type LoadedSet } from './utils/setName';
 import { readLandingStart, readLandingAbout } from './utils/landing';
 import { Info, Plus, Dice6, Table2, Swords, X } from 'lucide-react';
 import { Modal } from './components/Modal';
@@ -42,6 +42,8 @@ import { StatsModal } from './components/modals/StatsModal';
 import { TableView } from './components/TableView';
 import { tableTiles, tableMath } from './utils/tableView';
 import { gameKeyOf } from './utils/rollGroups';
+import { diceFromHistory } from './utils/historyReuse';
+import type { RollHistoryItem } from './hooks/useDiceState';
 import { saveItem, onSaveRefused, readItem } from './utils/safeStorage';
 import { useWakeLock } from './hooks/useWakeLock';
 import { useNewVersion } from './hooks/useNewVersion';
@@ -464,13 +466,21 @@ function App() {
     '--dice-gap': `${dynamicGap}px`
   } as React.CSSProperties;
 
-  // The typed name stays until it is saved or cleared, so tapping away loses nothing
+  const userSaveNames = Object.keys(savedConfigs).filter(n => n !== 'systemAutosave');
+
+  // Save fills in a name, selected so typing replaces it (owner, 2026-11-07).
+  // A name the user typed stays until it is saved or cleared, so tapping away
+  // loses nothing; an untouched suggestion follows the dice.
+  const lastSuggestion = useRef('');
   const handleSave = () => {
+    if (!saveName.trim() || saveName === lastSuggestion.current) {
+      const suggestion = suggestSaveName(diceList, loadedSet, userSaveNames);
+      lastSuggestion.current = suggestion;
+      setSaveName(suggestion);
+    }
     setSavePromptOpen(true);
     setMenuOpen(false);
   };
-
-  const userSaveNames = Object.keys(savedConfigs).filter(n => n !== 'systemAutosave');
 
   const executeSave = (mode: 'new' | 'keepBoth' | 'replace') => {
     const typed = saveName.trim();
@@ -506,6 +516,30 @@ function App() {
     else if (setName) showToast(`Loaded ${setName}`);
     setModalOpen(null);
     setMenuOpen(false);
+  };
+
+  // A History row tapped (owner, 2026-11-07): its dice come back out unrolled,
+  // as loading a game does, with Undo; a typed roll goes back in the roll box
+  const [rollPrefill, setRollPrefill] = useState<{ text: string; n: number } | undefined>();
+  // The roll box goes with RPG Mode; turning it on again later starts empty
+  if (!rpgMode && rollPrefill) setRollPrefill(undefined);
+  const handleReuseRoll = (roll: RollHistoryItem) => {
+    setModalOpen(null);
+    if (roll.typed) {
+      if (!rpgMode) toggleRpgMode();
+      setRollPrefill(p => ({ text: roll.typed!, n: (p?.n ?? 0) + 1 }));
+      showToast(`${roll.typed} is in the roll box`);
+      return;
+    }
+    const config = diceFromHistory(roll);
+    if (!config) return;
+    const loaded = sanitizeDiceList(config);
+    const before = diceList;
+    setDiceList(loaded);
+    setLoadedSet(roll.game ? { name: roll.game, signature: diceSignature(loaded) } : null);
+    // As loading a game: Undo only when different dice were out
+    if (before.length > 0 && diceSignature(before) !== diceSignature(loaded)) offerUndo('Loaded dice from History', () => restoreDice(before), { big: true });
+    else showToast('Loaded dice from History');
   };
 
   // A window picked from the menu closes the menu, as Save and Share do, so closing it lands on the dice
@@ -892,6 +926,7 @@ function App() {
               savedRolls={savedRolls}
               onSaveRoll={handleSaveRoll}
               onRemoveSavedRoll={handleRemoveSavedRoll}
+              prefill={rollPrefill}
             />
           </div>
         )}
@@ -1079,6 +1114,7 @@ function App() {
         rpgMode={rpgMode}
         modifier={modifier}
         rollAdvantage={rollAdvantage}
+        onReuse={handleReuseRoll}
       />
 
       <SetsModal 

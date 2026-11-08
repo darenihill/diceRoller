@@ -17,6 +17,19 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 - ~~Done 2026-11-08~~ Landing pages point at real menu items. Done when: no landing page sends
   people to "Load" or a "set"; they say Games and saved games
   (src/test/oneName.test.tsx).
+- ~~Done 2026-11-08~~ Save fills in a name for you (Daren 2026-11-07, Build:
+  "Save fills in a name for you, like “Catan 2” or “2 d6”"). Done when:
+  Save opens with a name already in the box and selected, so typing replaces
+  it: a loaded game's name ("Catan", or "Catan 2" when taken); dice named in
+  Dice Settings ("Lunch die + 2 d6"); plain dice counted by kind ("2 d6 + 1
+  d20"); unnamed custom-face dice "Custom dice". A taken name still asks Keep
+  both / Replace it (src/test/saveNameSuggest.test.tsx).
+- ~~Done 2026-11-08~~ Tap a past roll in History to put those dice back out (Daren 2026-11-07,
+  Build: "Tap a past roll in History to put those dice back out"). Done when:
+  tapping a History row closes History and puts that roll's dice out, unrolled,
+  with "Loaded dice from History · Undo"; a typed roll (2d6+3) goes back into
+  the roll box ready to roll; new rolls keep each die's color and name, and
+  older rolls come back in the default color (src/test/historyReuse.test.tsx).
 
 - ~~Done 2026-11-08~~ Phone menu groups (Daren 2026-11-01, Build: "Phone menu
   groups its tiles under App, Saves and Tools"; 2026-11-07: "I want to give
@@ -63,6 +76,9 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   "Saved Attack" show while an Undo bar is up, and the Undo stays reachable.
 - Loading text on a slow link (S14). Done when: the page shows "Loading
   dice…" before the app script arrives.
+- ~~Done 2026-11-06~~ Typed "2d6+3 adv" reads back as typed, not "d6+3 adv"
+  (stories, remix and words review; src/test/typeRoll.test.tsx). The word
+  list and wording changes are a Focus idea (reviews/2026-11-06-copy.md).
 - ~~Done 2026-11-06~~ Fixes from the 2026-11-06 review
   (reviews/2026-11-06-combined.md): Import Backup keeps the imported games, a
   file that isn't a backup is refused, search pages offer Undo, Add custom text
@@ -98,7 +114,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   that shows when the phone's share sheet isn't available is labeled "Share
   with this link" (src/test/shareSheet.test.tsx).
 - ~~Done 2026-11-07~~ Color names in the picker (Daren 2026-11-06, Build: "Color picker writes
-  the color's name, like \"Die color · White\""). Done when: the title above
+  the color's name, like "Die color · White""). Done when: the title above
   the color dots in Dice Settings and in Custom faces Color names the picked
   color in words, using the names screen readers hear; a custom color reads
   "Custom" and its code (src/test/colorPicker.test.tsx).

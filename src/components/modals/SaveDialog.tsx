@@ -21,6 +21,17 @@ export const SaveDialog: React.FC<SaveDialogProps> = ({
   onSave,
 }) => {
   const trimmed = saveName.trim();
+  // The filled-in name starts selected, so typing replaces it (owner, 2026-11-07)
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const frame = requestAnimationFrame(() => {
+      const box = inputRef.current;
+      // setSelectionRange, since iOS Safari doesn't always honour select()
+      box?.setSelectionRange(0, box.value.length);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isOpen]);
   const taken = trimmed !== '' && existingNames.includes(trimmed);
 
   return (
@@ -29,6 +40,7 @@ export const SaveDialog: React.FC<SaveDialogProps> = ({
         <label className={modalStyles.formLabel} htmlFor="save-game-name">Name for this game</label>
         <input 
           id="save-game-name"
+          ref={inputRef}
           autoFocus
           data-autofocus
           autoComplete="off"

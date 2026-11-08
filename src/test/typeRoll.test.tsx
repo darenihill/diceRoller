@@ -46,6 +46,9 @@ describe('Reading a typed roll', () => {
 
   it('reads adv or dis anywhere in the roll, and names a part it cannot read (fresh eyes, 2026-11-05)', () => {
     expect(ok('d20 dis +3')).toMatchObject({ groups: [{ count: 2, faces: 20 }], modifier: 3, advantage: 'disadvantage', text: 'd20+3 dis' });
+    // A typed pair reads back as typed, so "2d6+3 adv" isn't shown as "d6+3 adv" (review 2026-11-06)
+    expect(ok('2d6+3 adv')).toMatchObject({ groups: [{ count: 2, faces: 6 }], text: '2d6+3 adv' });
+    expect(ok('2d20 dis').text).toBe('2d20 dis');
     expect(ok('adv d20+7')).toMatchObject({ modifier: 7, advantage: 'advantage' });
     expect(note('d20 adv dis')).toMatch(/once/);
     expect(note('2d6*3')).toMatch(/can't read "\*"/);
