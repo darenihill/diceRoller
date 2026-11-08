@@ -97,12 +97,29 @@ const givenName = (d: Partial<DiceData>) => {
   return n && !/^d\d+$/i.test(n) ? n : '';
 };
 
-/** `base`, or `base 2`, `base 3`… when that name is taken */
+/** Room kept for the " 2" a taken name gets, so the result stays within the save name length */
+const SUGGEST_ROOM = MAX_NAME_LENGTH - 4;
+
+/** `base`, or `base 2`, `base 3`… when that name is taken; "Catan 2" taken gives "Catan 3", not "Catan 2 2" */
 function freeName(base: string, names: Set<string>): string {
-  if (!names.has(base)) return base;
+  let root = base.slice(0, SUGGEST_ROOM).trim();
+  if (!names.has(root)) return root;
+  root = root.replace(/ \d+$/, '') || root;
   let n = 2;
-  while (names.has(`${base} ${n}`)) n++;
-  return `${base} ${n}`;
+  while (names.has(`${root} ${n}`)) n++;
+  return `${root} ${n}`;
+}
+
+/** Joins the parts with " + ", whole parts only, ending "+ more" when they don't all fit */
+function joinParts(parts: string[]): string {
+  let out = '';
+  for (let i = 0; i < parts.length; i++) {
+    const next = out ? `${out} + ${parts[i]}` : parts[i];
+    const tail = i < parts.length - 1 ? ' + more' : '';
+    if (next.length + tail.length > SUGGEST_ROOM && out) return `${out} + more`;
+    out = next;
+  }
+  return out;
 }
 
 /**
@@ -132,5 +149,5 @@ export function suggestSaveName(dice: Partial<DiceData>[], loaded: LoadedSet | n
     ...[...plain].sort((a, b) => a[0] - b[0]).map(([f, c]) => `${c} d${f}`),
     ...(custom > 0 ? ['Custom dice'] : []),
   ];
-  return freeName(parts.join(' + ').slice(0, MAX_NAME_LENGTH), names);
+  return freeName(joinParts(parts), names);
 }

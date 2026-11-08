@@ -2,7 +2,7 @@ import React from 'react';
 import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import App from '../App';
-import { suggestSaveName } from '../utils/setName';
+import { suggestSaveName, diceSignature } from '../utils/setName';
 import { dicePresets } from '../utils/presets';
 import type { DiceData } from '../types';
 
@@ -33,9 +33,20 @@ describe('the name Save fills in', () => {
     expect(suggestSaveName([], null, [])).toBe('');
   });
 
-  it('keeps to the save name length', () => {
-    const many = Array.from({ length: 9 }, (_, i) => die(6, `Long die name ${i}`));
-    expect(suggestSaveName(many, null, []).length).toBeLessThanOrEqual(40);
+  it('saving "Catan 2" and saving again gives "Catan 3", never "Catan 2 2"', () => {
+    const catan = dicePresets.find(p => p.name === 'Catan')!;
+    const loaded = { name: 'Catan 2', signature: diceSignature(catan.dice) };
+    expect(suggestSaveName(catan.dice, loaded, ['Catan', 'Catan 2'])).toBe('Catan 3');
+  });
+
+  it('keeps to the save name length with whole names only, taken or not', () => {
+    const many = Array.from({ length: 9 }, (_, i) => die(6, `Attacker ${i}`));
+    const name = suggestSaveName(many, null, []);
+    expect(name.length).toBeLessThanOrEqual(40);
+    expect(name).toBe('Attacker 0 + Attacker 1 + more');
+    expect(suggestSaveName(many, null, [name]).length).toBeLessThanOrEqual(40);
+    const long = { name: 'x'.repeat(40), signature: diceSignature([die(6)]) };
+    expect(suggestSaveName([die(6)], long, ['x'.repeat(36)]).length).toBeLessThanOrEqual(40);
   });
 });
 

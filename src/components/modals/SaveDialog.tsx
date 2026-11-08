@@ -25,7 +25,11 @@ export const SaveDialog: React.FC<SaveDialogProps> = ({
   const inputRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {
     if (!isOpen) return;
-    const frame = requestAnimationFrame(() => inputRef.current?.select());
+    const frame = requestAnimationFrame(() => {
+      const box = inputRef.current;
+      // setSelectionRange, since iOS Safari doesn't always honour select()
+      box?.setSelectionRange(0, box.value.length);
+    });
     return () => cancelAnimationFrame(frame);
   }, [isOpen]);
   const taken = trimmed !== '' && existingNames.includes(trimmed);
