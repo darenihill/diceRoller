@@ -24,6 +24,9 @@ export interface RollHistoryItem {
   game?: string;
   /** When it was rolled (ms), for the "Switched to …" lines in the log */
   at?: number;
+  /** Each die's color and name, so a tap in History can put the same dice back out */
+  colors?: string[];
+  names?: string[];
 }
 
 export interface RollSummary {
@@ -91,6 +94,11 @@ export function sanitizeRollHistory(input: unknown): RollHistoryItem[] {
     if (typeof r.set === 'string' && r.set.length <= 20000) item.set = r.set;
     if (typeof r.game === 'string' && r.game) item.game = r.game.slice(0, MAX_NAME_LENGTH);
     if (typeof r.at === 'number' && Number.isFinite(r.at) && r.at > 0) item.at = r.at;
+    const strings = (v: unknown, max: number) => Array.isArray(v) ? v.slice(0, MAX_DICE_LIMIT).map(x => typeof x === 'string' ? x.slice(0, max) : '') : undefined;
+    const colors = strings(r.colors, 16);
+    if (colors) item.colors = colors;
+    const names = strings(r.names, MAX_NAME_LENGTH);
+    if (names) item.names = names;
     out.push(item);
   }
   return out;
@@ -397,7 +405,11 @@ export const useDiceState = () => {
         ...(onlyId !== undefined ? { single: true } : {}),
         ...(activeModifier !== 0 ? { modifier: activeModifier } : {}),
         ...(typed && onlyId === undefined ? { typed: typed.text } : {}),
-        ...(onlyId === undefined ? { set: luckSet(list, rpgMode, rollModifier, advantageMode) } : {}),
+        ...(onlyId === undefined ? {
+          set: luckSet(list, rpgMode, rollModifier, advantageMode),
+          colors: list.map(d => d.color),
+          names: list.map(d => d.name ?? ''),
+        } : {}),
         ...(onlyId === undefined && !typed && gameNameRef.current ? { game: gameNameRef.current } : {}),
         at: Date.now(),
       }, ...h].slice(0, MAX_HISTORY_LENGTH));

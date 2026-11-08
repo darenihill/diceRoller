@@ -4,6 +4,7 @@ import type { RollHistoryItem, RollAdvantageMode } from '../../hooks/useDiceStat
 import type { DiceData } from '../../types';
 import { fairOdds, luckRows, furthestFromFair, luckSet } from '../../utils/fairOdds';
 import { gameKeyFor, gameKeyOf, recentGroups, groupLabel, diceSummary } from '../../utils/rollGroups';
+import { canReuse } from '../../utils/historyReuse';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
 // The same tabs as Dice Settings / Custom faces, so the two dialogs match
@@ -21,6 +22,8 @@ interface HistoryModalProps {
   rpgMode?: boolean;
   modifier?: number;
   rollAdvantage?: RollAdvantageMode;
+  /** A tapped row: put that roll's dice back out, or a typed roll back in the box */
+  onReuse?: (roll: RollHistoryItem) => void;
 }
 
 export const HistoryModal: React.FC<HistoryModalProps> = ({
@@ -33,6 +36,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   rpgMode = false,
   modifier = 0,
   rollAdvantage = 'normal',
+  onReuse,
 }) => {
   // History by game (owner, 2026-11-05): Frequency counts the game on the table
   // now, with chips for the last few games before it and All
@@ -104,6 +108,11 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
     return starts;
   }, [isOpen, rollHistory]);
   const tabsId = React.useId();
+  // Which rows can be tapped, worked out once per change to the log
+  const reusable = React.useMemo(
+    () => new Set(isOpen && onReuse ? rollHistory.filter(canReuse).map(r => r.id) : []),
+    [isOpen, onReuse, rollHistory],
+  );
   const tabsHeader = (
     <div className={tabStyles.tabs} role="tablist" aria-label="Roll history">
       {([['history', 'History'], ['frequency', 'Frequency']] as const).map(([key, label]) => (
@@ -152,6 +161,10 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
             </div>
             <div className={styles.historyList}>
               <h3 className={modalStyles.sectionHeader}>Roll Log ({rollHistory.length})</h3>
+              {reusable.size > 0 && (<>
+                <p id={`${tabsId}-reuse`} className={modalStyles.toggleDesc} style={{ margin: '0 0 4px' }}>Tap a roll to put its dice back out.</p>
+                <span id={`${tabsId}-retype`} className={styles.srOnly}>Puts this typed roll back in the roll box.</span>
+              </>)}
               {rollHistory.map((roll, i) => (
                 <React.Fragment key={roll.id}>
                 {runStarts.get(roll.id) && (
@@ -159,14 +172,32 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
                     {runStarts.get(roll.id)}
                   </div>
                 )}
-                <div className={styles.historyItem} style={{ borderLeft: roll.isTargetHit ? '4px solid var(--color-gold)' : 'none' }}>
-                  <div className={styles.historyIndex}>Roll {rollHistory.length - i}{roll.single ? ' · one die' : ''}{roll.typed ? ` · ${roll.typed}` : ''}</div>
-                  <div className={styles.historyDetails}>{roll.details.join(', ')}</div>
-                  <div className={styles.historyTotal}>
-                    Total: {roll.total}
-                    {roll.isTargetHit && <span style={{ marginLeft: 6, color: 'var(--color-gold-ink)', fontSize: '0.75rem' }}>🎯 HIT!</span>}
-                  </div>
-                </div>
+                {(() => {
+                  const rowStyle = { borderLeft: roll.isTargetHit ? '4px solid var(--color-gold)' : 'none' };
+                  // Spans, so the row is valid inside a button; the grid lays them out
+                  const body = (<>
+                    <span className={styles.historyIndex}>Roll {rollHistory.length - i}{roll.single ? ' · one die' : ''}{roll.typed ? ` · ${roll.typed}` : ''}</span>
+                    <span className={styles.historyDetails}>{roll.details.join(', ')}</span>
+                    <span className={styles.historyTotal}>
+                      Total: {roll.total}
+                      {roll.isTargetHit && <span style={{ marginLeft: 6, color: 'var(--color-gold-ink)', fontSize: '0.75rem' }}>🎯 HIT!</span>}
+                    </span>
+                  </>);
+                  // Each row is a button that puts its dice back out (owner, 2026-11-07)
+                  return reusable.has(roll.id) ? (
+                    <button
+                      type="button"
+                      className={`${styles.historyItem} ${styles.historyReuse}`}
+                      style={rowStyle}
+                      onClick={() => onReuse?.(roll)}
+                      aria-describedby={`${tabsId}-${roll.typed ? 'retype' : 'reuse'}`}
+                    >
+                      {body}
+                    </button>
+                  ) : (
+                    <div className={styles.historyItem} style={rowStyle}>{body}</div>
+                  );
+                })()}
                 </React.Fragment>
               ))}
             </div>

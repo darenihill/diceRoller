@@ -40,6 +40,27 @@
   align-items: center;
 }
 
+/* A History row that puts its dice back out when tapped */
+.historyReuse {
+  width: 100%;
+  border: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.historyReuse:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .historyReuse:hover {
+    background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, var(--md-sys-color-surface-variant));
+  }
+}
+
 .historyIndex {
   font-weight: 500;
   color: var(--md-sys-color-primary);

@@ -11,11 +11,19 @@ interface TypeRollBoxProps {
   savedRolls?: SavedRoll[];
   onSaveRoll?: (roll: SavedRoll) => void;
   onRemoveSavedRoll?: (name: string) => void;
+  /** A roll put back from History; a new `n` fills the box again */
+  prefill?: { text: string; n: number };
 }
 
 /** RPG mode: type 2d6+3, d20 adv or 1d8+2d6 and roll it in one go. */
-export const TypeRollBox = ({ onRoll, disabled = false, savedRolls = [], onSaveRoll, onRemoveSavedRoll }: TypeRollBoxProps) => {
+export const TypeRollBox = ({ onRoll, disabled = false, savedRolls = [], onSaveRoll, onRemoveSavedRoll, prefill }: TypeRollBoxProps) => {
   const [text, setText] = useState('');
+  // A roll tapped in History lands in the box, ready to roll
+  const [filledN, setFilledN] = useState<number | undefined>();
+  if (prefill && prefill.n !== filledN) {
+    setFilledN(prefill.n);
+    setText(prefill.text);
+  }
   const [note, setNote] = useState<string | null>(null);
   // The roll being named, once Save this roll is tapped
   const [naming, setNaming] = useState<TypedRoll | null>(null);
