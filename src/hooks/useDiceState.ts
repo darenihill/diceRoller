@@ -409,7 +409,10 @@ export const useDiceState = () => {
           set: luckSet(list, rpgMode, rollModifier, advantageMode),
           colors: list.map(d => d.color),
           names: list.map(d => d.name ?? ''),
-        } : {}),
+        } : {
+          // A die rolled on its own keeps its color too, for its tile in History
+          colors: list.filter(d => d.id === onlyId).map(d => d.color),
+        }),
         ...(onlyId === undefined && !typed && gameNameRef.current ? { game: gameNameRef.current } : {}),
         at: Date.now(),
       }, ...h].slice(0, MAX_HISTORY_LENGTH));

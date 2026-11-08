@@ -5,6 +5,8 @@ import type { DiceData } from '../../types';
 import { fairOdds, luckRows, furthestFromFair, luckSet } from '../../utils/fairOdds';
 import { gameKeyFor, gameKeyOf, recentGroups, groupLabel, diceSummary } from '../../utils/rollGroups';
 import { canReuse } from '../../utils/historyReuse';
+import { historyTiles, historySubtitle } from '../../utils/historyTiles';
+import { getContrastColor } from '../../utils/diceUtils';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
 // The same tabs as Dice Settings / Custom faces, so the two dialogs match
@@ -176,11 +178,32 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
                   const rowStyle = { borderLeft: roll.isTargetHit ? '4px solid var(--color-gold)' : 'none' };
                   // Spans, so the row is valid inside a button; the grid lays them out
                   const body = (<>
-                    <span className={styles.historyIndex}>Roll {rollHistory.length - i}{roll.single ? ' · one die' : ''}{roll.typed ? ` · ${roll.typed}` : ''}</span>
-                    <span className={styles.historyDetails}>{roll.details.join(', ')}</span>
+                    <span className={styles.historyIndex}>
+                      Roll {rollHistory.length - i}
+                      {historySubtitle(roll) && <span className={styles.historySub}>{historySubtitle(roll)}</span>}
+                    </span>
+                    {/* Small dice in each die's color (owner, 2026-11-07); a
+                        screen reader hears the full lines instead */}
+                    <span className={styles.historyDetails}>
+                      <span className={styles.historyTiles} aria-hidden="true">
+                        {historyTiles(roll).map((t, k) => (
+                          <span
+                            key={k}
+                            className={`${styles.historyTile} ${t.dropped ? styles.historyTileDropped : ''}`}
+                            style={{ background: t.color, color: getContrastColor(t.color) }}
+                          >
+                            {t.face}
+                          </span>
+                        ))}
+                      </span>
+                      <span className={styles.srOnly}>{roll.details.join(', ')}</span>
+                    </span>
                     <span className={styles.historyTotal}>
-                      Total: {roll.total}
-                      {roll.isTargetHit && <span style={{ marginLeft: 6, color: 'var(--color-gold-ink)', fontSize: '0.75rem' }}>🎯 Target hit</span>}
+                      <span className={styles.srOnly}>Total </span>{roll.total}
+                      {roll.modifier !== undefined && roll.modifier !== 0 && (
+                        <span className={styles.historyMath}>{roll.total - roll.modifier} {roll.modifier > 0 ? '+' : '−'} {Math.abs(roll.modifier)}</span>
+                      )}
+                      {roll.isTargetHit && <span className={styles.historyMath} style={{ color: 'var(--color-gold-ink)' }}>🎯 Target hit</span>}
                     </span>
                   </>);
                   // Each row is a button that puts its dice back out (owner, 2026-11-07)
