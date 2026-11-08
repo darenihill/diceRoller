@@ -66,4 +66,5 @@ Daren's picks on suggested ideas for this app, from the Desk, oldest first: the 
 - 2026-11-04 · Watch · A new switch makes the phone say the total out loud
 - 2026-11-05 · Build · Drag a die's custom faces into a new order
 - 2026-11-05 · Build · The installed app shows a bar when a new version is ready
+- 2026-11-07 · Skip · 3D dice tumble across a tray — "How much extra code does 3d require? I don't really care for it. If it's a tiny add leave it otherwise drop it" (PR 75, 585 lines plus a library, closed)
 - 2026-11-08 · Skip · Face pictures in shared links: "No, keep icons: links stay picture-free, built-in icons already travel. Revisit if more players ask (autism center feedback, Nov 1)."
