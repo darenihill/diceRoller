@@ -46,9 +46,9 @@ const DND_GRID_DICE = [
 const D20_OPTION = { label: 'D20', faces: 20, name: 'd20', color: '#384050' };
 
 const ROLL_TYPES = [
-  ['advantage', 'ADV', 'Advantage: Keep Highest'],
-  ['normal', 'NORM', 'Normal Roll'],
-  ['disadvantage', 'DIS', 'Disadvantage: Keep Lowest'],
+  ['advantage', 'ADV', 'Advantage: keep highest'],
+  ['normal', 'NORM', 'Normal roll'],
+  ['disadvantage', 'DIS', 'Disadvantage: keep lowest'],
 ] as const;
 const ROLL_TYPE_NAMES: Record<RollAdvantageMode, string> = { advantage: 'Advantage', normal: 'Normal', disadvantage: 'Disadvantage' };
 const signed = (n: number) => `${n > 0 ? '+' : ''}${n}`;
@@ -165,7 +165,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
                 exit={{ opacity: 0, scale: 0.9, y: 10 }}
                 transition={{ duration: 0.15 }}
               >
-                <div className={styles.addPopoverTitle}>Add D&D Die</div>
+                <div className={styles.addPopoverTitle}>Add D&D die</div>
                 <div className={styles.dndGrid}>
                   {DND_GRID_DICE.map(opt => (
                     <button 
@@ -196,7 +196,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
           className={`md-icon-button control-ring ${styles.actionBtn}`} 
           data-add-button
           onClick={handleAddClick} 
-          title={rpgMode ? "Add D&D Dice Menu" : "Add Dice"}
+          title={rpgMode ? "Add a D&D die" : "Add a die"}
         >
           <Plus size={24} strokeWidth={2.5} />
         </button>

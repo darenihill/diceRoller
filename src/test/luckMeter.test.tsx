@@ -33,7 +33,7 @@ describe('fair-dice odds', () => {
     near(odds.get(1), 39 / 400);
   });
 
-  it('adds the modifier in RPG Mode only', () => {
+  it('adds the modifier in RPG mode only', () => {
     expect(fairOdds([die(6)], true, 2, 'normal').has(8)).toBe(true);
     expect(fairOdds([die(6)], false, 2, 'normal').has(8)).toBe(false);
   });
@@ -78,7 +78,7 @@ describe('held dice and big tables', () => {
   });
 });
 
-describe('Luck Meter rows', () => {
+describe('Frequency rows', () => {
   it('lists totals not rolled yet as zero rows', () => {
     const odds = fairOdds([die(6)], false, 0, 'normal');
     const rows = luckRows(new Map([[3, 2]]), odds, 2);
@@ -106,11 +106,11 @@ describe('History modal', () => {
   it('opens on History, with Frequency one tab over', () => {
     render(<HistoryModal isOpen onClose={() => {}} onClearHistory={() => {}} rollHistory={[roll(4), roll(5)]} />);
     expect(screen.getByRole('tab', { name: 'History' })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByText('Roll Log (2)')).toBeInTheDocument();
-    expect(screen.queryByText('Luck Meter')).toBeNull();
+    expect(screen.getByText('Rolls (2)')).toBeInTheDocument();
+    expect(screen.queryByText('How often each total came up')).toBeNull();
     fireEvent.click(screen.getByRole('tab', { name: 'Frequency' }));
-    expect(screen.getByText('Luck Meter')).toBeInTheDocument();
-    expect(screen.queryByText('Roll Log (2)')).toBeNull();
+    expect(screen.getByText('How often each total came up')).toBeInTheDocument();
+    expect(screen.queryByText('Rolls (2)')).toBeNull();
   });
 
   it('opens on History again after being closed on Frequency', () => {

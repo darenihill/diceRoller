@@ -35,9 +35,9 @@ export const SaveDialog: React.FC<SaveDialogProps> = ({
   const taken = trimmed !== '' && existingNames.includes(trimmed);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Save Game">
+    <Modal isOpen={isOpen} onClose={onClose} title="Save game">
       <div className={modalStyles.formGroup}>
-        <label className={modalStyles.formLabel} htmlFor="save-game-name">Enter a name for this game:</label>
+        <label className={modalStyles.formLabel} htmlFor="save-game-name">Name for this game</label>
         <input 
           id="save-game-name"
           ref={inputRef}

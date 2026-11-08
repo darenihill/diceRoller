@@ -78,7 +78,7 @@ describe('Save this roll', () => {
     render(<App />);
     expect(within(savedList()!).getByRole('button', { name: /Roll Dagger/ })).toBeInTheDocument();
     fireEvent.click(screen.getAllByRole('button', { name: /menu/i })[0]);
-    fireEvent.click(screen.getByText('RPG Mode'));
+    fireEvent.click(screen.getByText('RPG mode'));
     expect(savedList()).toBeNull();
   });
 

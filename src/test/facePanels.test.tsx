@@ -45,11 +45,11 @@ describe('Custom faces folds color, icons and text into three buttons', () => {
   });
 });
 
-describe('Dice Settings puts Standard Faces beside Name', () => {
+describe('Die settings puts Number of faces beside Name', () => {
   it('shares one row with the name box', () => {
     render(<DiceSettingsModal dice={plain} allDice={[plain]} {...props} />);
-    const name = screen.getByLabelText('Name (Optional)');
-    const faces = screen.getByLabelText('Standard Faces');
+    const name = screen.getByLabelText('Name (optional)');
+    const faces = screen.getByLabelText('Number of faces');
     expect(name.parentElement?.parentElement).toBe(faces.parentElement?.parentElement?.parentElement);
   });
 });

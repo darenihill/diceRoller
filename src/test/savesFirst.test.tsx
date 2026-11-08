@@ -9,19 +9,19 @@ const noop = () => {};
 const props = { isOpen: true, onClose: noop, onLoadSet: noop, onDeleteConfig: noop, onExportBackup: noop, onImportBackup: noop };
 
 describe('Games dialog lists your saves first', () => {
-  it('shows Your Saves above Presets when there are saves', () => {
+  it('shows Your games above Presets when there are saves', () => {
     const saved = { 'Friday game': { name: 'Friday game', config: [] } } as unknown as Record<string, DiceConfig>;
     render(<SetsModal {...props} savedConfigs={saved} />);
     const headings = screen.getAllByRole('heading', { level: 3 }).map(h => h.textContent);
-    expect(headings.indexOf('Your Saves')).toBeGreaterThanOrEqual(0);
-    expect(headings.indexOf('Your Saves')).toBeLessThan(headings.indexOf('Presets'));
+    expect(headings.indexOf('Your games')).toBeGreaterThanOrEqual(0);
+    expect(headings.indexOf('Your games')).toBeLessThan(headings.indexOf('Popular games'));
   });
 
   it('starts with Presets for a first-time visitor with no saves', () => {
     render(<SetsModal {...props} savedConfigs={{}} />);
     const headings = screen.getAllByRole('heading', { level: 3 }).map(h => h.textContent);
-    expect(headings[0]).toBe('Presets');
-    expect(headings).not.toContain('Your Saves');
+    expect(headings[0]).toBe('Popular games');
+    expect(headings).not.toContain('Your games');
   });
 });
 

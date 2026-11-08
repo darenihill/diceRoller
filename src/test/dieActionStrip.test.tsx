@@ -35,9 +35,9 @@ describe('Buttons for a tapped die with many dice out', () => {
   it('keeps the buttons round the die when dice are big, and drops them when compact', () => {
     const props = { dice: die, isRolling: false, isRevealed: true, onReveal: () => {}, onToggleHold: () => {}, onRemove: () => {}, onOpenSettings: () => {}, onClone: () => {}, onRollOne: () => {} };
     const { rerender } = render(<Dice {...props} />);
-    expect(screen.getByTitle('Dice Settings')).toBeInTheDocument();
+    expect(screen.getByTitle('Die settings')).toBeInTheDocument();
     rerender(<Dice {...props} compactActions />);
-    expect(screen.queryByTitle('Dice Settings')).toBeNull();
-    expect(screen.queryByTitle('Remove Die')).toBeNull();
+    expect(screen.queryByTitle('Die settings')).toBeNull();
+    expect(screen.queryByTitle('Remove this die')).toBeNull();
   });
 });

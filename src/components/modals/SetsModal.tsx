@@ -28,12 +28,12 @@ export const SetsModal: React.FC<SetsModalProps> = ({
   const userSaves = Object.values(savedConfigs).filter(c => c.name !== 'systemAutosave');
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Games & Saves">
+    <Modal isOpen={isOpen} onClose={onClose} title="Games">
       <div className={styles.setsContainer}>
         {/* A returning player usually wants their own set, so saves come first. */}
         {userSaves.length > 0 && (
           <>
-            <h3 className={modalStyles.sectionHeaderFirst}>Your Saves</h3>
+            <h3 className={modalStyles.sectionHeaderFirst}>Your games</h3>
             <div className={styles.setsGrid}>
               {userSaves.map((config) => (
                 <div key={config.name} className={`md-card ${styles.setCard} ${styles.saveCard}`}>
@@ -49,7 +49,7 @@ export const SetsModal: React.FC<SetsModalProps> = ({
           </>
         )}
 
-        <h3 className={userSaves.length > 0 ? modalStyles.sectionHeader : modalStyles.sectionHeaderFirst}>Presets</h3>
+        <h3 className={userSaves.length > 0 ? modalStyles.sectionHeader : modalStyles.sectionHeaderFirst}>Popular games</h3>
         <div className={styles.setsGrid}>
           {dicePresets.map((preset) => (
             <button key={preset.name} className={`md-card ${styles.setCard}`} onClick={() => onLoadSet(preset.dice, preset.name)}>
@@ -62,11 +62,11 @@ export const SetsModal: React.FC<SetsModalProps> = ({
         <div className={styles.setsGrid}>
           <button className={`md-card ${styles.setCard} ${modalStyles.iconCard}`} onClick={onExportBackup} title="Export games & settings to a backup file">
             <FileDown size={20} />
-            <span>Export Backup</span>
+            <span>Export backup</span>
           </button>
           <button className={`md-card ${styles.setCard} ${modalStyles.iconCard}`} onClick={() => document.getElementById('import-backup-input-modal')?.click()} title="Import games & settings from a backup file">
             <FileUp size={20} />
-            <span>Import Backup</span>
+            <span>Import backup</span>
           </button>
           <input 
             type="file" 

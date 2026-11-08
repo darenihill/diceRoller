@@ -8,7 +8,7 @@ beforeAll(() => {
 });
 afterEach(() => localStorage.clear());
 
-describe('RPG Mode: only the big Roll button is filled blue', () => {
+describe('RPG mode: only the big Roll button is filled blue', () => {
   it('leaves the typed-roll button and the roll types unfilled', () => {
     localStorage.setItem('rpgMode', 'true');
     const { container } = render(<App />);
@@ -22,8 +22,8 @@ describe('RPG Mode: only the big Roll button is filled blue', () => {
     localStorage.setItem('rpgMode', 'true');
     render(<App />);
     fireEvent.click(screen.getByTestId('roll-type-chip'));
-    const normal = screen.getByTitle('Normal Roll');
-    const adv = screen.getByTitle('Advantage: Keep Highest');
+    const normal = screen.getByTitle('Normal roll');
+    const adv = screen.getByTitle('Advantage: keep highest');
     expect(normal).toHaveAttribute('aria-pressed', 'true');
     expect(adv).toHaveAttribute('aria-pressed', 'false');
     fireEvent.click(adv);

@@ -49,7 +49,7 @@ export const landingPages = [
   <li>The chance of at least one natural 20 nearly doubles, from 5% to 9.75%.</li>
 </ul>
 <h2>Modifiers and more dice</h2>
-<p>Set your modifier once and every total includes it. Need damage dice too? Use the + button to add a d6, d8 or any die you like, or open the D&amp;D set from the menu. Roll history shows your last rolls if anyone asks what you got.</p>
+<p>Set your modifier once and every total includes it. Need damage dice too? Use the + button to add a d6, d8 or any die you like, or load Dungeons &amp; Dragons from Games in the menu. History shows your last rolls if anyone asks what you got.</p>
 `,
   },
   {
@@ -71,7 +71,7 @@ export const landingPages = [
 </ul>
 <p>A settlement on a 6, an 8 and a 5 collects on 14 of every 36 rolls on average. One on 2, 12 and 11 collects on 4.</p>
 <h2>Check your luck</h2>
-<p>Open History from the menu to see every roll and a chart of how often each total has come up this game. If the 6s seem to have vanished, the chart will tell you whether that is true. Playing Cities &amp; Knights? Load its set from Games to add the event die.</p>
+<p>Open History from the menu to see every roll and a chart of how often each total has come up this game. If the 6s seem to have vanished, the chart will tell you whether that is true. Playing Cities &amp; Knights? Load it from Games to add the event die.</p>
 `,
   },
   {
@@ -103,13 +103,13 @@ export const landingPages = [
   <li>story starters and vocabulary review,</li>
   <li>picking groups or turn order fairly.</li>
 </ul>
-<h2>Save a set and share it with your class</h2>
+<h2>Save a game and share it with your class</h2>
 <ol>
-  <li>Build your dice, open the menu and tap Save. Name the set, for example "Week 3 vocabulary".</li>
-  <li>Tap Share. A link to exactly those dice is copied, set name included.</li>
+  <li>Build your dice, open the menu and tap Save. Name the game, like "Week 3 vocabulary".</li>
+  <li>Tap Share. A link to exactly those dice is copied, its name included.</li>
   <li>Paste it into Google Classroom, an email or a slide. Students open the same dice, named at the top, with no sign-in.</li>
 </ol>
-<p>Saved sets stay on that device under Load, ready for the next lesson. On a classroom computer, Set Default opens your set every time. Anonymous page statistics can be switched off under Customize.</p>
+<p>Your games stay on that device under Games, ready for the next lesson. On a classroom computer, Set default opens your dice every time. Anonymous page metrics can be turned off in Customize.</p>
 `,
   },
 ];

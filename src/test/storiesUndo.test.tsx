@@ -14,7 +14,7 @@ beforeEach(() => {
 });
 
 function openSettings() {
-  fireEvent.click(screen.getAllByTitle('Dice Settings')[0]);
+  fireEvent.click(screen.getAllByTitle('Die settings')[0]);
 }
 
 describe('Undo inside a die\'s settings', () => {
@@ -23,7 +23,7 @@ describe('Undo inside a die\'s settings', () => {
     render(<App />);
     openSettings();
     expect(screen.getByLabelText(/^Face 1: Cat/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('tab', { name: 'Dice Settings' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Die settings' }));
     fireEvent.click(screen.getByTitle('Increase faces'));
     expect(screen.getByText('Replaced 3 faces')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
@@ -62,12 +62,12 @@ describe('Clear History', () => {
     render(<App />);
     fireEvent.click(screen.getAllByRole('button', { name: /menu/i })[0]);
     fireEvent.click(screen.getByText('History'));
-    expect(screen.getByText('Roll Log (4)')).toBeInTheDocument();
+    expect(screen.getByText('Rolls (4)')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Clear History'));
     expect(screen.getByText('No rolls yet. Each roll shows here.')).toBeInTheDocument();
     expect(screen.getByText('Cleared 4 rolls')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
-    expect(screen.getByText('Roll Log (4)')).toBeInTheDocument();
+    expect(screen.getByText('Rolls (4)')).toBeInTheDocument();
     expect(JSON.parse(localStorage.getItem('rollHistory')!)).toHaveLength(4);
   });
 });
@@ -77,7 +77,7 @@ describe('Dice size − and +', () => {
     render(<App />);
     fireEvent.click(screen.getAllByRole('button', { name: /menu/i })[0]);
     fireEvent.click(screen.getByText('Customize'));
-    const slider = screen.getByRole('slider', { name: 'Dice Size' });
+    const slider = screen.getByRole('slider', { name: 'Dice size' });
     const start = Number((slider as HTMLInputElement).value);
     fireEvent.click(screen.getByRole('button', { name: 'Bigger dice' }));
     expect(Number((slider as HTMLInputElement).value)).toBeCloseTo(start + 0.1);

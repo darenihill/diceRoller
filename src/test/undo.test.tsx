@@ -72,7 +72,7 @@ describe('Undo brings things back', () => {
     expect(result.current.diceList.map(d => d.faces)).toEqual([4, 6, 8]);
   });
 
-  it('brings every die back after Clear All', () => {
+  it('brings every die back after Clear all', () => {
     const { result } = renderHook(() => useDiceState());
     act(() => { result.current.addDice({ faces: 6 }); result.current.addDice({ faces: 20 }); });
     const before = result.current.diceList;

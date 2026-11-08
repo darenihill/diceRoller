@@ -57,6 +57,6 @@ describe('Install app tile', () => {
     render(<App />);
     openMenu();
     expect(screen.queryByRole('button', { name: /Install app/ })).toBeNull();
-    expect(screen.getByRole('button', { name: /RPG Mode/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /RPG mode/ })).toBeInTheDocument();
   });
 });

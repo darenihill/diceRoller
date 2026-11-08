@@ -10,13 +10,13 @@ const die = (customFaces: string[]): DiceData => ({
 
 const renderWith = (d: DiceData) => {
   render(<DiceSettingsModal dice={d} isOpen onClose={() => {}} onUpdate={() => {}} onRemove={() => {}} onClone={() => {}} allDice={[d]} />);
-  fireEvent.click(screen.getByRole('tab', { name: 'Dice Settings' }));
+  fireEvent.click(screen.getByRole('tab', { name: 'Die settings' }));
 };
 
 describe('Faces counter label', () => {
   it('names the custom faces it would replace', () => {
     renderWith(die(['YES', 'NO', 'MAYBE']));
-    expect(screen.getByLabelText(/Standard Faces\s*Replaces your 3 custom faces/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Number of faces\s*Replaces your 3 custom faces/)).toBeInTheDocument();
   });
 
   it('uses the singular for one face', () => {
@@ -26,7 +26,7 @@ describe('Faces counter label', () => {
 
   it('says nothing extra on a plain numbered die', () => {
     renderWith(die([]));
-    expect(screen.getByLabelText('Standard Faces')).toBeInTheDocument();
+    expect(screen.getByLabelText('Number of faces')).toBeInTheDocument();
     expect(screen.queryByText(/Replaces your/)).not.toBeInTheDocument();
   });
 });

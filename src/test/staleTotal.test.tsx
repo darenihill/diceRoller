@@ -22,7 +22,7 @@ describe("The Roll button's old total fades once you change the dice", () => {
     await roll();
     expect(isFaint()).toBe(false);
 
-    fireEvent.click(screen.getByTitle('Add Dice'));
+    fireEvent.click(screen.getByTitle('Add a die'));
     expect(isFaint()).toBe(true);
 
     await roll();

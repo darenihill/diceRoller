@@ -8,7 +8,7 @@ import App from '../App';
 
 // Review 2026-10-26 (reviews/2026-10-26-access.md): a die was a button with
 // buttons inside, which screen readers flatten, and its buttons all had the
-// same name ("Remove Die" twice).
+// same name ("Remove this die" twice).
 
 beforeAll(() => {
   globalThis.ResizeObserver ??= class { observe() {} unobserve() {} disconnect() {} } as unknown as typeof ResizeObserver;
@@ -45,16 +45,16 @@ describe('Screen readers reach every die and its buttons', () => {
     expect(screen.getByRole('button', { name: 'Hold Red' })).toHaveAttribute('aria-pressed', 'false');
   });
 
-  it('RPG Mode and Advantage say whether they are on', () => {
+  it('RPG mode and Advantage say whether they are on', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
-    const rpg = screen.getByRole('button', { name: /RPG Mode/ });
+    const rpg = screen.getByRole('button', { name: /RPG mode/ });
     expect(rpg).toHaveAttribute('aria-pressed', 'false');
     fireEvent.click(rpg);
     expect(screen.getByRole('button', { name: 'Roll type: Normal. Change' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Roll type: Normal. Change' }));
-    expect(screen.getByRole('button', { name: /Normal Roll|NORM/ })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('button', { name: /Advantage: Keep Highest|ADV/ })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: /Normal roll|NORM/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: /Advantage: keep highest|ADV/ })).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('Escape closes the menu and puts focus back on the menu button', () => {

@@ -28,19 +28,19 @@ export const StatsModal: React.FC<StatsModalProps> = ({ isOpen, onClose }) => {
     .slice(0, 5);
 
   const metrics: { label: string; value: string | number }[] = [
-    { label: 'Total Rolls', value: stats.totalRolls.toLocaleString() },
-    { label: 'Dice Rolled', value: stats.totalDiceRolled.toLocaleString() },
-    { label: 'Highest Roll', value: stats.highestRoll || '—' },
-    { label: 'Average Roll', value: averageRoll },
+    { label: 'Total rolls', value: stats.totalRolls.toLocaleString() },
+    { label: 'Dice rolled', value: stats.totalDiceRolled.toLocaleString() },
+    { label: 'Highest roll', value: stats.highestRoll || '—' },
+    { label: 'Average roll', value: averageRoll },
     { label: 'Sessions', value: stats.totalSessions.toLocaleString() },
-    { label: 'Dice Added', value: stats.customDiceAddedCount.toLocaleString() },
+    { label: 'Dice added', value: stats.customDiceAddedCount.toLocaleString() },
   ];
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Usage Stats">
+    <Modal isOpen={isOpen} onClose={onClose} title="Usage stats">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div>
-          <h3 className={modalStyles.sectionHeaderFirst}>Your Dice, By The Numbers</h3>
+          <h3 className={modalStyles.sectionHeaderFirst}>Your dice by the numbers</h3>
           <div className={modalStyles.metricsGrid}>
             {metrics.map(m => (
               <div key={m.label} className={modalStyles.metricCard}>
@@ -53,7 +53,7 @@ export const StatsModal: React.FC<StatsModalProps> = ({ isOpen, onClose }) => {
 
         {topPresets.length > 0 && (
           <div>
-            <h3 className={modalStyles.sectionHeader}>Most Played Games</h3>
+            <h3 className={modalStyles.sectionHeader}>Most played games</h3>
             <div className={modalStyles.presetList}>
               {topPresets.map(([name, count]) => (
                 <div key={name} className={modalStyles.presetRow}>
@@ -66,7 +66,7 @@ export const StatsModal: React.FC<StatsModalProps> = ({ isOpen, onClose }) => {
         )}
 
         <div>
-          <h3 className={modalStyles.sectionHeader}>History</h3>
+          <h3 className={modalStyles.sectionHeader}>Activity</h3>
           <div className={modalStyles.presetList}>
             <div className={modalStyles.presetRow}>
               <span className={modalStyles.presetName}>First used</span>

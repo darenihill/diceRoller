@@ -346,7 +346,7 @@ const DiceComponent: React.FC<DiceProps> = ({
       <button className={`${styles.actionBtn} ${styles.settingsBtn}`} onClick={(e) => {
         e.stopPropagation();
         onOpenSettings(dice.id);
-      }} title="Dice Settings" aria-label={`Settings for ${dieName}`}>
+      }} title="Die settings" aria-label={`Settings for ${dieName}`}>
         <Settings size={20} strokeWidth={2.5} color="currentColor" />
       </button>
 
@@ -367,7 +367,7 @@ const DiceComponent: React.FC<DiceProps> = ({
         <button 
           className={`${styles.actionBtn} ${styles.rollOneBtn}`} 
           onClick={(e) => { e.stopPropagation(); onRollOne(dice.id); }}
-          title="Roll This Die"
+          title="Roll this die"
           aria-label={`Roll only ${dieName}`}
         >
           <Dices size={20} strokeWidth={2.5} color="currentColor" />
@@ -378,7 +378,7 @@ const DiceComponent: React.FC<DiceProps> = ({
       <button 
         className={`${styles.actionBtn} ${styles.removeBtn}`} 
         onClick={(e) => { e.stopPropagation(); onRemove(dice.id); }}
-        title="Remove Die"
+        title="Remove this die"
         aria-label={`Remove ${dieName}`}
       >
         <Trash2 size={18} strokeWidth={2.5} color="currentColor" />

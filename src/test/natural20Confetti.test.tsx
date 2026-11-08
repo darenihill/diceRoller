@@ -47,14 +47,14 @@ describe('Natural 20 confetti', () => {
   });
   afterEach(() => vi.restoreAllMocks());
 
-  it('a d20 rolling 20 in RPG Mode fires one burst', async () => {
+  it('a d20 rolling 20 in RPG mode fires one burst', async () => {
     const s = await roll(true, r => r.addDice({ faces: 20 }));
     expect(s.natural20Ids).toHaveLength(1);
     expect(await celebrateNatural20(s.natural20Ids)).toBe(true);
     expect(confettiMock).toHaveBeenCalledTimes(1);
   });
 
-  it('no burst outside RPG Mode', async () => {
+  it('no burst outside RPG mode', async () => {
     const s = await roll(false, r => r.addDice({ faces: 20 }));
     expect(s.natural20Ids).toEqual([]);
   });

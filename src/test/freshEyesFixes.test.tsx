@@ -14,17 +14,17 @@ describe('Fresh eyes fixes (2026-11-05)', () => {
     vi.useFakeTimers();
     render(<SaveDialog isOpen onClose={() => {}} onChangeSaveName={() => {}} saveName="" existingNames={[]} onSave={() => {}} />);
     act(() => { vi.runAllTimers(); });
-    expect(screen.getByLabelText(/name for this game/)).toHaveFocus();
+    expect(screen.getByLabelText(/name for this game/i)).toHaveFocus();
     vi.useRealTimers();
   });
 
-  it('Escape closes the Add D&D Die menu', async () => {
+  it('Escape closes the Add D&D die menu', async () => {
     localStorage.setItem('rpgMode', 'true');
     render(<App />);
-    fireEvent.click(screen.getByTitle('Add D&D Dice Menu'));
-    expect(screen.getByText('Add D&D Die')).toBeInTheDocument();
+    fireEvent.click(screen.getByTitle('Add a D&D die'));
+    expect(screen.getByText('Add D&D die')).toBeInTheDocument();
     fireEvent.keyDown(document, { key: 'Escape' });
-    await waitFor(() => expect(screen.queryByText('Add D&D Die')).toBeNull());
+    await waitFor(() => expect(screen.queryByText('Add D&D die')).toBeNull());
   });
 
   it('the Undo bar steps aside while the menu is open and comes back after', () => {

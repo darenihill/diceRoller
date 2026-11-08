@@ -9,7 +9,7 @@ beforeAll(() => {
 });
 
 describe('Bright ring on the bottom-bar buttons', () => {
-  it('every round button and Roll carry the ring in RPG Mode', () => {
+  it('every round button and Roll carry the ring in RPG mode', () => {
     localStorage.clear();
     localStorage.setItem('rpgMode', 'true');
     render(<App />);

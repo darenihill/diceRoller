@@ -60,8 +60,8 @@ describe('Messages', () => {
     localStorage.clear();
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
-    fireEvent.click(screen.getByText('Set Default'));
-    expect(screen.getByRole('status')).toHaveTextContent('Startup dice set');
+    fireEvent.click(screen.getByText('Set default'));
+    expect(screen.getByRole('status')).toHaveTextContent('Default dice set');
   });
 
   it('a newer message gets its full time on screen', () => {

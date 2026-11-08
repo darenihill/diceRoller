@@ -61,9 +61,9 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
 }) => {
   const note = targetNote(targetHighlight);
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Customize App">
+    <Modal isOpen={isOpen} onClose={onClose} title="Customize">
       <div>
-        <h3 className={modalStyles.sectionHeaderFirst}>Visual Themes</h3>
+        <h3 className={modalStyles.sectionHeaderFirst}>Themes</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <button 
             className={`md-card ${styles.setCard}`} 
@@ -104,7 +104,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           {/* Dice Size */}
           <div className={modalStyles.toggleLabelCol}>
             <div className={modalStyles.toggleRow}>
-              <span className={modalStyles.toggleTitle} id="dice-size-label">Dice Size</span>
+              <span className={modalStyles.toggleTitle} id="dice-size-label">Dice size</span>
               {diceScale !== DICE_SCALE_DEFAULT && (
                 <button className="md-button md-button-surface md-button-compact" onClick={() => onChangeDiceScale(DICE_SCALE_DEFAULT)}>
                   Reset
@@ -147,14 +147,14 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           {/* Sound Toggle */}
           <div className={modalStyles.toggleRow}>
             <div className={modalStyles.toggleLabelCol}>
-              <span className={modalStyles.toggleTitle}>Sound Effects</span>
+              <span className={modalStyles.toggleTitle}>Sound effects</span>
               <span className={modalStyles.toggleDesc}>Play synthesized rolling rattles & landing thuds</span>
             </div>
             <div className={modalStyles.switchCol}>
               <button 
                 className="md-icon-button"
                 onClick={onToggleSound}
-                title={soundEnabled ? "Mute Sounds" : "Unmute Sounds"}
+                title={soundEnabled ? "Turn off sound effects" : "Turn on sound effects"}
                 aria-label="Sound effects"
                 aria-pressed={soundEnabled}
               >
@@ -167,7 +167,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           {/* Shake to Roll Toggle: off by default because iPhone asks for motion access */}
           <div className={modalStyles.toggleRow}>
             <div className={modalStyles.toggleLabelCol}>
-              <span className={modalStyles.toggleTitle}>Shake to Roll</span>
+              <span className={modalStyles.toggleTitle}>Shake to roll</span>
               <span className={modalStyles.toggleDesc}>Shake your phone to roll, just like the Roll button</span>
             </div>
             <div className={modalStyles.switchCol}>
@@ -188,7 +188,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           {onToggleSortDice && (
             <div className={modalStyles.toggleRow}>
               <div className={modalStyles.toggleLabelCol}>
-                <span className={modalStyles.toggleTitle}>Sort Dice After Each Roll</span>
+                <span className={modalStyles.toggleTitle}>Sort dice after each roll</span>
                 <span className={modalStyles.toggleDesc}>Dice line up from lowest to highest when they land. What they rolled stays the same</span>
               </div>
               <div className={modalStyles.switchCol}>
@@ -210,7 +210,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           {onToggleBrightRings && (
             <div className={modalStyles.toggleRow}>
               <div className={modalStyles.toggleLabelCol}>
-                <span className={modalStyles.toggleTitle}>Bright Rings</span>
+                <span className={modalStyles.toggleTitle}>Bright rings</span>
                 <span className={modalStyles.toggleDesc}>A bright ring round the bottom buttons, easier to find in sunlight</span>
               </div>
               <div className={modalStyles.switchCol}>
@@ -232,7 +232,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           {buzzShown && onToggleBuzz && (
             <div className={modalStyles.toggleRow}>
               <div className={modalStyles.toggleLabelCol}>
-                <span className={modalStyles.toggleTitle}>Buzz When Dice Land</span>
+                <span className={modalStyles.toggleTitle}>Buzz when dice land</span>
                 <span className={modalStyles.toggleDesc}>One short buzz when the dice land, even with sound off (Android)</span>
               </div>
               <div className={modalStyles.switchCol}>
@@ -254,14 +254,14 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           <div>
             <div className={modalStyles.toggleRow}>
               <div className={modalStyles.toggleLabelCol}>
-                <span className={modalStyles.toggleTitle}>Target Highlight</span>
-                <span className={modalStyles.toggleDesc}>Celebrate when the roll total hits these numbers (comma-separated, e.g. 7, 11)</span>
+                <span className={modalStyles.toggleTitle}>Target hit</span>
+                <span className={modalStyles.toggleDesc}>Celebrate when the roll total hits one of these numbers, like 7, 11</span>
               </div>
               <input
                 type="text"
                 value={targetHighlight}
                 onChange={(e) => onChangeTargetHighlight(e.target.value)}
-                placeholder="e.g. 7, 11"
+                placeholder="Like 7, 11"
                 autoComplete="off"
                 enterKeyHint="done"
                 onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
@@ -280,14 +280,14 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           {/* Usage Telemetry Privacy Toggle */}
           <div className={modalStyles.toggleRow}>
             <div className={modalStyles.toggleLabelCol}>
-              <span className={modalStyles.toggleTitle}>Anonymous Page Metrics</span>
+              <span className={modalStyles.toggleTitle}>Anonymous page metrics</span>
               <span className={modalStyles.toggleDesc}>Sends page visits, rolls and button taps to Google Analytics. Never your own face words, pictures or saved game names</span>
             </div>
             <div className={modalStyles.switchCol}>
               <button 
                 className="md-icon-button"
                 onClick={onToggleTelemetry}
-                title={telemetryEnabled ? "Disable Telemetry" : "Enable Telemetry"}
+                title={telemetryEnabled ? "Turn off anonymous page metrics" : "Turn on anonymous page metrics"}
                 aria-label="Anonymous page metrics"
                 aria-pressed={telemetryEnabled}
               >

@@ -6,7 +6,7 @@ import { nextFreeSaveName } from '../utils/setName';
 
 const base = { isOpen: true, onClose: () => {}, onChangeSaveName: () => {} };
 
-describe('Save Game when the name is taken', () => {
+describe('Save game when the name is taken', () => {
   it('says so and offers Keep both and Replace it', () => {
     const onSave = vi.fn();
     render(<SaveDialog {...base} saveName="Catan" existingNames={['Catan']} onSave={onSave} />);
@@ -27,13 +27,13 @@ describe('Save Game when the name is taken', () => {
   it('Enter never overwrites a taken name', () => {
     const onSave = vi.fn();
     render(<SaveDialog {...base} saveName="Catan" existingNames={['Catan']} onSave={onSave} />);
-    fireEvent.keyDown(screen.getByLabelText(/name for this game/), { key: 'Enter' });
+    fireEvent.keyDown(screen.getByLabelText(/name for this game/i), { key: 'Enter' });
     expect(onSave).not.toHaveBeenCalled();
   });
 
   it('Done on a taken name puts the keyboard away so the choices show', () => {
     render(<SaveDialog {...base} saveName="Catan" existingNames={['Catan']} onSave={() => {}} />);
-    const input = screen.getByLabelText(/name for this game/);
+    const input = screen.getByLabelText(/name for this game/i);
     input.focus();
     expect(input).toHaveFocus();
     fireEvent.keyDown(input, { key: 'Enter' });

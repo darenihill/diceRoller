@@ -12,7 +12,7 @@ const openMenu = () => fireEvent.click(screen.getByRole('button', { name: 'Open 
 const menuIsOpen = () => screen.queryByRole('button', { name: 'Close menu' }) !== null;
 
 describe('The menu closes when a window opens', () => {
-  it.each(['Help', 'Games', 'History', 'Usage Stats', 'Customize'])('%s closes the menu as its window opens', (item) => {
+  it.each(['Help', 'Games', 'History', 'Usage stats', 'Customize'])('%s closes the menu as its window opens', (item) => {
     render(<App />);
     openMenu();
     expect(menuIsOpen()).toBe(true);
@@ -31,10 +31,10 @@ describe('The menu closes when a window opens', () => {
     expect(screen.getByRole('button', { name: 'Roll dice' })).toBeInTheDocument();
   });
 
-  it('RPG Mode stays a switch inside the menu', () => {
+  it('RPG mode stays a switch inside the menu', () => {
     render(<App />);
     openMenu();
-    fireEvent.click(screen.getByRole('button', { name: /RPG Mode/ }));
+    fireEvent.click(screen.getByRole('button', { name: /RPG mode/ }));
     expect(menuIsOpen()).toBe(true);
   });
 });

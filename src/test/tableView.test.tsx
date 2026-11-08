@@ -158,7 +158,7 @@ describe('Table view switch and big total', () => {
     render(<App />);
     roll();
     expect(screen.getByTestId('table-view')).toBeInTheDocument();
-    fireEvent.click(screen.getByTitle('Add Dice'));
+    fireEvent.click(screen.getByTitle('Add a die'));
     expect(screen.queryByTestId('table-view')).toBeNull();
   });
 

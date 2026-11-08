@@ -355,8 +355,8 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
 
   // Two tabs in the title bar: Dice Settings and Custom faces (owner, 2026-11-02)
   const tabsHeader = (
-    <div className={styles.tabs} role="tablist" aria-label="Dice settings">
-      {([['settings', 'Dice Settings'], ['faces', 'Custom faces']] as const).map(([key, label]) => (
+    <div className={styles.tabs} role="tablist" aria-label="Die settings">
+      {([['settings', 'Die settings'], ['faces', 'Custom faces']] as const).map(([key, label]) => (
         <button
           key={key}
           type="button"
@@ -374,7 +374,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={finish} title="Dice Settings" header={tabsHeader}>
+    <Modal isOpen={isOpen} onClose={finish} title="Die settings" header={tabsHeader}>
       <div className={styles.container} ref={containerRef}>
 
         {tab === 'settings' && (
@@ -383,7 +383,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               width below (owner, 2026-11-05: "move standard faces up next to name") */}
           <div className={styles.topRow}>
             <div className={styles.nameField}>
-              <label className={styles.label} htmlFor={`${fieldId}-name`}>Name (Optional)</label>
+              <label className={styles.label} htmlFor={`${fieldId}-name`}>Name (optional)</label>
               <input 
                 id={`${fieldId}-name`}
                 type="text" 
@@ -392,13 +392,13 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                 onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
                 value={dice.name || ''} 
                 onChange={(e) => onUpdate(dice.id, { name: e.target.value })}
-                placeholder="e.g. Player 1"
+                placeholder="Like Player 1"
                 className={styles.inputField}
               />
             </div>
             <div className={styles.facesField}>
               <label className={styles.label} htmlFor={`${fieldId}-faces`}>
-                Standard Faces
+                Number of faces
                 {dice.customFaces.length > 0 && (
                   <span className={styles.labelNote}>
                     Replaces your {dice.customFaces.length} custom {dice.customFaces.length === 1 ? 'face' : 'faces'}
@@ -443,7 +443,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
           
           {dice.customFaces.length > 0 && (
             <p className={styles.sublabel} style={{ margin: '0 0 6px' }}>
-              The number box sets what a face counts as in totals, e.g. a star as 6.
+              The number box sets what a face counts as in totals, like a star as 6.
             </p>
           )}
           {dice.customFaces.some(f => parseFaceContent(f).image) && (
