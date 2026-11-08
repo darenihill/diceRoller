@@ -42,6 +42,8 @@ import { StatsModal } from './components/modals/StatsModal';
 import { TableView } from './components/TableView';
 import { tableTiles, tableMath } from './utils/tableView';
 import { gameKeyOf } from './utils/rollGroups';
+import { diceFromHistory } from './utils/historyReuse';
+import type { RollHistoryItem } from './hooks/useDiceState';
 import { saveItem, onSaveRefused, readItem } from './utils/safeStorage';
 import { useWakeLock } from './hooks/useWakeLock';
 import { useNewVersion } from './hooks/useNewVersion';
@@ -516,6 +518,30 @@ function App() {
     setMenuOpen(false);
   };
 
+  // A History row tapped (owner, 2026-11-07): its dice come back out unrolled,
+  // as loading a game does, with Undo; a typed roll goes back in the roll box
+  const [rollPrefill, setRollPrefill] = useState<{ text: string; n: number } | undefined>();
+  // The roll box goes with RPG Mode; turning it on again later starts empty
+  if (!rpgMode && rollPrefill) setRollPrefill(undefined);
+  const handleReuseRoll = (roll: RollHistoryItem) => {
+    setModalOpen(null);
+    if (roll.typed) {
+      if (!rpgMode) toggleRpgMode();
+      setRollPrefill(p => ({ text: roll.typed!, n: (p?.n ?? 0) + 1 }));
+      showToast(`${roll.typed} is in the roll box`);
+      return;
+    }
+    const config = diceFromHistory(roll);
+    if (!config) return;
+    const loaded = sanitizeDiceList(config);
+    const before = diceList;
+    setDiceList(loaded);
+    setLoadedSet(roll.game ? { name: roll.game, signature: diceSignature(loaded) } : null);
+    // As loading a game: Undo only when different dice were out
+    if (before.length > 0 && diceSignature(before) !== diceSignature(loaded)) offerUndo('Loaded dice from History', () => restoreDice(before), { big: true });
+    else showToast('Loaded dice from History');
+  };
+
   // A window picked from the menu closes the menu, as Save and Share do, so closing it lands on the dice
   const openFromMenu = (which: 'help' | 'history' | 'stats' | 'sets' | 'customize') => {
     setMenuOpen(false);
@@ -900,6 +926,7 @@ function App() {
               savedRolls={savedRolls}
               onSaveRoll={handleSaveRoll}
               onRemoveSavedRoll={handleRemoveSavedRoll}
+              prefill={rollPrefill}
             />
           </div>
         )}
@@ -1087,6 +1114,7 @@ function App() {
         rpgMode={rpgMode}
         modifier={modifier}
         rollAdvantage={rollAdvantage}
+        onReuse={handleReuseRoll}
       />
 
       <SetsModal 

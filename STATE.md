@@ -1,4 +1,4 @@
-Next: Save fills in a name, done 2026-11-08; waits on Daren's Land tap (History tap is pull request 87).
+Next: Dice Roller 86 to 91 landed 2026-11-08 on Daren's "Land all" tap; Recently deleted queued in GOAL.md.
 
 # State
 
@@ -18,3 +18,5 @@ Next: Save fills in a name, done 2026-11-08; waits on Daren's Land tap (History 
 - 2026-11-08: phone menu groups with word, shape and tint (Dispatch-Item custom-dice-roller/ask-2026-11-02-build-owner-2026-66edb6).
 - 2026-11-07: stories, security and SCAMPER review; backup keeps the newest switches, Usage Stats survives a damaged backup, metrics switch names Google Analytics (Dispatch-Item custom-dice-roller/lens-stories+security+scamper-30).
 - 2026-11-08: Save fills in a name, selected (Dispatch-Item custom-dice-roller/ask-2026-11-08-build-owner-2026-fa277a).
+- 2026-11-08: tap a History roll to put its dice back out; typed rolls go back in the roll box (Dispatch-Item custom-dice-roller/ask-2026-11-08-build-owner-2026-91e7df).
+- 2026-11-08: goal check, jobs + HEART + working backwards; goal stays (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-7).

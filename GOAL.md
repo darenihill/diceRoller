@@ -12,6 +12,12 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   Dice Settings ("Lunch die + 2 d6"); plain dice counted by kind ("2 d6 + 1
   d20"); unnamed custom-face dice "Custom dice". A taken name still asks Keep
   both / Replace it (src/test/saveNameSuggest.test.tsx).
+- ~~Done 2026-11-08~~ Tap a past roll in History to put those dice back out (Daren 2026-11-07,
+  Build: "Tap a past roll in History to put those dice back out"). Done when:
+  tapping a History row closes History and puts that roll's dice out, unrolled,
+  with "Loaded dice from History · Undo"; a typed roll (2d6+3) goes back into
+  the roll box ready to roll; new rolls keep each die's color and name, and
+  older rolls come back in the default color (src/test/historyReuse.test.tsx).
 
 - ~~Done 2026-11-08~~ Phone menu groups (Daren 2026-11-01, Build: "Phone menu
   groups its tiles under App, Saves and Tools"; 2026-11-07: "I want to give
@@ -58,6 +64,9 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   "Saved Attack" show while an Undo bar is up, and the Undo stays reachable.
 - Loading text on a slow link (S14). Done when: the page shows "Loading
   dice…" before the app script arrives.
+- ~~Done 2026-11-06~~ Typed "2d6+3 adv" reads back as typed, not "d6+3 adv"
+  (stories, remix and words review; src/test/typeRoll.test.tsx). The word
+  list and wording changes are a Focus idea (reviews/2026-11-06-copy.md).
 - ~~Done 2026-11-06~~ Fixes from the 2026-11-06 review
   (reviews/2026-11-06-combined.md): Import Backup keeps the imported games, a
   file that isn't a backup is refused, search pages offer Undo, Add custom text

@@ -56,4 +56,15 @@ Daren's picks on suggested ideas for this app, from the Desk, oldest first: the 
 - 2026-10-28 · Build · Usage Stats puts two numbers per row on a phone
 - 2026-10-28 · Build · When you open a die's settings, its faces show first, not the colour panel
 - 2026-10-29 · Build · A natural 20 sets off a one-second confetti burst
+- 2026-10-30 · Build · Share opens your phone's share sheet (Messages, WhatsApp), with a Copy button as backup
+- 2026-11-02 · Build · 3D dice tumble across a tray and land, instead of flat dice shaking
+- 2026-11-02 · Build · Dropped die animation: with Advantage, the lower die shrinks back and a DROPPED stamp drops onto it
+- 2026-11-02 · Build · New die animation: a die you add glides out of the + button into its place
+- 2026-11-02 · Build · Phone menu groups its tiles under App, Saves and Tools
+- 2026-11-02 · Build · The round buttons at the bottom get a thin ring so you can find them in sun
+- 2026-11-02 · Build · Total animation: the total on the Roll button pops slightly bigger and settles when the dice land
+- 2026-11-04 · Watch · A new switch makes the phone say the total out loud
+- 2026-11-05 · Build · Drag a die's custom faces into a new order
+- 2026-11-05 · Build · The installed app shows a bar when a new version is ready
 - 2026-11-07 · Skip · 3D dice tumble across a tray — "How much extra code does 3d require? I don't really care for it. If it's a tiny add leave it otherwise drop it" (PR 75, 585 lines plus a library, closed)
+- 2026-11-08 · Skip · Face pictures in shared links — tapped "No, keep icons" (links stay picture-free; built-in icons already travel; revisit if more players ask, autism center feedback Nov 1)
