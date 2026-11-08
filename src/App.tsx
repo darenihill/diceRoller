@@ -312,7 +312,7 @@ function App() {
         }
         return;
       }
-      showToast("That share link couldn't be read — loading your usual dice instead.");
+      showToast("That share link couldn't be read — loading your own dice instead.");
     }
 
     // A landing page opens with its game, ahead of the visitor's usual dice
@@ -484,7 +484,7 @@ function App() {
     setLoadedSet({ name, signature: diceSignature(diceList) });
     // The save's name is the user's own text, so only the dice count goes to analytics
     trackEvent('preset_saved', { diceCount: diceList.length });
-    showToast(name === typed ? (mode === 'replace' ? `Replaced ${name}` : 'Saved!') : `Saved as ${name}`);
+    showToast(name === typed ? (mode === 'replace' ? `Replaced ${name}` : 'Saved') : `Saved as ${name}`);
     setSaveName('');
     setSavePromptOpen(false);
   };
@@ -520,10 +520,10 @@ function App() {
     setMenuOpen(false);
     // A refused save shows the storage-full message instead of offering Undo
     if (!saveItem(SAVED.defaultSet, JSON.stringify(diceList))) return;
-    offerUndo('Startup dice set', () => {
+    offerUndo('Default dice set', () => {
       if (previous === null) { try { localStorage.removeItem(SAVED.defaultSet); } catch { /* storage blocked */ } }
       else saveItem(SAVED.defaultSet, previous);
-    }, { back: previous === null ? 'No startup dice again' : 'Old startup dice are back' });
+    }, { back: previous === null ? 'No default dice again' : 'Old default dice are back' });
   };
 
   // Clear All needs no confirm: Undo brings every die back for five seconds
@@ -609,7 +609,7 @@ function App() {
     const copyLink = () => {
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(url).then(() => {
-          showToast("Share link copied to clipboard!");
+          showToast('Link copied');
         }).catch(err => {
           console.error("Failed to copy link: ", err);
           setShareFallbackUrl(url);
@@ -645,10 +645,10 @@ function App() {
       // Revoking in the same tick can cancel the download in Safari and Firefox
       setTimeout(() => URL.revokeObjectURL(url), 0);
       trackEvent('backup_exported');
-      showToast('Exported backup successfully!');
+      showToast('Backup exported');
     } catch (e) {
       console.error(e);
-      showToast('Failed to export backup.');
+      showToast("Backup couldn't be exported");
     }
   };
 
@@ -661,7 +661,7 @@ function App() {
       try {
         const result = restoreBackup(JSON.parse(event.target?.result as string));
         if (result === 'invalid') {
-          showToast('Invalid backup file structure.');
+          showToast("That file isn't a Dice Roller backup");
           return;
         }
         // Storage full: the storage message is already up, so no reload
@@ -669,18 +669,18 @@ function App() {
         // From here the backup is what's saved; this page must not save over it
         freezeSaves();
         if (result === 'pictures') {
-          showToast('Imported, but some pictures did not fit on this device. Reloading...');
+          showToast("Backup imported, but some pictures didn't fit on this device. Reloading…");
           setTimeout(() => window.location.reload(), 1500);
           return;
         }
         trackEvent('backup_imported');
-        showToast('Imported backup successfully! Reloading...');
+        showToast('Backup imported. Reloading…');
         setTimeout(() => {
           window.location.reload();
         }, 1000);
       } catch (err) {
         console.error(err);
-        showToast('Failed to parse backup file.');
+        showToast("That backup file couldn't be read");
       }
     };
     reader.readAsText(file);
@@ -1161,7 +1161,7 @@ function App() {
           className={`${styles.toast} ${chipRow ? styles.toastAboveRpgBar : ''}`}
         />
       ) : toast ? (
-        // role="status" so a screen reader hears "Saved!" and the rest, as it does the Undo offer
+        // role="status" so a screen reader hears "Saved" and the rest, as it does the Undo offer
         <div className={`${styles.toast} ${chipRow ? styles.toastAboveRpgBar : ''}`} role="status">
           {toast}
         </div>

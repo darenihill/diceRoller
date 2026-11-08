@@ -17,14 +17,14 @@ afterEach(() => { localStorage.clear(); });
 
 const setDefault = () => {
   fireEvent.click(screen.getAllByRole('button', { name: /menu/i })[0]);
-  fireEvent.click(screen.getByText('Set Default'));
+  fireEvent.click(screen.getByText('Set default'));
 };
 
-describe('Undo after Set Default', () => {
-  it('shows "Startup dice set" with Undo', () => {
+describe('Undo after Set default', () => {
+  it('shows "Default dice set" with Undo', () => {
     render(<App />);
     setDefault();
-    expect(screen.getByText('Startup dice set')).toBeInTheDocument();
+    expect(screen.getByText('Default dice set')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Undo' })).toBeInTheDocument();
     expect(JSON.parse(localStorage.getItem('defaultDiceSet')!)[0].faces).toBe(20);
   });

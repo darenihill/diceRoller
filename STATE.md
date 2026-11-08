@@ -1,4 +1,4 @@
-Next: one name per thing (word list, about 40 labels, Help, landing pages), then Land tap.
+Next: one name per thing waits on Daren's Land tap; Recently deleted next in GOAL.md.
 
 # State
 
@@ -17,3 +17,4 @@ Next: one name per thing (word list, about 40 labels, Help, landing pages), then
 - 2026-11-06: feedback and motion polish, pressed look on every button (Dispatch-Item custom-dice-roller/polish-ui-feedback-9).
 - 2026-11-08: phone menu groups with word, shape and tint (Dispatch-Item custom-dice-roller/ask-2026-11-02-build-owner-2026-66edb6).
 - 2026-11-07: stories, security and SCAMPER review; backup keeps the newest switches, Usage Stats survives a damaged backup, metrics switch names Google Analytics (Dispatch-Item custom-dice-roller/lens-stories+security+scamper-30).
+- 2026-11-08: one name per thing: word list in DESIGN.md §7, about 45 labels and messages, shorter Help, landing pages fixed (Dispatch-Item custom-dice-roller/ask-2026-11-08-build-owner-2026-561938).

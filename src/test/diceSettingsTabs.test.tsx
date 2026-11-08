@@ -11,21 +11,21 @@ describe('Dice settings tabs', () => {
   it('two tabs sit in the title bar beside the close button', () => {
     open(die([]));
     const tabs = screen.getAllByRole('tab');
-    expect(tabs.map(t => t.textContent)).toEqual(['Dice Settings', 'Custom faces']);
+    expect(tabs.map(t => t.textContent)).toEqual(['Die settings', 'Custom faces']);
     expect(screen.getByRole('button', { name: 'Close dialog' })).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: 'Dice Settings' })).toBeNull();
+    expect(screen.queryByRole('heading', { name: 'Die settings' })).toBeNull();
   });
 
-  it('a plain die opens on Dice Settings; a die with its own faces opens on them', () => {
+  it('a plain die opens on Die settings; a die with its own faces opens on them', () => {
     const { unmount } = open(die([]));
-    expect(screen.getByRole('tab', { name: 'Dice Settings' })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByLabelText('Name (Optional)')).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Die settings' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByLabelText('Name (optional)')).toBeInTheDocument();
     unmount();
     open(die(['Cat', 'Dog']));
     expect(screen.getByRole('tab', { name: 'Custom faces' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByLabelText(/^Face 1: Cat/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('tab', { name: 'Dice Settings' }));
-    expect(screen.getByLabelText('Name (Optional)')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: 'Die settings' }));
+    expect(screen.getByLabelText('Name (optional)')).toBeInTheDocument();
   });
 
   it('the quick templates are gone', () => {

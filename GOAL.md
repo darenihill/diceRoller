@@ -5,16 +5,16 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- One name per thing (Daren 2026-11-07, Build: "Use one name for each thing
+- ~~Done 2026-11-08~~ One name per thing (Daren 2026-11-07, Build: "Use one name for each thing
   in the app, from a short word list"; way "Call saved dice games"; his
   comment: "Popular Games"). Done when: DESIGN.md §7 holds the word list;
   the Games dialog is titled "Games" with "Your games" and "Popular games";
   one die's dialog is "Die settings"; menu tiles and dialog titles are in
   sentence case; messages carry no "!" (src/test/oneName.test.tsx).
-- Help says tap, in short items. Done when: Help has no "click", "e.g." or
+- ~~Done 2026-11-08~~ Help says tap, in short items. Done when: Help has no "click", "e.g." or
   "preset", and each item is one or two short sentences
   (src/test/oneName.test.tsx).
-- Landing pages point at real menu items. Done when: no landing page sends
+- ~~Done 2026-11-08~~ Landing pages point at real menu items. Done when: no landing page sends
   people to "Load" or a "set"; they say Games and saved games
   (src/test/oneName.test.tsx).
 

@@ -41,7 +41,7 @@ describe('Roll history from storage or a backup', () => {
     render(<App />);
     fireEvent.click(screen.getAllByRole('button', { name: /menu/i })[0]);
     fireEvent.click(screen.getByText('History'));
-    expect(screen.getByText('Roll Log (1)')).toBeInTheDocument();
+    expect(screen.getByText('Rolls (1)')).toBeInTheDocument();
   });
 });
 
@@ -84,6 +84,6 @@ describe('Saved games from storage or a backup', () => {
     render(<App />);
     fireEvent.click(screen.getAllByRole('button', { name: /menu/i })[0]);
     fireEvent.click(screen.getByText('Games'));
-    expect(screen.getByText('Your Saves')).toBeInTheDocument();
+    expect(screen.getByText('Your games')).toBeInTheDocument();
   });
 });

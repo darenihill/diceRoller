@@ -105,29 +105,29 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
 
               <div className={`${styles.menuColumn} ${styles.groupSettings}`}>
                 <div className={styles.menuColumnHeader}><span className={styles.groupMark} aria-hidden="true" />Settings</div>
-                <button className={styles.menuItem} onClick={onStats}><BarChart2 size={18} /> <span>Usage Stats</span></button>
+                <button className={styles.menuItem} onClick={onStats}><BarChart2 size={18} /> <span>Usage stats</span></button>
                 <button className={styles.menuItem} onClick={onCustomize}><Palette size={18} /> <span>Customize</span></button>
                 <button className={styles.menuItem} onClick={onToggleTableView} aria-pressed={tableView}
                   title="Show each roll's total big for the whole table">
                   {tableView ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
                   <span>Table view</span>
                 </button>
-                <button className={styles.menuItem} onClick={onToggleRpgMode} title="Toggle RPG Mode (Advantage & Modifiers)" aria-pressed={rpgMode}>
+                <button className={styles.menuItem} onClick={onToggleRpgMode} title="RPG mode: D&D dice, modifier and advantage" aria-pressed={rpgMode}>
                   {rpgMode ? <ToggleRight size={18} color="var(--md-sys-color-primary)" /> : <ToggleLeft size={18} />}
-                  <span>RPG Mode</span>
+                  <span>RPG mode</span>
                 </button>
               </div>
 
               <div className={`${styles.menuColumn} ${styles.groupSaves}`}>
                 <div className={styles.menuColumnHeader}><span className={styles.groupMark} aria-hidden="true" />Saves</div>
-                <button className={styles.menuItem} onClick={onSetDefault} title="Pin as startup default"><Pin size={18} /> <span>Set Default</span></button>
+                <button className={styles.menuItem} onClick={onSetDefault} title="Open with these dice every time"><Pin size={18} /> <span>Set default</span></button>
                 <button className={styles.menuItem} onClick={onSave}><Save size={18} /> <span>Save</span></button>
                 <button className={styles.menuItem} onClick={onHistory}><History size={18} /> <span>History</span></button>
                 <button className={styles.menuItem} onClick={onSets}><Dice6 size={18} /> <span>Games</span></button>
               </div>
 
               {/* Full-width bottom row: Install app (until the app is on the home
-                  screen) beside Clear All, so the groups above stay four each */}
+                  screen) beside Clear all, so the groups above stay four each */}
               <div className={styles.menuFooterRow}>
                 {onInstall && (
                   <button className={`${styles.menuItem} ${styles.menuFooterItem} ${styles.menuInstallItem}`} onClick={onInstall} title="Put Dice Roller on your home screen">
@@ -138,7 +138,7 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
                   className={`${styles.menuItem} ${styles.menuFooterItem}`}
                   onClick={onDeleteAll}
                 >
-                  <Trash2 size={18} /> <span>Clear All</span>
+                  <Trash2 size={18} /> <span>Clear all</span>
                 </button>
               </div>
             </motion.div>

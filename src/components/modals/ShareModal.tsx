@@ -29,7 +29,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ url, onClose }) => {
   };
 
   return (
-    <Modal isOpen={!!url} onClose={handleClose} title="Share Link">
+    <Modal isOpen={!!url} onClose={handleClose} title="Share link">
       <div className={modalStyles.formGroup}>
         <label className={modalStyles.formLabel} htmlFor="share-link-url">Share with this link</label>
         <input 
@@ -44,7 +44,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ url, onClose }) => {
         <div className={modalStyles.buttonRow}>
           <button className="md-button md-button-surface" onClick={handleClose}>Done</button>
           <button className="md-button md-button-filled" onClick={handleCopy} aria-live="polite">
-            {copied ? 'Copied' : 'Copy'}
+            {copied ? 'Link copied' : 'Copy link'}
           </button>
         </div>
       </div>

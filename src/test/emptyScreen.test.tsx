@@ -14,7 +14,7 @@ describe('Empty screen', () => {
     localStorage.setItem('diceConfigs', JSON.stringify({ systemAutosave: { name: 'systemAutosave', config: [] } }));
     render(<App />);
     fireEvent.click(screen.getAllByRole('button', { name: /menu/i })[0]);
-    fireEvent.click(screen.getByText('Clear All'));
+    fireEvent.click(screen.getByText('Clear all'));
     const confirm = screen.queryByRole('button', { name: 'Delete All' });
     if (confirm) fireEvent.click(confirm);
     expect(screen.getByText('No dice yet')).toBeInTheDocument();

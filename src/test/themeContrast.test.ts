@@ -4,7 +4,7 @@ import path from 'path';
 
 // Every theme's text colors stay readable on the surfaces they sit on, so a
 // theme that forgets a token (light once inherited the dark theme's pale error
-// pink, and Clear All read at 1.3:1) fails here instead of on someone's phone.
+// pink, and Clear all read at 1.3:1) fails here instead of on someone's phone.
 const css = fs.readFileSync(path.resolve(__dirname, '../index.css'), 'utf-8');
 
 function tokens(selector: string): Record<string, string> {
@@ -35,7 +35,7 @@ const pairs: [string, string][] = [
   ['on-surface', 'surface-variant'],
   ['on-primary', 'primary'],
   ['error', 'surface'], // the bin on a saved game, Remove in Dice settings
-  ['error', 'surface-variant'], // Clear All in the menu
+  ['error', 'surface-variant'], // Clear all in the menu
   ['on-error', 'error'], // the bin on a die
   ['on-primary-container', 'primary-container'], // the Roll one button on a die
 ];

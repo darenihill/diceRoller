@@ -39,7 +39,7 @@ describe('Storage full', () => {
     const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
     // Any save is now refused
     fireEvent.click(screen.getAllByRole('button', { name: /menu/i })[0]);
-    fireEvent.click(screen.getByText('Set Default'));
+    fireEvent.click(screen.getByText('Set default'));
     const message = screen.getByRole('alert');
     expect(message).toHaveTextContent(/storage is full/i);
     fireEvent.click(screen.getByRole('button', { name: 'Export backup' }));
@@ -48,11 +48,11 @@ describe('Storage full', () => {
     expect(screen.queryByRole('alert')).toBeNull();
   });
 
-  it('Set Default with full storage shows the storage message, not "Saved as default"', () => {
+  it('Set default with full storage shows the storage message, not "Saved as default"', () => {
     render(<App />);
     fillStorage();
     fireEvent.click(screen.getAllByRole('button', { name: /menu/i })[0]);
-    fireEvent.click(screen.getByText('Set Default'));
+    fireEvent.click(screen.getByText('Set default'));
     expect(screen.queryByText(/Saved as default/)).toBeNull();
     expect(screen.getByRole('alert')).toHaveTextContent(/storage is full/i);
   });
@@ -61,7 +61,7 @@ describe('Storage full', () => {
     render(<App />);
     fillStorage();
     fireEvent.click(screen.getAllByRole('button', { name: /menu/i })[0]);
-    fireEvent.click(screen.getByText('Set Default'));
+    fireEvent.click(screen.getByText('Set default'));
     fireEvent.click(screen.getByRole('button', { name: 'Close storage message' }));
     expect(screen.queryByRole('alert')).toBeNull();
   });

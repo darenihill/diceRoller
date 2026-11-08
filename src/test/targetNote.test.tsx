@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 import { checkTargets, targetNote } from '../utils/targets';
 import { CustomizeModal } from '../components/modals/CustomizeModal';
 
-describe('Target Highlight check', () => {
+describe('Target hit check', () => {
   it('says nothing when every part is a whole number', () => {
     expect(targetNote('7, 11')).toBeNull();
     expect(targetNote('')).toBeNull();
@@ -28,7 +28,7 @@ const base = {
   telemetryEnabled: true, onToggleTelemetry: () => {}, diceScale: 1, onChangeDiceScale: () => {},
 };
 
-describe('Target Highlight box', () => {
+describe('Target hit box', () => {
   it('marks the box and shows the note when a part is not a number', () => {
     render(<CustomizeModal {...base} targetHighlight="7, x" />);
     expect(screen.getByLabelText(/Target totals/)).toHaveAttribute('aria-invalid', 'true');

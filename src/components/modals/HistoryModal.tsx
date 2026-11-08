@@ -105,7 +105,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   }, [isOpen, rollHistory]);
   const tabsId = React.useId();
   const tabsHeader = (
-    <div className={tabStyles.tabs} role="tablist" aria-label="Roll history">
+    <div className={tabStyles.tabs} role="tablist" aria-label="History">
       {([['history', 'History'], ['frequency', 'Frequency']] as const).map(([key, label]) => (
         <button
           key={key}
@@ -124,7 +124,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Roll History & Frequency" header={tabsHeader}>
+    <Modal isOpen={isOpen} onClose={onClose} title="History" header={tabsHeader}>
       {rollHistory.length === 0 ? (
         <p style={{ color: 'var(--md-sys-color-on-surface-variant)', textAlign: 'center', padding: '16px 0' }}>No rolls yet. Each roll shows here.</p>
       ) : (
@@ -151,7 +151,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
               </div>
             </div>
             <div className={styles.historyList}>
-              <h3 className={modalStyles.sectionHeader}>Roll Log ({rollHistory.length})</h3>
+              <h3 className={modalStyles.sectionHeader}>Rolls ({rollHistory.length})</h3>
               {rollHistory.map((roll, i) => (
                 <React.Fragment key={roll.id}>
                 {runStarts.get(roll.id) && (
@@ -164,7 +164,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
                   <div className={styles.historyDetails}>{roll.details.join(', ')}</div>
                   <div className={styles.historyTotal}>
                     Total: {roll.total}
-                    {roll.isTargetHit && <span style={{ marginLeft: 6, color: 'var(--color-gold-ink)', fontSize: '0.75rem' }}>🎯 HIT!</span>}
+                    {roll.isTargetHit && <span style={{ marginLeft: 6, color: 'var(--color-gold-ink)', fontSize: '0.75rem' }}>🎯 Target hit</span>}
                   </div>
                 </div>
                 </React.Fragment>
@@ -174,7 +174,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
           {tab === 'frequency' && (<>
             {/* Session Frequency Histogram */}
             <div>
-              <h3 className={modalStyles.sectionHeaderFirst}>Luck Meter</h3>
+              <h3 className={modalStyles.sectionHeaderFirst}>How often each total came up</h3>
               {groups.length > 1 && (
                 <div className={modalStyles.gameChips} role="group" aria-label="Which game">
                   {groups.map(g => (

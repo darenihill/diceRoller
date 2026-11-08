@@ -55,6 +55,39 @@ bright gold on dark themes and deep gold on light; glows and borders keep
 Icon-only controls carry `aria-label` (or `title` at minimum). Toggles say
 their state with `aria-pressed`. Dialogs trap focus and close on Esc.
 
+## 7. Words
+
+One name for each thing, written the same way everywhere (owner, 2026-11-07:
+Build "Use one name for each thing in the app, from a short word list", way
+"Call saved dice games", name "Popular games"). New labels and messages use
+these words; `src/test/oneName.test.tsx` checks the main ones.
+
+| Use | Not |
+|---|---|
+| game (saved dice); Games dialog with "Your games" and "Popular games" | save (as a noun), preset, set, configuration, ready-made game |
+| die (one), dice (more) | "dice" for one die |
+| hold / release | lock, unheld |
+| RPG mode | RPG Mode, D&D mode |
+| Customize (the app) | Settings, Customize App |
+| die settings (one die) | Dice Settings, gear menu |
+| History (past rolls) | Roll History & Frequency, roll log |
+| Frequency (how often each total came up) | Luck Meter, chart |
+| clear (empty a list) | delete all, wipe |
+| delete (a saved game) | remove |
+| remove (one die, face or picture) | delete, clear |
+| default dice | startup dice, usual dice |
+| faces | sides |
+| Copy link (share) | Copy |
+| tap | click, click/tap, simply |
+| anonymous page metrics | telemetry |
+| target hit | HIT!, Target Highlight |
+| like 7, 11 | e.g. |
+| sentence case: "Usage stats", "Set default" | Title Case |
+
+Messages are short and plain, with no "!": "Backup exported", "Link copied".
+The menu's group heading "Saves" stays: it names the group of saving
+actions (owner's pick, 2026-11-07), not saved dice.
+
 ## 9. Deviations
 
 | What | M3 says | This project does | Why |

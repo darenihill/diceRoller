@@ -42,14 +42,14 @@ describe.each(Object.entries(themes))('%s theme contrast', (_name, t) => {
     }
   });
 
-  it('red warning text (Clear All, a typo note) is readable', () => {
+  it('red warning text (Clear all, a typo note) is readable', () => {
     for (const bg of ['--md-sys-color-background', '--md-sys-color-surface-variant']) {
       expect(ratio(t['--md-sys-color-error'], t[bg])).toBeGreaterThanOrEqual(4.5);
     }
     expect(ratio(t['--md-sys-color-on-error'], t['--md-sys-color-error'])).toBeGreaterThanOrEqual(4.5);
   });
 
-  it('the gold lock and HIT! stand out from their buttons', () => {
+  it('the gold lock and Target hit stand out from their buttons', () => {
     expect(ratio(gold(t), t['--md-sys-color-surface-variant'])).toBeGreaterThanOrEqual(3);
   });
 

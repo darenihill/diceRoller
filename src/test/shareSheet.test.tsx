@@ -35,7 +35,7 @@ describe('Share', () => {
     const data = share.mock.calls[0][0] as ShareData;
     expect(data.url).toMatch(/#share=/);
     await act(async () => {});
-    expect(screen.queryByText('Share Link')).toBeNull();
+    expect(screen.queryByText('Share link')).toBeNull();
   });
 
   it('does nothing else when the sheet is closed', async () => {
@@ -45,8 +45,8 @@ describe('Share', () => {
     openShare();
     await act(async () => {});
     expect(writeText).not.toHaveBeenCalled();
-    expect(screen.queryByText('Share Link')).toBeNull();
-    expect(screen.queryByText(/copied to clipboard/)).toBeNull();
+    expect(screen.queryByText('Share link')).toBeNull();
+    expect(screen.queryByText(/Link copied/)).toBeNull();
   });
 
   it('copies the link when there is no share sheet', async () => {
@@ -54,14 +54,14 @@ describe('Share', () => {
     Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
     Object.defineProperty(window, 'isSecureContext', { value: true, configurable: true });
     openShare();
-    await waitFor(() => expect(screen.getByText(/copied to clipboard/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/Link copied/)).toBeInTheDocument());
     expect(writeText.mock.calls[0][0]).toMatch(/#share=/);
   });
 
   it('shows the link box when the sheet fails for another reason', async () => {
     nav.share = vi.fn().mockRejectedValue(Object.assign(new Error('nope'), { name: 'NotAllowedError' }));
     openShare();
-    await waitFor(() => expect(screen.getByText('Share Link')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Share link')).toBeInTheDocument());
   });
 });
 
@@ -70,21 +70,21 @@ describe('Share link box', () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
     render(<ShareModal url="https://example.test/#share=abc" onClose={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Copy' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Copy link' }));
     expect(writeText).toHaveBeenCalledWith('https://example.test/#share=abc');
-    expect(await screen.findByRole('button', { name: 'Copied' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Link copied' })).toBeInTheDocument();
   });
 
   it('opens fresh after Done, even for the same link', async () => {
     Object.defineProperty(navigator, 'clipboard', { value: { writeText: vi.fn().mockResolvedValue(undefined) }, configurable: true });
     const url = 'https://example.test/#share=abc';
     const { rerender } = render(<ShareModal url={url} onClose={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Copy' }));
-    await screen.findByRole('button', { name: 'Copied' });
+    fireEvent.click(screen.getByRole('button', { name: 'Copy link' }));
+    await screen.findByRole('button', { name: 'Link copied' });
     fireEvent.click(screen.getByRole('button', { name: 'Done' }));
     rerender(<ShareModal url={null} onClose={() => {}} />);
     rerender(<ShareModal url={url} onClose={() => {}} />);
-    expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Copy link' })).toBeInTheDocument();
   });
 
   it('selects the link when copying is refused', async () => {
@@ -92,8 +92,8 @@ describe('Share link box', () => {
     render(<ShareModal url="https://example.test/#share=abc" onClose={() => {}} />);
     const input = screen.getByLabelText('Share with this link') as HTMLInputElement;
     const select = vi.spyOn(input, 'select');
-    fireEvent.click(screen.getByRole('button', { name: 'Copy' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Copy link' }));
     await waitFor(() => expect(select).toHaveBeenCalled());
-    expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Copy link' })).toBeInTheDocument();
   });
 });
