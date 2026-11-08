@@ -57,6 +57,9 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   "Saved Attack" show while an Undo bar is up, and the Undo stays reachable.
 - Loading text on a slow link (S14). Done when: the page shows "Loading
   dice…" before the app script arrives.
+- ~~Done 2026-11-06~~ Typed "2d6+3 adv" reads back as typed, not "d6+3 adv"
+  (stories, remix and words review; src/test/typeRoll.test.tsx). The word
+  list and wording changes are a Focus idea (reviews/2026-11-06-copy.md).
 - ~~Done 2026-11-06~~ Fixes from the 2026-11-06 review
   (reviews/2026-11-06-combined.md): Import Backup keeps the imported games, a
   file that isn't a backup is refused, search pages offer Undo, Add custom text
