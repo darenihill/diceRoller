@@ -1,4 +1,4 @@
-Next: deep review (stories, security, inversion) under way, item lens-stories+security+inversion-39.
+Next: review 39 (stories, security, inversion) is in a pull request, waiting on Daren to merge (public site).
 
 # State
 
@@ -21,3 +21,4 @@ Next: deep review (stories, security, inversion) under way, item lens-stories+se
 - 2026-11-08: Save fills in a name, selected (Dispatch-Item custom-dice-roller/ask-2026-11-08-build-owner-2026-fa277a).
 - 2026-11-08: tap a History roll to put its dice back out; typed rolls go back in the roll box (Dispatch-Item custom-dice-roller/ask-2026-11-08-build-owner-2026-91e7df).
 - 2026-11-08: goal check, jobs + HEART + working backwards; goal stays (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-7).
+- 2026-11-08: stories, security, inversion review; share link in an open tab loads, Help and empty screen use the button words; 3 Focus ideas (Dispatch-Item custom-dice-roller/lens-stories+security+inversion-39).
