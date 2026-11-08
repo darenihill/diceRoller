@@ -5,6 +5,15 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-08~~ Phone menu groups (Daren 2026-11-01, Build: "Phone menu
+  groups its tiles under App, Saves and Tools"; 2026-11-07: "I want to give
+  more of an indicator (especially on mobile) related topics like we have on
+  desktop"; way A from the mock-ups). Done when: on a phone the App, Settings
+  and Saves headings show above their rows, each with a shape (circle, square,
+  triangle) and its row of tiles lightly tinted in a colorblind-safe blue,
+  orange or pink-purple; the computer menu keeps its headings
+  (src/test/menuGroups.test.tsx).
+
 - ~~Done 2026-11-07~~ Switches say On or Off (app standards: accessibility;
   deep review 2026-11-07). Done when: every Customize switch shows On or Off
   in words under it, so its state never rests on color alone
