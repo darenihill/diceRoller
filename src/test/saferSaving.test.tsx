@@ -27,13 +27,13 @@ describe('Save game when the name is taken', () => {
   it('Enter never overwrites a taken name', () => {
     const onSave = vi.fn();
     render(<SaveDialog {...base} saveName="Catan" existingNames={['Catan']} onSave={onSave} />);
-    fireEvent.keyDown(screen.getByLabelText(/name this game/i), { key: 'Enter' });
+    fireEvent.keyDown(screen.getByLabelText(/name for this game/i), { key: 'Enter' });
     expect(onSave).not.toHaveBeenCalled();
   });
 
   it('Done on a taken name puts the keyboard away so the choices show', () => {
     render(<SaveDialog {...base} saveName="Catan" existingNames={['Catan']} onSave={() => {}} />);
-    const input = screen.getByLabelText(/name this game/i);
+    const input = screen.getByLabelText(/name for this game/i);
     input.focus();
     expect(input).toHaveFocus();
     fireEvent.keyDown(input, { key: 'Enter' });

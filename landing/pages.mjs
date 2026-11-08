@@ -103,7 +103,7 @@ export const landingPages = [
   <li>story starters and vocabulary review,</li>
   <li>picking groups or turn order fairly.</li>
 </ul>
-<h2>Save a set and share it with your class</h2>
+<h2>Save a game and share it with your class</h2>
 <ol>
   <li>Build your dice, open the menu and tap Save. Name the game, like "Week 3 vocabulary".</li>
   <li>Tap Share. A link to exactly those dice is copied, its name included.</li>

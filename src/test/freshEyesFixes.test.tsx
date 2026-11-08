@@ -14,7 +14,7 @@ describe('Fresh eyes fixes (2026-11-05)', () => {
     vi.useFakeTimers();
     render(<SaveDialog isOpen onClose={() => {}} onChangeSaveName={() => {}} saveName="" existingNames={[]} onSave={() => {}} />);
     act(() => { vi.runAllTimers(); });
-    expect(screen.getByLabelText(/name this game/i)).toHaveFocus();
+    expect(screen.getByLabelText(/name for this game/i)).toHaveFocus();
     vi.useRealTimers();
   });
 

@@ -26,7 +26,7 @@ export const SaveDialog: React.FC<SaveDialogProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Save game">
       <div className={modalStyles.formGroup}>
-        <label className={modalStyles.formLabel} htmlFor="save-game-name">Name this game</label>
+        <label className={modalStyles.formLabel} htmlFor="save-game-name">Name for this game</label>
         <input 
           id="save-game-name"
           autoFocus
