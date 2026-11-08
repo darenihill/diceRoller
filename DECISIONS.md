@@ -56,3 +56,4 @@ Daren's picks on suggested ideas for this app, from the Desk, oldest first: the 
 - 2026-10-28 · Build · Usage Stats puts two numbers per row on a phone
 - 2026-10-28 · Build · When you open a die's settings, its faces show first, not the colour panel
 - 2026-10-29 · Build · A natural 20 sets off a one-second confetti burst
+- 2026-11-07 · Skip · 3D dice tumble across a tray — "How much extra code does 3d require? I don't really care for it. If it's a tiny add leave it otherwise drop it" (PR 75, 585 lines plus a library, closed)

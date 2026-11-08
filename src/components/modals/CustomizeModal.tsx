@@ -150,15 +150,18 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
               <span className={modalStyles.toggleTitle}>Sound Effects</span>
               <span className={modalStyles.toggleDesc}>Play synthesized rolling rattles & landing thuds</span>
             </div>
-            <button 
-              className="md-icon-button"
-              onClick={onToggleSound}
-              title={soundEnabled ? "Mute Sounds" : "Unmute Sounds"}
-              aria-label="Sound effects"
-              aria-pressed={soundEnabled}
-            >
-              {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
-            </button>
+            <div className={modalStyles.switchCol}>
+              <button 
+                className="md-icon-button"
+                onClick={onToggleSound}
+                title={soundEnabled ? "Mute Sounds" : "Unmute Sounds"}
+                aria-label="Sound effects"
+                aria-pressed={soundEnabled}
+              >
+                {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+              </button>
+              <span className={modalStyles.switchWord} aria-hidden="true">{soundEnabled ? 'On' : 'Off'}</span>
+            </div>
           </div>
 
           {/* Shake to Roll Toggle: off by default because iPhone asks for motion access */}
@@ -167,15 +170,18 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
               <span className={modalStyles.toggleTitle}>Shake to Roll</span>
               <span className={modalStyles.toggleDesc}>Shake your phone to roll, just like the Roll button</span>
             </div>
-            <button
-              className="md-icon-button"
-              onClick={onToggleShake}
-              title={shakeEnabled ? "Turn off shake to roll" : "Turn on shake to roll"}
-              aria-label="Shake to roll"
-              aria-pressed={shakeEnabled}
-            >
-              <Smartphone size={20} />
-            </button>
+            <div className={modalStyles.switchCol}>
+              <button
+                className="md-icon-button"
+                onClick={onToggleShake}
+                title={shakeEnabled ? "Turn off shake to roll" : "Turn on shake to roll"}
+                aria-label="Shake to roll"
+                aria-pressed={shakeEnabled}
+              >
+                <Smartphone size={20} />
+              </button>
+              <span className={modalStyles.switchWord} aria-hidden="true">{shakeEnabled ? 'On' : 'Off'}</span>
+            </div>
           </div>
 
           {/* Sort dice after each roll: off until turned on (owner, 2026-11-06) */}
@@ -185,15 +191,18 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
                 <span className={modalStyles.toggleTitle}>Sort Dice After Each Roll</span>
                 <span className={modalStyles.toggleDesc}>Dice line up from lowest to highest when they land. What they rolled stays the same</span>
               </div>
-              <button
-                className="md-icon-button"
-                onClick={onToggleSortDice}
-                title={sortDice ? "Turn off sort dice after each roll" : "Turn on sort dice after each roll"}
-                aria-label="Sort dice after each roll"
-                aria-pressed={sortDice}
-              >
-                {sortDice ? <ArrowDown01 size={20} /> : <ArrowDownUp size={20} />}
-              </button>
+              <div className={modalStyles.switchCol}>
+                <button
+                  className="md-icon-button"
+                  onClick={onToggleSortDice}
+                  title={sortDice ? "Turn off sort dice after each roll" : "Turn on sort dice after each roll"}
+                  aria-label="Sort dice after each roll"
+                  aria-pressed={sortDice}
+                >
+                  {sortDice ? <ArrowDown01 size={20} /> : <ArrowDownUp size={20} />}
+                </button>
+                <span className={modalStyles.switchWord} aria-hidden="true">{sortDice ? 'On' : 'Off'}</span>
+              </div>
             </div>
           )}
 
@@ -204,15 +213,18 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
                 <span className={modalStyles.toggleTitle}>Bright Rings</span>
                 <span className={modalStyles.toggleDesc}>A bright ring round the bottom buttons, easier to find in sunlight</span>
               </div>
-              <button
-                className="md-icon-button"
-                onClick={onToggleBrightRings}
-                title={brightRings ? "Turn off bright rings" : "Turn on bright rings"}
-                aria-label="Bright rings"
-                aria-pressed={brightRings}
-              >
-                {brightRings ? <CircleDot size={20} /> : <Circle size={20} />}
-              </button>
+              <div className={modalStyles.switchCol}>
+                <button
+                  className="md-icon-button"
+                  onClick={onToggleBrightRings}
+                  title={brightRings ? "Turn off bright rings" : "Turn on bright rings"}
+                  aria-label="Bright rings"
+                  aria-pressed={brightRings}
+                >
+                  {brightRings ? <CircleDot size={20} /> : <Circle size={20} />}
+                </button>
+                <span className={modalStyles.switchWord} aria-hidden="true">{brightRings ? 'On' : 'Off'}</span>
+              </div>
             </div>
           )}
 
@@ -223,15 +235,18 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
                 <span className={modalStyles.toggleTitle}>Buzz When Dice Land</span>
                 <span className={modalStyles.toggleDesc}>One short buzz when the dice land, even with sound off (Android)</span>
               </div>
-              <button
-                className="md-icon-button"
-                onClick={onToggleBuzz}
-                title={buzzEnabled ? "Turn off buzz when dice land" : "Turn on buzz when dice land"}
-                aria-label="Buzz when dice land"
-                aria-pressed={buzzEnabled}
-              >
-                {buzzEnabled ? <Vibrate size={20} /> : <VibrateOff size={20} />}
-              </button>
+              <div className={modalStyles.switchCol}>
+                <button
+                  className="md-icon-button"
+                  onClick={onToggleBuzz}
+                  title={buzzEnabled ? "Turn off buzz when dice land" : "Turn on buzz when dice land"}
+                  aria-label="Buzz when dice land"
+                  aria-pressed={buzzEnabled}
+                >
+                  {buzzEnabled ? <Vibrate size={20} /> : <VibrateOff size={20} />}
+                </button>
+                <span className={modalStyles.switchWord} aria-hidden="true">{buzzEnabled ? 'On' : 'Off'}</span>
+              </div>
             </div>
           )}
 
@@ -266,17 +281,20 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           <div className={modalStyles.toggleRow}>
             <div className={modalStyles.toggleLabelCol}>
               <span className={modalStyles.toggleTitle}>Anonymous Page Metrics</span>
-              <span className={modalStyles.toggleDesc}>Allow recording anonymous usage stats & session telemetry</span>
+              <span className={modalStyles.toggleDesc}>Sends page visits, rolls and button taps to Google Analytics. Never your own face words, pictures or saved game names</span>
             </div>
-            <button 
-              className="md-icon-button"
-              onClick={onToggleTelemetry}
-              title={telemetryEnabled ? "Disable Telemetry" : "Enable Telemetry"}
-              aria-label="Anonymous page metrics"
-              aria-pressed={telemetryEnabled}
-            >
-              <BarChart2 size={20} />
-            </button>
+            <div className={modalStyles.switchCol}>
+              <button 
+                className="md-icon-button"
+                onClick={onToggleTelemetry}
+                title={telemetryEnabled ? "Disable Telemetry" : "Enable Telemetry"}
+                aria-label="Anonymous page metrics"
+                aria-pressed={telemetryEnabled}
+              >
+                <BarChart2 size={20} />
+              </button>
+              <span className={modalStyles.switchWord} aria-hidden="true">{telemetryEnabled ? 'On' : 'Off'}</span>
+            </div>
           </div>
         </div>
       </div>
