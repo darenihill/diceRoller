@@ -120,7 +120,7 @@ function App() {
     return () => observer.disconnect();
   }, []);
 
-  const { savedConfigs, saveConfig, deleteConfig, getSystemAutosave } = useStorage();
+  const { savedConfigs, saveConfig, deleteConfig, restoreConfig, getSystemAutosave } = useStorage();
 
   const [menuOpen, setMenuOpen] = useState(false);
   // The Add D&D Die menu; the Undo bar steps aside for it too (review 2026-11-06)
@@ -611,13 +611,21 @@ function App() {
     if (index < 0) return;
     const die = diceList[index];
     removeDice(id);
-    offerUndo(`Removed ${dieLabel(die)}`, () => insertDiceAt(die, index));
+    // A second die removed while the bar is up joins the same Undo
+    offerUndo(`Removed ${dieLabel(die)}`, () => insertDiceAt(die, index), {
+      kind: 'die', many: n => ({ message: `Removed ${n} dice`, back: `${n} dice are back` }),
+    });
   };
 
   const handleDeleteSave = (name: string) => {
     const saved = savedConfigs[name];
+    const at = Object.keys(savedConfigs).indexOf(name);
     deleteConfig(name);
-    if (saved) offerUndo(`Deleted ${name}`, () => saveConfig(name, saved.config));
+    // Undo puts it back in its place; deleting another while the bar is up
+    // (a double tap slides the next game's bin under the finger) joins the same Undo
+    if (saved) offerUndo(`Deleted ${name}`, () => restoreConfig(saved, at), {
+      kind: 'game', many: n => ({ message: `Deleted ${n} games`, back: `${n} games are back` }),
+    });
   };
 
   // The faces count, a template or a face's X can drop custom faces; Undo puts them back
@@ -628,7 +636,15 @@ function App() {
       const sameCount = updates.customFaces.length === die.customFaces.length;
       const kept = new Set(updates.customFaces.map(f => parseFaceContent(f).content));
       const lost = sameCount ? [] : die.customFaces.filter(f => !kept.has(parseFaceContent(f).content));
-      if (lost.length > 0) {
+      // A picture taken off a face is a remove too (standard 2): the photo stays
+      // on this device until another picture is added, so Undo can put it back
+      const picturesAfter = new Set(updates.customFaces.map(f => parseFaceContent(f).image).filter(Boolean));
+      const lostPicture = sameCount ? die.customFaces.find(f => { const img = parseFaceContent(f).image; return img && !picturesAfter.has(img); }) : undefined;
+      if (lostPicture !== undefined) {
+        // Short, so it fits the bar on a phone; the face is in view just above
+        const before = { customFaces: die.customFaces };
+        offerUndo('Removed picture', () => updateDice(id, before), { back: 'Picture is back' });
+      } else if (lost.length > 0) {
         const before = { faces: die.faces, customFaces: die.customFaces, currentFaceIndex: die.currentFaceIndex };
         offerUndo(
           lost.length === 1 ? `Removed face ${parseFaceContent(lost[0]).content}` : `Replaced ${lost.length} faces`,

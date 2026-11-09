@@ -12,11 +12,23 @@ export interface UndoOffer {
   big: boolean;
   /** Changes with each new offer, so the countdown restarts */
   key: number;
+  /** What kind of thing went, so a second one while the bar is up joins it */
+  kind?: string;
+  /** How many things this Undo brings back (1 when left out) */
+  count?: number;
 }
 
 export interface UndoOptions {
   back?: string;
   big?: boolean;
+  /**
+   * Another removal of the same kind while the bar is up joins this one, so
+   * one Undo brings both back: a double tap on a bin that slides the next
+   * game under the finger no longer loses the first (review 2026-11-09).
+   */
+  kind?: string;
+  /** The message and the "is back" line for several of this kind */
+  many?: (n: number) => { message: string; back: string };
 }
 
 /** "Removed d20" → "d20 is back", "Cleared 4 rolls" → "4 rolls are back" */
@@ -36,7 +48,13 @@ export function backMessage(message: string): string {
  * bar is touched and a newer action replaces it (app standards, standard 2).
  */
 export function useUndo(windowMs = UNDO_WINDOW_MS) {
-  const [offer, setOffer] = useState<UndoOffer | null>(null);
+  const [offer, setOfferState] = useState<UndoOffer | null>(null);
+  // The offer that is up right now, for joining a second removal to it
+  const current = useRef<UndoOffer | null>(null);
+  const setOffer = useCallback((next: UndoOffer | null) => {
+    current.current = next;
+    setOfferState(next);
+  }, []);
   const [paused, setPaused] = useState(false);
   const timer = useRef<number | undefined>(undefined);
   const endsAt = useRef(0);
@@ -47,17 +65,26 @@ export function useUndo(windowMs = UNDO_WINDOW_MS) {
     window.clearTimeout(timer.current);
     setOffer(null);
     setPaused(false);
-  }, []);
+  }, [setOffer]);
 
   const offerUndo = useCallback((message: string, undo: () => void, options: UndoOptions = {}) => {
     window.clearTimeout(timer.current);
     seq.current += 1;
-    setOffer({ message, undo, back: options.back ?? backMessage(message), big: !!options.big, key: seq.current });
+    const prev = current.current;
+    if (options.kind && options.many && prev?.kind === options.kind) {
+      // Newest first, so each thing goes back into the place it left
+      const count = (prev.count ?? 1) + 1;
+      const earlier = prev.undo;
+      const { message: joined, back } = options.many(count);
+      setOffer({ message: joined, undo: () => { undo(); earlier(); }, back, big: true, key: seq.current, kind: options.kind, count });
+    } else {
+      setOffer({ message, undo, back: options.back ?? backMessage(message), big: !!options.big, key: seq.current, kind: options.kind, count: 1 });
+    }
     setPaused(false);
     left.current = windowMs;
     endsAt.current = Date.now() + windowMs;
     timer.current = window.setTimeout(() => setOffer(null), windowMs);
-  }, [windowMs]);
+  }, [windowMs, setOffer]);
 
   /** Touching the bar stops the clock; letting go starts it again */
   const pause = useCallback(() => {
@@ -72,7 +99,7 @@ export function useUndo(windowMs = UNDO_WINDOW_MS) {
     endsAt.current = Date.now() + left.current;
     timer.current = window.setTimeout(() => setOffer(null), left.current);
     setPaused(false);
-  }, [offer, paused]);
+  }, [offer, paused, setOffer]);
 
   /** Runs the undo and returns what to say ("d20 is back"), or null */
   const runUndo = useCallback((): string | null => {

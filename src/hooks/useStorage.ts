@@ -68,6 +68,18 @@ export function useStorage() {
     });
   }, []);
 
+  /** Puts a deleted game back in the place it had in the list (used by Undo) */
+  const restoreConfig = useCallback((entry: DiceConfig, at: number) => {
+    setSavedConfigs((prev) => {
+      if (savesFrozen) return prev;
+      const entries = Object.entries(prev).filter(([key]) => key !== entry.name);
+      entries.splice(Math.min(Math.max(at, 0), entries.length), 0, [entry.name, entry]);
+      const updated = Object.fromEntries(entries);
+      saveItem(SAVED.games, JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
   const getSystemAutosave = useCallback((): DiceConfig | null => {
     try {
       const stored = readItem(SAVED.games);
@@ -90,6 +102,7 @@ export function useStorage() {
     savedConfigs,
     saveConfig,
     deleteConfig,
+    restoreConfig,
     getSystemAutosave
   };
 }

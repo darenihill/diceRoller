@@ -5,6 +5,21 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-09~~ A double tap on Remove keeps its Undo (impaired and
+  stories review, standard 2). Done when: a tap on the Undo bar's × or Undo
+  that starts within half a second of the bar showing does nothing, so the
+  second tap of a double tap on Remove, Delete or Clear all can't throw the
+  Undo away; keyboard presses still work at once
+  (src/test/review20261109b.test.tsx).
+- ~~Done 2026-11-09~~ Two games deleted in a row both come back (impaired
+  review, standard 2). Done when: deleting a second game while the bar is up
+  says "Deleted 2 games", one Undo brings both back, and each game returns to
+  its old place in Your games, not the end; dice removed in a row join the same
+  way, "Removed 2 dice" (src/test/review20261109b.test.tsx).
+- ~~Done 2026-11-09~~ Removing a face's picture can be undone (stories
+  review, standard 2). Done when: Remove picture says "Removed picture" with
+  Undo, and Undo puts the same picture back on the face
+  (src/test/review20261109b.test.tsx).
 - ~~Done 2026-11-09~~ Page metrics off means nothing goes to Google (privacy
   review, standard 15). Done when: with metrics off, the home page and the four
   search pages don't fetch Google's tag script, turning metrics on fetches it

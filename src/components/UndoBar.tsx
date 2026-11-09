@@ -3,6 +3,14 @@ import { Undo2, X } from 'lucide-react';
 import type { UndoOffer } from '../hooks/useUndo';
 import styles from './UndoBar.module.css';
 
+/**
+ * A press that starts this soon after the bar shows was meant for the button
+ * that was there before it: the bar opens right where Remove, Clear all and
+ * Delete sit, so a double tap used to land on × and throw the Undo away
+ * (review 2026-11-09).
+ */
+export const UNDO_TAP_GUARD_MS = 500;
+
 interface UndoBarProps {
   offer: UndoOffer;
   windowMs: number;
@@ -50,12 +58,21 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
     ro.observe(svg);
     return () => ro.disconnect();
   }, [offer.key]);
+  // When this offer showed, and whether the press now under way started too soon after
+  const shownAt = React.useRef(0);
+  const early = React.useRef(false);
+  React.useEffect(() => { shownAt.current = Date.now(); early.current = false; }, [offer.key]);
+  const onPress = () => { early.current = Date.now() - shownAt.current < UNDO_TAP_GUARD_MS; };
+  const unlessEarly = (act: () => void) => () => {
+    if (early.current) { early.current = false; return; }
+    act();
+  };
   return (
   <div
     className={`${styles.bar} ${className ?? ''}`}
     role="status"
     data-testid="undo-bar"
-    onPointerDown={onPause}
+    onPointerDown={() => { onPress(); onPause(); }}
     onPointerUp={(e) => { if (!e.currentTarget.contains(document.activeElement)) onResume(); }}
     onPointerCancel={onResume}
     onPointerLeave={onResume}
@@ -63,7 +80,7 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
     onBlur={onResume}
   >
     <span className={styles.message}>{offer.message}</span>
-    <button type="button" className={styles.undo} onClick={onUndo}>
+    <button type="button" className={styles.undo} onClick={unlessEarly(onUndo)}>
       <svg className={styles.ring} aria-hidden="true" ref={svgRef}>
         <path
           key={offer.key}
@@ -77,7 +94,7 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
       Undo
     </button>
     {!offer.big && (
-      <button type="button" className={styles.close} onClick={onDismiss} aria-label="Dismiss">
+      <button type="button" className={styles.close} onClick={unlessEarly(onDismiss)} aria-label="Dismiss">
         <X size={18} strokeWidth={2.5} aria-hidden="true" />
       </button>
     )}
