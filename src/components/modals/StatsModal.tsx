@@ -40,7 +40,6 @@ export const StatsModal: React.FC<StatsModalProps> = ({ isOpen, onClose }) => {
     <Modal isOpen={isOpen} onClose={onClose} title="Usage stats">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div>
-          <h3 className={modalStyles.sectionHeaderFirst}>Your dice by the numbers</h3>
           <div className={modalStyles.metricsGrid}>
             {metrics.map(m => (
               <div key={m.label} className={modalStyles.metricCard}>

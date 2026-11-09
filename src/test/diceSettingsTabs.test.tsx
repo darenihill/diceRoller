@@ -19,13 +19,13 @@ describe('Dice settings tabs', () => {
   it('a plain die opens on Die settings; a die with its own faces opens on them', () => {
     const { unmount } = open(die([]));
     expect(screen.getByRole('tab', { name: 'Die settings' })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByLabelText('Name (optional)')).toBeInTheDocument();
+    expect(screen.getByLabelText('Name')).toBeInTheDocument();
     unmount();
     open(die(['Cat', 'Dog']));
     expect(screen.getByRole('tab', { name: 'Custom faces' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByLabelText(/^Face 1: Cat/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('tab', { name: 'Die settings' }));
-    expect(screen.getByLabelText('Name (optional)')).toBeInTheDocument();
+    expect(screen.getByLabelText('Name')).toBeInTheDocument();
   });
 
   it('the quick templates are gone', () => {

@@ -46,7 +46,7 @@ const roll = (...faces: number[]) => {
 const switchSort = () => {
   fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
   fireEvent.click(screen.getByText('Customize'));
-  fireEvent.click(screen.getByRole('button', { name: 'Sort dice after each roll' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Sort dice' }));
 };
 // The dice list is written out when the page is hidden
 const savedList = (): DiceData[] => {
@@ -66,7 +66,7 @@ describe('Sort dice after each roll', () => {
   it('when on, the dice take low-to-high places each time they land, and the switch stays on', () => {
     const { unmount } = render(<App />);
     switchSort();
-    expect(screen.getByRole('button', { name: 'Sort dice after each roll' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Sort dice' })).toHaveAttribute('aria-pressed', 'true');
     expect(localStorage.getItem('sortDice')).toBe('true');
     roll(6, 1, 3);
     expect(sitting()).toEqual(['b', 'c', 'a']);
@@ -96,7 +96,7 @@ describe('Sort dice after each roll', () => {
     switchSort();
     roll(6, 1, 3);
     expect(sitting()).toEqual(['b', 'c', 'a']);
-    fireEvent.click(screen.getByRole('button', { name: 'Sort dice after each roll' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Sort dice' }));
     expect(localStorage.getItem('sortDice')).toBe('false');
     expect(sitting()).toEqual(['a', 'b', 'c']);
   });

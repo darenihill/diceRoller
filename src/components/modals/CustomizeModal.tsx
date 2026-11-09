@@ -148,7 +148,6 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           <div className={modalStyles.toggleRow}>
             <div className={modalStyles.toggleLabelCol}>
               <span className={modalStyles.toggleTitle}>Sound effects</span>
-              <span className={modalStyles.toggleDesc}>Rattle and thud sounds when you roll</span>
             </div>
             <div className={modalStyles.switchCol}>
               <button 
@@ -168,7 +167,6 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           <div className={modalStyles.toggleRow}>
             <div className={modalStyles.toggleLabelCol}>
               <span className={modalStyles.toggleTitle}>Shake to roll</span>
-              <span className={modalStyles.toggleDesc}>Shake your phone to roll, just like the Roll button</span>
             </div>
             <div className={modalStyles.switchCol}>
               <button
@@ -188,15 +186,14 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           {onToggleSortDice && (
             <div className={modalStyles.toggleRow}>
               <div className={modalStyles.toggleLabelCol}>
-                <span className={modalStyles.toggleTitle}>Sort dice after each roll</span>
-                <span className={modalStyles.toggleDesc}>Dice line up from lowest to highest when they land. What they rolled stays the same</span>
+                <span className={modalStyles.toggleTitle}>Sort dice</span>
               </div>
               <div className={modalStyles.switchCol}>
                 <button
                   className="md-icon-button"
                   onClick={onToggleSortDice}
-                  title={sortDice ? "Turn off sort dice after each roll" : "Turn on sort dice after each roll"}
-                  aria-label="Sort dice after each roll"
+                  title={sortDice ? "Turn off sort dice" : "Turn on sort dice"}
+                  aria-label="Sort dice"
                   aria-pressed={sortDice}
                 >
                   {sortDice ? <ArrowDown01 size={20} /> : <ArrowDownUp size={20} />}

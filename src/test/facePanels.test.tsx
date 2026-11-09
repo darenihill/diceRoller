@@ -48,7 +48,7 @@ describe('Custom faces folds color, icons and text into three buttons', () => {
 describe('Die settings puts Number of faces beside Name', () => {
   it('shares one row with the name box', () => {
     render(<DiceSettingsModal dice={plain} allDice={[plain]} {...props} />);
-    const name = screen.getByLabelText('Name (optional)');
+    const name = screen.getByLabelText('Name');
     const faces = screen.getByLabelText('Number of faces');
     expect(name.parentElement?.parentElement).toBe(faces.parentElement?.parentElement?.parentElement);
   });

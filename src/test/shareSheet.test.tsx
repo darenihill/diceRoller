@@ -90,7 +90,7 @@ describe('Share link box', () => {
   it('selects the link when copying is refused', async () => {
     Object.defineProperty(navigator, 'clipboard', { value: { writeText: vi.fn().mockRejectedValue(new Error('no')) }, configurable: true });
     render(<ShareModal url="https://example.test/#share=abc" onClose={() => {}} />);
-    const input = screen.getByLabelText('Share with this link') as HTMLInputElement;
+    const input = screen.getByLabelText('Link to share') as HTMLInputElement;
     const select = vi.spyOn(input, 'select');
     fireEvent.click(screen.getByRole('button', { name: 'Copy link' }));
     await waitFor(() => expect(select).toHaveBeenCalled());
