@@ -12,6 +12,7 @@ import { TYPED_DIE_COLOR, type TypedRoll } from './utils/rollNotation';
 import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages, parseFaceContent, faceScores } from './utils/diceUtils';
+import { holdFaceImageForUndo } from './utils/faceImages';
 import { DieActionStrip } from './components/DieActionStrip';
 import { playRollSequence, playLandNow, scheduleLandingBuzz } from './utils/soundEffects';
 import { BUZZ_KEY, BUZZ_SHOWN_KEY, canBuzz, isBuzzLink } from './utils/buzz';
@@ -643,6 +644,8 @@ function App() {
       if (lostPicture !== undefined) {
         // Short, so it fits the bar on a phone; the face is in view just above
         const before = { customFaces: die.customFaces };
+        const img = parseFaceContent(lostPicture).image;
+        if (img) holdFaceImageForUndo(img);
         offerUndo('Removed picture', () => updateDice(id, before), { back: 'Picture is back' });
       } else if (lost.length > 0) {
         const before = { faces: die.faces, customFaces: die.customFaces, currentFaceIndex: die.currentFaceIndex };

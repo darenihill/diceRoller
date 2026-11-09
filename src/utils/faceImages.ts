@@ -88,6 +88,14 @@ export function usedFaceImages(extra: { customFaces: string[] }[] = []): FaceIma
   return Object.fromEntries(Object.entries(read()).filter(([id]) => inUse.has(id)));
 }
 
+/** Pictures an Undo bar can still put back, with when that offer ends */
+const heldForUndo = new Map<string, number>();
+
+/** Keeps a removed picture while its Undo is offered, so adding another can't let it go */
+export function holdFaceImageForUndo(id: string, ms = 60_000) {
+  heldForUndo.set(id, Date.now() + ms);
+}
+
 /**
  * Adds a picture and returns its id, or null when it can't be kept. Pictures
  * no face names any more (removed, replaced) are let go first, so the cap
@@ -95,7 +103,9 @@ export function usedFaceImages(extra: { customFaces: string[] }[] = []): FaceIma
  */
 export function addFaceImage(dataUrl: string, onScreen: { customFaces: string[] }[] = []): string | null {
   if (!sanitizeFaceImages({ x: dataUrl }).x) return null;
-  const kept = usedFaceImages(onScreen);
+  const now = Date.now();
+  for (const [id, until] of heldForUndo) if (until <= now) heldForUndo.delete(id);
+  const kept = usedFaceImages([...onScreen, { customFaces: [...heldForUndo.keys()].map(id => `:img:${id}`) }]);
   if (Object.keys(kept).length >= MAX_FACE_IMAGES) return null;
   const id = generateId();
   return write({ ...kept, [id]: dataUrl }) ? id : null;

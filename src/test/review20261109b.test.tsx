@@ -115,6 +115,17 @@ describe('the Undo bar ignores a tap meant for the button it opened over', () =>
     expect(onDismiss).toHaveBeenCalledOnce();
   });
 
+  it('an early press that never clicked does not swallow a later key press', () => {
+    vi.useFakeTimers();
+    const onUndo = vi.fn();
+    render(<UndoBar offer={offer} {...props} onUndo={onUndo} onDismiss={() => {}} />);
+    // A touch on the bar's words that turned into a scroll: no click follows
+    fireEvent.pointerDown(screen.getByTestId('undo-bar'));
+    act(() => { vi.advanceTimersByTime(2000); });
+    fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+    expect(onUndo).toHaveBeenCalledOnce();
+  });
+
   it('keyboard and screen reader presses work at once', () => {
     const onUndo = vi.fn();
     render(<UndoBar offer={offer} {...props} onUndo={onUndo} onDismiss={() => {}} />);
@@ -150,5 +161,19 @@ describe('removing a face\'s picture can be undone (standard 2)', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Custom faces' }));
     fireEvent.keyDown(screen.getByLabelText(/^Move face 1/), { key: 'ArrowDown' });
     expect(screen.queryByText(/Removed picture/)).toBeNull();
+  });
+});
+
+describe('second-read follow-ups', () => {
+  it('a picture removed with Undo up is kept when another picture is added', async () => {
+    const { addFaceImage, holdFaceImageForUndo } = await import('../utils/faceImages');
+    const png = 'data:image/png;base64,iVBORw0KGgo=';
+    const first = addFaceImage(png)!;
+    expect(first).toBeTruthy();
+    holdFaceImageForUndo(first);
+    // No face names it any more, but its Undo is still offered
+    const second = addFaceImage(png)!;
+    const stored = JSON.parse(localStorage.getItem('diceFaceImages') ?? '{}');
+    expect(Object.keys(stored)).toEqual(expect.arrayContaining([first, second]));
   });
 });

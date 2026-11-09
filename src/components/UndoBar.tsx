@@ -10,6 +10,8 @@ import styles from './UndoBar.module.css';
  * (review 2026-11-09).
  */
 export const UNDO_TAP_GUARD_MS = 500;
+/** How long after an early press its click still counts as part of it */
+const UNDO_PRESS_CLICK_MS = 1500;
 
 interface UndoBarProps {
   offer: UndoOffer;
@@ -61,10 +63,15 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
   // When this offer showed, and whether the press now under way started too soon after
   const shownAt = React.useRef(0);
   const early = React.useRef(false);
+  const pressAt = React.useRef(0);
   React.useEffect(() => { shownAt.current = Date.now(); early.current = false; }, [offer.key]);
-  const onPress = () => { early.current = Date.now() - shownAt.current < UNDO_TAP_GUARD_MS; };
+  const onPress = () => { pressAt.current = Date.now(); early.current = pressAt.current - shownAt.current < UNDO_TAP_GUARD_MS; };
+  // Only the click that ends that early press is dropped; a press that never
+  // clicked (a scroll, a tap on the words) doesn't swallow a later key press
   const unlessEarly = (act: () => void) => () => {
-    if (early.current) { early.current = false; return; }
+    const swallow = early.current && Date.now() - pressAt.current < UNDO_PRESS_CLICK_MS;
+    early.current = false;
+    if (swallow) return;
     act();
   };
   return (
