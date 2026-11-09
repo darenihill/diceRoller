@@ -1,4 +1,4 @@
-Next: History small dice done 2026-11-08; waits on Daren's Land tap in Dice Roller Preview: approve all.
+Next: Dice Roller 92 and 93 landed 2026-11-09 on Daren's "Land both" tap; 3 review ideas wait on the Focus tab.
 
 # State
 
@@ -21,4 +21,5 @@ Next: History small dice done 2026-11-08; waits on Daren's Land tap in Dice Roll
 - 2026-11-08: Save fills in a name, selected (Dispatch-Item custom-dice-roller/ask-2026-11-08-build-owner-2026-fa277a).
 - 2026-11-08: tap a History roll to put its dice back out; typed rolls go back in the roll box (Dispatch-Item custom-dice-roller/ask-2026-11-08-build-owner-2026-91e7df).
 - 2026-11-08: goal check, jobs + HEART + working backwards; goal stays (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-7).
+- 2026-11-08: stories, security, inversion review; share link in an open tab loads, Help and empty screen use the button words; 3 Focus ideas (Dispatch-Item custom-dice-roller/lens-stories+security+inversion-39).
 - 2026-11-08: History shows each roll as small dice (Dispatch-Item custom-dice-roller/ask-2026-11-08-build-owner-2026-0bc531).

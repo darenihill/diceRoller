@@ -12,8 +12,8 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16, color: 'var(--md-sys-color-on-surface-variant)', fontSize: '0.875rem', lineHeight: 1.6 }}>
         <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <li><strong>Add and roll:</strong> Tap <code>+</code> to add a die. Tap Roll to roll every die that isn't held.</li>
-          <li><strong>Hold:</strong> Tap a die, then its lock. Held dice stay put when you roll. Tap the gold HELD tag, or Release above Roll, to let them roll again.</li>
-          <li><strong>Die settings:</strong> Tap a die, then its gear. Change its name, color and faces, or add words, icons and pictures as faces. Pictures stay on this device; share links show the face's words instead.</li>
+          <li><strong>Hold:</strong> Tap a die, then Hold. Held dice stay put when you roll. Tap the gold HELD tag, or Release above Roll, to let them roll again.</li>
+          <li><strong>Die settings:</strong> Tap a die, then Settings. Change its name, color and faces, or add words, icons and pictures as faces. Pictures stay on this device; share links show the face's words instead.</li>
           <li><strong>Games:</strong> Open the menu (☰) and tap Games. Load one of the popular games, like <em>Catan</em> or <em>Dungeons &amp; Dragons</em>, or one of your games. Tap Save to keep the dice you have as a game.</li>
           <li><strong>Default dice:</strong> Tap Set default in the menu, and Dice Roller opens with these dice every time.</li>
           <li><strong>RPG mode:</strong> Tap RPG mode in the menu for D&amp;D dice, a modifier and advantage or disadvantage. Advantage keeps the highest of matching plain dice; disadvantage keeps the lowest.</li>
