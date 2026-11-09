@@ -88,7 +88,9 @@ export function restoreBackup(input: unknown): RestoreResult {
   if (typeof data.tableView === 'boolean') keep(SAVED.tableView, String(data.tableView));
   if (typeof data.brightRings === 'boolean') keep(SAVED.brightRings, String(data.brightRings));
   if (typeof data.sortDice === 'boolean') keep(SAVED.sortDice, String(data.sortDice));
-  if (typeof data.telemetryEnabled === 'boolean') keep(SAVED.telemetry, String(data.telemetryEnabled));
+  // A backup can turn page metrics off, never back on: almost every backup says
+  // "on" (the default), and the choice made on this device wins (privacy review, 2026-11-09)
+  if (data.telemetryEnabled === false) keep(SAVED.telemetry, 'false');
   if (isObject(data.usageStats)) keep(SAVED.usageStats, JSON.stringify(data.usageStats));
   // Older backups have no buzz settings; they keep this phone's own
   if (typeof data.buzzOnLand === 'boolean') keep(BUZZ_KEY, String(data.buzzOnLand));

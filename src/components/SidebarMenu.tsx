@@ -68,6 +68,7 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
           title="Menu"
           aria-label={isOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={isOpen}
+          data-return-focus
         >
           <MenuIcon open={isOpen} />
         </button>

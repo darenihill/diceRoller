@@ -58,6 +58,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, header, ch
   useEffect(() => {
     if (!isOpen) return;
     const previous = document.activeElement as HTMLElement | null;
+    const openedPanel = panelRef.current;
 
     const id = window.setTimeout(() => {
       const panel = panelRef.current;
@@ -72,7 +73,14 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, header, ch
 
     return () => {
       window.clearTimeout(id);
-      previous?.focus?.();
+      // A dialog opened from the menu: the menu closed as it opened and its tile
+      // is gone (or a field inside the dialog took focus first, as Save's name
+      // box does), so focus goes to the menu button instead of falling to the
+      // page's start (stories review, 2026-11-09)
+      const lost = !previous || previous === document.body || !previous.isConnected
+        || !!openedPanel?.contains(previous);
+      const back = lost ? document.querySelector<HTMLElement>('[data-return-focus]') : previous;
+      back?.focus?.();
     };
   }, [isOpen]);
 
