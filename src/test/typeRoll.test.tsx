@@ -61,7 +61,7 @@ describe('Reading a typed roll', () => {
     expect(note('2d1')).toMatch(/2 to 1000 faces/);
     expect(note('60d6')).toMatch(/most is 50/);
     expect(note('1d8+2d6 adv')).toMatch(/one kind of die/);
-    expect(note('d20-d4')).toMatch(/added/);
+    expect(note('d20-d4')).toMatch(/add dice, not take them away/);
   });
 });
 

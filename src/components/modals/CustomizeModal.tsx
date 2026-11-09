@@ -148,7 +148,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           <div className={modalStyles.toggleRow}>
             <div className={modalStyles.toggleLabelCol}>
               <span className={modalStyles.toggleTitle}>Sound effects</span>
-              <span className={modalStyles.toggleDesc}>Play synthesized rolling rattles & landing thuds</span>
+              <span className={modalStyles.toggleDesc}>Rattle and thud sounds when you roll</span>
             </div>
             <div className={modalStyles.switchCol}>
               <button 
@@ -211,7 +211,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
             <div className={modalStyles.toggleRow}>
               <div className={modalStyles.toggleLabelCol}>
                 <span className={modalStyles.toggleTitle}>Bright rings</span>
-                <span className={modalStyles.toggleDesc}>A bright ring round the bottom buttons, easier to find in sunlight</span>
+                <span className={modalStyles.toggleDesc}>A bright ring around the bottom buttons, easier to find in sunlight</span>
               </div>
               <div className={modalStyles.switchCol}>
                 <button

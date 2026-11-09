@@ -88,8 +88,8 @@ export const StatsModal: React.FC<StatsModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         <p className={modalStyles.toggleDesc} style={{ margin: 0 }}>
-          These stats are calculated and stored only on this device. Clearing your
-          browser data resets them, and they are never tied to an account.
+          These stats stay on this device. Clearing your browser data resets them.
+          They're never tied to an account.
         </p>
       </div>
     </Modal>

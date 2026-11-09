@@ -5,6 +5,11 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-09~~ Words on screen, last pass (polish lens ui-copy). Done
+  when: the safe rewrites left over from the 2026-11-06 copy audit are in
+  (no semicolons in messages, US "around", plain sound and stats lines,
+  "No custom faces yet"), and reviews/2026-11-09-ui-copy.md says what was
+  found.
 - ~~Done 2026-11-08~~ History shows each roll as small dice (Daren 2026-11-07,
   Build: "History shows each roll as small dice, not “d6 #1: 2, d6 #2: 4”").
   Done when: each History row shows the roll number with the game, typed roll

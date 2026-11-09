@@ -457,7 +457,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
             </p>
           )}
           <div className={styles.facesGrid}>
-            {dice.customFaces.length === 0 && <span className={styles.emptyText}>No custom faces added</span>}
+            {dice.customFaces.length === 0 && <span className={styles.emptyText}>No custom faces yet</span>}
             {shownOrder.map((i, place) => {
               const f = dice.customFaces[i];
               const parsed = parseFaceContent(f);
