@@ -77,7 +77,10 @@
         // Share links carry the dice and the set's name after the #; never send them
         gtag('config', GA_ID, { page_location: location.href.split('#')[0] });
 
-        if (!isDev) {
+        // With metrics off Google's script isn't fetched at all, so a visit asks
+        // nothing of Google (privacy review, 2026-11-09). Turning metrics on
+        // fetches it then (src/utils/analytics.ts loadGoogleTag).
+        if (!isDev && !optedOut) {
           var s = document.createElement('script');
           s.async = true;
           s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;

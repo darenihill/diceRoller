@@ -107,6 +107,47 @@ export function setTelemetryEnabled(enabled: boolean): void {
   // Google Analytics' official kill switch: when set, gtag drops all hits
   // (including automatic page_views), making the privacy toggle actually binding.
   (window as unknown as Record<string, unknown>)[`ga-disable-${GA_MEASUREMENT_ID}`] = !enabled;
+  if (enabled) loadGoogleTag();
+  else clearGoogleCookies();
+}
+
+/** True on the developer's own machine, where nothing goes to Google (index.html) */
+const isDevHost = () => location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+/**
+ * Fetches Google's tag script when metrics are turned on. index.html skips it
+ * while metrics are off, so a visit with metrics off asks nothing of Google
+ * (privacy review, 2026-11-09).
+ */
+export function loadGoogleTag(): void {
+  if (isDevHost() || document.querySelector('script[src*="googletagmanager.com/gtag/js"]')) return;
+  const s = document.createElement('script');
+  s.async = true;
+  s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+  document.head.appendChild(s);
+}
+
+/**
+ * Google Analytics keeps an ID in its own cookies (_ga, _ga_<id>) for about 13
+ * months. With metrics off they are deleted, on this site and its parent
+ * domain, so turning metrics off leaves nothing of Google's behind (privacy
+ * review, 2026-11-09).
+ */
+export function clearGoogleCookies(): void {
+  try {
+    const names = document.cookie.split(';').map(c => c.split('=')[0].trim()).filter(n => /^_ga(_|$)/.test(n));
+    if (names.length === 0) return;
+    const parts = location.hostname.split('.');
+    const domains = [''];
+    for (let i = 0; i < parts.length - 1; i++) domains.push(`; domain=.${parts.slice(i).join('.')}`);
+    for (const name of names) {
+      for (const domain of domains) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/${domain}`;
+      }
+    }
+  } catch {
+    // Cookies blocked: there is nothing of Google's to clear
+  }
 }
 
 /** Detect device classification for metrics */
@@ -123,6 +164,8 @@ export function recordSessionStart(): LocalAnalyticsStats {
   stats.totalSessions += 1;
   stats.lastSessionTime = new Date().toISOString();
   saveLocalStats(stats);
+  // Metrics turned off before this fix, or by a backup, may have left Google's cookies
+  if (!stats.telemetryEnabled) clearGoogleCookies();
 
   if (stats.telemetryEnabled) {
     dispatchExternalEvent('session_start', {

@@ -5,6 +5,19 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-09~~ Page metrics off means nothing goes to Google (privacy
+  review, standard 15). Done when: with metrics off, the home page and the four
+  search pages don't fetch Google's tag script, turning metrics on fetches it
+  without a reload, and Google's `_ga` cookies are deleted when metrics go off
+  and on each visit while off (src/test/review20261109.test.tsx).
+- ~~Done 2026-11-09~~ A backup can't turn page metrics back on (privacy
+  review). Done when: Import keeps metrics off when the backup says on, and
+  still turns them off when the backup says off
+  (src/test/review20261109.test.tsx).
+- ~~Done 2026-11-09~~ Focus goes back to the menu button after a menu dialog
+  (stories review, standard 9). Done when: closing Customize, History, Games,
+  Help, Usage stats or Save leaves focus on the menu button, not the start of
+  the page (src/test/review20261109.test.tsx).
 - ~~Done 2026-11-09~~ Words on screen, last pass (polish lens ui-copy). Done
   when: the safe rewrites left over from the 2026-11-06 copy audit are in
   (no semicolons in messages, US "around", plain sound and stats lines,

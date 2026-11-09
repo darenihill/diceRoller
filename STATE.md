@@ -1,4 +1,4 @@
-Next: Dice Roller release PR (one PR Daren merges, owner 2026-11-09) holds the words-on-screen pass; next item from the hand-out goes on the same branch.
+Next: Dice Roller release PR (Dice Roller 94, Daren merges) now also holds the 2026-11-09 review fixes (metrics off means off, backup can't turn metrics on, focus back on the menu button); next is Recently deleted, with picture clean-up and Erase everything as Desk ideas.
 
 # State
 
@@ -23,3 +23,4 @@ Next: Dice Roller release PR (one PR Daren merges, owner 2026-11-09) holds the w
 - 2026-11-08: goal check, jobs + HEART + working backwards; goal stays (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-7).
 - 2026-11-08: stories, security, inversion review; share link in an open tab loads, Help and empty screen use the button words; 3 Focus ideas (Dispatch-Item custom-dice-roller/lens-stories+security+inversion-39).
 - 2026-11-08: History shows each roll as small dice (Dispatch-Item custom-dice-roller/ask-2026-11-08-build-owner-2026-0bc531).
+- 2026-11-09: stories, laws of UX and privacy review; metrics off fetches nothing from Google and clears its cookies, a backup can't turn metrics on, focus returns to the menu button (Dispatch-Item custom-dice-roller/lens-stories+laws-of-ux+privacy-42).
