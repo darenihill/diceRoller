@@ -73,7 +73,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   (src/test/switchWords.test.tsx).
 - ~~Done 2026-11-07~~ Backup keeps the newest switches (review 2026-11-07,
   standard 1, no lost work). Done when: Export backup carries Table view,
-  Bright Rings and Sort dice after each roll, Import brings them back, and the
+  Bright Rings and Sort dice, Import brings them back, and the
   round-trip test fails if any saved value is left unseeded
   (src/test/backup.test.tsx).
 - ~~Done 2026-11-07~~ Usage Stats survives a damaged backup (review
@@ -153,7 +153,8 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   "Custom" and its code (src/test/colorPicker.test.tsx).
 - ~~Done 2026-11-07~~ Sort dice after each roll (Daren 2026-11-06, Build: "A Sort button lines
   up the dice from low to high after a roll"; card: no button on the main
-  screen, a "Sort dice after each roll" switch in Customize, off by default
+  screen, a "Sort dice" switch in Customize (named "Sort dice after each roll"
+  until the 2026-11-09 trim pass), off by default
   and kept on this device). Done when: with the switch on, the dice slide
   into low-to-high order each time a roll lands, only where they sit changes
   (never what they rolled, the saved dice order or History), and turning it

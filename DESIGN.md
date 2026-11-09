@@ -88,6 +88,14 @@ Messages are short and plain, with no "!": "Backup exported", "Link copied".
 The menu's group heading "Saves" stays: it names the group of saving
 actions (owner's pick, 2026-11-07), not saved dice.
 
+### Menu budget (hub plan Move 2, 2026-11-09)
+
+About seven entries a menu, three words a label, one name per thing, and no
+sentence under a switch unless the switch can lose data. Lists of content
+(popular games, your games, faces, history rows) don't count. Daren sets the
+numbers after the first take-things-out page. A change that breaks the budget
+is a bug (standard 11).
+
 ## 9. Deviations
 
 | What | M3 says | This project does | Why |

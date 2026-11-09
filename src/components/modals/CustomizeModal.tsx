@@ -182,7 +182,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
             </div>
           </div>
 
-          {/* Sort dice after each roll: off until turned on (owner, 2026-11-06) */}
+          {/* Sort dice: off until turned on (owner, 2026-11-06) */}
           {onToggleSortDice && (
             <div className={modalStyles.toggleRow}>
               <div className={modalStyles.toggleLabelCol}>
