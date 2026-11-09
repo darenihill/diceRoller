@@ -251,12 +251,12 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
                 {showFair && (
                   <p className={modalStyles.freqNote}>
                     <span className={modalStyles.freqFairKey} aria-hidden="true" /> marks what fair dice would give
-                    {diceChanged ? ', using the dice and settings now (they changed since some of these rolls)' : ''}.
+                    {diceChanged ? ' with your dice now. They changed since some of these rolls' : ''}.
                   </p>
                 )}
                 {odd && (
                   <p className={modalStyles.freqNote} data-furthest={odd.total}>
-                    Furthest from fair: {odd.total} came up {times(odd.count)}; fair dice would give about {Math.round(odd.fair * 10) / 10}.
+                    Furthest from fair: {odd.total} came up {times(odd.count)}. Fair dice would give about {Math.round(odd.fair * 10) / 10}.
                   </p>
                 )}
                 {rows.map(row => (

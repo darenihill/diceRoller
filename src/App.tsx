@@ -922,7 +922,7 @@ function App() {
       trackEvent('shake_toggled', { enabled: true });
       showToast('Shake to roll is on. Shake your phone to roll.');
     } else if (permission === 'denied') {
-      showToast('Motion access was turned down, so shake to roll stays off.');
+      showToast('Motion access is blocked, so shake to roll stays off.');
     } else {
       showToast("This device can't sense shaking, so shake to roll stays off.");
     }

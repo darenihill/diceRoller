@@ -1,4 +1,4 @@
-Next: Dice Roller 92 and 93 landed 2026-11-09 on Daren's "Land both" tap; 3 review ideas wait on the Focus tab.
+Next: Dice Roller release PR (one PR Daren merges, owner 2026-11-09) holds the words-on-screen pass; next item from the hand-out goes on the same branch.
 
 # State
 

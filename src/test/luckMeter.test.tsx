@@ -142,6 +142,6 @@ describe('History modal', () => {
         rollHistory={[roll(5, luckSet(dice, true, 2)), roll(3, set)]} />,
     );
     fireEvent.click(screen.getByRole('tab', { name: 'Frequency' }));
-    expect(container.ownerDocument.body.textContent).toContain('they changed since some of these rolls');
+    expect(container.ownerDocument.body.textContent).toContain('with your dice now. They changed since some of these rolls');
   });
 });
