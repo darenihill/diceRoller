@@ -5,6 +5,15 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-08~~ History shows each roll as small dice (Daren 2026-11-07,
+  Build: "History shows each roll as small dice, not “d6 #1: 2, d6 #2: 4”").
+  Done when: each History row shows the roll number with the game, typed roll
+  or die name under it, a small tile per die in that die's color with its
+  face, the Advantage die left out faded and struck through, and the total on
+  the right with any modifier math under it; many dice wrap; a screen reader
+  still hears the full lines; older rolls show plain white tiles
+  (src/test/historyTiles.test.tsx).
+
 - ~~Done 2026-11-08~~ One name per thing (Daren 2026-11-07, Build: "Use one name for each thing
   in the app, from a short word list"; way "Call saved dice games"; his
   comment: "Popular Games"). Done when: DESIGN.md §7 holds the word list;

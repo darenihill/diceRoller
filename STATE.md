@@ -1,4 +1,4 @@
-Next: Dice Roller 86 to 91 landed 2026-11-08 on Daren's "Land all" tap; Recently deleted queued in GOAL.md.
+Next: History small dice done 2026-11-08; waits on Daren's Land tap in Dice Roller Preview: approve all.
 
 # State
 
@@ -21,3 +21,4 @@ Next: Dice Roller 86 to 91 landed 2026-11-08 on Daren's "Land all" tap; Recently
 - 2026-11-08: Save fills in a name, selected (Dispatch-Item custom-dice-roller/ask-2026-11-08-build-owner-2026-fa277a).
 - 2026-11-08: tap a History roll to put its dice back out; typed rolls go back in the roll box (Dispatch-Item custom-dice-roller/ask-2026-11-08-build-owner-2026-91e7df).
 - 2026-11-08: goal check, jobs + HEART + working backwards; goal stays (Dispatch-Item custom-dice-roller/goal-check-goal-jtbd+goal-heart+goal-backwards-7).
+- 2026-11-08: History shows each roll as small dice (Dispatch-Item custom-dice-roller/ask-2026-11-08-build-owner-2026-0bc531).
