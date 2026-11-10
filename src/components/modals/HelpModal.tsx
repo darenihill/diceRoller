@@ -17,7 +17,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
           <li><strong>Games:</strong> Open the menu (☰) and tap Games. Load one of the popular games, like <em>Catan</em> or <em>Dungeons &amp; Dragons</em>, or one of your games. Tap Save to keep the dice you have as a game.</li>
           <li><strong>Default dice:</strong> Tap Set default in the menu, and Dice Roller opens with these dice every time.</li>
           <li><strong>RPG mode:</strong> Tap RPG mode in the menu for D&amp;D dice, a modifier and advantage or disadvantage. Advantage keeps the highest of matching plain dice; disadvantage keeps the lowest.</li>
-          <li><strong>Type a roll:</strong> In RPG mode, type a roll like <code>2d6+3</code> or <code>d20 adv</code> in the box at the top, then tap Roll. Tap <em>Save this roll</em> to keep it as a button.</li>
+          <li><strong>Type a roll:</strong> In RPG mode, type a roll like <code>2d6+3</code> or <code>d20 adv</code> in the box at the top, then tap Roll there or the big Roll button. Tap <em>Save this roll</em> to keep it as a button.</li>
           <li><strong>Table view:</strong> Tap Table view in the menu to show each total big, with an upside-down copy for the people across the table. Tap × to turn it off.</li>
           <li><strong>History:</strong> Tap History in the menu to see past rolls and how often each total came up.</li>
           <li><strong>Target hit:</strong> In Customize, type the totals you want, like <code>7, 11</code>. A roll that hits one gets a 🎯.</li>

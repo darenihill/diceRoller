@@ -1,4 +1,4 @@
-Next: Dice Roller release PR (Daren merges) now also holds the 2026-11-10 review fixes (Enter in Save no longer opens the menu, the Undo bar sits under an open dialog, die settings tabs wrap at large text, share-link names can't hide a popular game's name); next is Recently deleted, with picture clean-up and Erase everything as Desk ideas.
+Next: Dice Roller release PR (Daren merges) holds the 2026-11-10 review fixes (Enter in Save no longer opens the menu, the Undo bar sits under an open dialog, die settings tabs wrap at large text, share-link names can't hide a popular game's name) and Daren's 5 builds (the big Roll button rolls a typed roll; pictures on removed dice are deleted; a saved game loads from anywhere on its row; the font comes from the site; a security policy allows only the site and Google Analytics); next is Recently deleted, with Erase everything as a Desk idea.
 
 # State
 

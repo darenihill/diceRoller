@@ -15,7 +15,7 @@ what the code uses today, so checks have something true to compare against.
 | Family | Code location | Notes |
 |---|---|---|
 | Colors | `src/index.css` `:root` and `body.theme-*` (`--md-sys-color-*`, `--color-*`) | four themes: dark (default), light, felt, midnight |
-| Typography | Roboto 400/500/700 from Google Fonts (`src/index.css`) | no named type-style classes yet (Known drift) |
+| Typography | Roboto 400/500/700, served from this site (`public/fonts/`, `@font-face` in `src/index.css`) | no named type-style classes yet (Known drift) |
 | Spacing | none; raw px in CSS modules | Known drift |
 | Radius | `--shape-small` 8, `--shape-medium` 12, `--shape-large` 16; buttons fully rounded | |
 | Elevation | `--elevation-1..3` | |
