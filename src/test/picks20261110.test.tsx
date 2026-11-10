@@ -11,6 +11,9 @@ import App from '../App';
 import { resetFaceImageCache, pruneFaceImages, holdFaceImageForUndo, releaseFaceImageHolds } from '../utils/faceImages';
 import { UNDO_WINDOW_MS } from '../hooks/useUndo';
 import { HelpModal } from '../components/modals/HelpModal';
+import { SetsModal } from '../components/modals/SetsModal';
+import fs from 'fs';
+import path from 'path';
 import { ROLL_DURATION_MS } from '../utils/constants';
 
 beforeAll(() => {
@@ -158,5 +161,42 @@ describe('Photos on removed dice are really deleted from the phone (owner, 2026-
     expect(pruneFaceImages([])).toBe(0);
     spy.mockRestore();
     expect(stored()).toEqual(['held']);
+  });
+});
+
+describe('Saved games load from a tap anywhere on their row (owner, 2026-11-10)', () => {
+  const css = fs.readFileSync(path.resolve(__dirname, '../App.module.css'), 'utf-8');
+  const rule = (selector: string) => {
+    const m = css.match(new RegExp(`(?:^|\\n)${selector.replace(/[.*]/g, '\\$&')}\\s*\\{([^}]+)\\}`));
+    expect(m, selector).not.toBeNull();
+    return m![1];
+  };
+
+  it('the load target fills the row: full height, everything left of the bin, at least 48px tall', () => {
+    // The row gives its top, bottom and left padding to the load target
+    expect(rule('.setsGrid .saveCard')).toMatch(/padding:\s*0 4px 0 0;/);
+    const load = rule('.setsGrid .saveCardBtn');
+    expect(load).toMatch(/align-self:\s*stretch/);
+    expect(load).toMatch(/min-height:\s*48px/);
+    expect(rule('.saveCardBtn')).toMatch(/flex-grow:\s*1/);
+    // The text keeps its place: 4px row + 8px button before, 12px button now
+    expect(load).toMatch(/padding:\s*12px 0 12px 12px/);
+  });
+
+  it('the bin stays 48 x 48 beside a long name', () => {
+    const icon = fs.readFileSync(path.resolve(__dirname, '../index.css'), 'utf-8').match(/\n\.md-icon-button\s*\{([^}]+)\}/)![1];
+    expect(icon).toMatch(/width:\s*48px/);
+    expect(icon).toMatch(/height:\s*48px/);
+    const bin = rule('.saveCardBin');
+    expect(bin).toMatch(/flex-shrink:\s*0/);
+    expect(bin).toMatch(/margin:\s*4px 0/);
+
+    render(<SetsModal isOpen onClose={() => {}} savedConfigs={{ 'A rather long game name that wraps': { name: 'A rather long game name that wraps', config: [] } }}
+      onLoadSet={() => {}} onDeleteConfig={() => {}} onExportBackup={() => {}} onImportBackup={() => {}} />);
+    const del = screen.getByLabelText('Delete A rather long game name that wraps');
+    expect(del.className).toMatch(/saveCardBin/);
+    const load = screen.getByRole('button', { name: 'A rather long game name that wraps' });
+    expect(load.className).toMatch(/saveCardBtn/);
+    expect(load.parentElement).toBe(del.parentElement);
   });
 });

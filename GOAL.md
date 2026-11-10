@@ -5,6 +5,11 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-10~~ Saved games load from a tap anywhere on their row (Daren
+  2026-11-10, Build). Done when: in Games > Your games the load target fills
+  the row's full height and everything left of the bin, at least 48px tall,
+  the bin stays 48 x 48 even beside a long name, and the text sits where it
+  did (src/test/picks20261110.test.tsx).
 - ~~Done 2026-11-10~~ Photos on removed dice are really deleted from the phone
   (Daren 2026-11-10, Build). Done when: when the app starts, and whenever an
   Undo bar or a die's settings close with neither left up, pictures no face
