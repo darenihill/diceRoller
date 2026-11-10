@@ -40,7 +40,7 @@ describe('Custom faces folds color, icons and text into three buttons', () => {
 
   it('a die with no faces yet opens on Text, ready to type one', () => {
     render(<DiceSettingsModal dice={plain} allDice={[plain]} {...props} />);
-    fireEvent.click(screen.getByRole('tab', { name: 'Custom faces' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom Faces' }));
     expect(screen.getByLabelText('Custom face text')).toBeInTheDocument();
   });
 });

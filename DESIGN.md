@@ -83,6 +83,7 @@ these words; `src/test/oneName.test.tsx` checks the main ones.
 | target hit | HIT!, Target Highlight |
 | like 7, 11 | e.g. |
 | sentence case: "Usage stats", "Set default" | Title Case |
+| except the two die settings tabs: "Die Settings", "Custom Faces" (owner, 2026-11-10) | |
 
 Messages are short and plain, with no "!": "Backup exported", "Link copied".
 The menu's group heading "Saves" stays: it names the group of saving

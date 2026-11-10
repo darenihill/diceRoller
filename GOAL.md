@@ -77,8 +77,8 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   groups its tiles under App, Saves and Tools"; 2026-11-07: "I want to give
   more of an indicator (especially on mobile) related topics like we have on
   desktop"; way A from the mock-ups). Done when: on a phone the App, Settings
-  and Saves headings show above their rows, each with a shape (circle, square,
-  triangle) and its row of tiles lightly tinted in a colorblind-safe blue,
+  and Saves headings show above their rows (the circle, square and triangle
+  came out 2026-11-10 at Daren's ask), each row of tiles lightly tinted in a colorblind-safe blue,
   orange or pink-purple; the computer menu keeps its headings
   (src/test/menuGroups.test.tsx).
 

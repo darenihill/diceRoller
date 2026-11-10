@@ -142,7 +142,7 @@ describe('removing a face\'s picture can be undone (standard 2)', () => {
     ] } }));
     render(<App />);
     fireEvent.click(screen.getByLabelText('Settings for Kids'));
-    fireEvent.click(screen.getByRole('tab', { name: 'Custom faces' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom Faces' }));
     fireEvent.click(screen.getByLabelText('Remove picture from face 1'));
     expect(screen.getByLabelText('Choose picture for face 1')).toBeInTheDocument();
     expect(screen.getByTestId('undo-bar')).toHaveTextContent('Removed picture');
@@ -158,7 +158,7 @@ describe('removing a face\'s picture can be undone (standard 2)', () => {
     ] } }));
     render(<App />);
     fireEvent.click(screen.getByLabelText('Settings for Kids'));
-    fireEvent.click(screen.getByRole('tab', { name: 'Custom faces' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom Faces' }));
     fireEvent.keyDown(screen.getByLabelText(/^Move face 1/), { key: 'ArrowDown' });
     expect(screen.queryByText(/Removed picture/)).toBeNull();
   });

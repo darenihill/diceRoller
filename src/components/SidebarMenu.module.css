@@ -98,9 +98,9 @@
   gap: 6px;
 }
 
-/* Each group has a word, a shape and a color (Okabe-Ito blue, orange and
-   reddish purple, told apart with red-green colorblindness), so none of
-   them relies on color alone (owner, 2026-11-07: way A) */
+/* Each group has a word and a color (Okabe-Ito blue, orange and reddish
+   purple, told apart with red-green colorblindness); the word means none of
+   them relies on color alone (owner, 2026-11-07: way A; shapes out 2026-11-10) */
 .menu {
   --group-app: #56B4E9;
   --group-settings: #E69F00;
@@ -108,7 +108,7 @@
 }
 
 :global(body.theme-light) .menu {
-  /* Darker on the light card, so each shape keeps 3:1 contrast */
+  /* Darker on the light card, so each tint stays visible */
   --group-app: #0072B2;
   --group-settings: #B07800;
   --group-saves: #A8487F;
@@ -117,24 +117,6 @@
 .groupApp { --group: var(--group-app); }
 .groupSettings { --group: var(--group-settings); }
 .groupSaves { --group: var(--group-saves); }
-
-.groupMark {
-  width: 9px;
-  height: 9px;
-  flex: none;
-  background: var(--group);
-}
-
-.groupApp .groupMark { border-radius: 50%; }
-
-.groupSaves .groupMark {
-  width: 0;
-  height: 0;
-  background: none;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 9px solid var(--group);
-}
 
 @media (max-width: 468px) {
   /* No Hold All button below it any more (owner, 2026-11-05), so the menu

@@ -10,7 +10,7 @@ const die = (customFaces: string[]): DiceData => ({
 
 const renderWith = (d: DiceData) => {
   render(<DiceSettingsModal dice={d} isOpen onClose={() => {}} onUpdate={() => {}} onRemove={() => {}} onClone={() => {}} allDice={[d]} />);
-  fireEvent.click(screen.getByRole('tab', { name: 'Die settings' }));
+  fireEvent.click(screen.getByRole('tab', { name: 'Die Settings' }));
 };
 
 describe('Faces counter label', () => {
