@@ -5,6 +5,14 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-10~~ Photos on removed dice are really deleted from the phone
+  (Daren 2026-11-10, Build). Done when: when the app starts, and whenever an
+  Undo bar or a die's settings close with neither left up, pictures no face
+  names are deleted; a picture is kept while it is on screen, in any saved
+  value (saved games, the autosave at start, the default dice, History rows)
+  or held for an Undo, and all are kept when storage can't be read; a removed
+  picture is gone after a reload, and ones in a saved game, the default dice
+  or History stay (src/test/picks20261110.test.tsx).
 - ~~Done 2026-11-10~~ After you type a roll, the big Roll button rolls it
   (Daren 2026-11-10, Build). Done when: in RPG mode, with a roll that reads in
   the roll box, the big Roll button rolls it exactly as the box's own Roll

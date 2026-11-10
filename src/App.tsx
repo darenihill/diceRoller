@@ -12,7 +12,7 @@ import { TYPED_DIE_COLOR, parseRollNotation, type TypedRoll } from './utils/roll
 import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages, parseFaceContent, faceScores } from './utils/diceUtils';
-import { holdFaceImageForUndo } from './utils/faceImages';
+import { holdFaceImageForUndo, pruneFaceImages, releaseFaceImageHolds } from './utils/faceImages';
 import { DieActionStrip } from './components/DieActionStrip';
 import { playRollSequence, playLandNow, scheduleLandingBuzz } from './utils/soundEffects';
 import { BUZZ_KEY, BUZZ_SHOWN_KEY, canBuzz, isBuzzLink } from './utils/buzz';
@@ -147,6 +147,21 @@ function App() {
   const [rolledSignature, setRolledSignature] = useState<string | null>(null);
   const latestDiceRef = useRef<DiceData[]>([]);
   useEffect(() => { latestDiceRef.current = diceList; }, [diceList]);
+  // Pictures no face names any more are let go from the device: when the app
+  // starts, and whenever an Undo bar or a die's settings close with neither
+  // left up, so nothing an Undo could still put back is lost (owner, 2026-11-10)
+  const pictureCheckDue = useRef(false);
+  useEffect(() => {
+    if (undoOffer !== null || editingDiceId !== null) {
+      pictureCheckDue.current = true;
+      return;
+    }
+    releaseFaceImageHolds();
+    // At start the saved autosave counts too; once a bar or the settings have
+    // come and gone, the dice on screen are the current ones
+    pruneFaceImages(latestDiceRef.current, pictureCheckDue.current);
+    pictureCheckDue.current = false;
+  }, [undoOffer, editingDiceId]);
   const [soundEnabled, setSoundEnabled] = useState(() => readItem(SAVED.sound) === 'true');
   const [diceScale, setDiceScale] = useState(() => sanitizeDiceScale(readItem(SAVED.diceScale)));
 
