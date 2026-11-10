@@ -617,13 +617,21 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
 
           {openPanel === 'icons' && (
             <div id={`${fieldId}-panel-icons`} className={styles.panelBody}>
+              {/* Each panel names its mode first: adding a new face, or changing
+                  the face tapped above (owner, 2026-11-10: "a clear add vs update") */}
               {editing !== null ? (
                 <div className={styles.editNote}>
-                  <span className={styles.sublabel} style={{ margin: 0 }}>Tap an icon to put it on face {editing + 1}</span>
+                  <span className={styles.modeTitle}>Changing face {editing + 1}</span>
                   <button type="button" className={styles.listUndo} onClick={() => setEditFace(null)}>Add a new face instead</button>
+                  <span className={styles.sublabel} style={{ margin: 0, flexBasis: '100%' }}>Tap an icon to put it on this face</span>
                 </div>
               ) : (
-                <span className={styles.sublabel}>Tap an icon to add it as a face</span>
+                <div className={styles.editNote}>
+                  <span className={styles.modeTitle}>Adding a new face</span>
+                  <span className={styles.sublabel} style={{ margin: 0, flexBasis: '100%' }}>
+                    Tap an icon to add it as a face{dice.customFaces.length > 0 ? '. To change a face, tap it above' : ''}
+                  </span>
+                </div>
               )}
               <div className={styles.iconGrid} style={{ maxHeight: showAllIcons ? '150px' : 'auto', overflowY: showAllIcons ? 'auto' : 'visible' }}>
                 {(showAllIcons ? ALL_ICONS : COMMON_ICONS).map(icon => (
@@ -659,8 +667,9 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               {editing !== null && editingParts ? (
                 <>
                   <div className={styles.editNote}>
-                    <span className={styles.sublabel} style={{ margin: 0 }}>Words on face {editing + 1}{editingParts.icon ? `, under the ${editingParts.icon.toLowerCase()}` : ''}</span>
+                    <span className={styles.modeTitle}>Changing face {editing + 1}</span>
                     <button type="button" className={styles.listUndo} onClick={() => setEditFace(null)}>Add a new face instead</button>
+                    <span className={styles.sublabel} style={{ margin: 0, flexBasis: '100%' }}>Words on this face{editingParts.icon ? `, under the ${editingParts.icon.toLowerCase()}` : ''}. Changes save as you type</span>
                   </div>
                   <div className={styles.addFaceRow}>
                     <input
@@ -679,6 +688,13 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                   </div>
                 </>
               ) : (
+              <>
+              <div className={styles.editNote}>
+                <span className={styles.modeTitle}>Adding a new face</span>
+                {dice.customFaces.length > 0 && (
+                  <span className={styles.sublabel} style={{ margin: 0, flexBasis: '100%' }}>To change a face, tap it above</span>
+                )}
+              </div>
               <div className={styles.addFaceRow}>
                 <input 
                   type="text" 
@@ -686,16 +702,17 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                   onChange={(e) => setCustomInput(e.target.value)}
                   onKeyDown={(e) => { if(e.key === 'Enter') addCustomFace(customInput); }}
                   onPaste={handleListPaste}
-                  placeholder="Add custom text"
+                  placeholder="New face text"
                   aria-label="Custom face text"
                   autoComplete="off"
                   className={styles.inputField}
                   style={{ flex: 1, minWidth: 0 }}
                 />
                 <button className={`md-button md-button-filled ${styles.addFaceBtn}`} onClick={() => addCustomFace(customInput)} aria-label="Add face" title="Add face">
-                  <Plus size={20} strokeWidth={2.5} />
+                  <Plus size={20} strokeWidth={2.5} aria-hidden="true" /> Add
                 </button>
               </div>
+              </>
               )}
               {/* Any later edit to the faces retires the note, so Undo never wipes that edit */}
               {listNote && listNote.after === dice.customFaces && (

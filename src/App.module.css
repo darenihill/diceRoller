@@ -411,11 +411,12 @@
   max-width: none;
 }
 
-/* A phone: the name and About keep the first line, the box takes the next */
+/* A phone: the box shares the top line with the name and About, taking the
+   room left after them (owner, 2026-11-10: move it up to the top line) */
 @media (max-width: 600px) {
   .topRoll {
     order: 10;
-    flex-basis: 100%;
+    flex: 1 1 0;
     max-width: none;
   }
 }

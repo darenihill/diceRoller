@@ -825,6 +825,35 @@ function App() {
     }
   };
 
+  // The roll box's +: puts the typed dice, modifier and advantage out without
+  // rolling, so the big Roll button rolls them (owner, 2026-11-10). Undo puts
+  // back the dice and settings that were out before.
+  const handlePutOutTyped = (roll: TypedRoll) => {
+    typedOverDiceRef.current = null;
+    const before = { dice: diceList, modifier, advantage: rollAdvantage };
+    const dice = roll.groups.flatMap(g => Array.from({ length: g.count }, () => ({
+      id: generateId(),
+      numberValue: 1,
+      faces: g.faces,
+      currentFaceIndex: 0,
+      name: `d${g.faces}`,
+      customFaces: [],
+      color: TYPED_DIE_COLOR,
+      held: false
+    })));
+    restoreDice(dice);
+    setModifier(roll.modifier);
+    setRollAdvantage(roll.advantage);
+    trackEvent('dice_added', { typed: true, diceCount: dice.length });
+    if (before.dice.length > 0) {
+      offerUndo(`Put out ${roll.text}`, () => {
+        restoreDice(before.dice);
+        setModifier(before.modifier);
+        setRollAdvantage(before.advantage);
+      });
+    }
+  };
+
   const handleSaveRoll = (roll: SavedRoll) => {
     // A full list never drops an older roll to make room
     if (savedRolls.length >= MAX_SAVED_ROLLS && !savedRolls.some(r => r.name === roll.name)) {
@@ -1009,11 +1038,12 @@ function App() {
           </span>
         )}
         {/* RPG mode's Type a roll box sits up here by the name, not as a row of its
-            own over the dice (owner, 2026-11-05). A phone gives it the next line. */}
+            own over the dice (owner, 2026-11-05). On a phone too (owner, 2026-11-10). */}
         {rpgMode && (
           <div className={styles.topRoll}>
             <TypeRollBox
               onRoll={handleTypedRoll}
+              onPutOut={handlePutOutTyped}
               disabled={isRolling}
               savedRolls={savedRolls}
               onSaveRoll={handleSaveRoll}

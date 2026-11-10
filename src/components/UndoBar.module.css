@@ -7,7 +7,18 @@
   padding: 6px 6px 6px 20px;
   pointer-events: auto;
   white-space: nowrap;
-  touch-action: manipulation;
+  /* Up and down still scroll the page; sideways is the bar's swipe */
+  touch-action: pan-y;
+  transition: transform 160ms ease-out, opacity 160ms ease-out;
+}
+
+/* While a finger drags it, the bar follows with no lag */
+.bar.swiping {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar.bar { transition: none; }
 }
 
 /* Single class on purpose: a phone's narrower limit, which keeps the bar clear
@@ -55,8 +66,10 @@
   outline-offset: 2px;
 }
 
-/* The countdown: a line in the words' colour, inside the pill, starting at the
-   top and running clockwise, draining away. No track under it. */
+/* The countdown: a line hugging the outside edge of the pill, in the pill's own
+   fill colour, 2px out from its edge (owner, 2026-11-10: "Line on the
+   outside edge"), starting at the top and running clockwise, draining away.
+   No track under it. */
 .ring {
   position: absolute;
   inset: 0;
@@ -68,7 +81,7 @@
 
 .ringLine {
   fill: none;
-  stroke: currentColor;
+  stroke: var(--md-sys-color-on-primary);
   stroke-width: var(--line);
   stroke-linecap: round;
   /* The path starts at the top middle; one dash as long as the whole line,

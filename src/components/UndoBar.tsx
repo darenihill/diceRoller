@@ -12,6 +12,8 @@ import styles from './UndoBar.module.css';
 export const UNDO_TAP_GUARD_MS = 500;
 /** How long after an early press its click still counts as part of it */
 const UNDO_PRESS_CLICK_MS = 1500;
+/** How far a sideways swipe must go to dismiss the bar */
+export const SWIPE_DISMISS_PX = 80;
 
 interface UndoBarProps {
   offer: UndoOffer;
@@ -27,7 +29,7 @@ interface UndoBarProps {
 /**
  * The one Undo bar (app standards, standard 2): what happened, a filled Undo
  * pill whose countdown line runs clockwise round its inside from the top and
- * drains away, then × (left off after a big change, which keeps the full time).
+ * drains away, then ×. A sideways swipe dismisses it too.
  */
 export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUndo, onDismiss, onPause, onResume, className }) => {
   // One unbroken line drawn as a path that starts and ends at the top middle,
@@ -43,7 +45,8 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
       const box = svg.getBoundingClientRect();
       if (!box.width || !box.height) return;
       const lw = parseFloat(getComputedStyle(svg).getPropertyValue('--line')) || 2;
-      const i = lw / 2 + 1;
+      // Just outside the pill, a 2px gap from its edge (owner, 2026-11-10: "Line on the outside edge")
+      const i = -(lw / 2 + 2);
       const w = box.width - 2 * i, h = box.height - 2 * i;
       const r = Math.min(h / 2, w / 2);
       const x0 = i, y0 = i, cx = i + w / 2;
@@ -74,15 +77,53 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
     if (swallow) return;
     act();
   };
+  // A sideways swipe dismisses the bar, like × (owner, 2026-11-10). The bar
+  // follows the finger; past SWIPE_DISMISS_PX it slides away, short of it it
+  // springs back. Taps on Undo and × still work as before.
+  const swipe = React.useRef<{ x: number; y: number; id: number; on: boolean } | null>(null);
+  // The drag belongs to one offer, so a new offer starts with the bar in place
+  const [drag, setDrag] = React.useState({ key: offer.key, dx: 0 });
+  const dx = drag.key === offer.key ? drag.dx : 0;
+  const setDx = (n: number) => setDrag({ key: offer.key, dx: n });
+  const swiped = React.useRef(false);
+  const endSwipe = (dismiss: boolean) => {
+    const was = swipe.current?.on;
+    swipe.current = null;
+    if (was) swiped.current = true;
+    if (was && dismiss) { onDismiss(); return; }
+    setDx(0);
+  };
   return (
   <div
-    className={`${styles.bar} ${className ?? ''}`}
+    className={`${styles.bar} ${dx ? styles.swiping : ''} ${className ?? ''}`}
     role="status"
     data-testid="undo-bar"
-    onPointerDown={() => { onPress(); onPause(); }}
-    onPointerUp={(e) => { if (!e.currentTarget.contains(document.activeElement)) onResume(); }}
-    onPointerCancel={onResume}
-    onPointerLeave={onResume}
+    style={dx ? { transform: `translateX(${dx}px)`, opacity: Math.max(0.3, 1 - Math.abs(dx) / 240) } : undefined}
+    onPointerDown={(e) => { onPress(); onPause(); swiped.current = false; swipe.current = { x: e.clientX, y: e.clientY, id: e.pointerId, on: false }; }}
+    onPointerMove={(e) => {
+      const s = swipe.current;
+      if (!s || s.id !== e.pointerId) return;
+      const mx = e.clientX - s.x, my = e.clientY - s.y;
+      if (!s.on) {
+        // Only a mostly sideways move counts as a swipe
+        if (Math.abs(mx) < 10 || Math.abs(mx) < Math.abs(my)) return;
+        s.on = true;
+        e.currentTarget.setPointerCapture?.(e.pointerId);
+      }
+      setDx(mx);
+    }}
+    onPointerUp={(e) => {
+      const s = swipe.current;
+      if (s?.on) { endSwipe(Math.abs(e.clientX - s.x) >= SWIPE_DISMISS_PX); return; }
+      swipe.current = null;
+      if (!e.currentTarget.contains(document.activeElement)) onResume();
+    }}
+    onClickCapture={(e) => {
+      // The click that ends a swipe is not a tap on Undo or ×
+      if (swiped.current) { swiped.current = false; e.stopPropagation(); e.preventDefault(); }
+    }}
+    onPointerCancel={() => { endSwipe(false); onResume(); }}
+    onPointerLeave={() => { if (!swipe.current?.on) onResume(); }}
     onFocus={onPause}
     onBlur={onResume}
   >
@@ -100,11 +141,10 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
       <Undo2 size={18} strokeWidth={2.5} aria-hidden="true" />
       Undo
     </button>
-    {!offer.big && (
-      <button type="button" className={styles.close} onClick={unlessEarly(onDismiss)} aria-label="Dismiss">
-        <X size={18} strokeWidth={2.5} aria-hidden="true" />
-      </button>
-    )}
+    {/* × on every bar, big changes too, so it is always there (owner, 2026-11-10) */}
+    <button type="button" className={styles.close} onClick={unlessEarly(onDismiss)} aria-label="Dismiss">
+      <X size={18} strokeWidth={2.5} aria-hidden="true" />
+    </button>
   </div>
 );
 };

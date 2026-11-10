@@ -296,9 +296,10 @@
 }
 
 .addFaceBtn {
-  width: 40px;
   height: 40px;
-  padding: 0;
+  padding: 0 14px 0 10px;
+  gap: 4px;
+  flex: none;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -597,6 +598,12 @@
 }
 
 /* Icons or Text changing a tapped face: what they change, and the way back to adding */
+.modeTitle {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--md-sys-color-on-surface);
+}
+
 .editNote {
   display: flex;
   flex-wrap: wrap;
