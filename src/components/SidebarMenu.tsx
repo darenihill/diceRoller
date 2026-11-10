@@ -90,14 +90,14 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
               transition={{ duration: 0.2 }}
             >
               {/* Three groups of four, so the columns line up (owner, 2026-11-02).
-                  On a phone each group shows its heading with a shape (circle App,
-                  square Settings, triangle Saves) and a light tint, so groups read
-                  without relying on color (owner, 2026-11-07; way A).
+                  On a phone each group shows its heading word and a light tint, so
+                  groups read without relying on color (owner, 2026-11-07; way A).
+                  The shapes beside the headings came out (owner, 2026-11-10).
                   Most used sits far right (owner, 2026-11-02): Saves is the right-hand
                   group, and each group ends with its most used tile, which is the
                   right-hand tile of its row on a phone */}
               <div className={`${styles.menuColumn} ${styles.groupApp}`}>
-                <div className={styles.menuColumnHeader}><span className={styles.groupMark} aria-hidden="true" />App</div>
+                <div className={styles.menuColumnHeader}>App</div>
                 <button className={styles.menuItem} onClick={onDonate}><Coffee size={18} /> <span>Donate</span></button>
                 <button className={styles.menuItem} onClick={onIdeas}><Lightbulb size={18} /> <span>Feedback</span></button>
                 <button className={styles.menuItem} onClick={onShare}><Share2 size={18} /> <span>Share</span></button>
@@ -105,7 +105,7 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
               </div>
 
               <div className={`${styles.menuColumn} ${styles.groupSettings}`}>
-                <div className={styles.menuColumnHeader}><span className={styles.groupMark} aria-hidden="true" />Settings</div>
+                <div className={styles.menuColumnHeader}>Settings</div>
                 <button className={styles.menuItem} onClick={onStats}><BarChart2 size={18} /> <span>Usage stats</span></button>
                 <button className={styles.menuItem} onClick={onCustomize}><Palette size={18} /> <span>Customize</span></button>
                 <button className={styles.menuItem} onClick={onToggleTableView} aria-pressed={tableView}
@@ -120,7 +120,7 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
               </div>
 
               <div className={`${styles.menuColumn} ${styles.groupSaves}`}>
-                <div className={styles.menuColumnHeader}><span className={styles.groupMark} aria-hidden="true" />Saves</div>
+                <div className={styles.menuColumnHeader}>Saves</div>
                 <button className={styles.menuItem} onClick={onSetDefault} title="Open with these dice every time"><Pin size={18} /> <span>Set default</span></button>
                 <button className={styles.menuItem} onClick={onSave}><Save size={18} /> <span>Save</span></button>
                 <button className={styles.menuItem} onClick={onHistory}><History size={18} /> <span>History</span></button>

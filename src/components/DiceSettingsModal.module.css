@@ -349,7 +349,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
+  /* Three buttons share a phone's width: the button's usual 24px sides
+     squeezed the icons to nothing (owner, 2026-11-10) */
+  padding-left: 8px;
+  padding-right: 8px;
+  min-width: 0;
+}
+
+/* The icon keeps its size; it never shrinks to make room for the word */
+.footerBtnRemove svg,
+.footerBtnClone svg,
+.footerBtnDone svg {
+  flex-shrink: 0;
 }
 
 .footerBtnRemove {

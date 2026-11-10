@@ -291,6 +291,22 @@
   font-weight: 600;
 }
 
+/* The chip fades in instead of popping in. On a phone (Android Chrome) the
+   first frame of the gold border could flash as a yellow line along the
+   bottom of the screen when a die was held (owner, 2026-11-10) */
+.releaseChip {
+  animation: releaseChipIn 160ms ease-out both;
+}
+
+@keyframes releaseChipIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .releaseChip { animation: none; }
+}
+
 .rpgChip.releaseChip::before {
   content: '';
   position: absolute;

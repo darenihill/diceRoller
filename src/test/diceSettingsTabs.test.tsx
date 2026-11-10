@@ -11,26 +11,26 @@ describe('Dice settings tabs', () => {
   it('two tabs sit in the title bar beside the close button', () => {
     open(die([]));
     const tabs = screen.getAllByRole('tab');
-    expect(tabs.map(t => t.textContent)).toEqual(['Die settings', 'Custom faces']);
+    expect(tabs.map(t => t.textContent)).toEqual(['Die Settings', 'Custom Faces']);
     expect(screen.getByRole('button', { name: 'Close dialog' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Die settings' })).toBeNull();
   });
 
   it('a plain die opens on Die settings; a die with its own faces opens on them', () => {
     const { unmount } = open(die([]));
-    expect(screen.getByRole('tab', { name: 'Die settings' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: 'Die Settings' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByLabelText('Name')).toBeInTheDocument();
     unmount();
     open(die(['Cat', 'Dog']));
-    expect(screen.getByRole('tab', { name: 'Custom faces' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: 'Custom Faces' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByLabelText(/^Face 1: Cat/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('tab', { name: 'Die settings' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Die Settings' }));
     expect(screen.getByLabelText('Name')).toBeInTheDocument();
   });
 
   it('the quick templates are gone', () => {
     open(die([]));
-    fireEvent.click(screen.getByRole('tab', { name: 'Custom faces' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Custom Faces' }));
     expect(screen.queryByText(/Quick Templates/)).toBeNull();
     expect(screen.queryByText(/Decision Maker/)).toBeNull();
     expect(screen.queryByText(/Compass/)).toBeNull();
@@ -44,6 +44,6 @@ describe('Dice settings tabs', () => {
     render(<Harness />);
     fireEvent.click(screen.getByRole('button', { name: 'Remove face 1' }));
     expect(screen.queryByLabelText(/^Face 1: Cat/)).toBeNull();
-    expect(screen.getByRole('tab', { name: 'Custom faces' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: 'Custom Faces' })).toHaveAttribute('aria-selected', 'true');
   });
 });

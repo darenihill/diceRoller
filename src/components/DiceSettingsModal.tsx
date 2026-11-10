@@ -356,7 +356,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
   // Two tabs in the title bar: Dice Settings and Custom faces (owner, 2026-11-02)
   const tabsHeader = (
     <div className={styles.tabs} role="tablist" aria-label="Die settings">
-      {([['settings', 'Die settings'], ['faces', 'Custom faces']] as const).map(([key, label]) => (
+      {([['settings', 'Die Settings'], ['faces', 'Custom Faces']] as const).map(([key, label]) => (
         <button
           key={key}
           type="button"
