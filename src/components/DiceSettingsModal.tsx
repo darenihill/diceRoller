@@ -383,7 +383,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               width below (owner, 2026-11-05: "move standard faces up next to name") */}
           <div className={styles.topRow}>
             <div className={styles.nameField}>
-              <label className={styles.label} htmlFor={`${fieldId}-name`}>Name (optional)</label>
+              <label className={styles.label} htmlFor={`${fieldId}-name`}>Name</label>
               <input 
                 id={`${fieldId}-name`}
                 type="text" 

@@ -3,6 +3,16 @@ import { Undo2, X } from 'lucide-react';
 import type { UndoOffer } from '../hooks/useUndo';
 import styles from './UndoBar.module.css';
 
+/**
+ * A press that starts this soon after the bar shows was meant for the button
+ * that was there before it: the bar opens right where Remove, Clear all and
+ * Delete sit, so a double tap used to land on × and throw the Undo away
+ * (review 2026-11-09).
+ */
+export const UNDO_TAP_GUARD_MS = 500;
+/** How long after an early press its click still counts as part of it */
+const UNDO_PRESS_CLICK_MS = 1500;
+
 interface UndoBarProps {
   offer: UndoOffer;
   windowMs: number;
@@ -50,12 +60,26 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
     ro.observe(svg);
     return () => ro.disconnect();
   }, [offer.key]);
+  // When this offer showed, and whether the press now under way started too soon after
+  const shownAt = React.useRef(0);
+  const early = React.useRef(false);
+  const pressAt = React.useRef(0);
+  React.useEffect(() => { shownAt.current = Date.now(); early.current = false; }, [offer.key]);
+  const onPress = () => { pressAt.current = Date.now(); early.current = pressAt.current - shownAt.current < UNDO_TAP_GUARD_MS; };
+  // Only the click that ends that early press is dropped; a press that never
+  // clicked (a scroll, a tap on the words) doesn't swallow a later key press
+  const unlessEarly = (act: () => void) => () => {
+    const swallow = early.current && Date.now() - pressAt.current < UNDO_PRESS_CLICK_MS;
+    early.current = false;
+    if (swallow) return;
+    act();
+  };
   return (
   <div
     className={`${styles.bar} ${className ?? ''}`}
     role="status"
     data-testid="undo-bar"
-    onPointerDown={onPause}
+    onPointerDown={() => { onPress(); onPause(); }}
     onPointerUp={(e) => { if (!e.currentTarget.contains(document.activeElement)) onResume(); }}
     onPointerCancel={onResume}
     onPointerLeave={onResume}
@@ -63,7 +87,7 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
     onBlur={onResume}
   >
     <span className={styles.message}>{offer.message}</span>
-    <button type="button" className={styles.undo} onClick={onUndo}>
+    <button type="button" className={styles.undo} onClick={unlessEarly(onUndo)}>
       <svg className={styles.ring} aria-hidden="true" ref={svgRef}>
         <path
           key={offer.key}
@@ -77,7 +101,7 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
       Undo
     </button>
     {!offer.big && (
-      <button type="button" className={styles.close} onClick={onDismiss} aria-label="Dismiss">
+      <button type="button" className={styles.close} onClick={unlessEarly(onDismiss)} aria-label="Dismiss">
         <X size={18} strokeWidth={2.5} aria-hidden="true" />
       </button>
     )}
