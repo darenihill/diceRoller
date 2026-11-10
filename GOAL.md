@@ -5,6 +5,63 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-10~~ Enter in Save no longer opens the menu (stories
+  review, standard 20). Done when: pressing Enter (or a phone keyboard's Done)
+  in Save's name box saves the game and the menu stays shut; with a taken name
+  Enter still only puts the keyboard away (src/test/review20261110.test.tsx).
+- ~~Done 2026-11-10~~ The Undo bar never covers a dialog's buttons (stories
+  review, standard 2). Done when: with a dialog open (Die settings, Games,
+  History, Save) the bar and messages sit at the screen's bottom edge, under
+  the dialog, so Done after removing a face closes the dialog instead of
+  pressing Undo; with no dialog open the bar stays just above the buttons
+  (src/test/review20261110.test.tsx).
+- ~~Done 2026-11-10~~ Die settings tabs fit at a large text size (stories
+  review, standard 9). Done when: at 150% and 200% text size "Die Settings"
+  and "Custom Faces" wrap onto two lines instead of running into each other
+  and under ×; at normal size they look the same as before
+  (src/test/review20261110.test.tsx).
+- ~~Done 2026-11-10~~ A share link can't dress other dice up as a popular game
+  (security review). Done when: a link named "Catan" with a hidden character,
+  wide letters or an extra space, and other dice, opens with no name, and
+  direction marks are taken out of link names; Catan's own dice and ordinary
+  names still keep theirs (src/test/review20261110.test.tsx).
+- ~~Done 2026-11-10~~ Safety net: the site refuses code from anywhere except
+  itself and Google (Daren 2026-11-10, Build). Done when: the home page and
+  the four search pages carry a Content-Security-Policy meta, written by npm
+  run landing, that allows scripts only from the site, Google Tag Manager and
+  the two inline scripts' sha256 hashes (no 'unsafe-inline' for scripts),
+  images from the site, data:, blob: and Google Analytics, data only to the
+  site and Google Analytics, and workers and the manifest only from the site;
+  a Playwright walk of the built site (roll, die settings with a picture,
+  share link, History, Customize with metrics on and off, RPG mode with a
+  natural 20, the four search pages) logs no policy violation
+  (src/test/picks20261110.test.tsx).
+- ~~Done 2026-11-10~~ With metrics off, the app no longer contacts Google for
+  its font (Daren 2026-11-10, Build). Done when: Roboto 400, 500 and 700 come
+  from the site (public/fonts/, @font-face with font-display: swap), the home
+  page and the four search pages have no Google Fonts links, the service
+  worker saves the font for offline and has no Google Fonts branch, and
+  screenshots before and after match pixel for pixel
+  (src/test/picks20261110.test.tsx).
+- ~~Done 2026-11-10~~ Saved games load from a tap anywhere on their row (Daren
+  2026-11-10, Build). Done when: in Games > Your games the load target fills
+  the row's full height and everything left of the bin, at least 48px tall,
+  the bin stays 48 x 48 even beside a long name, and the text sits where it
+  did (src/test/picks20261110.test.tsx).
+- ~~Done 2026-11-10~~ Photos on removed dice are really deleted from the phone
+  (Daren 2026-11-10, Build). Done when: when the app starts, and whenever an
+  Undo bar or a die's settings close with neither left up, pictures no face
+  names are deleted; a picture is kept while it is on screen, in any saved
+  value (saved games, the autosave at start, the default dice, History rows)
+  or held for an Undo, and all are kept when storage can't be read; a removed
+  picture is gone after a reload, and ones in a saved game, the default dice
+  or History stay (src/test/picks20261110.test.tsx).
+- ~~Done 2026-11-10~~ After you type a roll, the big Roll button rolls it
+  (Daren 2026-11-10, Build). Done when: in RPG mode, with a roll that reads in
+  the roll box, the big Roll button rolls it exactly as the box's own Roll
+  does (its dice swap in, with Undo); with the box empty or holding a roll
+  that doesn't read, Roll works as before; Help's typed-roll line names the
+  big Roll button (src/test/picks20261110.test.tsx).
 - ~~Done 2026-11-09~~ A double tap on Remove keeps its Undo (impaired and
   stories review, standard 2). Done when: a tap on the Undo bar's × or Undo
   that starts within half a second of the bar showing does nothing, so the

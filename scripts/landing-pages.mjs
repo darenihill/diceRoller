@@ -4,6 +4,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { createHash } from 'node:crypto';
 import { landingPages } from '../landing/pages.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -55,6 +56,56 @@ export function renderPage(template, page) {
   return html;
 }
 
+// Content-Security-Policy (owner, 2026-11-10: "the site refuses code from
+// anywhere except itself and Google"). A <meta> because the host can't send
+// headers, so frame-ancestors is left out (a meta policy ignores it). The two
+// inline scripts (Google Analytics' start, the service worker sign-up) are
+// allowed by their sha256, worked out here, so editing one and running
+// `npm run landing` keeps the policy in step; src/test/picks20261110.test.tsx
+// fails while it isn't. style-src keeps 'unsafe-inline': React and the
+// animation library set style="" on elements.
+const GOOGLE_ANALYTICS = {
+  script: ['https://www.googletagmanager.com'],
+  connect: ['https://*.google-analytics.com', 'https://*.analytics.google.com', 'https://*.googletagmanager.com'],
+  img: ['https://*.google-analytics.com', 'https://*.googletagmanager.com'],
+};
+
+/** sha256 sources for each inline script that runs (not src=, not JSON-LD data) */
+export function inlineScriptHashes(html) {
+  const hashes = [];
+  for (const m of html.matchAll(/<script(\s[^>]*)?>([\s\S]*?)<\/script>/g)) {
+    const attrs = m[1] ?? '';
+    if (/\bsrc=/.test(attrs) || /type="application\/ld\+json"/.test(attrs)) continue;
+    hashes.push(`'sha256-${createHash('sha256').update(m[2], 'utf8').digest('base64')}'`);
+  }
+  return hashes;
+}
+
+export function contentSecurityPolicy(html) {
+  return [
+    "default-src 'self'",
+    `script-src 'self' ${[...inlineScriptHashes(html), ...GOOGLE_ANALYTICS.script].join(' ')}`,
+    "style-src 'self' 'unsafe-inline'",
+    // Face pictures are data: URLs, and a chosen picture is read from a blob:
+    `img-src 'self' data: blob: ${GOOGLE_ANALYTICS.img.join(' ')}`,
+    `connect-src 'self' ${GOOGLE_ANALYTICS.connect.join(' ')}`,
+    "font-src 'self'",
+    "worker-src 'self'",
+    "manifest-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ].join('; ');
+}
+
+const CSP_META = /<meta http-equiv="Content-Security-Policy" content="[^"]*" \/>/;
+
+/** Writes the page's own policy into its Content-Security-Policy meta */
+export function withCsp(html) {
+  if (!CSP_META.test(html)) throw new Error('landing-pages: index.html has no Content-Security-Policy meta');
+  return html.replace(CSP_META, () => `<meta http-equiv="Content-Security-Policy" content="${contentSecurityPolicy(html)}" />`);
+}
+
 export function renderSitemap(lastmod) {
   const urls = [{ loc: `${SITE}/`, priority: '1.0' }]
     .concat(landingPages.map(p => ({ loc: `${SITE}/${p.slug}/`, priority: '0.8' })));
@@ -74,10 +125,11 @@ export function sitemapLastmod() {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const template = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  const template = withCsp(readFileSync(join(ROOT, 'index.html'), 'utf8'));
+  writeFileSync(join(ROOT, 'index.html'), template);
   for (const page of landingPages) {
     mkdirSync(join(ROOT, page.slug), { recursive: true });
-    writeFileSync(join(ROOT, page.slug, 'index.html'), renderPage(template, page));
+    writeFileSync(join(ROOT, page.slug, 'index.html'), withCsp(renderPage(template, page)));
   }
   const lastmod = process.argv[2] || new Date().toISOString().slice(0, 10);
   writeFileSync(join(ROOT, 'public/sitemap.xml'), renderSitemap(lastmod));

@@ -3,7 +3,10 @@ import { renderHook, act } from '@testing-library/react';
 import { useDiceState, type RollSummary } from '../hooks/useDiceState';
 
 const confettiMock = vi.fn();
-vi.mock('canvas-confetti', () => ({ default: (opts: unknown) => confettiMock(opts) }));
+vi.mock('canvas-confetti', () => ({ default: Object.assign((opts: unknown) => confettiMock(opts), {
+  // The app makes its own cannon that draws without a worker (security policy, 2026-11-10)
+  create: (_canvas: unknown, global: { useWorker?: boolean }) => (opts: unknown) => confettiMock({ ...(opts as object), useWorker: global.useWorker }),
+}) }));
 
 import { celebrateNatural20 } from '../utils/confetti';
 

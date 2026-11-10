@@ -38,6 +38,15 @@ export function currentSetName(dice: Partial<DiceData>[], loaded: LoadedSet | nu
   return preset ? preset.name : null;
 }
 
+const BIDI_CONTROLS = /[\u061C\u200E\u200F\u202A-\u202E\u2066-\u2069]/g;
+
+/**
+ * A name as it reads on screen: same-looking letters folded together (NFKC),
+ * invisible characters and spaces dropped, any case. "Cat\u200Ban" and
+ * "Ｃａｔａｎ" both read as Catan (security review, 2026-11-10).
+ */
+const readsAs = (name: string) => name.normalize('NFKC').replace(/[\p{Cf}\s]/gu, '').toLowerCase();
+
 // Share links carry the set's name after the dice: #share=<dice>&name=<name>.
 // The compressed dice never contain "&", so older links without a name still read.
 export function splitShareHash(hash: string): { data: string; name: string | null } {
@@ -46,7 +55,9 @@ export function splitShareHash(hash: string): { data: string; name: string | nul
   if (at === -1) return { data: body, name: null };
   let name: string | null;
   try {
-    name = decodeURIComponent(body.slice(at + 6)).trim().slice(0, MAX_NAME_LENGTH) || null;
+    // Direction marks have no place in a game's name and can make it read
+    // backwards, so "\u202Enatac" showed as "catan" (security review, 2026-11-10)
+    name = decodeURIComponent(body.slice(at + 6)).replace(BIDI_CONTROLS, '').trim().slice(0, MAX_NAME_LENGTH) || null;
   } catch {
     name = null;
   }
@@ -56,12 +67,13 @@ export function splitShareHash(hash: string): { data: string; name: string | nul
 /** Longest unpacked share link read, in characters */
 export const MAX_SHARE_JSON = 1_000_000;
 
-// A link may only carry a built-in game's name (any letter case) when its dice
+// A link may only carry a built-in game's name (any letter case, hidden
+// characters or look-alike widths) when its dice
 // are that game's dice, so other dice can't pose as "Catan". Other names pass.
 export function shareNameFor(dice: Partial<DiceData>[], name: string | null): string | null {
   if (!name) return name;
-  const key = name.trim().toLowerCase();
-  const preset = dicePresets.find(p => p.name.toLowerCase() === key);
+  const key = readsAs(name);
+  const preset = dicePresets.find(p => readsAs(p.name) === key);
   return !preset || diceSignature(preset.dice) === diceSignature(dice) ? name : null;
 }
 

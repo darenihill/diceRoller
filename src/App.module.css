@@ -146,7 +146,10 @@
 }
 
 .setsGrid .saveCard {
-  padding: 4px 4px 4px 12px;
+  /* The load target takes the card's top, bottom and left padding into
+     itself, so a tap anywhere left of the bin loads the game (owner,
+     2026-11-10); the text sits where it did */
+  padding: 0 4px 0 0;
 }
 
 .setCard {
@@ -186,6 +189,23 @@
   padding: 8px 0;
 }
 
+/* In Games > Your games: the full height of the row and everything left of
+   the bin, at least 48px tall */
+.setsGrid .saveCardBtn {
+  align-self: stretch;
+  min-height: 48px;
+  min-width: 0;
+  padding: 12px 0 12px 12px;
+  border-radius: var(--shape-large) 0 0 var(--shape-large);
+}
+
+/* The bin keeps its 48 x 48 even beside a long name, with the 4px it had
+   above and below */
+.saveCardBin {
+  flex-shrink: 0;
+  margin: 4px 0;
+}
+
 .toast {
   position: fixed;
   /* Just above the Roll, + and lock buttons, where Android puts its Undo */
@@ -208,6 +228,13 @@
 .toastAboveRpgBar {
   /* Above RPG Mode's chip row: 24 + Roll 72 + 10 + chips 44 = 150, plus a gap */
   bottom: calc(162px + env(safe-area-inset-bottom, 0px));
+}
+
+/* A dialog is open: the bar goes to the screen's bottom edge, below the dialog
+   (at most 80% of the screen tall, centred), so it never covers the dialog's
+   Done, Copy or Remove (review 2026-11-10) */
+.toastBelowDialog {
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
 }
 
 /* On a phone the menu button sits above the lock on the left, so the bar

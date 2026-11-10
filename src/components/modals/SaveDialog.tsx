@@ -52,6 +52,10 @@ export const SaveDialog: React.FC<SaveDialogProps> = ({
           aria-describedby={taken ? 'save-name-taken' : undefined}
           onKeyDown={(e) => {
             if (e.key !== 'Enter') return;
+            // Saving closes the dialog and hands focus to the menu button within
+            // this key press, so the same Enter used to press that button and open
+            // the menu (review 2026-11-10). Stopping its default keeps it to Save.
+            e.preventDefault();
             // A taken name needs a choice, so Done just puts the keyboard away to show the buttons
             if (taken) e.currentTarget.blur();
             else if (trimmed) onSave('new');

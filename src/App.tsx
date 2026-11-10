@@ -8,11 +8,11 @@ import { Dice, type GlideOrigin } from './components/Dice';
 import { ActionBar } from './components/ActionBar';
 import { TypeRollBox } from './components/TypeRollBox';
 import { loadSavedRolls, withSavedRoll, SAVED_ROLLS_KEY, MAX_SAVED_ROLLS, type SavedRoll } from './utils/savedRolls';
-import { TYPED_DIE_COLOR, type TypedRoll } from './utils/rollNotation';
+import { TYPED_DIE_COLOR, parseRollNotation, type TypedRoll } from './utils/rollNotation';
 import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages, parseFaceContent, faceScores } from './utils/diceUtils';
-import { holdFaceImageForUndo } from './utils/faceImages';
+import { holdFaceImageForUndo, pruneFaceImages, releaseFaceImageHolds } from './utils/faceImages';
 import { DieActionStrip } from './components/DieActionStrip';
 import { playRollSequence, playLandNow, scheduleLandingBuzz } from './utils/soundEffects';
 import { BUZZ_KEY, BUZZ_SHOWN_KEY, canBuzz, isBuzzLink } from './utils/buzz';
@@ -147,6 +147,24 @@ function App() {
   const [rolledSignature, setRolledSignature] = useState<string | null>(null);
   const latestDiceRef = useRef<DiceData[]>([]);
   useEffect(() => { latestDiceRef.current = diceList; }, [diceList]);
+  // Pictures no face names any more are let go from the device: when the app
+  // starts, and whenever an Undo bar or a die's settings close with neither
+  // left up, so nothing an Undo could still put back is lost (owner, 2026-11-10)
+  const pictureCheckDue = useRef(false);
+  // A backup just imported is what's saved now; the reload checks its pictures
+  const importedBackupRef = useRef(false);
+  useEffect(() => {
+    if (importedBackupRef.current) return;
+    if (undoOffer !== null || editingDiceId !== null) {
+      pictureCheckDue.current = true;
+      return;
+    }
+    releaseFaceImageHolds();
+    // At start the saved autosave counts too; once a bar or the settings have
+    // come and gone, the dice on screen are the current ones
+    pruneFaceImages(latestDiceRef.current, pictureCheckDue.current);
+    pictureCheckDue.current = false;
+  }, [undoOffer, editingDiceId]);
   const [soundEnabled, setSoundEnabled] = useState(() => readItem(SAVED.sound) === 'true');
   const [diceScale, setDiceScale] = useState(() => sanitizeDiceScale(readItem(SAVED.diceScale)));
 
@@ -748,6 +766,7 @@ function App() {
         if (result === 'full') return;
         // From here the backup is what's saved; this page must not save over it
         freezeSaves();
+        importedBackupRef.current = true;
         if (result === 'pictures') {
           showToast("Backup imported, but some pictures didn't fit on this device. Reloading…");
           setTimeout(() => window.location.reload(), 1500);
@@ -766,9 +785,15 @@ function App() {
     reader.readAsText(file);
   };
 
+  // The roll box's text, and the dice it was typed over (see handleRoll)
+  const typedTextRef = useRef('');
+  const typedOverDiceRef = useRef<DiceData[] | null>(null);
   // A typed roll swaps in its own dice, modifier and advantage and rolls them;
   // Undo puts back the dice and settings that were out before
   const handleTypedRoll = (roll: TypedRoll) => {
+    // A typed roll runs once per edit of the box: after Undo the big Roll
+    // button rolls the dice that came back
+    typedOverDiceRef.current = null;
     const before = { dice: diceList, modifier, advantage: rollAdvantage };
     const dice = roll.groups.flatMap(g => Array.from({ length: g.count }, () => ({
       id: generateId(),
@@ -873,7 +898,25 @@ function App() {
     setTelemetryEnabled(nextState);
   };
 
+  // What the roll box holds: with a roll that reads, the big Roll button rolls
+  // it, exactly as the box's own button does (owner, 2026-11-10). Only while
+  // the dice are as they were when it was typed: once it has been rolled, or
+  // the dice changed (held, loaded, rolled), the big button rolls the dice
+  const handleTypedText = useCallback((text: string) => {
+    typedTextRef.current = text;
+    typedOverDiceRef.current = latestDiceRef.current;
+  }, []);
+
   const handleRoll = () => {
+    // A tap during the tumble still only lands the dice
+    if (rpgMode && !isRolling && typedTextRef.current.trim()
+      && typedOverDiceRef.current === diceList) {
+      const typed = parseRollNotation(typedTextRef.current);
+      if (typed.ok) {
+        handleTypedRoll(typed.roll);
+        return;
+      }
+    }
     const hasUnheldDice = diceList.some(d => !d.held);
     // Every die held: nothing would change, so say why instead of logging a
     // repeat of the last roll
@@ -907,6 +950,9 @@ function App() {
   // Every dialog, sheet or menu counts, not only the named modals: Dice
   // settings, Save and the share fallback have their own open state.
   const overlayOpen = modalOpen !== null || menuOpen || savePromptOpen || editingDiceId !== null || shareFallbackUrl !== null;
+  // Where the bottom bar sits: under an open dialog, else just above the buttons
+  const dialogOpen = modalOpen !== null || savePromptOpen || editingDiceId !== null || shareFallbackUrl !== null;
+  const toastPlace = dialogOpen ? styles.toastBelowDialog : chipRow ? styles.toastAboveRpgBar : '';
   const handleRollRef = useRef(handleRoll);
   const overlayOpenRef = useRef(overlayOpen);
   useEffect(() => {
@@ -973,6 +1019,7 @@ function App() {
               onSaveRoll={handleSaveRoll}
               onRemoveSavedRoll={handleRemoveSavedRoll}
               prefill={rollPrefill}
+              onTextChange={handleTypedText}
             />
           </div>
         )}
@@ -1224,9 +1271,12 @@ function App() {
         onClose={() => setModalOpen(null)}
       />
 
-      {/* Toast Notification */}
+      {/* Toast Notification. With a dialog open the bar sits at the screen's
+          bottom edge, under the dialog: above the Roll buttons it covered the
+          dialog's own Done, so a tap on Done after removing a face pressed
+          Undo instead (review 2026-11-10) */}
       {storageFull ? (
-        <div className={`${styles.toast} ${styles.undoToast} ${styles.storageToast} ${chipRow ? styles.toastAboveRpgBar : ''}`} role="alert">
+        <div className={`${styles.toast} ${styles.undoToast} ${styles.storageToast} ${toastPlace}`} role="alert">
           <span>Storage is full, so your last change wasn't saved.</span>
           <button className={styles.undoButton} onClick={() => { setStorageFull(false); handleExportData(); }}>Export backup</button>
           <button className={styles.undoButton} onClick={() => setStorageFull(false)} aria-label="Close storage message" style={{ minWidth: 44 }}>✕</button>
@@ -1240,16 +1290,16 @@ function App() {
           onDismiss={dismissUndo}
           onPause={pauseUndo}
           onResume={resumeUndo}
-          className={`${styles.toast} ${chipRow ? styles.toastAboveRpgBar : ''}`}
+          className={`${styles.toast} ${toastPlace}`}
         />
       ) : toast ? (
         // role="status" so a screen reader hears "Saved" and the rest, as it does the Undo offer
-        <div className={`${styles.toast} ${chipRow ? styles.toastAboveRpgBar : ''}`} role="status">
+        <div className={`${styles.toast} ${toastPlace}`} role="status">
           {toast}
         </div>
       ) : newVersion.ready && (
         // An app left open hears about a new version; Refresh loads it (owner's pick, 2026-11-03)
-        <div className={`${styles.toast} ${styles.undoToast} ${chipRow ? styles.toastAboveRpgBar : ''}`} role="status" data-testid="new-version-bar">
+        <div className={`${styles.toast} ${styles.undoToast} ${toastPlace}`} role="status" data-testid="new-version-bar">
           <span style={{ flexShrink: 0 }}>New version</span>
           <button className={styles.undoButton} onClick={() => window.location.reload()}>Refresh</button>
           <button className={styles.undoButton} onClick={newVersion.later} aria-label="Later" title="Later" style={{ minWidth: 44 }}>✕</button>
