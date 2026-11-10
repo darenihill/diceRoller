@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React from 'react';
 import { Lock, Unlock, Settings, Trash2, Copy, Dices } from 'lucide-react';
 import type { DiceData } from '../types';
 import { parseFaceContent, faceLabel } from '../utils/diceUtils';
@@ -29,27 +29,16 @@ const showing = (die: DiceData): string => {
 /**
  * With many small dice, a tapped die's buttons come out here as one row of
  * thumb-sized buttons above the bottom bar (owner, 2026-10-28), instead of
- * crowding round the die.
+ * crowding round the die. It always opens in that one spot, never jumping to
+ * the top (owner, 2026-11-10: "a more consistent spot. It moves around");
+ * its heading names the die, so covering it doesn't lose which one.
  */
 export const DieActionStrip: React.FC<DieActionStripProps> = ({ die, rpgMode, onRollOne, onToggleHold, onClone, onOpenSettings, onRemove, onInteract }) => {
   const name = die.name || `d${die.faces}`;
-  const ref = useRef<HTMLDivElement>(null);
-  // If the strip would cover the tapped die, it moves to the top of the screen
-  const [atTop, setAtTop] = useState(false);
-  useLayoutEffect(() => {
-    const strip = ref.current;
-    const dieEl = document.querySelector(`[data-dice-id="${CSS.escape(die.id)}"]`);
-    if (!strip || !dieEl) return;
-    const below = strip.classList.contains(styles.top) ? null : strip.getBoundingClientRect();
-    const d = dieEl.getBoundingClientRect();
-    const bottomTop = below ? below.top : window.innerHeight - strip.offsetHeight - (rpgMode ? 162 : 108);
-    setAtTop(d.bottom > bottomTop);
-  }, [die.id, rpgMode]);
   return (
     <div
-      ref={ref}
       onPointerDownCapture={onInteract}
-      className={`${styles.strip} ${rpgMode ? styles.rpg : ''} ${atTop ? styles.top : ''}`}
+      className={`${styles.strip} ${rpgMode ? styles.rpg : ''}`}
       role="group"
       aria-label={`Actions for ${name}`}
       data-die-actions={die.id}

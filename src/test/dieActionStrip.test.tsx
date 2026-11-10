@@ -41,3 +41,19 @@ describe('Buttons for a tapped die with many dice out', () => {
     expect(screen.queryByTitle('Remove this die')).toBeNull();
   });
 });
+
+describe('Where and when the strip shows (owner, 2026-11-10)', () => {
+  it('starts at a smaller die size than before', async () => {
+    const { COMPACT_DIE_SIZE } = await import('../utils/constants');
+    expect(COMPACT_DIE_SIZE).toBe(120);
+  });
+
+  it('always opens in one spot above the bottom bar, never jumping to the top', async () => {
+    const { readFileSync } = await import('node:fs');
+    const css = readFileSync('src/components/DieActionStrip.module.css', 'utf8');
+    expect(css).not.toMatch(/\.strip\.top/);
+    expect(css).not.toMatch(/\btop:/);
+    render(<DieActionStrip die={die} rpgMode={false} onToggleHold={vi.fn()} onClone={vi.fn()} onOpenSettings={vi.fn()} onRemove={vi.fn()} />);
+    expect(screen.getByRole('group', { name: 'Actions for d6' }).className).not.toMatch(/top/);
+  });
+});
