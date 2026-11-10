@@ -1,4 +1,4 @@
-Next: Dice Roller builds of 2026-11-10 are on their own branch for the release (the big Roll button rolls a typed roll; pictures on removed dice are deleted; a saved game loads from anywhere on its row); next is Recently deleted, with Erase everything as a Desk idea.
+Next: Dice Roller builds of 2026-11-10 are on their own branch for the release (the big Roll button rolls a typed roll; pictures on removed dice are deleted; a saved game loads from anywhere on its row; the font comes from the site, not Google); next is Recently deleted, with Erase everything as a Desk idea.
 
 # State
 

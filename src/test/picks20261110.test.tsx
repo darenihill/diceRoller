@@ -14,6 +14,7 @@ import { HelpModal } from '../components/modals/HelpModal';
 import { SetsModal } from '../components/modals/SetsModal';
 import fs from 'fs';
 import path from 'path';
+import { runInNewContext } from 'node:vm';
 import { ROLL_DURATION_MS } from '../utils/constants';
 
 beforeAll(() => {
@@ -198,5 +199,60 @@ describe('Saved games load from a tap anywhere on their row (owner, 2026-11-10)'
     const load = screen.getByRole('button', { name: 'A rather long game name that wraps' });
     expect(load.className).toMatch(/saveCardBtn/);
     expect(load.parentElement).toBe(del.parentElement);
+  });
+});
+
+describe('With metrics off, the app no longer contacts Google for its font (owner, 2026-11-10)', () => {
+  const root = path.resolve(__dirname, '../..');
+  const read = (f: string) => fs.readFileSync(path.join(root, f), 'utf-8');
+  const pages = ['index.html', 'dnd-dice-roller/index.html', 'd20-roller/index.html', 'catan-dice-roller/index.html', 'classroom-dice-roller/index.html'];
+
+  it('the home page and the four search pages load nothing from Google Fonts', () => {
+    for (const page of pages) {
+      const html = read(page);
+      expect(html, page).not.toMatch(/fonts\.googleapis\.com|fonts\.gstatic\.com/);
+      expect(html, page).toContain('<link rel="preload" href="/fonts/roboto-latin.woff2" as="font" type="font/woff2" crossorigin />');
+    }
+  });
+
+  it('Roboto 400, 500 and 700 come from the site, with font-display: swap', () => {
+    const css = read('src/index.css');
+    const faces = [...css.matchAll(/@font-face\s*\{([^}]+)\}/g)].map(m => m[1]);
+    expect(faces.map(f => f.match(/font-weight:\s*(\d+)/)![1])).toEqual(['400', '500', '700']);
+    for (const f of faces) {
+      expect(f).toMatch(/font-family:\s*'Roboto'/);
+      expect(f).toMatch(/font-display:\s*swap/);
+      expect(f).toMatch(/src:\s*url\('\/fonts\/roboto-latin\.woff2'\) format\('woff2'\)/);
+    }
+    const file = fs.readFileSync(path.join(root, 'public/fonts/roboto-latin.woff2'));
+    expect(file.subarray(0, 4).toString('latin1')).toBe('wOF2');
+    expect(file.length).toBeLessThan(100_000);
+  });
+
+  it('the service worker saves the font for offline and leaves other sites alone', () => {
+    const sw = read('public/sw.js');
+    expect(sw).toContain("'/fonts/roboto-latin.woff2'");
+    expect(sw).not.toMatch(/googleapis|gstatic|GoogleFont/);
+
+    const listeners: Record<string, (e: unknown) => void> = {};
+    const added: string[] = [];
+    const cache = { addAll: (list: string[]) => { added.push(...list); return Promise.resolve(); }, match: () => Promise.resolve(undefined), put: () => Promise.resolve() };
+    runInNewContext(sw, {
+      self: { addEventListener: (t: string, fn: (e: unknown) => void) => { listeners[t] = fn; }, location: { origin: 'https://customdiceroller.com' }, skipWaiting: () => {} },
+      caches: { open: () => Promise.resolve(cache), match: () => Promise.resolve(undefined), keys: () => Promise.resolve([]) },
+      fetch: () => Promise.resolve({ status: 200, text: () => Promise.resolve(''), clone() { return this; } }),
+      URL, Promise, setTimeout, console,
+    });
+    let installing: Promise<unknown> | undefined;
+    listeners.install({ waitUntil: (p: Promise<unknown>) => { installing = p; } });
+    const handled = (url: string) => {
+      let used = false;
+      listeners.fetch({ request: { method: 'GET', url, mode: 'cors', destination: 'font' }, respondWith: () => { used = true; }, waitUntil: () => {} });
+      return used;
+    };
+    expect(handled('https://customdiceroller.com/fonts/roboto-latin.woff2')).toBe(true);
+    expect(handled('https://fonts.gstatic.com/s/roboto/v51/x.woff2')).toBe(false);
+    expect(handled('https://fonts.googleapis.com/css2?family=Roboto')).toBe(false);
+    return installing!.then(() => expect(added).toContain('/fonts/roboto-latin.woff2'));
   });
 });

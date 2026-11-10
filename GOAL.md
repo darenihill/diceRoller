@@ -5,6 +5,13 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-10~~ With metrics off, the app no longer contacts Google for
+  its font (Daren 2026-11-10, Build). Done when: Roboto 400, 500 and 700 come
+  from the site (public/fonts/, @font-face with font-display: swap), the home
+  page and the four search pages have no Google Fonts links, the service
+  worker saves the font for offline and has no Google Fonts branch, and
+  screenshots before and after match pixel for pixel
+  (src/test/picks20261110.test.tsx).
 - ~~Done 2026-11-10~~ Saved games load from a tap anywhere on their row (Daren
   2026-11-10, Build). Done when: in Games > Your games the load target fills
   the row's full height and everything left of the bin, at least 48px tall,

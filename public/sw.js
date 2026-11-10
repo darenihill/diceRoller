@@ -1,4 +1,4 @@
-const CACHE_NAME = 'diceroller-v4';
+const CACHE_NAME = 'diceroller-v5';
 // How long opening the app waits for the network before using the saved copy
 const NAV_TIMEOUT_MS = 3000;
 const ASSETS_TO_CACHE = [
@@ -6,7 +6,9 @@ const ASSETS_TO_CACHE = [
   '/index.html',
   '/favicon.svg',
   '/icons.svg',
-  '/manifest.json'
+  '/manifest.json',
+  // Roboto is served from this site, so it works offline from the first visit
+  '/fonts/roboto-latin.woff2'
 ];
 
 // Install: Cache core static shell assets
@@ -44,7 +46,7 @@ self.addEventListener('activate', (e) => {
 
 // Fetch: Stale-While-Revalidate caching strategy
 self.addEventListener('fetch', (e) => {
-  // Only handle GET requests and local/font resources
+  // Only handle GET requests for this site's own files
   if (e.request.method !== 'GET') return;
   
   const url = new URL(e.request.url);
@@ -52,14 +54,12 @@ self.addEventListener('fetch', (e) => {
   // Bypass caching on localhost/127.0.0.1 to prevent caching outdated code in local development
   if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') return;
   
-  const isLocal = url.origin === self.location.origin;
-  const isGoogleFont = url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
-  
-  if (!isLocal && !isGoogleFont) return;
+  // Anything from another site (Google Analytics) goes straight to the network
+  if (url.origin !== self.location.origin) return;
 
   // The page's "is there a new version?" check must reach the network, never a
   // saved copy (src/hooks/useNewVersion.ts)
-  if (isLocal && url.searchParams.has('version-check')) return;
+  if (url.searchParams.has('version-check')) return;
 
   // Navigation requests (the HTML shell) use network-first. Under
   // stale-while-revalidate a returning visitor would render the PREVIOUS
