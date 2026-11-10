@@ -66,7 +66,7 @@
 
 .inputField {
   width: 100%;
-  height: 40px;
+  height: 48px;
   padding: 0 12px;
   border-radius: 8px;
   font-size: 0.875rem;
@@ -87,8 +87,8 @@
 }
 
 .stepperBtn {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   background-color: rgba(0, 0, 0, 0.2);
   color: var(--md-sys-color-on-surface);
   border: none;
@@ -107,7 +107,7 @@
 
 .stepperInput {
   width: 56px;
-  height: 44px;
+  height: 48px;
   padding: 0 4px;
   border-radius: 8px;
   font-size: 0.9375rem;
@@ -156,7 +156,7 @@
 .faceGrip {
   flex: none;
   width: 24px;
-  min-height: 44px;
+  min-height: 48px;
   margin: -4px 2px -4px -6px;
   padding: 0;
   display: flex;
@@ -183,9 +183,9 @@
 .faceTile {
   display: flex;
   align-items: center;
-  min-width: 44px;
+  min-width: 48px;
   max-width: 55%;
-  min-height: 40px;
+  min-height: 48px;
   padding: 4px 10px;
   border-radius: var(--shape-small);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -260,6 +260,27 @@
   padding: 0;
 }
 
+/* The face row has no room for 48px buttons beside the tile and its number
+   box, so the picture and remove buttons keep their look and take taps from
+   a 48px-tall area around them (tap-target standard, 2026-11-10) */
+.facePictureBtn,
+.faceRemoveBtn {
+  position: relative;
+}
+
+.facePictureBtn::after,
+.faceRemoveBtn::after {
+  content: '';
+  position: absolute;
+  inset: -10px -2px;
+}
+
+.faceRemoveBtn::after {
+  top: -13px;
+  bottom: -13px;
+  right: -12px;
+}
+
 .addPictureBtn {
   display: inline-flex;
   align-items: center;
@@ -296,7 +317,7 @@
 }
 
 .addFaceBtn {
-  height: 40px;
+  height: 48px;
   padding: 0 14px 0 10px;
   gap: 4px;
   flex: none;
@@ -432,7 +453,7 @@
 }
 
 .listUndo {
-  min-height: 44px;
+  min-height: 48px;
   padding: 0 12px;
   border: none;
   border-radius: var(--shape-small);
@@ -490,7 +511,7 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 44px;
+  min-height: 48px;
   padding: 0 8px;
   border-radius: 999px;
   border: 1px solid var(--md-sys-color-outline);
@@ -583,9 +604,9 @@
   flex: 0 0 auto;
 }
 
-/* The name box lines up with the 44px stepper beside it */
+/* The name box lines up with the 48px stepper beside it */
 .nameField .inputField {
-  height: 44px;
+  height: 48px;
 }
 
 /* Narrow phones: the tab names wrap to two lines instead of running under the close button */

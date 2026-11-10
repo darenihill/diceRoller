@@ -11,6 +11,16 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   every text box shows a 2px edge while typing, and
   reviews/2026-11-10-ui-material.md says what was found
   (src/test/materialFit.test.ts).
+- ~~Done 2026-11-10~~ Dialog buttons are 48px tall (Daren 2026-11-10 on the
+  Desk: "This shouldn't be a card if it's matching a standard"; standards 9
+  and 20). Done when: every button inside a dialog (Save's Cancel and Save,
+  Keep both, Replace it, Clear History, Share's and Install's Done, Die
+  settings' Remove, Copy, Done and Add) is at least 48px tall through one
+  shared rule, with the same words, order and colors and 8px between
+  buttons; the dialogs' boxes, steppers and chips are 48px too; nothing runs
+  off at 320px or at 200% text that didn't before; and
+  reviews/2026-11-10-tap-targets.md lists what is left under 48 and why
+  (src/test/tapTargets.test.ts).
 - ~~Done 2026-11-10~~ Enter in Save no longer opens the menu (stories
   review, standard 20). Done when: pressing Enter (or a phone keyboard's Done)
   in Save's name box saves the game and the menu stays shut; with a taken name

@@ -239,9 +239,18 @@ button:focus-visible {
 
 /* Compact button: in-dialog secondary actions and template chips */
 .md-button-compact {
-  height: 32px;
+  min-height: 32px;
   padding: 0 12px;
   font-size: 12px;
+}
+
+/* Every button inside a dialog is at least 48px tall, the app's tap-target
+   standard (hub standards 9 and 20: tap targets are 48dp). Save's Cancel and
+   Save were 36px and Clear History 32px. One rule here, so every dialog
+   follows; words, order, colors and the 8px between buttons stay (owner,
+   2026-11-10: "This shouldn't be a card if it's matching a standard"). */
+[role='dialog'] .md-button {
+  min-height: 48px;
 }
 
 /* Destructive confirm action */
