@@ -151,7 +151,10 @@ function App() {
   // starts, and whenever an Undo bar or a die's settings close with neither
   // left up, so nothing an Undo could still put back is lost (owner, 2026-11-10)
   const pictureCheckDue = useRef(false);
+  // A backup just imported is what's saved now; the reload checks its pictures
+  const importedBackupRef = useRef(false);
   useEffect(() => {
+    if (importedBackupRef.current) return;
     if (undoOffer !== null || editingDiceId !== null) {
       pictureCheckDue.current = true;
       return;
@@ -763,6 +766,7 @@ function App() {
         if (result === 'full') return;
         // From here the backup is what's saved; this page must not save over it
         freezeSaves();
+        importedBackupRef.current = true;
         if (result === 'pictures') {
           showToast("Backup imported, but some pictures didn't fit on this device. Reloading…");
           setTimeout(() => window.location.reload(), 1500);
@@ -889,13 +893,20 @@ function App() {
   };
 
   // What the roll box holds: with a roll that reads, the big Roll button rolls
-  // it, exactly as the box's own button does (owner, 2026-11-10)
+  // it, exactly as the box's own button does (owner, 2026-11-10). Only while
+  // the dice are as they were when it was typed: once it has been rolled, or
+  // the dice changed (held, loaded, rolled), the big button rolls the dice
   const typedTextRef = useRef('');
-  const handleTypedText = useCallback((text: string) => { typedTextRef.current = text; }, []);
+  const typedOverDiceRef = useRef<DiceData[] | null>(null);
+  const handleTypedText = useCallback((text: string) => {
+    typedTextRef.current = text;
+    typedOverDiceRef.current = latestDiceRef.current;
+  }, []);
 
   const handleRoll = () => {
     // A tap during the tumble still only lands the dice
-    if (rpgMode && !isRolling && typedTextRef.current.trim()) {
+    if (rpgMode && !isRolling && typedTextRef.current.trim()
+      && typedOverDiceRef.current === diceList) {
       const typed = parseRollNotation(typedTextRef.current);
       if (typed.ok) {
         handleTypedRoll(typed.roll);

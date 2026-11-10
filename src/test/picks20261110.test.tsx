@@ -68,6 +68,50 @@ describe('After you type a roll, the big Roll button rolls it (owner, 2026-11-10
     expect(screen.queryByRole('button', { name: 'Undo' })).toBeNull();
   });
 
+  it('rolls the typed roll once: a second tap, or a hold after it, rolls the dice on the table', () => {
+    vi.useFakeTimers();
+    localStorage.setItem('rpgMode', 'true');
+    oneD4();
+    render(<App />);
+    fireEvent.change(screen.getByRole('textbox', { name: /Type a roll/ }), { target: { value: '2d6' } });
+    fireEvent.click(bigRoll());
+    act(() => { vi.advanceTimersByTime(ROLL_DURATION_MS + 50); });
+    expect(screen.getAllByLabelText(/^d6 showing/)).toHaveLength(2);
+    const ids = () => Array.from(document.querySelectorAll('[data-dice-id]')).map(el => el.getAttribute('data-dice-id')).join();
+    const before = ids();
+    // Hold one of the typed dice, then roll: the held die stays, nothing is swapped
+    fireEvent.click(screen.getAllByRole('button', { name: /^Hold / })[0]);
+    fireEvent.click(bigRoll());
+    act(() => { vi.advanceTimersByTime(ROLL_DURATION_MS + 50); });
+    const history = JSON.parse(localStorage.getItem('rollHistory') ?? '[]');
+    expect(history).toHaveLength(2);
+    expect(history[0].typed).toBeUndefined();
+    expect(before).not.toBe('');
+    expect(ids()).toBe(before);
+    expect(screen.getAllByLabelText(/^d6 showing/)).toHaveLength(2);
+  });
+
+  it('a game loaded after typing is what the big Roll button rolls', () => {
+    vi.useFakeTimers();
+    localStorage.setItem('rpgMode', 'true');
+    oneD4();
+    localStorage.setItem('diceConfigs', JSON.stringify({
+      ...JSON.parse(localStorage.getItem('diceConfigs')!),
+      Fireball: { name: 'Fireball', config: [1, 2, 3].map(n => ({ id: `f${n}`, numberValue: 1, faces: 12, currentFaceIndex: 0, customFaces: [], color: '#ff0000', held: false })) },
+    }));
+    render(<App />);
+    fireEvent.change(screen.getByRole('textbox', { name: /Type a roll/ }), { target: { value: '2d6' } });
+    fireEvent.click(screen.getByRole('button', { name: /^(Open )?menu/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Games/ }));
+    fireEvent.click(screen.getByRole('button', { name: /^(?!Delete).*Fireball/ }));
+    act(() => { vi.advanceTimersByTime(UNDO_WINDOW_MS + 50); });
+    expect(screen.getAllByLabelText(/^d12 showing/)).toHaveLength(3);
+    fireEvent.click(bigRoll());
+    act(() => { vi.advanceTimersByTime(ROLL_DURATION_MS + 50); });
+    expect(screen.getAllByLabelText(/^d12 showing/)).toHaveLength(3);
+    expect(screen.queryAllByLabelText(/^d6 showing/)).toHaveLength(0);
+  });
+
   it("Help's typed-roll line names the big Roll button", () => {
     render(<HelpModal isOpen onClose={() => {}} />);
     expect(screen.getByText(/Type a roll:/).closest('li')).toHaveTextContent(/big Roll button/);
