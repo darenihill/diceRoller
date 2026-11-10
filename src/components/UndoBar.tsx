@@ -12,8 +12,12 @@ import styles from './UndoBar.module.css';
 export const UNDO_TAP_GUARD_MS = 500;
 /** How long after an early press its click still counts as part of it */
 const UNDO_PRESS_CLICK_MS = 1500;
-/** How far a sideways swipe must go to dismiss the bar */
-export const SWIPE_DISMISS_PX = 80;
+/** How far a sideways swipe must go to dismiss the bar (Sitter's distance) */
+export const SWIPE_DISMISS_PX = 96;
+/** A quicker flick than this, in px per ms, dismisses however short (Sitter's speed) */
+export const SWIPE_FLICK_PX_PER_MS = 0.5;
+/** How long the bar takes to slide off before it goes */
+export const SWIPE_EXIT_MS = 200;
 
 interface UndoBarProps {
   offer: UndoOffer;
@@ -77,29 +81,37 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
     if (swallow) return;
     act();
   };
-  // A sideways swipe dismisses the bar, like × (owner, 2026-11-10). The bar
-  // follows the finger; past SWIPE_DISMISS_PX it slides away, short of it it
-  // springs back. Taps on Undo and × still work as before.
-  const swipe = React.useRef<{ x: number; y: number; id: number; on: boolean } | null>(null);
+  // A sideways swipe dismisses the bar, like × (owner, 2026-11-10), and works
+  // as Sitter's does: the bar follows the finger and fades; past
+  // SWIPE_DISMISS_PX, or on a quick flick, it slides off the screen and goes;
+  // short of that it springs back. Taps on Undo and × still work as before.
+  const swipe = React.useRef<{ x: number; y: number; id: number; on: boolean; lastX: number; lastT: number; v: number } | null>(null);
   // The drag belongs to one offer, so a new offer starts with the bar in place
-  const [drag, setDrag] = React.useState({ key: offer.key, dx: 0 });
+  const [drag, setDrag] = React.useState({ key: offer.key, dx: 0, live: false });
   const dx = drag.key === offer.key ? drag.dx : 0;
-  const setDx = (n: number) => setDrag({ key: offer.key, dx: n });
+  const live = drag.key === offer.key && drag.live;
   const swiped = React.useRef(false);
   const endSwipe = (dismiss: boolean) => {
     const was = swipe.current?.on;
     swipe.current = null;
     if (was) swiped.current = true;
-    if (was && dismiss) { onDismiss(); return; }
-    setDx(0);
+    if (was && dismiss) {
+      const reduced = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduced) { onDismiss(); return; }
+      // Slide the rest of the way off the side it was swiped to, then go
+      setDrag({ key: offer.key, dx: Math.sign(dx || 1) * window.innerWidth, live: false });
+      window.setTimeout(onDismiss, SWIPE_EXIT_MS);
+      return;
+    }
+    setDrag({ key: offer.key, dx: 0, live: false });
   };
   return (
   <div
-    className={`${styles.bar} ${dx ? styles.swiping : ''} ${className ?? ''}`}
+    className={`${styles.bar} ${live ? styles.swiping : ''} ${className ?? ''}`}
     role="status"
     data-testid="undo-bar"
-    style={dx ? { translate: `${dx}px 0`, opacity: Math.max(0.3, 1 - Math.abs(dx) / 240) } : undefined}
-    onPointerDown={(e) => { onPress(); onPause(); swiped.current = false; swipe.current = { x: e.clientX, y: e.clientY, id: e.pointerId, on: false }; }}
+    style={dx ? { translate: `${dx}px 0`, opacity: live ? Math.max(0.3, 1 - Math.abs(dx) / 240) : 0 } : undefined}
+    onPointerDown={(e) => { onPress(); onPause(); swiped.current = false; swipe.current = { x: e.clientX, y: e.clientY, id: e.pointerId, on: false, lastX: e.clientX, lastT: Date.now(), v: 0 }; }}
     onPointerMove={(e) => {
       const s = swipe.current;
       if (!s || s.id !== e.pointerId) return;
@@ -110,11 +122,18 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
         s.on = true;
         e.currentTarget.setPointerCapture?.(e.pointerId);
       }
-      setDx(mx);
+      // Speed over the latest move, so a flick counts even if it is short
+      const now = Date.now();
+      s.v = (e.clientX - s.lastX) / Math.max(1, now - s.lastT);
+      s.lastX = e.clientX;
+      s.lastT = now;
+      setDrag({ key: offer.key, dx: mx, live: true });
     }}
     onPointerUp={(e) => {
       const s = swipe.current;
-      if (s?.on) endSwipe(Math.abs(e.clientX - s.x) >= SWIPE_DISMISS_PX);
+      // A finger that stopped before lifting is not a flick
+      if (s && Date.now() - s.lastT > 100) s.v = 0;
+      if (s?.on) endSwipe(Math.abs(e.clientX - s.x) >= SWIPE_DISMISS_PX || Math.abs(s.v) > SWIPE_FLICK_PX_PER_MS);
       swipe.current = null;
       if (!e.currentTarget.contains(document.activeElement)) onResume();
     }}

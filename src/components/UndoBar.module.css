@@ -9,7 +9,13 @@
   white-space: nowrap;
   /* Up and down still scroll the page; sideways is the bar's swipe */
   touch-action: pan-y;
-  transition: translate 160ms ease-out, opacity 160ms ease-out;
+  transition: translate 200ms ease-out, opacity 200ms ease-out;
+  /* Sitter's bar: a quiet raised surface, so the filled Undo is what stands
+     out (owner, 2026-11-10: "see how undo works for sitter") */
+  background-color: var(--md-sys-color-surface-variant);
+  color: var(--md-sys-color-on-surface);
+  border-radius: 12px;
+  font-weight: 500;
 }
 
 /* While a finger drags it, the bar follows with no lag */
@@ -29,6 +35,7 @@
 
 .message {
   min-width: 0;
+  color: var(--md-sys-color-on-surface-variant);
   /* Up to two lines, so a typed roll's "Rolled 1d20+2d6+3" says what happened
      in full (app standard 4, review 2026-11-06); longer still ends in … */
   white-space: normal;
@@ -51,9 +58,9 @@
   padding: 0 16px 0 14px;
   border: none;
   border-radius: 999px;
-  /* Filled, the reverse of the bar: the bar's text colour as the fill */
-  background-color: var(--md-sys-color-on-primary);
-  color: var(--md-sys-color-primary);
+  /* Filled in the app's main colour, as Sitter's Undo is */
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -62,7 +69,7 @@
 }
 
 .undo:focus-visible {
-  outline: 2px solid currentColor;
+  outline: 2px solid var(--md-sys-color-primary);
   outline-offset: 2px;
 }
 
@@ -81,7 +88,7 @@
 
 .ringLine {
   fill: none;
-  stroke: var(--md-sys-color-on-primary);
+  stroke: var(--md-sys-color-primary);
   stroke-width: var(--line);
   stroke-linecap: round;
   /* The path starts at the top middle; one dash as long as the whole line,
@@ -108,7 +115,7 @@
   border: none;
   border-radius: 999px;
   background: transparent;
-  color: inherit;
+  color: var(--md-sys-color-on-surface-variant);
   cursor: pointer;
 }
 

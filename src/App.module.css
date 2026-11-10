@@ -406,7 +406,9 @@
   align-self: flex-start;
 }
 
-.topRoll > * {
+/* Doubled class: wins over the box's own top margin, so the box lines up
+   with the name (owner, 2026-11-10: "vertically align with the title") */
+.topRoll.topRoll > * {
   margin: 0;
   max-width: none;
 }

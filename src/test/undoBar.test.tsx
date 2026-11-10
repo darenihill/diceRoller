@@ -1,8 +1,8 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, createEvent } from '@testing-library/react';
+import { render, screen, fireEvent, createEvent, act } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
-import { UndoBar } from '../components/UndoBar';
+import { UndoBar, SWIPE_EXIT_MS } from '../components/UndoBar';
 
 const offer = (big = false) => ({ message: 'Removed d20', undo: () => {}, back: 'd20 is back', big, key: 1 });
 const props = { windowMs: 7000, paused: false, onUndo: () => {}, onDismiss: () => {}, onPause: () => {}, onResume: () => {} };
@@ -31,19 +31,45 @@ describe('The Undo bar follows the standard', () => {
     expect(screen.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
   });
 
-  it('a sideways swipe past the line dismisses; a short one springs back (owner, 2026-11-10)', () => {
+  it('a sideways swipe past the line slides off and dismisses; a short slow one springs back (owner, 2026-11-10, like Sitter)', () => {
+    vi.useFakeTimers();
     const onDismiss = vi.fn();
     render(<UndoBar offer={offer()} {...props} onDismiss={onDismiss} />);
     const bar = screen.getByTestId('undo-bar');
     ptr('pointerDown', bar, 100, 10, 1);
+    act(() => { vi.advanceTimersByTime(300); });
     ptr('pointerMove', bar, 140, 12, 1);
+    act(() => { vi.advanceTimersByTime(200); });
     ptr('pointerUp', bar, 140, 12, 1);
     expect(onDismiss).not.toHaveBeenCalled();
     expect(bar.style.translate).toBe('');
     ptr('pointerDown', bar, 100, 10, 2);
+    act(() => { vi.advanceTimersByTime(300); });
     ptr('pointerMove', bar, 220, 14, 2);
+    act(() => { vi.advanceTimersByTime(30); });
     ptr('pointerUp', bar, 220, 14, 2);
+    // It slides the rest of the way off first, then goes
+    expect(onDismiss).not.toHaveBeenCalled();
+    expect(bar.style.translate).not.toBe('');
+    act(() => { vi.advanceTimersByTime(SWIPE_EXIT_MS); });
     expect(onDismiss).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
+  });
+
+  it('a quick flick dismisses even when short, as on Sitter', () => {
+    vi.useFakeTimers();
+    const onDismiss = vi.fn();
+    render(<UndoBar offer={offer()} {...props} onDismiss={onDismiss} />);
+    const bar = screen.getByTestId('undo-bar');
+    ptr('pointerDown', bar, 100, 10, 1);
+    act(() => { vi.advanceTimersByTime(16); });
+    ptr('pointerMove', bar, 115, 10, 1);
+    act(() => { vi.advanceTimersByTime(16); });
+    ptr('pointerMove', bar, 150, 10, 1);
+    ptr('pointerUp', bar, 150, 10, 1);
+    act(() => { vi.advanceTimersByTime(SWIPE_EXIT_MS); });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
   });
 
   it('an up-and-down drag is a scroll, not a swipe', () => {
@@ -74,7 +100,10 @@ describe('The Undo bar follows the standard', () => {
     expect(css).toMatch(/to\s*{\s*stroke-dashoffset:\s*-1px;\s*}/);
     expect(css).toMatch(/--line:\s*2px/);
     expect(css).toMatch(/@media \(min-width: 769px\)\s*{\s*\.undo\s*{\s*--line:\s*3px/);
-    expect(css).toMatch(/stroke:\s*var\(--md-sys-color-on-primary\)/);
+    expect(css).toMatch(/stroke:\s*var\(--md-sys-color-primary\)/);
+    // Sitter's look: a quiet surface bar, the Undo filled in the main colour
+    expect(css).toMatch(/background-color:\s*var\(--md-sys-color-surface-variant\)/);
+    expect(css).toMatch(/background-color:\s*var\(--md-sys-color-primary\);\s*color:\s*var\(--md-sys-color-on-primary\)/);
     // Hugs the pill's outside edge (owner, 2026-11-10)
     expect(readFileSync('src/components/UndoBar.tsx', 'utf8')).toMatch(/const i = -\(lw \/ 2 \+ 2\);/);
   });
