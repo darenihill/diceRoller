@@ -1,4 +1,4 @@
-Next: Dice Roller release PR (Dice Roller 96, Daren merges) now also holds the second 2026-11-09 review's fixes (a double tap on Remove keeps its Undo, two games deleted in a row both come back, Undo after removing a picture); next is Recently deleted, with picture clean-up and Erase everything as Desk ideas.
+Next: Dice Roller release PR (Daren merges) now also holds the 2026-11-10 review fixes (Enter in Save no longer opens the menu, the Undo bar sits under an open dialog, die settings tabs wrap at large text, share-link names can't hide a popular game's name); next is Recently deleted, with picture clean-up and Erase everything as Desk ideas.
 
 # State
 
@@ -25,3 +25,4 @@ Next: Dice Roller release PR (Dice Roller 96, Daren merges) now also holds the s
 - 2026-11-08: History shows each roll as small dice (Dispatch-Item custom-dice-roller/ask-2026-11-08-build-owner-2026-0bc531).
 - 2026-11-09: stories, laws of UX and privacy review; metrics off fetches nothing from Google and clears its cookies, a backup can't turn metrics on, focus returns to the menu button (Dispatch-Item custom-dice-roller/lens-stories+laws-of-ux+privacy-42).
 - 2026-11-09: stories, impaired, cognitive walk and top apps review; a double tap can't throw away Undo, games and dice removed in a row come back together, Remove picture has Undo (Dispatch-Item custom-dice-roller/lens-stories+impaired+cognitive-walk-45).
+- 2026-11-10: stories, security and privacy review; Enter in Save keeps the menu shut, the Undo bar moves under an open dialog, die settings tabs wrap at large text, share-link names checked as they read (Dispatch-Item custom-dice-roller/lens-stories+security+privacy-48).

@@ -456,7 +456,12 @@
   color: var(--md-sys-color-on-surface-variant);
   font-size: 0.9375rem;
   font-weight: 600;
-  white-space: nowrap;
+  /* One line when there is room; with a larger text size the two words wrap
+     instead of running into each other and under × (review 2026-11-10) */
+  white-space: normal;
+  line-height: 1.15;
+  overflow-wrap: break-word;
+  hyphens: auto;
   cursor: pointer;
 }
 

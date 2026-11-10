@@ -907,6 +907,9 @@ function App() {
   // Every dialog, sheet or menu counts, not only the named modals: Dice
   // settings, Save and the share fallback have their own open state.
   const overlayOpen = modalOpen !== null || menuOpen || savePromptOpen || editingDiceId !== null || shareFallbackUrl !== null;
+  // Where the bottom bar sits: under an open dialog, else just above the buttons
+  const dialogOpen = modalOpen !== null || savePromptOpen || editingDiceId !== null || shareFallbackUrl !== null;
+  const toastPlace = dialogOpen ? styles.toastBelowDialog : chipRow ? styles.toastAboveRpgBar : '';
   const handleRollRef = useRef(handleRoll);
   const overlayOpenRef = useRef(overlayOpen);
   useEffect(() => {
@@ -1224,9 +1227,12 @@ function App() {
         onClose={() => setModalOpen(null)}
       />
 
-      {/* Toast Notification */}
+      {/* Toast Notification. With a dialog open the bar sits at the screen's
+          bottom edge, under the dialog: above the Roll buttons it covered the
+          dialog's own Done, so a tap on Done after removing a face pressed
+          Undo instead (review 2026-11-10) */}
       {storageFull ? (
-        <div className={`${styles.toast} ${styles.undoToast} ${styles.storageToast} ${chipRow ? styles.toastAboveRpgBar : ''}`} role="alert">
+        <div className={`${styles.toast} ${styles.undoToast} ${styles.storageToast} ${toastPlace}`} role="alert">
           <span>Storage is full, so your last change wasn't saved.</span>
           <button className={styles.undoButton} onClick={() => { setStorageFull(false); handleExportData(); }}>Export backup</button>
           <button className={styles.undoButton} onClick={() => setStorageFull(false)} aria-label="Close storage message" style={{ minWidth: 44 }}>✕</button>
@@ -1240,16 +1246,16 @@ function App() {
           onDismiss={dismissUndo}
           onPause={pauseUndo}
           onResume={resumeUndo}
-          className={`${styles.toast} ${chipRow ? styles.toastAboveRpgBar : ''}`}
+          className={`${styles.toast} ${toastPlace}`}
         />
       ) : toast ? (
         // role="status" so a screen reader hears "Saved" and the rest, as it does the Undo offer
-        <div className={`${styles.toast} ${chipRow ? styles.toastAboveRpgBar : ''}`} role="status">
+        <div className={`${styles.toast} ${toastPlace}`} role="status">
           {toast}
         </div>
       ) : newVersion.ready && (
         // An app left open hears about a new version; Refresh loads it (owner's pick, 2026-11-03)
-        <div className={`${styles.toast} ${styles.undoToast} ${chipRow ? styles.toastAboveRpgBar : ''}`} role="status" data-testid="new-version-bar">
+        <div className={`${styles.toast} ${styles.undoToast} ${toastPlace}`} role="status" data-testid="new-version-bar">
           <span style={{ flexShrink: 0 }}>New version</span>
           <button className={styles.undoButton} onClick={() => window.location.reload()}>Refresh</button>
           <button className={styles.undoButton} onClick={newVersion.later} aria-label="Later" title="Later" style={{ minWidth: 44 }}>✕</button>

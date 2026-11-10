@@ -5,6 +5,26 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-10~~ Enter in Save no longer opens the menu (stories
+  review, standard 20). Done when: pressing Enter (or a phone keyboard's Done)
+  in Save's name box saves the game and the menu stays shut; with a taken name
+  Enter still only puts the keyboard away (src/test/review20261110.test.tsx).
+- ~~Done 2026-11-10~~ The Undo bar never covers a dialog's buttons (stories
+  review, standard 2). Done when: with a dialog open (Die settings, Games,
+  History, Save) the bar and messages sit at the screen's bottom edge, under
+  the dialog, so Done after removing a face closes the dialog instead of
+  pressing Undo; with no dialog open the bar stays just above the buttons
+  (src/test/review20261110.test.tsx).
+- ~~Done 2026-11-10~~ Die settings tabs fit at a large text size (stories
+  review, standard 9). Done when: at 150% and 200% text size "Die Settings"
+  and "Custom Faces" wrap onto two lines instead of running into each other
+  and under ×; at normal size they look the same as before
+  (src/test/review20261110.test.tsx).
+- ~~Done 2026-11-10~~ A share link can't dress other dice up as a popular game
+  (security review). Done when: a link named "Catan" with a hidden character,
+  wide letters or an extra space, and other dice, opens with no name, and
+  direction marks are taken out of link names; Catan's own dice and ordinary
+  names still keep theirs (src/test/review20261110.test.tsx).
 - ~~Done 2026-11-09~~ A double tap on Remove keeps its Undo (impaired and
   stories review, standard 2). Done when: a tap on the Undo bar's × or Undo
   that starts within half a second of the bar showing does nothing, so the

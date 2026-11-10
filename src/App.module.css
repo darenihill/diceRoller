@@ -210,6 +210,13 @@
   bottom: calc(162px + env(safe-area-inset-bottom, 0px));
 }
 
+/* A dialog is open: the bar goes to the screen's bottom edge, below the dialog
+   (at most 80% of the screen tall, centred), so it never covers the dialog's
+   Done, Copy or Remove (review 2026-11-10) */
+.toastBelowDialog {
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+}
+
 /* On a phone the menu button sits above the lock on the left, so the bar
    lines up with Roll on the right and stays clear of the menu */
 @media (max-width: 468px) {
