@@ -5,6 +5,17 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-10~~ Safety net: the site refuses code from anywhere except
+  itself and Google (Daren 2026-11-10, Build). Done when: the home page and
+  the four search pages carry a Content-Security-Policy meta, written by npm
+  run landing, that allows scripts only from the site, Google Tag Manager and
+  the two inline scripts' sha256 hashes (no 'unsafe-inline' for scripts),
+  images from the site, data:, blob: and Google Analytics, data only to the
+  site and Google Analytics, and workers and the manifest only from the site;
+  a Playwright walk of the built site (roll, die settings with a picture,
+  share link, History, Customize with metrics on and off, RPG mode with a
+  natural 20, the four search pages) logs no policy violation
+  (src/test/picks20261110.test.tsx).
 - ~~Done 2026-11-10~~ With metrics off, the app no longer contacts Google for
   its font (Daren 2026-11-10, Build). Done when: Roboto 400, 500 and 700 come
   from the site (public/fonts/, @font-face with font-display: swap), the home

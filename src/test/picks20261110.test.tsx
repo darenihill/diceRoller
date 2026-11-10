@@ -256,3 +256,44 @@ describe('With metrics off, the app no longer contacts Google for its font (owne
     return installing!.then(() => expect(added).toContain('/fonts/roboto-latin.woff2'));
   });
 });
+
+describe('Safety net: the site refuses code from anywhere except itself and Google (owner, 2026-11-10)', () => {
+  const root = path.resolve(__dirname, '../..');
+  const read = (f: string) => fs.readFileSync(path.join(root, f), 'utf-8');
+  const pages = ['index.html', 'dnd-dice-roller/index.html', 'd20-roller/index.html', 'catan-dice-roller/index.html', 'classroom-dice-roller/index.html'];
+  const policyOf = (html: string) => {
+    const m = html.match(/<meta http-equiv="Content-Security-Policy" content="([^"]+)" \/>/);
+    expect(m).not.toBeNull();
+    return Object.fromEntries(m![1].split(/;\s*/).map(d => { const [name, ...values] = d.trim().split(/\s+/); return [name, values]; }));
+  };
+
+  it.each(pages)('%s carries the policy before any script, and every inline script is allowed by its hash', async (page) => {
+    const html = read(page);
+    const { inlineScriptHashes, withCsp } = await import('../../scripts/landing-pages.mjs');
+    expect(html.indexOf('Content-Security-Policy')).toBeLessThan(html.indexOf('<script'));
+    // Up to date with the inline scripts (run npm run landing after editing one)
+    expect(withCsp(html)).toBe(html);
+    const p = policyOf(html);
+    const hashes = inlineScriptHashes(html);
+    expect(hashes).toHaveLength(2); // Google Analytics' start and the service worker sign-up
+    expect(p['script-src']).toEqual(["'self'", ...hashes, 'https://www.googletagmanager.com']);
+    expect(p['script-src']).not.toContain("'unsafe-inline'");
+    expect(p['script-src']).not.toContain("'unsafe-eval'");
+    expect(p['default-src']).toEqual(["'self'"]);
+    expect(p['img-src']).toEqual(expect.arrayContaining(["'self'", 'data:', 'blob:', 'https://*.google-analytics.com', 'https://*.googletagmanager.com']));
+    expect(p['connect-src']).toEqual(expect.arrayContaining(["'self'", 'https://*.google-analytics.com', 'https://*.analytics.google.com', 'https://*.googletagmanager.com']));
+    expect(p['worker-src']).toEqual(["'self'"]);
+    expect(p['manifest-src']).toEqual(["'self'"]);
+    expect(p['font-src']).toEqual(["'self'"]);
+    expect(p['object-src']).toEqual(["'none'"]);
+    // A meta policy ignores frame-ancestors, so it isn't claimed
+    expect(p['frame-ancestors']).toBeUndefined();
+    // Nothing else that runs: no inline event handlers
+    expect(html).not.toMatch(/\son[a-z]+="/);
+  });
+
+  it('natural 20 confetti draws on the page, not in a blob: worker the policy refuses', () => {
+    const src = fs.readFileSync(path.join(root, 'src/utils/confetti.ts'), 'utf-8');
+    expect(src).toMatch(/confetti\.create\(undefined, \{[^}]*useWorker: false/);
+  });
+});

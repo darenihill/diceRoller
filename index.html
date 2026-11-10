@@ -2,6 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- Where the page may load code, styles, pictures and data from: this site
+         and Google Analytics only. Written by `npm run landing`
+         (scripts/landing-pages.mjs), which works out the inline scripts' hashes. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-mTGKGNn1vHOTv9HwVt/LjOvm/eBZp469GxUBH4DdAow=' 'sha256-cLKsSHPxvh60O810I3qnaje95aabiHTcjGbQnEHrCt8=' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; font-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#121212" />
