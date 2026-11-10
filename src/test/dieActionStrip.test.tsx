@@ -48,11 +48,16 @@ describe('Where and when the strip shows (owner, 2026-11-10)', () => {
     expect(COMPACT_DIE_SIZE).toBe(120);
   });
 
-  it('always opens in one spot above the bottom bar, never jumping to the top', async () => {
+  it('always comes up from the bottom edge over the Roll button, never jumping to the top', async () => {
     const { readFileSync } = await import('node:fs');
     const css = readFileSync('src/components/DieActionStrip.module.css', 'utf8');
     expect(css).not.toMatch(/\.strip\.top/);
     expect(css).not.toMatch(/\btop:/);
+    // A sheet from the bottom edge, over the Roll button, with a handle (owner, 2026-11-10)
+    expect(css).toMatch(/\.strip {[^}]*bottom: 0;[^}]*z-index: 101;/);
+    expect(css).toMatch(/\.strip::before/);
+    // No 5-second timer for the sheet: it stays until you tap away
+    expect(readFileSync('src/App.tsx', 'utf8')).toMatch(/const timer = compactDieActions \? undefined : setTimeout/);
     render(<DieActionStrip die={die} rpgMode={false} onToggleHold={vi.fn()} onClone={vi.fn()} onOpenSettings={vi.fn()} onRemove={vi.fn()} />);
     expect(screen.getByRole('group', { name: 'Actions for d6' }).className).not.toMatch(/top/);
   });

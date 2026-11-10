@@ -279,30 +279,6 @@ function App() {
   // Each tap in the die's button strip restarts the timer below, so it doesn't close mid-use
   const [stripTouch, setStripTouch] = useState(0);
 
-  // Auto-deselect active die on mobile after 5 seconds
-  useEffect(() => {
-    if (!revealedDiceId) return;
-
-    const timer = setTimeout(() => {
-      setRevealedDiceId(null);
-    }, 5000);
-
-    const handleOutsideClick = (e: PointerEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.closest('[data-dice-id], [data-die-actions]')) {
-        return;
-      }
-      setRevealedDiceId(null);
-    };
-
-    document.addEventListener('pointerdown', handleOutsideClick);
-
-    return () => {
-      clearTimeout(timer);
-      document.removeEventListener('pointerdown', handleOutsideClick);
-    };
-  }, [revealedDiceId, stripTouch]);
-
   // Load shared config from URL, default set, or autosave on mount & record session telemetry
   useEffect(() => {
     recordSessionStart();
@@ -505,6 +481,33 @@ function App() {
   // Below this size the buttons round a tapped die get too small, so they move to one strip (owner, 2026-10-28)
   const compactDieActions = diceList.length > 0 && containerSize.width > 0 && optimalSize < COMPACT_DIE_SIZE;
   const revealedDie = compactDieActions ? diceList.find(d => d.id === revealedDiceId) : undefined;
+
+  // Auto-deselect active die on mobile after 5 seconds. With many small dice
+  // the buttons come up in a sheet that stays until you tap away (owner,
+  // 2026-11-10), so it has no timer.
+  useEffect(() => {
+    if (!revealedDiceId) return;
+
+    const timer = compactDieActions ? undefined : setTimeout(() => {
+      setRevealedDiceId(null);
+    }, 5000);
+
+    const handleOutsideClick = (e: PointerEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('[data-dice-id], [data-die-actions]')) {
+        return;
+      }
+      setRevealedDiceId(null);
+    };
+
+    document.addEventListener('pointerdown', handleOutsideClick);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('pointerdown', handleOutsideClick);
+    };
+  }, [revealedDiceId, stripTouch, compactDieActions]);
+
 
   const diceStyles = {
     '--dice-size': `${optimalSize}px`,

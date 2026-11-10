@@ -6,6 +6,7 @@ import styles from './DieActionStrip.module.css';
 
 interface DieActionStripProps {
   die: DiceData;
+  /** A row of chips sits above Roll: the sheet grows to cover it */
   rpgMode: boolean;
   onRollOne?: (id: string) => void;
   onToggleHold: (id: string) => void;
