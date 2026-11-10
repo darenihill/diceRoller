@@ -39,7 +39,7 @@ describe('The Undo bar follows the standard', () => {
     ptr('pointerMove', bar, 140, 12, 1);
     ptr('pointerUp', bar, 140, 12, 1);
     expect(onDismiss).not.toHaveBeenCalled();
-    expect(bar.style.transform).toBe('');
+    expect(bar.style.translate).toBe('');
     ptr('pointerDown', bar, 100, 10, 2);
     ptr('pointerMove', bar, 220, 14, 2);
     ptr('pointerUp', bar, 220, 14, 2);

@@ -98,7 +98,7 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
     className={`${styles.bar} ${dx ? styles.swiping : ''} ${className ?? ''}`}
     role="status"
     data-testid="undo-bar"
-    style={dx ? { transform: `translateX(${dx}px)`, opacity: Math.max(0.3, 1 - Math.abs(dx) / 240) } : undefined}
+    style={dx ? { translate: `${dx}px 0`, opacity: Math.max(0.3, 1 - Math.abs(dx) / 240) } : undefined}
     onPointerDown={(e) => { onPress(); onPause(); swiped.current = false; swipe.current = { x: e.clientX, y: e.clientY, id: e.pointerId, on: false }; }}
     onPointerMove={(e) => {
       const s = swipe.current;
@@ -114,7 +114,7 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
     }}
     onPointerUp={(e) => {
       const s = swipe.current;
-      if (s?.on) { endSwipe(Math.abs(e.clientX - s.x) >= SWIPE_DISMISS_PX); return; }
+      if (s?.on) endSwipe(Math.abs(e.clientX - s.x) >= SWIPE_DISMISS_PX);
       swipe.current = null;
       if (!e.currentTarget.contains(document.activeElement)) onResume();
     }}

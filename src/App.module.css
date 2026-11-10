@@ -412,11 +412,13 @@
 }
 
 /* A phone: the box shares the top line with the name and About, taking the
-   room left after them (owner, 2026-11-10: move it up to the top line) */
+   room left after them (owner, 2026-11-10: move it up to the top line). It
+   never gets narrower than 160px: with a game's name or the table switch up
+   there too, it wraps to a line of its own instead */
 @media (max-width: 600px) {
   .topRoll {
     order: 10;
-    flex: 1 1 0;
+    flex: 1 1 160px;
     max-width: none;
   }
 }
