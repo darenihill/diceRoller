@@ -91,6 +91,11 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
   const dx = drag.key === offer.key ? drag.dx : 0;
   const live = drag.key === offer.key && drag.live;
   const swiped = React.useRef(false);
+  // The slide-off belongs to this offer: a newer one (the key changes, even
+  // when removes join up) or the bar going away cancels it, so it can never
+  // dismiss an Undo it didn't slide (second read, 2026-11-10)
+  const exitTimer = React.useRef<number | undefined>(undefined);
+  React.useEffect(() => () => window.clearTimeout(exitTimer.current), [offer.key]);
   const endSwipe = (dismiss: boolean) => {
     const was = swipe.current?.on;
     swipe.current = null;
@@ -100,7 +105,7 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
       if (reduced) { onDismiss(); return; }
       // Slide the rest of the way off the side it was swiped to, then go
       setDrag({ key: offer.key, dx: Math.sign(dx || 1) * window.innerWidth, live: false });
-      window.setTimeout(onDismiss, SWIPE_EXIT_MS);
+      exitTimer.current = window.setTimeout(onDismiss, SWIPE_EXIT_MS);
       return;
     }
     setDrag({ key: offer.key, dx: 0, live: false });
@@ -122,9 +127,11 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
         s.on = true;
         e.currentTarget.setPointerCapture?.(e.pointerId);
       }
-      // Speed over the latest move, so a flick counts even if it is short
+      // Speed over the latest moves, smoothed so one jittery frame isn't a
+      // flick, and a quick flick counts even if it is short
       const now = Date.now();
-      s.v = (e.clientX - s.lastX) / Math.max(1, now - s.lastT);
+      const step = (e.clientX - s.lastX) / Math.max(8, now - s.lastT);
+      s.v = 0.6 * step + 0.4 * s.v;
       s.lastX = e.clientX;
       s.lastT = now;
       setDrag({ key: offer.key, dx: mx, live: true });

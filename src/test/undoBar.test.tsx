@@ -56,6 +56,38 @@ describe('The Undo bar follows the standard', () => {
     vi.useRealTimers();
   });
 
+  it('a new Undo that shows while the old one slides off is not dismissed by it', () => {
+    vi.useFakeTimers();
+    const onDismiss = vi.fn();
+    const { rerender } = render(<UndoBar offer={offer()} {...props} onDismiss={onDismiss} />);
+    const bar = screen.getByTestId('undo-bar');
+    ptr('pointerDown', bar, 100, 10, 1);
+    act(() => { vi.advanceTimersByTime(300); });
+    ptr('pointerMove', bar, 220, 10, 1);
+    act(() => { vi.advanceTimersByTime(30); });
+    ptr('pointerUp', bar, 220, 10, 1);
+    rerender(<UndoBar offer={{ ...offer(), message: 'Removed d6', key: 2 }} {...props} onDismiss={onDismiss} />);
+    act(() => { vi.advanceTimersByTime(SWIPE_EXIT_MS * 2); });
+    expect(onDismiss).not.toHaveBeenCalled();
+    expect(screen.getByTestId('undo-bar').style.translate).toBe('');
+    vi.useRealTimers();
+  });
+
+  it('one jittery frame in a slow drag is not a flick', () => {
+    vi.useFakeTimers();
+    const onDismiss = vi.fn();
+    render(<UndoBar offer={offer()} {...props} onDismiss={onDismiss} />);
+    const bar = screen.getByTestId('undo-bar');
+    ptr('pointerDown', bar, 100, 10, 1);
+    act(() => { vi.advanceTimersByTime(200); });
+    ptr('pointerMove', bar, 120, 10, 1);
+    ptr('pointerMove', bar, 124, 10, 1);
+    ptr('pointerUp', bar, 124, 10, 1);
+    act(() => { vi.advanceTimersByTime(SWIPE_EXIT_MS); });
+    expect(onDismiss).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
   it('a quick flick dismisses even when short, as on Sitter', () => {
     vi.useFakeTimers();
     const onDismiss = vi.fn();
