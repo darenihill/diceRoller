@@ -5,6 +5,12 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-10~~ After you type a roll, the big Roll button rolls it
+  (Daren 2026-11-10, Build). Done when: in RPG mode, with a roll that reads in
+  the roll box, the big Roll button rolls it exactly as the box's own Roll
+  does (its dice swap in, with Undo); with the box empty or holding a roll
+  that doesn't read, Roll works as before; Help's typed-roll line names the
+  big Roll button (src/test/picks20261110.test.tsx).
 - ~~Done 2026-11-09~~ A double tap on Remove keeps its Undo (impaired and
   stories review, standard 2). Done when: a tap on the Undo bar's × or Undo
   that starts within half a second of the bar showing does nothing, so the

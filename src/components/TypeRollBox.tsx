@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { parseRollNotation, type TypedRoll } from '../utils/rollNotation';
 import { MAX_ROLL_NAME, type SavedRoll } from '../utils/savedRolls';
@@ -13,10 +13,12 @@ interface TypeRollBoxProps {
   onRemoveSavedRoll?: (name: string) => void;
   /** A roll put back from History; a new `n` fills the box again */
   prefill?: { text: string; n: number };
+  /** Hears what the box holds, so the big Roll button can roll it too */
+  onTextChange?: (text: string) => void;
 }
 
 /** RPG mode: type 2d6+3, d20 adv or 1d8+2d6 and roll it in one go. */
-export const TypeRollBox = ({ onRoll, disabled = false, savedRolls = [], onSaveRoll, onRemoveSavedRoll, prefill }: TypeRollBoxProps) => {
+export const TypeRollBox = ({ onRoll, disabled = false, savedRolls = [], onSaveRoll, onRemoveSavedRoll, prefill, onTextChange }: TypeRollBoxProps) => {
   const [text, setText] = useState('');
   // A roll tapped in History lands in the box, ready to roll
   const [filledN, setFilledN] = useState<number | undefined>();
@@ -25,6 +27,7 @@ export const TypeRollBox = ({ onRoll, disabled = false, savedRolls = [], onSaveR
     setText(prefill.text);
   }
   const [note, setNote] = useState<string | null>(null);
+  useEffect(() => { onTextChange?.(text); }, [text, onTextChange]);
   // The roll being named, once Save this roll is tapped
   const [naming, setNaming] = useState<TypedRoll | null>(null);
   const [name, setName] = useState('');

@@ -8,7 +8,7 @@ import { Dice, type GlideOrigin } from './components/Dice';
 import { ActionBar } from './components/ActionBar';
 import { TypeRollBox } from './components/TypeRollBox';
 import { loadSavedRolls, withSavedRoll, SAVED_ROLLS_KEY, MAX_SAVED_ROLLS, type SavedRoll } from './utils/savedRolls';
-import { TYPED_DIE_COLOR, type TypedRoll } from './utils/rollNotation';
+import { TYPED_DIE_COLOR, parseRollNotation, type TypedRoll } from './utils/rollNotation';
 import { SidebarMenu } from './components/SidebarMenu';
 import { DiceSettingsModal } from './components/DiceSettingsModal';
 import { generateId, calculateGridDimensions, scaleGridDimensions, sanitizeDiceScale, sanitizeDiceList, withoutFaceImages, parseFaceContent, faceScores } from './utils/diceUtils';
@@ -873,7 +873,20 @@ function App() {
     setTelemetryEnabled(nextState);
   };
 
+  // What the roll box holds: with a roll that reads, the big Roll button rolls
+  // it, exactly as the box's own button does (owner, 2026-11-10)
+  const typedTextRef = useRef('');
+  const handleTypedText = useCallback((text: string) => { typedTextRef.current = text; }, []);
+
   const handleRoll = () => {
+    // A tap during the tumble still only lands the dice
+    if (rpgMode && !isRolling && typedTextRef.current.trim()) {
+      const typed = parseRollNotation(typedTextRef.current);
+      if (typed.ok) {
+        handleTypedRoll(typed.roll);
+        return;
+      }
+    }
     const hasUnheldDice = diceList.some(d => !d.held);
     // Every die held: nothing would change, so say why instead of logging a
     // repeat of the last roll
@@ -973,6 +986,7 @@ function App() {
               onSaveRoll={handleSaveRoll}
               onRemoveSavedRoll={handleRemoveSavedRoll}
               prefill={rollPrefill}
+              onTextChange={handleTypedText}
             />
           </div>
         )}

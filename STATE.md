@@ -1,4 +1,4 @@
-Next: Dice Roller release PR (Dice Roller 96, Daren merges) now also holds the second 2026-11-09 review's fixes (a double tap on Remove keeps its Undo, two games deleted in a row both come back, Undo after removing a picture); next is Recently deleted, with picture clean-up and Erase everything as Desk ideas.
+Next: Dice Roller builds of 2026-11-10 are on their own branch for the release (the big Roll button rolls a typed roll so far); next is Recently deleted, with Erase everything as a Desk idea.
 
 # State
 
