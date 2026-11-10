@@ -785,9 +785,15 @@ function App() {
     reader.readAsText(file);
   };
 
+  // The roll box's text, and the dice it was typed over (see handleRoll)
+  const typedTextRef = useRef('');
+  const typedOverDiceRef = useRef<DiceData[] | null>(null);
   // A typed roll swaps in its own dice, modifier and advantage and rolls them;
   // Undo puts back the dice and settings that were out before
   const handleTypedRoll = (roll: TypedRoll) => {
+    // A typed roll runs once per edit of the box: after Undo the big Roll
+    // button rolls the dice that came back
+    typedOverDiceRef.current = null;
     const before = { dice: diceList, modifier, advantage: rollAdvantage };
     const dice = roll.groups.flatMap(g => Array.from({ length: g.count }, () => ({
       id: generateId(),
@@ -896,8 +902,6 @@ function App() {
   // it, exactly as the box's own button does (owner, 2026-11-10). Only while
   // the dice are as they were when it was typed: once it has been rolled, or
   // the dice changed (held, loaded, rolled), the big button rolls the dice
-  const typedTextRef = useRef('');
-  const typedOverDiceRef = useRef<DiceData[] | null>(null);
   const handleTypedText = useCallback((text: string) => {
     typedTextRef.current = text;
     typedOverDiceRef.current = latestDiceRef.current;

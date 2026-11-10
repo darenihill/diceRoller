@@ -91,6 +91,22 @@ describe('After you type a roll, the big Roll button rolls it (owner, 2026-11-10
     expect(screen.getAllByLabelText(/^d6 showing/)).toHaveLength(2);
   });
 
+  it('after Undo of a typed roll, the big Roll button rolls the dice that came back', () => {
+    vi.useFakeTimers();
+    localStorage.setItem('rpgMode', 'true');
+    oneD4();
+    render(<App />);
+    fireEvent.change(screen.getByRole('textbox', { name: /Type a roll/ }), { target: { value: '2d6' } });
+    fireEvent.click(bigRoll());
+    act(() => { vi.advanceTimersByTime(ROLL_DURATION_MS + 50); });
+    fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+    expect(screen.getAllByLabelText(/^d4 showing/)).toHaveLength(1);
+    fireEvent.click(bigRoll());
+    act(() => { vi.advanceTimersByTime(ROLL_DURATION_MS + 50); });
+    expect(screen.getAllByLabelText(/^d4 showing/)).toHaveLength(1);
+    expect(screen.queryAllByLabelText(/^d6 showing/)).toHaveLength(0);
+  });
+
   it('a game loaded after typing is what the big Roll button rolls', () => {
     vi.useFakeTimers();
     localStorage.setItem('rpgMode', 'true');
