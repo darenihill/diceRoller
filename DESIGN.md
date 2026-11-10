@@ -45,6 +45,7 @@ bright gold on dark themes and deep gold on light; glows and borders keep
 | Destructive confirm | `.md-button.md-button-danger` | error-colored button |
 | Icon action | `.md-icon-button` | icon button |
 | On/off setting | `.md-icon-button` with `aria-pressed` | icon toggle button |
+| Text field | `Modals.module.css` `.formInput` look: 1px `outline` edge, no fill, 2px `primary` edge while typing (Die settings, Save, Customize, Share and the typed roll box all match; `src/test/materialFit.test.ts`) | outlined text field |
 | Card / tile | `.md-card` | card |
 | Card with icon over label | `.md-card` + `Modals.module.css` `.iconCard` | card |
 | Dialog | `components/Modal.tsx` (title, close, Esc, focus trap) | dialog |

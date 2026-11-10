@@ -43,15 +43,32 @@
   opacity: 0.6;
 }
 
-/* Inputs */
+/* Inputs: the app's one text field, the Material 3 outlined field that Save
+   and the typed roll box use (an edge in the outline color, 2px primary while
+   typing). They were dark filled boxes with no edge: the box barely showed on
+   the dark themes (1.1:1), and on Clean Light its hint text fell to 4.4:1
+   (Material 3 fit pass, 2026-11-10). */
+.inputField,
+.stepperInput,
+.faceValueInput {
+  border: 1px solid var(--md-sys-color-outline);
+  background-color: transparent;
+  color: var(--md-sys-color-on-surface);
+}
+
+.inputField:focus,
+.stepperInput:focus,
+.faceValueInput:focus {
+  outline: none;
+  border-color: var(--md-sys-color-primary);
+  box-shadow: inset 0 0 0 1px var(--md-sys-color-primary);
+}
+
 .inputField {
   width: 100%;
   height: 40px;
   padding: 0 12px;
   border-radius: 8px;
-  border: none;
-  background-color: rgba(0, 0, 0, 0.2);
-  color: var(--md-sys-color-on-surface);
   font-size: 0.875rem;
 }
 
@@ -93,9 +110,6 @@
   height: 44px;
   padding: 0 4px;
   border-radius: 8px;
-  border: none;
-  background-color: rgba(0, 0, 0, 0.2);
-  color: var(--md-sys-color-on-surface);
   font-size: 0.9375rem;
   font-weight: 600;
   text-align: center;
@@ -395,9 +409,6 @@
   height: 28px;
   padding: 0 6px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: transparent;
-  color: var(--md-sys-color-on-surface);
   font-size: 0.875rem;
   text-align: center;
   -moz-appearance: textfield;
@@ -407,11 +418,6 @@
 .faceValueInput::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
-}
-
-.faceValueInput:focus {
-  outline: none;
-  border-color: var(--md-sys-color-primary);
 }
 
 /* "Added 6 faces. Undo" after a list goes in */

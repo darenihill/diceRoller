@@ -1,4 +1,4 @@
-Next: working the Material 3 fit pass (polish lens ui-material, 2026-11-10) on the release branch; the release PR (Daren merges) still holds the 2026-11-10 review fixes and Daren's 5 builds; after this, Recently deleted, with Erase everything as a Desk idea.
+Next: Dice Roller release PR (Daren merges) holds the 2026-11-10 review fixes (Enter in Save no longer opens the menu, the Undo bar sits under an open dialog, die settings tabs wrap at large text, share-link names can't hide a popular game's name), Daren's 5 builds (the big Roll button rolls a typed roll; pictures on removed dice are deleted; a saved game loads from anywhere on its row; the font comes from the site; a security policy allows only the site and Google Analytics) and the Material 3 fit pass (Die settings text boxes match the app's other text boxes; 3 Focus ideas parked); next is Recently deleted, with Erase everything as a Desk idea.
 
 # State
 

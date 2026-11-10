@@ -5,6 +5,12 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-10~~ Material 3 fit (polish lens ui-material). Done when:
+  the Die settings text boxes (name, number of faces, custom face text,
+  "counts as") are the same outlined field as Save and the typed roll box,
+  every text box shows a 2px edge while typing, and
+  reviews/2026-11-10-ui-material.md says what was found
+  (src/test/materialFit.test.ts).
 - ~~Done 2026-11-10~~ Enter in Save no longer opens the menu (stories
   review, standard 20). Done when: pressing Enter (or a phone keyboard's Done)
   in Save's name box saves the game and the menu stays shut; with a taken name

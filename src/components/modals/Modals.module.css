@@ -52,7 +52,9 @@
 }
 
 .formInput:focus {
+  /* 2px while typing, as Material 3's outlined field does */
   border-color: var(--md-sys-color-primary);
+  box-shadow: inset 0 0 0 1px var(--md-sys-color-primary);
 }
 
 .formInputReadOnly {
@@ -63,6 +65,10 @@
 .formInputInvalid,
 .formInputInvalid:focus {
   border-color: var(--md-sys-color-error);
+}
+
+.formInputInvalid:focus {
+  box-shadow: inset 0 0 0 1px var(--md-sys-color-error);
 }
 
 .fieldNote {
