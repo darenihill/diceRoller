@@ -11,6 +11,22 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   every text box shows a 2px edge while typing, and
   reviews/2026-11-10-ui-material.md says what was found
   (src/test/materialFit.test.ts).
+- ~~Done 2026-11-10~~ Die settings face cards are white on Clean Light (Focus
+  card built as a fix, Daren 2026-11-10: fixes shouldn't be cards). Done
+  when: the face cards, − and + and the icon picker take each theme's own
+  shade, not a fixed black; on Clean Light the cards are white with a gray
+  edge and the "counts as" edge is 3:1 or more on every theme; Dark, Felt and
+  Midnight look the same (src/test/cardFixes.test.tsx).
+- ~~Done 2026-11-10~~ Messages like "Saved" don't cover the open menu (Focus
+  card built as a fix). Done when: with the menu or the Add menu open no
+  message shows on it; a message still fresh when the menu closes shows then
+  (src/test/cardFixes.test.tsx).
+- ~~Done 2026-11-10~~ One offline copy per page, without ad IDs (Focus card
+  built as a fix). Done when: the offline worker saves each page under its
+  address without the query, so ad links (?gclid, ?fbclid) share the plain
+  page's copy and keep no ID; the cache moves to v6 so the old copies go;
+  offline, an ad link still opens the app (src/test/cardFixes.test.tsx; check
+  on the live site after it lands).
 - ~~Done 2026-11-10~~ Dialog buttons are 48px tall (Daren 2026-11-10 on the
   Desk: "This shouldn't be a card if it's matching a standard"; standards 9
   and 20). Done when: every button inside a dialog (Save's Cancel and Save,

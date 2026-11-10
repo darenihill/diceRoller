@@ -77,6 +77,7 @@ Nothing was added, removed or moved. No flow or saved data changed.
   The face card's own grey fill causes it. The number inside the box still
   shows where the box is. Fixing it means repainting the face cards, so it
   is an idea below.
+  (Built as a fix later the same day: reviews/2026-11-10-card-fixes.md.)
 - **The theme picker cards** paint each theme's own colors. This is already
   in DESIGN.md §9.
 

@@ -89,7 +89,7 @@
 .stepperBtn {
   width: 48px;
   height: 48px;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: var(--die-tonal-button);
   color: var(--md-sys-color-on-surface);
   border: none;
   border-radius: 50%;
@@ -134,10 +134,10 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  background-color: rgba(0, 0, 0, 0.15);
+  background-color: var(--die-face-card);
   padding: 10px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--die-face-card-edge);
 }
 
 /* The face the colour row will paint */
@@ -335,7 +335,7 @@
 }
 
 .iconBtn {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: var(--die-tonal-button);
   color: var(--md-sys-color-on-surface);
   border-radius: 50%;
   aspect-ratio: 1;

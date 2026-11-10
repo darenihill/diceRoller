@@ -1305,13 +1305,17 @@ function App() {
           bottom edge, under the dialog: above the Roll buttons it covered the
           dialog's own Done, so a tap on Done after removing a face pressed
           Undo instead (review 2026-11-10) */}
-      {storageFull ? (
+      {/* With the menu (or the Add menu) open, no message sits on its tiles:
+          "Saved" covered half of Clear all. Each waits and shows when the
+          menu closes, if it is still up, as the Undo bar already did (fix,
+          2026-11-10) */}
+      {menuOpen || addMenuOpen ? null : storageFull ? (
         <div className={`${styles.toast} ${styles.undoToast} ${styles.storageToast} ${toastPlace}`} role="alert">
           <span>Storage is full, so your last change wasn't saved.</span>
           <button className={styles.undoButton} onClick={() => { setStorageFull(false); handleExportData(); }}>Export backup</button>
           <button className={styles.undoButton} onClick={() => setStorageFull(false)} aria-label="Close storage message" style={{ minWidth: 44 }}>✕</button>
         </div>
-      ) : undoOffer && !menuOpen && !addMenuOpen ? (
+      ) : undoOffer ? (
         <UndoBar
           offer={undoOffer}
           windowMs={UNDO_WINDOW_MS}

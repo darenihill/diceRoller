@@ -1,4 +1,6 @@
-const CACHE_NAME = 'diceroller-v5';
+// v6: pages are saved under their plain address (no ad IDs); the bump clears
+// v5's copies, which were saved under each ad link (fix, 2026-11-10)
+const CACHE_NAME = 'diceroller-v6';
 // How long opening the app waits for the network before using the saved copy
 const NAV_TIMEOUT_MS = 3000;
 const ASSETS_TO_CACHE = [
@@ -69,7 +71,12 @@ self.addEventListener('fetch', (e) => {
   const isNavigation = e.request.mode === 'navigate' || e.request.destination === 'document';
 
   if (isNavigation) {
-    const cachedShell = () => caches.match(e.request).then((cached) => cached || caches.match('/index.html'));
+    // One saved copy per page: the page's address without its query, so an ad
+    // link (?gclid=…, ?fbclid=…) or a share link neither saves its own copy
+    // nor keeps its ID on the phone. The page is the same HTML whatever the
+    // query; the app reads the query from the address bar, not from here.
+    const pageKey = url.origin + url.pathname;
+    const cachedShell = () => caches.match(pageKey).then((cached) => cached || caches.match('/index.html'));
     const network = fetch(e.request);
     // Save the fresh page on the side: a good signal shows it straight away, and
     // after a slow network loses the race below it still saves, so the newer
@@ -77,12 +84,12 @@ self.addEventListener('fetch', (e) => {
     e.waitUntil(network.then((networkResponse) => {
       if (networkResponse.status !== 200) return;
       const copy = networkResponse.clone();
-      return caches.open(CACHE_NAME).then((cache) => cache.put(e.request, copy));
+      return caches.open(CACHE_NAME).then((cache) => cache.put(pageKey, copy));
     }).catch(() => {}));
     // A weak signal: after NAV_TIMEOUT_MS open this page's copy on the phone
     // instead of a blank screen. With no copy of it yet, keep waiting.
     const slow = new Promise((resolve) => setTimeout(resolve, NAV_TIMEOUT_MS))
-      .then(() => caches.match(e.request))
+      .then(() => caches.match(pageKey))
       .then((cached) => cached || network);
     e.respondWith(
       Promise.race([network, slow]).catch(() => cachedShell())
