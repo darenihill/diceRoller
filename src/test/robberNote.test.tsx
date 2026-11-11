@@ -324,3 +324,46 @@ describe('Bars that come first', () => {
     expect(note()).toHaveTextContent('🎯 7 · Robber');
   });
 });
+
+describe('Room for the note under the dice (re-read, 2026-11-11)', () => {
+  // jsdom lays nothing out, so give the dice area and the note their places
+  // on a 640px phone: the area ends at 520; the note's top is 454, or 400
+  // once the Release chip row lifts it
+  const room = () => {
+    const area = document.querySelector('[class*="diceContainer"]') as HTMLElement;
+    return area.style.getPropertyValue('--note-room');
+  };
+  beforeEach(() => {
+    const rect = HTMLElement.prototype.getBoundingClientRect;
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
+      return /diceContainer/.test(this.className) ? ({ top: 68, bottom: 520, left: 0, right: 320, width: 320, height: 452 } as DOMRect) : rect.call(this);
+    });
+    vi.spyOn(HTMLElement.prototype, 'offsetTop', 'get').mockImplementation(function (this: HTMLElement) {
+      if (this.dataset.testid !== 'seven-note') return 0;
+      return /toastAboveRpgBar/.test(this.className) ? 400 : 454;
+    });
+  });
+
+  it('a 7 then Hold measures again, and Release gives the room back', () => {
+    startWith(gameDice('Cities & Knights'));
+    render(<App />);
+    roll(3, 4, 1);
+    expect(note()).not.toBeNull();
+    // 520 - 52 - (454 - 8) = 22
+    expect(room()).toBe('22px');
+    fireEvent.click(screen.getAllByRole('button', { name: /^Hold / })[0]);
+    expect(note()?.className).toMatch(/toastAboveRpgBar/);
+    // 520 - 52 - (400 - 8) = 76
+    expect(room()).toBe('76px');
+    fireEvent.click(screen.getAllByRole('button', { name: /^Hold / })[0]);
+    expect(note()?.className).not.toMatch(/toastAboveRpgBar/);
+    expect(room()).toBe('22px');
+  });
+
+  it('no note, no room', () => {
+    startWith(gameDice('Catan'));
+    render(<App />);
+    roll(3, 5);
+    expect(room()).toBe('');
+  });
+});

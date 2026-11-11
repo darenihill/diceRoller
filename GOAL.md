@@ -26,7 +26,8 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   Undo bar and the new-version bar keep the spot and the note shows once
   they go (src/test/robberNote.test.tsx). Playwright on the built site, root
   text 16px and 32px, Catan and Cities & Knights at 320×640 and 390×844: the
-  note stays inside the 16px gutters and covers no die, the dice area giving
+  note stays inside the 16px gutters and covers no die, with or without the
+  Release row (a die held), the dice area giving
   up room for it when it would (shots in
   dice-roller/2026-11-11/robber/).
 - ~~Done 2026-11-11~~ Help names the note. Done when: Help has one line under Games saying a 7

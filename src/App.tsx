@@ -1024,14 +1024,22 @@ function App() {
     const note = sevenNoteRef.current;
     const area = containerRef.current;
     if (!sevenNoteShown || !note || !area) { setNoteRoom(0); return; }
+    // The note's top from layout (offsetTop), not its box on screen, which
+    // its slide-up animation moves. The room only pads the inside of the
+    // dice area, whose edges stay put, so measuring again can't loop
     const measure = () => {
-      const overlap = area.getBoundingClientRect().bottom - DICE_AREA_PADDING - (note.getBoundingClientRect().top - 8);
+      const overlap = area.getBoundingClientRect().bottom - DICE_AREA_PADDING - (note.offsetTop - 8);
       setNoteRoom(Math.max(0, Math.ceil(overlap)));
     };
     measure();
+    // The note grows with a text size change; the area with the window
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
+    observer?.observe(note);
+    observer?.observe(area);
     window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, [sevenNoteShown, sevenNote]);
+    return () => { observer?.disconnect(); window.removeEventListener('resize', measure); };
+    // toastPlace: the Release or RPG chip row lifts the note 54px (re-read, 2026-11-11)
+  }, [sevenNoteShown, sevenNote, toastPlace]);
   const handleRollRef = useRef(handleRoll);
   const overlayOpenRef = useRef(overlayOpen);
   useEffect(() => {
