@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import styles from './SidebarMenu.module.css';
 import { useBackToClose } from '../hooks/useBackToClose';
+import { useSheetDrag, usePhoneWidth } from '../hooks/useSheetDrag';
 import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Share2, Palette, Pin, ToggleLeft, ToggleRight, BarChart2, Download } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
@@ -40,10 +41,13 @@ interface SidebarMenuProps {
   onToggleTableView: () => void;
   /** Install app tile; left out once the app runs from the home screen */
   onInstall?: () => void;
+  /** A dialog is open: a menu closing because a tile opened one goes at once,
+      so on a phone the dialog's sheet takes its place in the same spot */
+  dialogOpen?: boolean;
 }
 
 export const SidebarMenu: React.FC<SidebarMenuProps> = ({
-  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onStats, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, rpgMode, onToggleRpgMode, tableView, onToggleTableView, onInstall
+  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onStats, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, rpgMode, onToggleRpgMode, tableView, onToggleTableView, onInstall, dialogOpen = false
 }) => {
   const toggleRef = useRef<HTMLButtonElement>(null);
   // Escape closes the menu, as it does every dialog, and focus goes back to the menu button
@@ -61,6 +65,10 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
 
   // Phone Back closes the menu instead of leaving the app
   useBackToClose(isOpen, onToggle);
+  // On a phone the menu is the same bottom sheet as the dialogs (the Desk
+  // card's answer to Daren's "Does it slide up from the bottom as well?",
+  // 2026-11-11): from the bottom edge, with a grab bar to drag it down
+  const phone = usePhoneWidth();
   return (
     <>
       <div className={styles.toggleContainer}>
@@ -74,21 +82,14 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
         </button>
       </div>
 
-      <AnimatePresence>
+      <AnimatePresence custom={{ phone, swap: dialogOpen }}>
         {isOpen && (
           <>
             <div 
               style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 98, cursor: 'default' }} 
               onClick={onToggle}
             />
-            <motion.div 
-              className={`${styles.menu} md-card`}
-              style={{ zIndex: 120 }}
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 20, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
+            <MenuPanel phone={phone} dialogOpen={dialogOpen} onClose={onToggle}>
               {/* Three groups of four, so the columns line up (owner, 2026-11-02).
                   On a phone each group shows its heading word and a light tint, so
                   groups read without relying on color (owner, 2026-11-07; way A).
@@ -142,10 +143,46 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
                   <Trash2 size={18} /> <span>Clear all</span>
                 </button>
               </div>
-            </motion.div>
+            </MenuPanel>
           </>
         )}
       </AnimatePresence>
     </>
+  );
+};
+
+/** Opening and closing: a short rise on a computer; on a phone the sheet
+    slides up from the bottom edge and back down, or goes at once when a tile
+    opened a dialog, whose sheet comes up in its place */
+const panelVariants = {
+  hidden: ({ phone, swap }: { phone: boolean; swap: boolean }) =>
+    swap ? { opacity: 0, transition: { duration: 0 } }
+      : phone ? { y: '100%', transition: { duration: 0.2 } }
+      : { y: 20, opacity: 0, transition: { duration: 0.2 } },
+  shown: ({ phone }: { phone: boolean }) =>
+    phone ? { y: 0, opacity: 1, transition: { duration: 0.25, ease: ICON_EASE } } : { y: 0, opacity: 1, transition: { duration: 0.2 } },
+};
+
+const MenuPanel: React.FC<{ phone: boolean; dialogOpen: boolean; onClose: () => void; children: React.ReactNode }> = ({ phone, dialogOpen, onClose, children }) => {
+  // Mounts fresh on each open, so a drag never carries over
+  const sheet = useSheetDrag(phone ? onClose : undefined);
+  return (
+    <motion.div
+      className={`${styles.menu} ${phone ? styles.sheet : ''} ${sheet.dragging ? styles.dragging : ''} md-card`}
+      data-sheet={phone ? '' : undefined}
+      custom={{ phone, swap: dialogOpen }}
+      variants={panelVariants}
+      initial="hidden"
+      animate="shown"
+      exit="hidden"
+      style={{ zIndex: 120, ...sheet.style }}
+    >
+      {phone && (
+        <div className={styles.grab} data-sheet-grab="" aria-hidden="true" {...sheet.handlers}>
+          <div className={styles.handle} />
+        </div>
+      )}
+      {children}
+    </motion.div>
   );
 };

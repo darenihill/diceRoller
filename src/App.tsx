@@ -1277,6 +1277,7 @@ function App() {
 
       <SidebarMenu
         isOpen={menuOpen}
+        dialogOpen={dialogOpen}
         onToggle={() => setMenuOpen(!menuOpen)}
         onDonate={() => window.open('https://www.buymeacoffee.com/darenihill', '_blank', 'noopener,noreferrer')}
         onIdeas={() => window.open('https://forms.gle/wqYaKsEZ5FQwizuMA', '_blank', 'noopener,noreferrer')}

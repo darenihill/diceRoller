@@ -242,3 +242,55 @@
     height: 52px;
   }
 }
+
+/* On a phone the menu is the same bottom sheet as the dialogs and the die
+   buttons (the Desk card's answer to Daren's "Does it slide up from the
+   bottom as well?", 2026-11-11): full width from the bottom edge, top
+   corners round, a grab bar on top. It covers the menu button, so a drag
+   down, a tap above it, Back or Escape closes it. Doubled class so it
+   outranks the narrower screens' menu offsets above. */
+@media (max-width: 468px) {
+  .menu.sheet {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    max-width: none;
+    max-height: calc(100dvh - 72px);
+    padding: 0 max(16px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+    border-radius: 28px 28px 0 0;
+    background-color: var(--md-sys-color-surface);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
+    transition: translate 200ms ease-out;
+  }
+
+  /* While a finger drags it, the sheet follows with no lag */
+  .menu.sheet.dragging {
+    transition: none;
+  }
+
+  /* The grab bar spans the top of the sheet and takes the drag; the tiles
+     below keep scrolling on a short phone */
+  .grab {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 28px;
+    margin: 0 -16px;
+    touch-action: none;
+    cursor: grab;
+  }
+
+  .handle {
+    width: 32px;
+    height: 4px;
+    border-radius: 2px;
+    background-color: var(--md-sys-color-on-surface-variant);
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu.sheet { transition: none; }
+}

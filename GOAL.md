@@ -15,7 +15,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   motion on it appears without sliding; the focus trap, 48px buttons, the
   Undo bar under it and a focused text box above the phone keyboard all
   hold; the computer layout is unchanged (src/test/bottomSheets.test.tsx).
-- The phone menu is the same bottom sheet (the Desk card's answer to
+- ~~Done 2026-11-11~~ The phone menu is the same bottom sheet (the Desk card's answer to
   Daren's "Does it slide up from the bottom as well?"). Done when: at the
   phone width the menu rises from the bottom edge with the grab bar and
   closes on a drag down, a tap above it or Back, and tapping History or

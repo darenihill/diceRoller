@@ -1,7 +1,8 @@
 import React from 'react';
 import { readFileSync } from 'node:fs';
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, fireEvent, createEvent, act } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach, beforeAll } from 'vitest';
+import { render, screen, fireEvent, createEvent, act, waitFor } from '@testing-library/react';
+import App from '../App';
 import { Modal } from '../components/Modal';
 import { SHEET_EXIT_MS } from '../hooks/useSheetDrag';
 
@@ -154,5 +155,61 @@ describe('On a computer dialogs stay boxes in the middle', () => {
     swipe(d.firstElementChild!, 300, 30);
     act(() => { vi.advanceTimersByTime(SHEET_EXIT_MS); });
     expect(onClose).not.toHaveBeenCalled();
+  });
+});
+
+describe('On a phone the menu is the same bottom sheet', () => {
+  beforeAll(() => {
+    globalThis.ResizeObserver ??= class { observe() {} unobserve() {} disconnect() {} } as unknown as typeof ResizeObserver;
+  });
+  afterEach(() => { localStorage.clear(); });
+  const menuSheet = () => document.querySelector('[data-sheet]:not([role="dialog"])');
+
+  it('opens as a sheet with a grab bar, and a drag down closes it', async () => {
+    vi.useFakeTimers();
+    setScreen({ phone: true });
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    const sheet = menuSheet();
+    expect(sheet).not.toBeNull();
+    const grab = sheet!.querySelector('[data-sheet-grab]')!;
+    swipe(grab, 200, 30);
+    act(() => { vi.advanceTimersByTime(SHEET_EXIT_MS); });
+    expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('tapping History swaps the menu for the History sheet in the same spot', async () => {
+    setScreen({ phone: true });
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    fireEvent.click(screen.getByRole('button', { name: /^History$/ }));
+    const d = screen.getByRole('dialog');
+    expect(d).toHaveAttribute('data-sheet');
+    // The menu goes at once rather than sliding down under it
+    await waitFor(() => expect(menuSheet()).toBeNull());
+  });
+
+  it('tapping Games does the same', async () => {
+    setScreen({ phone: true });
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    fireEvent.click(screen.getByRole('button', { name: /^Games$/ }));
+    expect(screen.getByRole('dialog')).toHaveAttribute('data-sheet');
+    await waitFor(() => expect(menuSheet()).toBeNull());
+  });
+
+  it('stays the panel above its button on a computer', () => {
+    setScreen({ phone: false });
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    expect(screen.getByRole('button', { name: /^History$/ })).toBeInTheDocument();
+    expect(document.querySelector('[data-sheet]')).toBeNull();
+    expect(document.querySelector('[data-sheet-grab]')).toBeNull();
+  });
+
+  it('the sheet rule outranks the narrow screens\' menu offsets', () => {
+    const css = readFileSync('src/components/SidebarMenu.module.css', 'utf8');
+    expect(css).toMatch(/\.menu\.sheet \{\s*bottom: 0;\s*left: 0;\s*right: 0;/);
+    expect(css).toMatch(/prefers-reduced-motion: reduce\)\s*\{\s*\.menu\.sheet \{ transition: none; \}/);
   });
 });
