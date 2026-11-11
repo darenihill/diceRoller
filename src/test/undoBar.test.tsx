@@ -128,15 +128,16 @@ describe('The Undo bar follows the standard', () => {
   it('the line runs inside the pill and drains clockwise from the top middle, 2px on a phone and 3px on a computer, with no track', () => {
     // A path from the top middle; one whole-line dash whose start slides clockwise to the end
     expect(css).toMatch(/stroke-dasharray:\s*1px 1px/);
-    expect(css).toMatch(/from\s*{\s*stroke-dashoffset:\s*0px;\s*}/);
-    expect(css).toMatch(/to\s*{\s*stroke-dashoffset:\s*-1px;\s*}/);
+    expect(css).toMatch(/from\s*{\s*stroke-dasharray:\s*1px 1px;\s*}/);
+    expect(css).toMatch(/to\s*{\s*stroke-dasharray:\s*0px 1px;\s*}/);
+    expect(css).toMatch(/stroke-linecap:\s*butt/);
     expect(css).toMatch(/--line:\s*2px/);
     expect(css).toMatch(/@media \(min-width: 769px\)\s*{\s*\.undo\s*{\s*--line:\s*3px/);
     expect(css).toMatch(/stroke:\s*var\(--md-sys-color-on-primary\)/);
     // Sitter's look: a quiet surface bar, the Undo filled in the main colour
     expect(css).toMatch(/background-color:\s*var\(--md-sys-color-surface-variant\)/);
     expect(css).toMatch(/background-color:\s*var\(--md-sys-color-primary\);\s*color:\s*var\(--md-sys-color-on-primary\)/);
-    // Inside the pill (owner, 2026-11-10, second word on it)
-    expect(readFileSync('src/components/UndoBar.tsx', 'utf8')).toMatch(/const i = lw \/ 2 \+ 3;/);
+    // Flush with the pill's inside edge, as Sitter's watch draws it (owner, 2026-11-10)
+    expect(readFileSync('src/components/UndoBar.tsx', 'utf8')).toMatch(/const i = lw \/ 2;/);
   });
 });

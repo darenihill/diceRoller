@@ -73,9 +73,10 @@
   outline-offset: 2px;
 }
 
-/* The countdown: a line in the words' colour round the inside of the pill
-   (owner, 2026-11-10: "inside the button"), starting at the top and running
-   clockwise, draining away. No track under it. */
+/* The countdown, as Sitter's watch draws it: a line in the words' colour
+   flush with the inside edge of the pill (owner, 2026-11-10), from the top
+   middle clockwise round the pill, shrinking back toward the top as time runs
+   out. Flat ends, no track under it. */
 .ring {
   position: absolute;
   inset: 0;
@@ -89,19 +90,18 @@
   fill: none;
   stroke: var(--md-sys-color-on-primary);
   stroke-width: var(--line);
-  stroke-linecap: round;
-  /* The path starts at the top middle; one dash as long as the whole line,
-     its start sliding clockwise round to the end */
+  stroke-linecap: butt;
+  /* The path starts at the top middle; what is left is the line from there
+     clockwise, its far end drawing back toward the top (Sitter's getSegment) */
   stroke-dasharray: 1px 1px;
-  stroke-dashoffset: 0px;
   animation-name: undoDrain;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
 }
 
 @keyframes undoDrain {
-  from { stroke-dashoffset: 0px; }
-  to { stroke-dashoffset: -1px; }
+  from { stroke-dasharray: 1px 1px; }
+  to { stroke-dasharray: 0px 1px; }
 }
 
 .close {
