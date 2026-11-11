@@ -5,6 +5,28 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- Catan: a 7 shows a Robber note above the Roll button (Daren 2026-11-10,
+  Build, way "With the game, shown above Roll"): "Lives with the built-in
+  game, not in Customize. The note follows the game name on the top line:
+  while it says Catan (or Cities & Knights), a total of 7 shows the note in
+  the message spot above Roll, in words with the 🎯 mark, never color alone,
+  until the next roll." Done when: with Catan on the top line a roll of 7
+  shows "🎯 7 · Robber" and "Over 7 cards? Discard half, then move it" just
+  above Roll, a screen reader hears it with the total, and the next roll
+  takes it away; any other total shows nothing (src/test/robberNote.test.tsx).
+- Cities & Knights carries its own 7 note. Done when: with Cities &
+  Knights on the top line a 7 shows "🎯 7 · Robber" and "Over 7 cards?
+  Discard half"; the note sits with each game in the popular games list, not
+  in Customize (src/test/robberNote.test.tsx).
+- The note stops when the game does. Done when: after a die is added,
+  removed or edited, or another game is loaded, a 7 shows no note; other
+  games and plain dice never show it; Target hit, Customize and the Undo bar
+  work as before, and the note waits behind them in the same spot; it fits at
+  320px and 390px and at 200% text (src/test/robberNote.test.tsx).
+- Help names the note. Done when: Help has one line under Games saying a 7
+  in Catan or Cities & Knights shows what to do above Roll
+  (src/test/robberNote.test.tsx).
+
 - ~~Done 2026-11-10~~ Material 3 fit (polish lens ui-material). Done when:
   the Die settings text boxes (name, number of faces, custom face text,
   "counts as") are the same outlined field as Save and the typed roll box,
