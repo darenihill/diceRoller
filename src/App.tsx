@@ -20,6 +20,7 @@ import { celebrateNatural20 } from './utils/confetti';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { COMPACT_DIE_SIZE } from './utils/constants';
 import { dicePresets, sevenNoteFor } from './utils/presets';
+import { isFirstVisit, markDieButtonsShown } from './utils/firstVisit';
 import { currentSetName, diceSignature, rollSignature, readShareLink, nextFreeSaveName, suggestSaveName, type LoadedSet } from './utils/setName';
 import { readLandingStart, readLandingAbout } from './utils/landing';
 import { Info, Plus, Dice6, Table2, Swords, X } from 'lucide-react';
@@ -138,7 +139,12 @@ function App() {
     return landing?.name ? { name: landing.name, signature: diceSignature(landing.dice) } : null;
   });
   const [editingDiceId, setEditingDiceId] = useState<string | null>(null);
-  const [revealedDiceId, setRevealedDiceId] = useState<string | null>(null);
+  // The very first visit opens the first die's buttons, exactly as a tap
+  // does, once per phone (owner, 2026-11-10: "Show the buttons once"). Read
+  // before anything is saved this visit; a share link or a search page opens
+  // its own dice instead, so not then
+  const [firstDieId] = useState(() => (!window.location.hash && !landing && isFirstVisit() ? generateId() : null));
+  const [revealedDiceId, setRevealedDiceId] = useState<string | null>(firstDieId);
   // Only a known theme reaches the page's class list; a backup file could hold anything
   const [theme, setTheme] = useState(() => {
     const saved = readItem(SAVED.theme);
@@ -364,9 +370,9 @@ function App() {
     }
 
     // Default to 2 basic dice if the app has never been used
-    setDiceList([
+    const starting: DiceData[] = [
       {
-        id: generateId(),
+        id: firstDieId ?? generateId(),
         numberValue: 1,
         faces: 6,
         currentFaceIndex: 0,
@@ -385,7 +391,11 @@ function App() {
         color: '#E9EAEC',
         held: false
       }
-    ]);
+    ];
+    setDiceList(starting);
+    // Its buttons are open (firstDieId above): save the mark so they never
+    // open by themselves again
+    if (firstDieId) markDieButtonsShown();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -490,7 +500,12 @@ function App() {
 
   // Below this size the buttons round a tapped die get too small, so they move to one strip (owner, 2026-10-28)
   const compactDieActions = diceList.length > 0 && containerSize.width > 0 && optimalSize < COMPACT_DIE_SIZE;
-  const revealedDie = compactDieActions ? diceList.find(d => d.id === revealedDiceId) : undefined;
+  // The first visit's buttons open round the die only. Where small dice put
+  // them in the sheet over Roll, they wait for a tap instead, so the very
+  // first tap on Roll rolls rather than landing on the sheet (2026-11-11)
+  const [firstOpenWaiting, setFirstOpenWaiting] = useState(firstDieId !== null);
+  const shownRevealedId = firstOpenWaiting && compactDieActions && revealedDiceId === firstDieId ? null : revealedDiceId;
+  const revealedDie = compactDieActions ? diceList.find(d => d.id === shownRevealedId) : undefined;
 
   // Auto-deselect active die on mobile after 5 seconds. With many small dice
   // the buttons come up in a sheet that stays until you tap away (owner,
@@ -1175,8 +1190,8 @@ function App() {
             key={dice.id}
             dice={dice}
             isRolling={isRolling && (rollingId === null || rollingId === dice.id)}
-            isRevealed={revealedDiceId === dice.id}
-            onReveal={() => setRevealedDiceId(dice.id)}
+            isRevealed={shownRevealedId === dice.id}
+            onReveal={() => { setFirstOpenWaiting(false); setRevealedDiceId(dice.id); }}
             onToggleHold={toggleHold}
             onRemove={handleRemoveDie}
             onOpenSettings={setEditingDiceId}

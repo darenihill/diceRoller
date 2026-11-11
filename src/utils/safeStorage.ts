@@ -18,6 +18,19 @@ export function saveItem(key: string, value: string): boolean {
   }
 }
 
+/**
+ * Saves a value that matters to nobody if it is lost (a hint shown once), so
+ * a refused save doesn't raise the storage-full message. Returns whether it saved.
+ */
+export function saveQuietly(key: string, value: string): boolean {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /** Calls back whenever a save is refused; returns the way to stop listening. */
 export function onSaveRefused(listener: Listener): () => void {
   listeners.add(listener);

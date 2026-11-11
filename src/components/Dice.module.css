@@ -282,6 +282,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .droppedBadge { animation: none; }
+  /* The buttons round a die simply appear, on a tap and on the first visit */
+  .unlockIcon, .settingsBtn, .cloneBtn, .rollOneBtn, .removeBtn { transition: none; }
 }
 
 .crit20 {

@@ -5,23 +5,29 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- First visit: the first die starts with its buttons open (Daren 2026-11-10,
-  Build, way "Show the buttons once"): "On the very first visit only
-  (nothing saved on the phone yet), the first die's button strip starts
-  open, exactly as a tap opens it. Any tap, Roll included, closes it as it
-  does today, and a mark saved on the phone stops it opening by itself
-  again. No new text, color or box; with Reduce motion on it simply
-  appears." Done when: with nothing saved, the app opens with the first
-  die's buttons open as a tap opens them (the buttons round the die, or the
-  sheet when the dice are small), and a tap anywhere else, Roll included,
-  closes them as a tap does today (src/test/firstVisit.test.tsx).
-- One saved mark, so it happens once per phone. Done when: the mark is saved
-  as the buttons open; a second visit, anyone with saved dice, settings or
-  History, and a share link never see them open by themselves; a backup
-  import doesn't change it (src/test/firstVisit.test.tsx).
-- Nothing else changes. Done when: no new words, colors or boxes; with
-  Reduce motion on the buttons appear without sliding; screenshots at 390px
-  in dice-roller/2026-11-11/first-visit/ (src/test/firstVisit.test.tsx).
+- ~~Done 2026-11-11~~ First visit: the first die starts with its buttons
+  open (Daren 2026-11-10, Build, way "Show the buttons once"): "On the very
+  first visit only (nothing saved on the phone yet), the first die's button
+  strip starts open, exactly as a tap opens it. Any tap, Roll included,
+  closes it as it does today, and a mark saved on the phone stops it opening
+  by itself again. No new text, color or box; with Reduce motion on it
+  simply appears." Done when: with nothing saved, the app opens with the
+  buttons round the first die open as a tap opens them; a tap on Roll closes
+  them and rolls, a tap anywhere else closes them, and they close after five
+  seconds as a tap's do; where small dice would put them in the sheet over
+  Roll (a short screen or a phone on its side), they wait for a tap instead
+  (src/test/firstVisit.test.tsx).
+- ~~Done 2026-11-11~~ One saved mark, so it happens once per phone. Done
+  when: the mark is saved as the buttons open; a second visit, anyone with
+  saved dice, a theme, default dice, History, saved rolls or usage stats,
+  and a share link never see them open by themselves; the mark stays out of
+  backups and an import leaves it as it is (src/test/firstVisit.test.tsx).
+- ~~Done 2026-11-11~~ Nothing else changes. Done when: no new words, colors
+  or boxes; with Reduce motion on the buttons round a die appear without
+  fading and the sheet without sliding (src/test/firstVisit.test.tsx);
+  Playwright on the built site at 390px, dark and Clean Light, Reduce
+  motion, a second visit and an existing user (shots in
+  dice-roller/2026-11-11/first-visit/).
 
 - ~~Done 2026-11-11~~ Catan: a 7 shows a Robber note above the Roll button (Daren 2026-11-10,
   Build, way "With the game, shown above Roll"): "Lives with the built-in
