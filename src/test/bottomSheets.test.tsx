@@ -60,6 +60,7 @@ const fingerSwipe = (el: Element, to: number, ms: number, x = 100) => {
 const dialog = (onClose: () => void) => render(
   <Modal isOpen onClose={onClose} title="History">
     <input aria-label="Name" />
+    <button data-own-drag="">Move</button>
     <button>Done</button>
   </Modal>,
 );
@@ -139,6 +140,8 @@ describe('On a phone every dialog is a bottom sheet', () => {
     expect(moved.defaultPrevented).toBe(false);
     content.scrollTop = 0;
     fingerSwipe(screen.getByRole('textbox', { name: 'Name' }), 300, 30);
+    // The custom faces' move grip runs its own drag
+    fingerSwipe(screen.getByRole('button', { name: 'Move' }), 300, 30);
     act(() => { vi.advanceTimersByTime(SHEET_EXIT_MS); });
     expect(onClose).not.toHaveBeenCalled();
   });

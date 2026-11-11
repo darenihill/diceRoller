@@ -127,8 +127,9 @@ export function useSheetDrag(onClose?: () => void) {
     };
     const start = (e: TouchEvent) => {
       // The grab bar has its own pointer drag; a second finger is a pinch
-      // and a text box, picker or slider keeps its own drags
-      if (e.touches.length !== 1 || (e.target as Element).closest?.('[data-sheet-grab], input, textarea, select, [role="slider"], canvas')) { scroll = true; return; }
+      // and a text box, picker, slider or anything marked data-own-drag (the
+      // custom faces' move grip) keeps its own drags (second read, 2026-11-11)
+      if (e.touches.length !== 1 || (e.target as Element).closest?.('[data-sheet-grab], [data-own-drag], input, textarea, select, [role="slider"], canvas')) { scroll = true; return; }
       scroll = scrolledDown(e.target);
       if (!scroll) { const t = e.touches[0]; steps.current.begin(t.clientX, t.clientY, t.identifier); }
     };

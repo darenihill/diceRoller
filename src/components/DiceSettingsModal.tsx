@@ -479,6 +479,7 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
                       type="button"
                       ref={(el) => { gripRefs.current[place] = el; }}
                       className={styles.faceGrip}
+                      data-own-drag=""
                       aria-label={`Move face ${i + 1}, place ${i + 1} of ${dice.customFaces.length}`}
                       aria-describedby={dice.customFaces.length > 1 ? `${fieldId}-grip-help` : undefined}
                       title="Drag to move. Arrow keys move it too."
