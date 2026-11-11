@@ -51,18 +51,20 @@ export const DieActionStrip: React.FC<DieActionStripProps> = ({ die, rpgMode, on
   const drag = React.useRef<{ y: number; x: number; id: number; on: boolean; lastY: number; lastT: number; v: number } | null>(null);
   const [dy, setDy] = React.useState(0);
   const [live, setLive] = React.useState(false);
-  const dragged = React.useRef(false);
+  // When the last drag ended: only the click right after it is swallowed
+  const dragged = React.useRef(0);
   const exitTimer = React.useRef<number | undefined>(undefined);
   React.useEffect(() => () => window.clearTimeout(exitTimer.current), []);
   const endDrag = (e: React.PointerEvent) => {
     const d = drag.current;
     drag.current = null;
     if (!d?.on) return;
-    dragged.current = true;
+    dragged.current = Date.now();
     setLive(false);
     if (Date.now() - d.lastT > 100) d.v = 0;
     const moved = e.clientY - d.y;
-    if (onClose && (moved >= SHEET_CLOSE_PX || d.v > SHEET_FLICK_PX_PER_MS)) {
+    // A flick back up at the end means "keep it", as phone sheets do
+    if (onClose && d.v > -0.1 && (moved >= SHEET_CLOSE_PX || d.v > SHEET_FLICK_PX_PER_MS)) {
       const reduced = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (reduced) { onClose(); return; }
       setDy(window.innerHeight);
@@ -74,7 +76,7 @@ export const DieActionStrip: React.FC<DieActionStripProps> = ({ die, rpgMode, on
   return (
     <div
       onPointerDownCapture={onInteract}
-      onPointerDown={(e) => { dragged.current = false; drag.current = { y: e.clientY, x: e.clientX, id: e.pointerId, on: false, lastY: e.clientY, lastT: Date.now(), v: 0 }; }}
+      onPointerDown={(e) => { dragged.current = 0; drag.current = { y: e.clientY, x: e.clientX, id: e.pointerId, on: false, lastY: e.clientY, lastT: Date.now(), v: 0 }; }}
       onPointerMove={(e) => {
         const d = drag.current;
         if (!d || d.id !== e.pointerId) return;
@@ -97,7 +99,7 @@ export const DieActionStrip: React.FC<DieActionStripProps> = ({ die, rpgMode, on
       onPointerCancel={() => { drag.current = null; setLive(false); setDy(0); }}
       onClickCapture={(e) => {
         // The click that ends a swipe is not a tap on a button
-        if (dragged.current) { dragged.current = false; e.stopPropagation(); e.preventDefault(); }
+        if (dragged.current && Date.now() - dragged.current < 1000) { dragged.current = 0; e.stopPropagation(); e.preventDefault(); }
       }}
       style={dy ? { translate: `0 ${dy}px` } : undefined}
       className={`${styles.strip} ${rpgMode ? styles.rpg : ''} ${live ? styles.dragging : ''}`}

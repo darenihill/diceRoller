@@ -1152,6 +1152,7 @@ function App() {
 
       {revealedDie && (
         <DieActionStrip
+          key={revealedDie.id}
           die={revealedDie}
           rpgMode={chipRow}
           onRollOne={isRolling ? undefined : handleRollOne}
