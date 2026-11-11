@@ -11,6 +11,7 @@ import { DIE_BUTTONS_SHOWN_KEY, isFirstVisit } from '../utils/firstVisit';
 import { unfreezeSavesForTests } from '../hooks/useStorage';
 import { resetFaceImageCache } from '../utils/faceImages';
 import { reloadAfterErase } from '../utils/erase';
+import { GA_MEASUREMENT_ID } from '../utils/constants';
 
 // The real one opens the home page afresh; here it is only counted
 vi.mock('../utils/erase', async (original) => ({ ...(await original<typeof import('../utils/erase')>()), reloadAfterErase: vi.fn() }));
@@ -164,5 +165,54 @@ describe('Words and Help', () => {
     render(<HelpModal isOpen onClose={() => {}} />);
     const lines = screen.getAllByRole('listitem').map(li => li.textContent ?? '').filter(t => /Erase everything/.test(t));
     expect(lines).toEqual(['Erase everything: At the bottom of Usage stats. It asks first, then takes your games, History, pictures, stats and settings off this phone.']);
+  });
+});
+
+describe('Google can\'t write the old ID back (second read, 2026-11-11)', () => {
+  const killSwitch = () => (window as unknown as Record<string, unknown>)[`ga-disable-${GA_MEASUREMENT_ID}`];
+  afterEach(() => { delete (window as unknown as Record<string, unknown>)[`ga-disable-${GA_MEASUREMENT_ID}`]; });
+
+  it('Google\'s kill switch is on before its cookies are deleted', () => {
+    document.cookie = '_ga=GA1.1.123.456; path=/';
+    (window as unknown as Record<string, unknown>)[`ga-disable-${GA_MEASUREMENT_ID}`] = false;
+    const real = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie')!;
+    const switchAtDelete: unknown[] = [];
+    Object.defineProperty(document, 'cookie', {
+      configurable: true,
+      get: () => real.get!.call(document),
+      set: (v: string) => { if (/^_ga.*expires=Thu, 01 Jan 1970/.test(v)) switchAtDelete.push(killSwitch()); real.set!.call(document, v); },
+    });
+    try {
+      eraseEverything();
+    } finally {
+      delete (document as unknown as Record<string, unknown>).cookie;
+    }
+    expect(switchAtDelete.length).toBeGreaterThan(0);
+    expect(switchAtDelete.every(v => v === true)).toBe(true);
+    expect(document.cookie).not.toMatch(/_ga=/);
+  });
+});
+
+describe('Erase all in another tab', () => {
+  it('this tab stops saving and reopens, so its autosave can\'t write games back', () => {
+    const reload = vi.mocked(reloadAfterErase);
+    reload.mockClear();
+    fill();
+    render(<App />);
+    // The other tab empties storage; this tab hears it as a storage event with no key
+    localStorage.clear();
+    act(() => { window.dispatchEvent(new StorageEvent('storage', { key: null, storageArea: localStorage })); });
+    expect(reload).toHaveBeenCalledTimes(1);
+    act(() => { window.dispatchEvent(new Event('pagehide')); });
+    expect(localStorage.getItem('diceConfigs')).toBeNull();
+  });
+
+  it('a single value changed in another tab does nothing of the kind', () => {
+    const reload = vi.mocked(reloadAfterErase);
+    reload.mockClear();
+    fill();
+    render(<App />);
+    act(() => { window.dispatchEvent(new StorageEvent('storage', { key: 'appTheme', newValue: 'theme-dark', storageArea: localStorage })); });
+    expect(reload).not.toHaveBeenCalled();
   });
 });

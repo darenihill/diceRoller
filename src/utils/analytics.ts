@@ -99,6 +99,15 @@ export function saveLocalStats(stats: LocalAnalyticsStats): void {
   }
 }
 
+/**
+ * Google Analytics' official kill switch for this page: while it is set, the
+ * tag sends nothing and writes no cookie. A new page reads the metrics switch
+ * afresh (index.html).
+ */
+export function setGoogleDisabled(disabled: boolean): void {
+  (window as unknown as Record<string, unknown>)[`ga-disable-${GA_MEASUREMENT_ID}`] = disabled;
+}
+
 export function setTelemetryEnabled(enabled: boolean): void {
   const stats = getLocalStats();
   stats.telemetryEnabled = enabled;
@@ -106,7 +115,7 @@ export function setTelemetryEnabled(enabled: boolean): void {
 
   // Google Analytics' official kill switch: when set, gtag drops all hits
   // (including automatic page_views), making the privacy toggle actually binding.
-  (window as unknown as Record<string, unknown>)[`ga-disable-${GA_MEASUREMENT_ID}`] = !enabled;
+  setGoogleDisabled(!enabled);
   if (enabled) loadGoogleTag();
   else clearGoogleCookies();
 }

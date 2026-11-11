@@ -20,7 +20,8 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   dialog's × to Tab to (src/test/eraseEverything.test.tsx; Playwright at
   390px, dark and Clean Light, shots in dice-roller/2026-11-11/erase/).
 - ~~Done 2026-11-11~~ Erase all really erases. Done when: every saved item and the first-visit
-  mark are gone and Google's _ga cookies deleted, the metrics switch is kept
+  mark are gone and Google's _ga cookies deleted after its tag is told to
+  stop, another open tab stops saving and reopens too, the metrics switch is kept
   as it was, nothing on the page saves again before the reload (an Undo bar
   or a held picture can't bring anything back), and the app reloads at the
   home page and opens like a first visit; no Undo is offered

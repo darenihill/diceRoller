@@ -17,7 +17,7 @@ import { DieActionStrip } from './components/DieActionStrip';
 import { playRollSequence, playLandNow, scheduleLandingBuzz } from './utils/soundEffects';
 import { BUZZ_KEY, BUZZ_SHOWN_KEY, canBuzz, isBuzzLink } from './utils/buzz';
 import { celebrateNatural20 } from './utils/confetti';
-import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
+import { recordSessionStart, trackEvent, setTelemetryEnabled, setGoogleDisabled } from './utils/analytics';
 import { COMPACT_DIE_SIZE } from './utils/constants';
 import { dicePresets, sevenNoteFor } from './utils/presets';
 import { isFirstVisit, markDieButtonsShown } from './utils/firstVisit';
@@ -805,6 +805,21 @@ function App() {
     eraseEverything();
     reloadAfterErase();
   };
+
+  // Erase all in another tab empties storage there (a storage event with no
+  // key): this tab stops saving and reopens too, so its autosave as it goes
+  // can't write games back (second read, 2026-11-11)
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== null || (e.storageArea && e.storageArea !== localStorage)) return;
+      freezeSaves();
+      importedBackupRef.current = true;
+      setGoogleDisabled(true);
+      reloadAfterErase();
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
 
   const handleImportData = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

@@ -7,7 +7,7 @@
  */
 import { readItem } from './safeStorage';
 import { SAVED } from './savedValues';
-import { clearGoogleCookies } from './analytics';
+import { clearGoogleCookies, setGoogleDisabled } from './analytics';
 import { getFaceImages, releaseFaceImageHolds, resetFaceImageCache } from './faceImages';
 
 export interface SavedCounts {
@@ -58,6 +58,10 @@ export function eraseQuestion(c: SavedCounts): string {
  * saving (freezeSaves) and then reloads. Returns whether storage could be emptied.
  */
 export function eraseEverything(): boolean {
+  // First silence Google's tag on this page: it still holds the old ID, and a
+  // hit as the page goes would write the old cookie back. With metrics on,
+  // the reloaded page starts Google afresh with a new ID (second read, 2026-11-11)
+  setGoogleDisabled(true);
   const metrics = readItem(SAVED.telemetry);
   releaseFaceImageHolds();
   let erased = true;
