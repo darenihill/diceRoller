@@ -5,6 +5,20 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- Send Google less (Daren 2026-11-10, Build, way "Cut what isn't used"):
+  "Rolls send how many dice and which mode, not the total or modifier; The
+  second visit count and an unused second sender go; You keep Google's data
+  2 months and turn its ad links off, in Google's settings." Done when: a
+  roll sends Google its dice count, RPG mode, advantage and whether it was
+  typed, and no total or modifier, while Usage stats still counts the total
+  on the phone; the app's own session_start event is gone; the unused second
+  sender (VITE_ANALYTICS_ENDPOINT) and the event names nothing sends are
+  gone (src/test/sendGoogleLess.test.ts). Google's own settings are
+  Daren's step.
+- The Privacy page stays exactly true. Done when: it no longer says a
+  roll's total goes, and still names what Google gathers by itself; the
+  field-list test passes (src/test/privacyPage.test.tsx).
+
 - ~~Done 2026-11-11~~ Say plainly what goes to Google (Daren 2026-11-10, Build, way "Privacy
   page plus a Help line"): a short Privacy page, a Help line and a switch
   called "Page metrics". His page text: "Stays on this phone: your dice,
