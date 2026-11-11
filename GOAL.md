@@ -5,6 +5,29 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- Say plainly what goes to Google (Daren 2026-11-10, Build, way "Privacy
+  page plus a Help line"): a short Privacy page, a Help line and a switch
+  called "Page metrics". His page text: "Stays on this phone: your dice,
+  games, History and pictures. Nothing you type, name or photograph is ever
+  sent. Goes to Google while Page metrics is on: counts of visits, rolls and
+  taps; your rough city, device and browser; a random ID Google keeps on
+  this phone for about 13 months. Turning it off: Customize, Page metrics,
+  Off. Then nothing goes to Google and its ID is deleted." He has not picked
+  "Send Google less", so the page says what today's app sends, with any
+  claim that isn't true of it corrected. Done when: customdiceroller.com/privacy/
+  is a static page in the site's look with that text, true to
+  src/utils/analytics.ts and every trackEvent call; it carries its own
+  Content-Security-Policy written by npm run landing, is in the sitemap,
+  opens offline, and reads at 320px and 200% text
+  (src/test/privacyPage.test.ts).
+- The switch is called "Page metrics". Done when: Customize's metrics switch
+  says "Page metrics" (its label, title and name for screen readers) and its
+  line ends in a "What's sent" link to the Privacy page; DESIGN.md's word
+  list has "Page metrics" in place of "anonymous page metrics", and the
+  classroom page says Page metrics (src/test/privacyPage.test.ts).
+- Help has one Privacy line linking to the page
+  (src/test/privacyPage.test.ts).
+
 - ~~Done 2026-11-11~~ Erase everything at the bottom of Usage stats (Daren 2026-11-10, Build,
   way "Bottom of Usage stats"): "The ask-first panel counts what goes:
   'Erase 3 games, 120 rolls, 4 pictures and your stats? This can't be
