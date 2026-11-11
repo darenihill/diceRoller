@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal } from '../Modal';
+import modalStyles from './Modals.module.css';
 
 interface HelpModalProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
           <li><strong>Usage stats:</strong> Your total rolls, highest roll and most played games. They stay on this device.</li>
           <li><strong>Erase everything:</strong> At the bottom of Usage stats. It asks first, then takes your games, History, pictures, stats and settings off this phone.</li>
           <li><strong>Keyboard:</strong> On a computer, press <kbd>Space</kbd> or <kbd>R</kbd> to roll.</li>
+          <li><strong>Privacy:</strong> Your dice and games stay on this phone. <a href="/privacy/" target="_blank" rel="noopener" className={modalStyles.inlineLink}>What goes to Google</a> while Page metrics is on, and how to turn it off.</li>
           <li><strong>Fair dice:</strong> Every roll uses your browser's secure random numbers, so each face is equally likely.</li>
           <li><strong>Colorblind friendly:</strong> Text and icons on each die get a color that stands out from the die, and states are shown in words, not color alone.</li>
         </ul>

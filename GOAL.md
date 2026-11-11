@@ -5,7 +5,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- Say plainly what goes to Google (Daren 2026-11-10, Build, way "Privacy
+- ~~Done 2026-11-11~~ Say plainly what goes to Google (Daren 2026-11-10, Build, way "Privacy
   page plus a Help line"): a short Privacy page, a Help line and a switch
   called "Page metrics". His page text: "Stays on this phone: your dice,
   games, History and pictures. Nothing you type, name or photograph is ever
@@ -19,14 +19,18 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   src/utils/analytics.ts and every trackEvent call; it carries its own
   Content-Security-Policy written by npm run landing, is in the sitemap,
   opens offline, and reads at 320px and 200% text
-  (src/test/privacyPage.test.ts).
-- The switch is called "Page metrics". Done when: Customize's metrics switch
+  (src/test/privacyPage.test.tsx; Playwright on the built site: no policy
+  errors, no sideways scroll at 320px and 200% text, and with the offline
+  worker installed it opens offline on its first visit, checked on a local
+  copy without the worker's localhost skip; shots in
+  dice-roller/2026-11-11/privacy/).
+- ~~Done 2026-11-11~~ The switch is called "Page metrics". Done when: Customize's metrics switch
   says "Page metrics" (its label, title and name for screen readers) and its
   line ends in a "What's sent" link to the Privacy page; DESIGN.md's word
   list has "Page metrics" in place of "anonymous page metrics", and the
-  classroom page says Page metrics (src/test/privacyPage.test.ts).
-- Help has one Privacy line linking to the page
-  (src/test/privacyPage.test.ts).
+  classroom page says Page metrics (src/test/privacyPage.test.tsx).
+- ~~Done 2026-11-11~~ Help has one Privacy line linking to the page
+  (src/test/privacyPage.test.tsx).
 
 - ~~Done 2026-11-11~~ Erase everything at the bottom of Usage stats (Daren 2026-11-10, Build,
   way "Bottom of Usage stats"): "The ask-first panel counts what goes:

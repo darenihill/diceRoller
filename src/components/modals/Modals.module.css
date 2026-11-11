@@ -399,3 +399,13 @@
   justify-content: flex-end;
   gap: 8px;
 }
+
+/* A link inside a line of text (Customize's "What's sent", Help's Privacy
+   line): the theme's link color and an underline, so it reads as a link
+   without color alone */
+.inlineLink {
+  color: var(--md-sys-color-primary);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

@@ -81,7 +81,7 @@ these words; `src/test/oneName.test.tsx` checks the main ones.
 | faces | sides |
 | Copy link (share) | Copy |
 | tap | click, click/tap, simply |
-| anonymous page metrics | telemetry |
+| Page metrics (the switch that sends visits and taps to Google; owner, 2026-11-10) | anonymous page metrics, telemetry |
 | target hit | HIT!, Target Highlight |
 | like 7, 11 | e.g. |
 | sentence case: "Usage stats", "Set default" | Title Case |

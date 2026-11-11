@@ -277,15 +277,15 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           {/* Usage Telemetry Privacy Toggle */}
           <div className={modalStyles.toggleRow}>
             <div className={modalStyles.toggleLabelCol}>
-              <span className={modalStyles.toggleTitle}>Anonymous page metrics</span>
-              <span className={modalStyles.toggleDesc}>Sends page visits, rolls and button taps to Google Analytics. Never your own face words, pictures or saved game names</span>
+              <span className={modalStyles.toggleTitle}>Page metrics</span>
+              <span className={modalStyles.toggleDesc}>Sends page visits, rolls and button taps to Google Analytics. Never your own face words, pictures or saved game names. <a href="/privacy/" target="_blank" rel="noopener" className={modalStyles.inlineLink}>What's sent</a></span>
             </div>
             <div className={modalStyles.switchCol}>
               <button 
                 className="md-icon-button"
                 onClick={onToggleTelemetry}
-                title={telemetryEnabled ? "Turn off anonymous page metrics" : "Turn on anonymous page metrics"}
-                aria-label="Anonymous page metrics"
+                title={telemetryEnabled ? "Turn off page metrics" : "Turn on page metrics"}
+                aria-label="Page metrics"
                 aria-pressed={telemetryEnabled}
               >
                 <BarChart2 size={20} />

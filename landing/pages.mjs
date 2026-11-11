@@ -109,7 +109,7 @@ export const landingPages = [
   <li>Tap Share. A link to exactly those dice is copied, its name included.</li>
   <li>Paste it into Google Classroom, an email or a slide. Students open the same dice, named at the top, with no sign-in.</li>
 </ol>
-<p>Your games stay on that device under Games, ready for the next lesson. On a classroom computer, Set default opens your dice every time. Anonymous page metrics can be turned off in Customize.</p>
+<p>Your games stay on that device under Games, ready for the next lesson. On a classroom computer, Set default opens your dice every time. Page metrics can be turned off in Customize.</p>
 `,
   },
 ];

@@ -9,6 +9,8 @@ const ASSETS_TO_CACHE = [
   '/favicon.svg',
   '/icons.svg',
   '/manifest.json',
+  // The Privacy page opens offline too, even before it was ever visited
+  '/privacy/',
   // Roboto is served from this site, so it works offline from the first visit
   '/fonts/roboto-latin.woff2'
 ];
