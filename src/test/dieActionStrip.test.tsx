@@ -58,6 +58,9 @@ describe('Where and when the strip shows (owner, 2026-11-10)', () => {
     expect(css).toMatch(/\.strip::before/);
     // No 5-second timer for the sheet: it stays until you tap away
     expect(readFileSync('src/App.tsx', 'utf8')).toMatch(/const timer = compactDieActions \? undefined : setTimeout/);
+    // A keyboard closes it with Escape or by moving on (second read, 2026-11-10)
+    expect(readFileSync('src/App.tsx', 'utf8')).toMatch(/e\.key === 'Escape'\) setRevealedDiceId\(null\)/);
+    expect(readFileSync('src/App.tsx', 'utf8')).toMatch(/addEventListener\('focusin', handleFocus\)/);
     render(<DieActionStrip die={die} rpgMode={false} onToggleHold={vi.fn()} onClone={vi.fn()} onOpenSettings={vi.fn()} onRemove={vi.fn()} />);
     expect(screen.getByRole('group', { name: 'Actions for d6' }).className).not.toMatch(/top/);
   });

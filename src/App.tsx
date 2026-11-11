@@ -500,11 +500,24 @@ function App() {
       setRevealedDiceId(null);
     };
 
+    // Escape, or the keyboard moving on past the die and its buttons, closes
+    // them too, since a keyboard never taps away (second read, 2026-11-10)
+    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setRevealedDiceId(null); };
+    const handleFocus = (e: FocusEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest?.('[data-dice-id], [data-die-actions]')) return;
+      setRevealedDiceId(null);
+    };
+
     document.addEventListener('pointerdown', handleOutsideClick);
+    document.addEventListener('keydown', handleKey);
+    document.addEventListener('focusin', handleFocus);
 
     return () => {
       clearTimeout(timer);
       document.removeEventListener('pointerdown', handleOutsideClick);
+      document.removeEventListener('keydown', handleKey);
+      document.removeEventListener('focusin', handleFocus);
     };
   }, [revealedDiceId, stripTouch, compactDieActions]);
 
@@ -633,6 +646,8 @@ function App() {
     if (index < 0) return;
     const die = diceList[index];
     removeDice(id);
+    // Its buttons go with it, and don't come back if it is undone
+    if (revealedDiceId === id) setRevealedDiceId(null);
     // A second die removed while the bar is up joins the same Undo
     offerUndo(`Removed ${dieLabel(die)}`, () => insertDiceAt(die, index), {
       kind: 'die', many: n => ({ message: `Removed ${n} dice`, back: `${n} dice are back` }),

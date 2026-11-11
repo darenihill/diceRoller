@@ -7,8 +7,6 @@
   left: 0;
   right: 0;
   bottom: 0;
-  max-width: 560px;
-  margin: 0 auto;
   z-index: 101; /* over the bottom bar (100), under the Undo bar */
   display: flex;
   flex-direction: column;
@@ -46,6 +44,14 @@
 
 @media (prefers-reduced-motion: reduce) {
   .strip { animation: none; }
+}
+
+.heading,
+.row {
+  /* Full-width sheet so it covers Roll on any screen; its contents stay a phone's width */
+  width: 100%;
+  max-width: 528px;
+  margin: 0 auto;
 }
 
 .heading {
