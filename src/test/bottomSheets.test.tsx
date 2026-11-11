@@ -39,6 +39,24 @@ const swipe = (el: Element, to: number, ms: number) => {
   ptr('pointerUp', el, 100, to);
 };
 
+// A finger: touch events, which jsdom gives no touch lists, so set them by hand
+const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', el: Element, y: number, x = 100) => {
+  const ev = createEvent[type](el, { cancelable: true });
+  const pt = [{ clientX: x, clientY: y, identifier: 7 }];
+  Object.defineProperty(ev, 'touches', { value: type === 'touchEnd' ? [] : pt });
+  Object.defineProperty(ev, 'changedTouches', { value: pt });
+  fireEvent(el, ev);
+  return ev;
+};
+const fingerSwipe = (el: Element, to: number, ms: number, x = 100) => {
+  touch('touchStart', el, 100);
+  act(() => { vi.advanceTimersByTime(300); });
+  const moved = touch('touchMove', el, to, x);
+  act(() => { vi.advanceTimersByTime(ms); });
+  touch('touchEnd', el, to, x);
+  return moved;
+};
+
 const dialog = (onClose: () => void) => render(
   <Modal isOpen onClose={onClose} title="History">
     <input aria-label="Name" />
@@ -89,12 +107,53 @@ describe('On a phone every dialog is a bottom sheet', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('a drag in the content does not close it, so long dialogs still scroll', () => {
+  it('a mouse drag in the content does not close it', () => {
     vi.useFakeTimers();
     setScreen({ phone: true });
     const onClose = vi.fn();
     dialog(onClose);
     swipe(screen.getByRole('button', { name: 'Done' }), 300, 30);
+    act(() => { vi.advanceTimersByTime(SHEET_EXIT_MS); });
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('a finger swipe down anywhere in it closes it, as on the menu (owner, 2026-11-11)', () => {
+    vi.useFakeTimers();
+    setScreen({ phone: true });
+    const onClose = vi.fn();
+    dialog(onClose);
+    const moved = fingerSwipe(screen.getByRole('button', { name: 'Done' }), 220, 30);
+    expect(moved.defaultPrevented).toBe(true);
+    act(() => { vi.advanceTimersByTime(SHEET_EXIT_MS); });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('a long dialog scrolled down scrolls back up instead of closing; a text box keeps its own drags', () => {
+    vi.useFakeTimers();
+    setScreen({ phone: true });
+    const onClose = vi.fn();
+    dialog(onClose);
+    const content = screen.getByRole('button', { name: 'Done' }).parentElement!;
+    content.scrollTop = 80;
+    const moved = fingerSwipe(screen.getByRole('button', { name: 'Done' }), 300, 30);
+    expect(moved.defaultPrevented).toBe(false);
+    content.scrollTop = 0;
+    fingerSwipe(screen.getByRole('textbox', { name: 'Name' }), 300, 30);
+    act(() => { vi.advanceTimersByTime(SHEET_EXIT_MS); });
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('a finger moving up or sideways first is left to scroll', () => {
+    vi.useFakeTimers();
+    setScreen({ phone: true });
+    const onClose = vi.fn();
+    dialog(onClose);
+    const done = screen.getByRole('button', { name: 'Done' });
+    touch('touchStart', done, 100);
+    expect(touch('touchMove', done, 80).defaultPrevented).toBe(false);
+    expect(touch('touchMove', done, 300).defaultPrevented).toBe(false);
+    touch('touchEnd', done, 300);
+    fingerSwipe(done, 112, 30, 160);
     act(() => { vi.advanceTimersByTime(SHEET_EXIT_MS); });
     expect(onClose).not.toHaveBeenCalled();
   });
@@ -174,6 +233,18 @@ describe('On a phone the menu is the same bottom sheet', () => {
     expect(sheet).not.toBeNull();
     const grab = sheet!.querySelector('[data-sheet-grab]')!;
     swipe(grab, 200, 30);
+    act(() => { vi.advanceTimersByTime(SHEET_EXIT_MS); });
+    expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('a finger swipe down from anywhere in the menu closes it, not only the top (owner, 2026-11-11)', () => {
+    vi.useFakeTimers();
+    setScreen({ phone: true });
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    const tile = menuSheet()!.querySelector('button')!;
+    expect(tile.closest('[data-sheet-grab]')).toBeNull();
+    fingerSwipe(tile, 220, 30);
     act(() => { vi.advanceTimersByTime(SHEET_EXIT_MS); });
     expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute('aria-expanded', 'false');
   });

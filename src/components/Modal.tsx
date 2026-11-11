@@ -126,7 +126,8 @@ interface PanelProps {
 /**
  * The dialog itself. On a phone it is a bottom sheet (owner, 2026-11-10,
  * Build "sheet"): full width from the bottom edge, a grab bar on top, and a
- * drag down on the grab bar or title bar closes it, as the die buttons'
+ * drag down on the grab bar or title bar, or anywhere below once its content
+ * is scrolled to the top, closes it, as the die buttons'
  * sheet does. It mounts fresh on each open, so a drag never carries over.
  * On a computer it stays the box in the middle.
  */
@@ -161,7 +162,7 @@ const ModalPanel: React.FC<PanelProps> = ({ panelRef, phone, title, header, onCl
           {head}
         </div>
       ) : head}
-      <div className={styles.content}>
+      <div className={styles.content} ref={phone ? sheet.bodyRef : undefined}>
         {children}
       </div>
     </motion.div>

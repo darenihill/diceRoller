@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import React, { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 /** How far a swipe down must go to close a sheet */
 export const SHEET_CLOSE_PX = 60;
@@ -19,7 +19,8 @@ const reducedMotion = () =>
  * short of that it springs back. A tap on a button is still a tap, and the
  * click that ends a swipe is swallowed. Shared by the die buttons' sheet,
  * every dialog and the menu on a phone (owner, 2026-11-10 and 2026-11-11).
- * Spread `handlers` on the part that takes the drag, put `dy` on the sheet
+ * Spread `handlers` on the grab bar, give the sheet `bodyRef` so a swipe
+ * anywhere on it works too, put `dy` on the sheet
  * as `translate`, and turn its transition off while `dragging`.
  */
 export function useSheetDrag(onClose?: () => void) {
@@ -30,15 +31,41 @@ export function useSheetDrag(onClose?: () => void) {
   const dragged = useRef(0);
   const exitTimer = useRef<number | undefined>(undefined);
   useEffect(() => () => window.clearTimeout(exitTimer.current), []);
+  const bodyCleanup = useRef<(() => void) | undefined>(undefined);
 
-  const endDrag = (e: React.PointerEvent) => {
+  // The drag itself, fed by the grab bar's pointer events and by touches
+  // anywhere on the sheet (bodyRef)
+  const begin = (x: number, y: number, id: number) => {
+    dragged.current = 0;
+    drag.current = { y, x, id, on: false, lastY: y, lastT: Date.now(), v: 0 };
+  };
+  /** True once the move is a drag down */
+  const follow = (x: number, y: number) => {
+    const d = drag.current;
+    if (!d) return false;
+    const my = y - d.y, mx = x - d.x;
+    if (!d.on) {
+      // Only a mostly downward move counts
+      if (my < 10 || my < Math.abs(mx)) return false;
+      d.on = true;
+      setDragging(true);
+    }
+    const now = Date.now();
+    const step = (y - d.lastY) / Math.max(8, now - d.lastT);
+    d.v = 0.6 * step + 0.4 * d.v;
+    d.lastY = y;
+    d.lastT = now;
+    setDy(Math.max(0, my));
+    return true;
+  };
+  const finish = (y: number) => {
     const d = drag.current;
     drag.current = null;
     if (!d?.on) return;
     dragged.current = Date.now();
     setDragging(false);
     if (Date.now() - d.lastT > 100) d.v = 0;
-    const moved = e.clientY - d.y;
+    const moved = y - d.y;
     // A flick back up at the end means "keep it", as phone sheets do
     if (onClose && d.v > -0.1 && (moved >= SHEET_CLOSE_PX || d.v > SHEET_FLICK_PX_PER_MS)) {
       if (reducedMotion()) { onClose(); return; }
@@ -48,11 +75,11 @@ export function useSheetDrag(onClose?: () => void) {
     }
     setDy(0);
   };
+  const cancel = () => { drag.current = null; setDragging(false); setDy(0); };
 
   const handlers = {
     onPointerDown: (e: React.PointerEvent) => {
-      dragged.current = 0;
-      drag.current = { y: e.clientY, x: e.clientX, id: e.pointerId, on: false, lastY: e.clientY, lastT: Date.now(), v: 0 };
+      begin(e.clientX, e.clientY, e.pointerId);
       // A finger keeps sending its moves here by itself; a mouse leaves a
       // short grab bar (the menu's is 28px) before the drag starts, so hold
       // it from the press. Never on a button or link, so their clicks stay
@@ -64,29 +91,84 @@ export function useSheetDrag(onClose?: () => void) {
     onPointerMove: (e: React.PointerEvent) => {
       const d = drag.current;
       if (!d || d.id !== e.pointerId) return;
-      const my = e.clientY - d.y, mx = e.clientX - d.x;
-      if (!d.on) {
-        // Only a mostly downward move counts
-        if (my < 10 || my < Math.abs(mx)) return;
-        d.on = true;
-        setDragging(true);
-        (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
-      }
-      const now = Date.now();
-      const step = (e.clientY - d.lastY) / Math.max(8, now - d.lastT);
-      d.v = 0.6 * step + 0.4 * d.v;
-      d.lastY = e.clientY;
-      d.lastT = now;
-      setDy(Math.max(0, my));
+      const was = d.on;
+      if (follow(e.clientX, e.clientY) && !was) (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
     },
-    onPointerUp: endDrag,
-    onPointerCancel: () => { drag.current = null; setDragging(false); setDy(0); },
+    onPointerUp: (e: React.PointerEvent) => finish(e.clientY),
+    onPointerCancel: cancel,
     onClickCapture: (e: React.MouseEvent) => {
       if (dragged.current && Date.now() - dragged.current < 1000) { dragged.current = 0; e.stopPropagation(); e.preventDefault(); }
     },
   };
 
-  return { handlers, dy, dragging, style: dy ? { translate: `0 ${dy}px` } : undefined };
+  // The latest drag steps for the touch listeners, which are set once
+  const steps = useRef({ begin, follow, finish, cancel });
+  useEffect(() => { steps.current = { begin, follow, finish, cancel }; });
+
+  /**
+   * Put on the whole sheet so a swipe down from anywhere on it closes it,
+   * not only from the grab bar (owner, 2026-11-11: "swipe down the popup
+   * menu from anywhere in the menu"). Its content still scrolls: the swipe
+   * only takes over when nothing under the finger is scrolled down, and an
+   * upward or sideways start is left to scroll. Touch only; a mouse drags
+   * by the grab bar.
+   */
+  const bodyRef = useCallback((el: HTMLElement | null) => {
+    bodyCleanup.current?.();
+    bodyCleanup.current = undefined;
+    if (!el) return;
+    // Whether this touch belongs to the scroll, decided on its first move
+    let scroll = false;
+    const scrolledDown = (t: EventTarget | null) => {
+      for (let n = t instanceof Element ? t : null; n && n !== el.parentElement; n = n.parentElement) {
+        if (n.scrollTop > 0) return true;
+      }
+      return false;
+    };
+    const start = (e: TouchEvent) => {
+      // The grab bar has its own pointer drag; a second finger is a pinch
+      // and a text box, picker or slider keeps its own drags
+      if (e.touches.length !== 1 || (e.target as Element).closest?.('[data-sheet-grab], input, textarea, select, [role="slider"], canvas')) { scroll = true; return; }
+      scroll = scrolledDown(e.target);
+      if (!scroll) { const t = e.touches[0]; steps.current.begin(t.clientX, t.clientY, t.identifier); }
+    };
+    const move = (e: TouchEvent) => {
+      const d = drag.current;
+      if (scroll || !d) return;
+      const t = Array.from(e.touches).find(p => p.identifier === d.id);
+      if (!t) return;
+      const my = t.clientY - d.y, mx = t.clientX - d.x;
+      if (!d.on && (my < 0 || Math.abs(mx) > my)) {
+        // Up or sideways: the content's to scroll, not ours
+        if (Math.abs(my) + Math.abs(mx) >= 10) { scroll = true; drag.current = null; }
+        return;
+      }
+      // Down at the top: nothing to scroll, so keep the page from taking it
+      if (e.cancelable) e.preventDefault();
+      steps.current.follow(t.clientX, t.clientY);
+    };
+    const end = (e: TouchEvent) => {
+      const d = drag.current;
+      if (scroll || !d) return;
+      const t = Array.from(e.changedTouches).find(p => p.identifier === d.id);
+      if (!t) return;
+      if (d.on && e.cancelable) e.preventDefault();
+      steps.current.finish(t.clientY);
+    };
+    const stop = () => { if (!scroll && drag.current) steps.current.cancel(); };
+    el.addEventListener('touchstart', start, { passive: true });
+    el.addEventListener('touchmove', move, { passive: false });
+    el.addEventListener('touchend', end);
+    el.addEventListener('touchcancel', stop);
+    bodyCleanup.current = () => {
+      el.removeEventListener('touchstart', start);
+      el.removeEventListener('touchmove', move);
+      el.removeEventListener('touchend', end);
+      el.removeEventListener('touchcancel', stop);
+    };
+  }, []);
+
+  return { handlers, bodyRef, dy, dragging, style: dy ? { translate: `0 ${dy}px` } : undefined };
 }
 
 const subscribePhone = (cb: () => void) => {

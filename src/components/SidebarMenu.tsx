@@ -176,6 +176,7 @@ const MenuPanel: React.FC<{ phone: boolean; dialogOpen: boolean; onClose: () => 
       animate="shown"
       exit="hidden"
       style={{ zIndex: 120, ...sheet.style }}
+      ref={phone ? sheet.bodyRef : undefined}
     >
       {phone && (
         <div className={styles.grab} data-sheet-grab="" aria-hidden="true" {...sheet.handlers}>
