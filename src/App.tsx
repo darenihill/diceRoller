@@ -78,6 +78,8 @@ function App() {
   useEffect(() => onSaveRefused(() => setStorageFull(true)), []);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  /** The dice area's bottom padding, room for the chip row (.diceContainer) */
+  const DICE_AREA_PADDING = 52;
   // A roll shakes the dice past the edge of their area, which flashed a scroll
   // bar on and off (owner, 2026-11-05). When the dice fit without scrolling,
   // the area hides overflow until they land; it shares the count the glide uses.
@@ -1008,6 +1010,28 @@ function App() {
   // Where the bottom bar sits: under an open dialog, else just above the buttons
   const dialogOpen = modalOpen !== null || savePromptOpen || editingDiceId !== null || shareFallbackUrl !== null;
   const toastPlace = dialogOpen ? styles.toastBelowDialog : chipRow ? styles.toastAboveRpgBar : '';
+  // The Robber note shows only when nothing else wants the spot: the storage
+  // warning, Undo, a message like "🎯 Target hit: 7" and the new-version bar
+  // all come first, and it waits while a menu or dialog is open
+  const sevenNoteShown = !!sevenNote && !dialogOpen && !menuOpen && !addMenuOpen
+    && !storageFull && !undoOffer && !toast && !newVersion.ready;
+  // At a big text size the note can reach down onto the lowest die, so the
+  // dice area gives up just that much room while it shows (second read,
+  // 2026-11-11: it hid a whole die at 320px and 200% text)
+  const sevenNoteRef = useRef<HTMLDivElement>(null);
+  const [noteRoom, setNoteRoom] = useState(0);
+  useLayoutEffect(() => {
+    const note = sevenNoteRef.current;
+    const area = containerRef.current;
+    if (!sevenNoteShown || !note || !area) { setNoteRoom(0); return; }
+    const measure = () => {
+      const overlap = area.getBoundingClientRect().bottom - DICE_AREA_PADDING - (note.getBoundingClientRect().top - 8);
+      setNoteRoom(Math.max(0, Math.ceil(overlap)));
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [sevenNoteShown, sevenNote]);
   const handleRollRef = useRef(handleRoll);
   const overlayOpenRef = useRef(overlayOpen);
   useEffect(() => {
@@ -1137,7 +1161,7 @@ function App() {
         />
       )}
 
-      <div ref={containerRef} className={`${styles.diceContainer} ${showTable ? styles.diceHidden : ''}`} style={diceStyles}>
+      <div ref={containerRef} className={`${styles.diceContainer} ${showTable ? styles.diceHidden : ''}`} style={noteRoom ? { ...diceStyles, '--note-room': `${noteRoom}px` } as React.CSSProperties : diceStyles}>
         {shownDice.map((dice) => (
           <Dice
             key={dice.id}
@@ -1359,20 +1383,20 @@ function App() {
         <div className={`${styles.toast} ${toastPlace}`} role="status">
           {toast}
         </div>
-      ) : sevenNote && !dialogOpen ? (
-        // The Robber note waits behind Undo and messages like "🎯 Target hit: 7"
-        // and shows once they go, until the next roll. A screen reader hears it
-        // with the total, below, so this copy has no role of its own
-        <div className={`${styles.toast} ${styles.sevenNote} ${toastPlace}`} data-testid="seven-note">
-          <span className={styles.sevenNoteTitle}>{sevenNote.title}</span>
-          <span>{sevenNote.text}</span>
-        </div>
-      ) : newVersion.ready && (
+      ) : newVersion.ready ? (
         // An app left open hears about a new version; Refresh loads it (owner's pick, 2026-11-03)
         <div className={`${styles.toast} ${styles.undoToast} ${toastPlace}`} role="status" data-testid="new-version-bar">
           <span style={{ flexShrink: 0 }}>New version</span>
           <button className={styles.undoButton} onClick={() => window.location.reload()}>Refresh</button>
           <button className={styles.undoButton} onClick={newVersion.later} aria-label="Later" title="Later" style={{ minWidth: 44 }}>✕</button>
+        </div>
+      ) : sevenNoteShown && sevenNote && (
+        // The Robber note waits behind everything above and shows once they
+        // go, until the next roll. A screen reader hears it with the total,
+        // below, so this copy has no role of its own
+        <div ref={sevenNoteRef} className={`${styles.toast} ${styles.sevenNote} ${toastPlace}`} data-testid="seven-note">
+          <span className={styles.sevenNoteTitle}>{sevenNote.title}</span>
+          <span>{sevenNote.text}</span>
         </div>
       )}
 

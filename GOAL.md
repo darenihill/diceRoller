@@ -18,11 +18,17 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   Knights on the top line a 7 shows "🎯 7 · Robber" and "Over 7 cards?
   Discard half"; the note sits with each game in the popular games list, not
   in Customize (src/test/robberNote.test.tsx).
-- ~~Done 2026-11-11~~ The note stops when the game does. Done when: after a die is added,
-  removed or edited, or another game is loaded, a 7 shows no note; other
-  games and plain dice never show it; Target hit, Customize and the Undo bar
-  work as before, and the note waits behind them in the same spot; it fits at
-  320px and 390px and at 200% text (src/test/robberNote.test.tsx).
+- ~~Done 2026-11-11~~ The note stops when the game does. Done when: after a
+  die is added or removed, Catan is loaded again or another game is loaded,
+  or Catan's dice are saved under another name, the note is gone and a 7
+  shows none; other popular games, plain dice and typed rolls never show it;
+  in RPG mode the dice make the 7, not the bonus; "🎯 Target hit: 7", the
+  Undo bar and the new-version bar keep the spot and the note shows once
+  they go (src/test/robberNote.test.tsx). Playwright on the built site, root
+  text 16px and 32px, Catan and Cities & Knights at 320×640 and 390×844: the
+  note stays inside the 16px gutters and covers no die, the dice area giving
+  up room for it when it would (shots in
+  dice-roller/2026-11-11/robber/).
 - ~~Done 2026-11-11~~ Help names the note. Done when: Help has one line under Games saying a 7
   in Catan or Cities & Knights shows what to do above Roll
   (src/test/robberNote.test.tsx).

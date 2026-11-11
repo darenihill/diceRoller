@@ -7,7 +7,8 @@ const css = readFileSync(resolve(__dirname, '../App.module.css'), 'utf8');
 describe('The chip row above Roll never sits on the dice', () => {
   it('keeps the row above Roll clear on every width', () => {
     // 44px chip + 10px gap above Roll; the app already keeps Roll's own row clear
-    for (const block of [/@media \(min-width: 769px\)\s*\{\s*\.diceContainer\s*\{([^}]*)\}/, /\.diceContainer\s*\{\s*padding-bottom:\s*(\d+)px !important/]) {
+    // (plus --note-room while the Robber note needs it, 2026-11-11)
+    for (const block of [/@media \(min-width: 769px\)\s*\{\s*\.diceContainer\s*\{([^}]*)\}/, /\.diceContainer\s*\{\s*padding-bottom:\s*(?:calc\()?(\d+)px[^;]*!important/]) {
       const m = css.match(block);
       expect(m).not.toBeNull();
       const px = Number((m![1].match(/(\d+)px/) ?? m!)[1]);

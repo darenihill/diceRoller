@@ -1,12 +1,16 @@
 import React from 'react';
 import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, within } from '@testing-library/react';
 import App from '../App';
 import { HelpModal } from '../components/modals/HelpModal';
 import { ROLL_DURATION_MS, TOAST_DURATION_MS } from '../utils/constants';
 import { UNDO_WINDOW_MS } from '../hooks/useUndo';
 import { dicePresets, sevenNoteFor } from '../utils/presets';
 import type { DiceData } from '../types';
+
+// The new-version bar, switched on by a test
+const version = vi.hoisted(() => ({ ready: false, later: () => { version.ready = false; } }));
+vi.mock('../hooks/useNewVersion', () => ({ useNewVersion: () => ({ ready: version.ready, later: version.later }) }));
 
 // Catan: a 7 shows a Robber note above the Roll button (owner, 2026-11-10,
 // way "With the game, shown above Roll").
@@ -26,6 +30,7 @@ const startWith = (dice: DiceData[]) =>
 // Each die rolls the next number in the queue, in list order
 let queue: number[] = [];
 beforeEach(() => {
+  version.ready = false;
   vi.useFakeTimers();
   localStorage.clear();
   vi.spyOn(globalThis.crypto, 'getRandomValues').mockImplementation(<T extends ArrayBufferView | null>(arr: T) => {
@@ -215,5 +220,107 @@ describe('Help', () => {
     const games = items.findIndex(t => t.startsWith('Games:'));
     expect(items[games + 1]).toBe('A 7 in Catan: In Catan or Cities & Knights, a roll of 7 shows 🎯 and what to do just above Roll, until the next roll.');
     expect(items.filter(t => /Robber|roll of 7/.test(t))).toHaveLength(1);
+  });
+});
+
+describe('RPG mode: the dice make the 7, not the bonus', () => {
+  it('a 7 plus a bonus of 2 shows it', () => {
+    localStorage.setItem('rpgMode', 'true');
+    localStorage.setItem('rollModifier', '2');
+    startWith(gameDice('Catan'));
+    render(<App />);
+    roll(3, 4);
+    expect(note()).toHaveTextContent('Over 7 cards? Discard half, then move it');
+  });
+
+  it('a 5 plus a bonus of 2, a total of 7, does not', () => {
+    localStorage.setItem('rpgMode', 'true');
+    localStorage.setItem('rollModifier', '2');
+    startWith(gameDice('Catan'));
+    render(<App />);
+    roll(2, 3);
+    expect(note()).toBeNull();
+    expect(spoken()).toBe('Rolled 7: 5 plus 2');
+  });
+});
+
+describe('Each guard on its own', () => {
+  it('same game name, new dice: loading Catan again after its 7 stops the note', () => {
+    // The top line still says Catan; only the changed dice catch it
+    startWith(gameDice('Catan'));
+    render(<App />);
+    roll(3, 4);
+    expect(note()).not.toBeNull();
+    loadGame('Catan');
+    expect(screen.getByText('Catan', { selector: 'span' })).toBeInTheDocument();
+    expect(note()).toBeNull();
+  });
+
+  it("same dice, new name: saving Catan's dice as another game stops the note", () => {
+    // The dice don't change; only the name on the top line catches it
+    startWith(gameDice('Catan'));
+    render(<App />);
+    roll(3, 4);
+    expect(note()).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    fireEvent.click(screen.getByRole('button', { name: /^Save/ }));
+    fireEvent.change(screen.getByRole('textbox', { name: /name for this game/i }), { target: { value: 'Friday night' } });
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Save' }));
+    act(() => { vi.advanceTimersByTime(UNDO_WINDOW_MS + 500); });
+    expect(screen.getByText('Friday night', { selector: 'span' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^7, roll again$/ })).toBeInTheDocument();
+    expect(note()).toBeNull();
+  });
+});
+
+describe('Typed rolls', () => {
+  it('a typed roll of 7 never shows it, before or after its Undo puts Catan back', () => {
+    localStorage.setItem('rpgMode', 'true');
+    startWith(gameDice('Catan'));
+    render(<App />);
+    fireEvent.change(screen.getByRole('textbox', { name: /Type a roll/ }), { target: { value: '2d6' } });
+    roll(3, 4);
+    expect(spoken()).toBe('Rolled 7');
+    expect(note()).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+    act(() => { vi.advanceTimersByTime(TOAST_DURATION_MS + 50); });
+    expect(screen.getByText('Catan', { selector: 'span' })).toBeInTheDocument();
+    expect(note()).toBeNull();
+  });
+});
+
+describe('Bars that come first', () => {
+  it('the Undo bar keeps the spot; the note shows once it goes', () => {
+    // Deleting a saved game offers Undo and leaves the dice as they are
+    localStorage.setItem('diceConfigs', JSON.stringify({
+      systemAutosave: { name: 'systemAutosave', config: gameDice('Catan') },
+      Old: { name: 'Old', config: [{ id: 'o', numberValue: 1, faces: 20, currentFaceIndex: 0, customFaces: [], color: '#384050', held: false }] },
+    }));
+    render(<App />);
+    roll(3, 4);
+    expect(note()).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Games' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Delete Old' }));
+    fireEvent.keyDown(document, { key: 'Escape' });
+    act(() => { vi.advanceTimersByTime(500); });
+    expect(screen.getByRole('button', { name: 'Undo' })).toBeInTheDocument();
+    expect(note()).toBeNull();
+    act(() => { vi.advanceTimersByTime(UNDO_WINDOW_MS + 500); });
+    expect(screen.queryByRole('button', { name: 'Undo' })).toBeNull();
+    expect(note()).toHaveTextContent('🎯 7 · Robber');
+  });
+
+  it('the new-version bar keeps the spot; the note shows after Later', () => {
+    startWith(gameDice('Catan'));
+    version.ready = true;
+    const { rerender } = render(<App />);
+    roll(3, 4);
+    expect(screen.getByTestId('new-version-bar')).toBeInTheDocument();
+    expect(note()).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Later' }));
+    rerender(<App />);
+    expect(screen.queryByTestId('new-version-bar')).toBeNull();
+    expect(note()).toHaveTextContent('🎯 7 · Robber');
   });
 });
