@@ -89,7 +89,7 @@ describe('The page stays true to what the app sends', () => {
     const pairs = new Set<string>();
     for (const file of sourceFiles('src')) {
       const src = readFileSync(join(process.cwd(), file), 'utf8');
-      for (const m of src.matchAll(/\b(trackEvent|dispatchExternalEvent)\(\s*'([a-z_]+)'/g)) {
+      for (const m of src.matchAll(/\b(trackEvent|sendToGoogle|gtag)\(\s*'([a-z_]+)'/g)) {
         const args = argsAt(src, m.index! + m[1].length);
         pairs.add(m[2]);
         for (const key of keysOf(args.slice(args.indexOf(m[2]) + m[2].length + 1))) pairs.add(`${m[2]}.${key}`);
@@ -100,15 +100,9 @@ describe('The page stays true to what the app sends', () => {
 
   // What the page says for each event and field
   const SAYS: Record<string, string> = {
-    session_start: 'Your visits',
-    'session_start.deviceCategory': 'device',
-    'session_start.referrer': 'the page you came from',
-    'session_start.screenSize': 'your screen size',
-    roll_dice: 'each roll’s total',
-    'roll_dice.sum': 'each roll’s total',
-    'roll_dice.modifier': 'RPG settings',
-    'roll_dice.rpgMode': 'RPG settings',
-    'roll_dice.rollAdvantage': 'RPG settings',
+    roll_dice: 'Your visits and taps',
+    'roll_dice.rpgMode': 'whether each roll used RPG mode',
+    'roll_dice.rollAdvantage': 'advantage or disadvantage',
     'roll_dice.diceCount': 'how many dice you roll',
     'roll_dice.typed': 'whether a roll was typed (never the words)',
     roll_one_die: 'taps',
@@ -142,12 +136,15 @@ describe('The page stays true to what the app sends', () => {
   it('every event and field the app sends is one the page names', () => {
     const found = sent();
     expect(found.has('share_link_copied.diceCount')).toBe(true);
+    expect(text).not.toMatch(/total/);
     expect([...found].filter(p => !(p in SAYS)), 'sent but not on the page').toEqual([]);
     for (const p of found) expect(text, p).toContain(SAYS[p]);
   });
 
-  it('names what Google gathers by itself: rough city, device, browser, language, how far you scroll, its ID', () => {
-    for (const words of ['your rough city, device, browser and language', 'how far you scroll', 'a random ID Google keeps on this phone for up to 2 years after your last visit']) {
+  it('names what Google gathers by itself: the page you came from, screen size, rough city, device, browser, language, how far you scroll, its ID', () => {
+    // GA4 reads the referrer and screen size with every page view, so the page
+    // still says them now the app's own visit event is gone
+    for (const words of ['the page you came from and your screen size', 'your rough city, device, browser and language', 'how far you scroll', 'a random ID Google keeps on this phone for up to 2 years after your last visit']) {
       expect(text).toContain(words);
     }
   });

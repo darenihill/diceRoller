@@ -884,7 +884,7 @@ function App() {
       setHasRolledThisSession(true);
       setRolledSignature(rollSignature(latestDiceRef.current));
       void celebrateNatural20(natural20Ids);
-      trackEvent('roll_dice', { diceCount, sum: total, modifier: roll.modifier, rpgMode, rollAdvantage: roll.advantage, typed: true });
+      trackEvent('roll_dice', { diceCount, rpgMode, rollAdvantage: roll.advantage, typed: true }, { sum: total });
     }, undefined, { text: roll.text, dice, modifier: roll.modifier, advantage: roll.advantage });
     rollFeedback();
     if (before.dice.length > 0) {
@@ -1031,7 +1031,7 @@ function App() {
       setRolledSignature(rollSignature(latestDiceRef.current));
       void celebrateNatural20(natural20Ids);
       if (diceCount > 0) {
-        trackEvent('roll_dice', { diceCount, sum: total, modifier, rpgMode, rollAdvantage });
+        trackEvent('roll_dice', { diceCount, rpgMode, rollAdvantage }, { sum: total });
       }
     });
 

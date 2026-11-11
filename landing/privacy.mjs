@@ -14,7 +14,7 @@ export const privacyPage = {
     },
     {
       heading: 'Goes to Google while Page metrics is on',
-      body: 'Your visits and taps, with each roll’s total and RPG settings; how many dice you roll, save, share or add; whether a roll was typed (never the words); the popular game you load, the theme you pick and the switches you turn on or off; how far you scroll; the page you came from and your screen size; your rough city, device, browser and language; a random ID Google keeps on this phone for up to 2 years after your last visit.',
+      body: 'Your visits and taps, with whether each roll used RPG mode, advantage or disadvantage; how many dice you roll, save, share or add; whether a roll was typed (never the words); the popular game you load, the theme you pick and the switches you turn on or off; how far you scroll; the page you came from and your screen size; your rough city, device, browser and language; a random ID Google keeps on this phone for up to 2 years after your last visit.',
     },
     {
       heading: 'Turning it off',
