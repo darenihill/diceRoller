@@ -76,6 +76,7 @@ these words; `src/test/oneName.test.tsx` checks the main ones.
 | clear (empty a list) | delete all, wipe |
 | delete (a saved game) | remove |
 | remove (one die, face or picture) | delete, clear |
+| erase (everything on this phone: Erase everything, Erase all; owner, 2026-11-10) | wipe, reset, delete all |
 | default dice | startup dice, usual dice |
 | faces | sides |
 | Copy link (share) | Copy |

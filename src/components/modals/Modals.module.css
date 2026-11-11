@@ -370,3 +370,32 @@
   color: var(--md-sys-color-on-surface-variant);
   line-height: 1;
 }
+
+/* Erase everything, at the bottom of Usage stats (owner, 2026-11-10): an
+   outlined red button whose words say what it does, and the ask-first panel */
+.eraseEverything {
+  align-self: flex-start;
+  background: transparent;
+  color: var(--md-sys-color-error);
+  border: 2px solid var(--md-sys-color-error);
+}
+
+.eraseAsk {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.eraseQuestion {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--md-sys-color-on-surface);
+}
+
+.eraseButtons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}

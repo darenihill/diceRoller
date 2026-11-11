@@ -21,6 +21,7 @@ import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/ana
 import { COMPACT_DIE_SIZE } from './utils/constants';
 import { dicePresets, sevenNoteFor } from './utils/presets';
 import { isFirstVisit, markDieButtonsShown } from './utils/firstVisit';
+import { eraseEverything, reloadAfterErase } from './utils/erase';
 import { currentSetName, diceSignature, rollSignature, readShareLink, nextFreeSaveName, suggestSaveName, type LoadedSet } from './utils/setName';
 import { readLandingStart, readLandingAbout } from './utils/landing';
 import { Info, Plus, Dice6, Table2, Swords, X } from 'lucide-react';
@@ -793,6 +794,18 @@ function App() {
     }
   };
 
+  // Erase everything (owner, 2026-11-10): asked first in Usage stats. From
+  // here this page saves nothing more, not even the autosave as it unloads,
+  // and an open Undo bar goes, so nothing comes back before the reload. No
+  // Undo: the panel says it can't be undone
+  const handleEraseEverything = () => {
+    freezeSaves();
+    importedBackupRef.current = true;
+    dismissUndo();
+    eraseEverything();
+    reloadAfterErase();
+  };
+
   const handleImportData = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1374,6 +1387,7 @@ function App() {
       <StatsModal
         isOpen={modalOpen === 'stats'}
         onClose={() => setModalOpen(null)}
+        onEraseEverything={handleEraseEverything}
       />
 
       {/* Toast Notification. With a dialog open the bar sits at the screen's

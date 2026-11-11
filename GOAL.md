@@ -5,7 +5,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- Erase everything at the bottom of Usage stats (Daren 2026-11-10, Build,
+- ~~Done 2026-11-11~~ Erase everything at the bottom of Usage stats (Daren 2026-11-10, Build,
   way "Bottom of Usage stats"): "The ask-first panel counts what goes:
   'Erase 3 games, 120 rolls, 4 pictures and your stats? This can't be
   undone.' with a red 'Erase all' and 'Not now'. It clears every saved item
@@ -16,14 +16,16 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   this phone." and an "Erase everything" button outlined in red; it asks
   first in a panel that counts what goes (no part that is zero, "1 game"
   for one) with "Not now" and a red "Erase all", 48px tall; Escape is Not
-  now and focus stays in the panel (src/test/eraseEverything.test.tsx).
-- Erase all really erases. Done when: every saved item and the first-visit
+  now and focus starts on Not now, with only Not now, Erase all and the
+  dialog's × to Tab to (src/test/eraseEverything.test.tsx; Playwright at
+  390px, dark and Clean Light, shots in dice-roller/2026-11-11/erase/).
+- ~~Done 2026-11-11~~ Erase all really erases. Done when: every saved item and the first-visit
   mark are gone and Google's _ga cookies deleted, the metrics switch is kept
   as it was, nothing on the page saves again before the reload (an Undo bar
   or a held picture can't bring anything back), and the app reloads at the
   home page and opens like a first visit; no Undo is offered
   (src/test/eraseEverything.test.tsx).
-- Words and Help. Done when: "erase (everything on this phone)" is in
+- ~~Done 2026-11-11~~ Words and Help. Done when: "erase (everything on this phone)" is in
   DESIGN.md's word list beside clear and delete, and Help has one line about
   it (src/test/eraseEverything.test.tsx).
 

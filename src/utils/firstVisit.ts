@@ -11,10 +11,14 @@ import { BUZZ_KEY, BUZZ_SHOWN_KEY } from './buzz';
  */
 export const DIE_BUTTONS_SHOWN_KEY = 'dieButtonsShown';
 
-/** Nothing saved on this phone yet: no mark, no games, settings, History or saved rolls */
+/**
+ * Nothing saved on this phone yet: no mark, no games, settings, History or
+ * saved rolls. The metrics switch doesn't count: Erase everything keeps it as
+ * it was set, and the app then opens like a first visit (owner, 2026-11-10)
+ */
 export function isFirstVisit(): boolean {
   if (readItem(DIE_BUTTONS_SHOWN_KEY) !== null) return false;
-  const keys = [...Object.values(SAVED), SAVED_ROLLS_KEY, BUZZ_KEY, BUZZ_SHOWN_KEY];
+  const keys = [...Object.values(SAVED).filter(key => key !== SAVED.telemetry), SAVED_ROLLS_KEY, BUZZ_KEY, BUZZ_SHOWN_KEY];
   return keys.every(key => readItem(key) === null);
 }
 
