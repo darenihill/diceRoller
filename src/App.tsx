@@ -19,7 +19,7 @@ import { BUZZ_KEY, BUZZ_SHOWN_KEY, canBuzz, isBuzzLink } from './utils/buzz';
 import { celebrateNatural20 } from './utils/confetti';
 import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
 import { COMPACT_DIE_SIZE } from './utils/constants';
-import { dicePresets } from './utils/presets';
+import { dicePresets, sevenNoteFor } from './utils/presets';
 import { currentSetName, diceSignature, rollSignature, readShareLink, nextFreeSaveName, suggestSaveName, type LoadedSet } from './utils/setName';
 import { readLandingStart, readLandingAbout } from './utils/landing';
 import { Info, Plus, Dice6, Table2, Swords, X } from 'lucide-react';
@@ -452,6 +452,14 @@ function App() {
   const setName = currentSetName(diceList, loadedSet);
   // Each roll records the game it was made in, for History and Frequency by game
   useEffect(() => { gameNameRef.current = setName; }, [setName, gameNameRef]);
+  // Catan's Robber note (owner, 2026-11-10: "With the game, shown above
+  // Roll"): a 7 in a game that carries a 7 note says what to do, until the
+  // next roll. It follows the name on the top line, so changing the dice or
+  // loading another game stops it; a die rolled on its own is a new roll too
+  const lastMainSeven = lastMainRoll && lastMainRoll.total - (lastMainRoll.modifier ?? 0) === 7
+    ? sevenNoteFor(lastMainRoll.game) : null;
+  const sevenNote = lastMainSeven && totalVisible && !totalStale && !isRolling
+    && rollHistory[0] === lastMainRoll && lastMainRoll?.game === setName ? lastMainSeven : null;
   const tableReady = tableView && totalVisible && !isRolling && !!lastMainRoll
     && diceList.length > 0 && diceList.map(d => d.id).join() === tableRolledIds;
   // A roll from the table stays on the table, the numbers dimmed until the
@@ -1351,6 +1359,14 @@ function App() {
         <div className={`${styles.toast} ${toastPlace}`} role="status">
           {toast}
         </div>
+      ) : sevenNote && !dialogOpen ? (
+        // The Robber note waits behind Undo and messages like "🎯 Target hit: 7"
+        // and shows once they go, until the next roll. A screen reader hears it
+        // with the total, below, so this copy has no role of its own
+        <div className={`${styles.toast} ${styles.sevenNote} ${toastPlace}`} data-testid="seven-note">
+          <span className={styles.sevenNoteTitle}>{sevenNote.title}</span>
+          <span>{sevenNote.text}</span>
+        </div>
       ) : newVersion.ready && (
         // An app left open hears about a new version; Refresh loads it (owner's pick, 2026-11-03)
         <div className={`${styles.toast} ${styles.undoToast} ${toastPlace}`} role="status" data-testid="new-version-bar">
@@ -1362,7 +1378,9 @@ function App() {
 
       {/* Screen-reader announcement of roll results */}
       <div aria-live="polite" className={styles.srOnly}>
-        {totalVisible && !isRolling ? spokenTotal(lastTotal, lastModifier) : ''}
+        {totalVisible && !isRolling
+          ? spokenTotal(lastTotal, lastModifier) + (lastMainSeven ? `. Robber: ${lastMainSeven.text}` : '')
+          : ''}
       </div>
 
       {/* Dice Settings Modal */}

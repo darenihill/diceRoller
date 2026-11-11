@@ -1,0 +1,219 @@
+import React from 'react';
+import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
+import { render, screen, fireEvent, act } from '@testing-library/react';
+import App from '../App';
+import { HelpModal } from '../components/modals/HelpModal';
+import { ROLL_DURATION_MS, TOAST_DURATION_MS } from '../utils/constants';
+import { UNDO_WINDOW_MS } from '../hooks/useUndo';
+import { dicePresets, sevenNoteFor } from '../utils/presets';
+import type { DiceData } from '../types';
+
+// Catan: a 7 shows a Robber note above the Roll button (owner, 2026-11-10,
+// way "With the game, shown above Roll").
+
+beforeAll(() => {
+  globalThis.ResizeObserver ??= class { observe() {} unobserve() {} disconnect() {} } as unknown as typeof ResizeObserver;
+});
+
+const gameDice = (name: string): DiceData[] =>
+  dicePresets.find(p => p.name === name)!.dice.map((d, i) => ({
+    id: `${name}-${i}`, currentFaceIndex: 0, held: false, numberValue: 1, faces: 6, customFaces: [], color: '#E9EAEC', ...d,
+  }) as DiceData);
+
+const startWith = (dice: DiceData[]) =>
+  localStorage.setItem('diceConfigs', JSON.stringify({ systemAutosave: { name: 'systemAutosave', config: dice } }));
+
+// Each die rolls the next number in the queue, in list order
+let queue: number[] = [];
+beforeEach(() => {
+  vi.useFakeTimers();
+  localStorage.clear();
+  vi.spyOn(globalThis.crypto, 'getRandomValues').mockImplementation(<T extends ArrayBufferView | null>(arr: T) => {
+    const face = queue.length ? queue.shift()! : 1;
+    (arr as unknown as Uint32Array)[0] = Math.floor(2 ** 32 / 6) * (face - 1);
+    return arr;
+  });
+});
+afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); localStorage.clear(); });
+
+const roll = (...faces: number[]) => {
+  queue = faces;
+  fireEvent.click(screen.getByRole('button', { name: /^Roll dice|roll again$/ }));
+  act(() => { vi.advanceTimersByTime(ROLL_DURATION_MS + 50); });
+};
+const note = () => screen.queryByTestId('seven-note');
+const spoken = () => document.querySelector('[aria-live="polite"]')?.textContent ?? '';
+const loadGame = (name: string) => {
+  fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Games' }));
+  fireEvent.click(screen.getByRole('button', { name }));
+  act(() => { vi.advanceTimersByTime(UNDO_WINDOW_MS + 500); });
+};
+
+describe('The 7 note lives with the built-in games', () => {
+  it('Catan and Cities & Knights carry their own words; no other game has one', () => {
+    expect(sevenNoteFor('Catan')).toEqual({ title: '🎯 7 · Robber', text: 'Over 7 cards? Discard half, then move it' });
+    expect(sevenNoteFor('Cities & Knights')).toEqual({ title: '🎯 7 · Robber', text: 'Over 7 cards? Discard half' });
+    const others = dicePresets.filter(p => p.sevenNote).map(p => p.name);
+    expect(others).toEqual(['Catan', 'Cities & Knights']);
+    expect(sevenNoteFor(null)).toBeNull();
+    expect(sevenNoteFor('My Catan night')).toBeNull();
+  });
+});
+
+describe('Catan: a 7 shows the Robber note above Roll', () => {
+  it('shows "🎯 7 · Robber" and what to do, and a screen reader hears it with the total', () => {
+    startWith(gameDice('Catan'));
+    render(<App />);
+    expect(screen.getByText('Catan', { selector: 'span' })).toBeInTheDocument();
+    roll(3, 4);
+    const shown = note();
+    expect(shown).not.toBeNull();
+    expect(shown).toHaveTextContent('🎯 7 · Robber');
+    expect(shown).toHaveTextContent('Over 7 cards? Discard half, then move it');
+    expect(spoken()).toBe('Rolled 7. Robber: Over 7 cards? Discard half, then move it');
+  });
+
+  it('a total other than 7 shows nothing', () => {
+    startWith(gameDice('Catan'));
+    render(<App />);
+    roll(3, 5);
+    expect(note()).toBeNull();
+    expect(spoken()).toBe('Rolled 8');
+  });
+
+  it('stays until the next roll, and the next roll takes it away', () => {
+    startWith(gameDice('Catan'));
+    render(<App />);
+    roll(1, 6);
+    act(() => { vi.advanceTimersByTime(60_000); });
+    expect(note()).not.toBeNull();
+    // Gone while the dice tumble, and an 8 brings nothing back
+    queue = [2, 6];
+    fireEvent.click(screen.getByRole('button', { name: /roll again$/ }));
+    expect(note()).toBeNull();
+    act(() => { vi.advanceTimersByTime(ROLL_DURATION_MS + 50); });
+    expect(note()).toBeNull();
+  });
+
+  it('a die rolled on its own is a new roll too', () => {
+    startWith(gameDice('Catan'));
+    render(<App />);
+    roll(3, 4);
+    expect(note()).not.toBeNull();
+    // Tap a die, then its Roll this die button
+    fireEvent.click(document.querySelector('[data-dice-id]')!);
+    queue = [2];
+    fireEvent.click(screen.getAllByRole('button', { name: /^Roll only/ })[0]);
+    act(() => { vi.advanceTimersByTime(ROLL_DURATION_MS + 50); });
+    expect(note()).toBeNull();
+  });
+});
+
+describe('Cities & Knights', () => {
+  it('shows its own words', () => {
+    startWith(gameDice('Cities & Knights'));
+    render(<App />);
+    // Regular 3, Event 4, Progress lands a Barbarian (counts 0)
+    roll(3, 4, 1);
+    expect(note()).toHaveTextContent('🎯 7 · Robber');
+    expect(note()).toHaveTextContent('Over 7 cards? Discard half');
+    expect(note()).not.toHaveTextContent('move it');
+  });
+
+  it('loading it from Games carries its note', () => {
+    startWith(gameDice('Catan'));
+    render(<App />);
+    loadGame('Cities & Knights');
+    roll(2, 5, 1);
+    expect(note()?.textContent).toBe('🎯 7 · RobberOver 7 cards? Discard half');
+  });
+});
+
+describe('The note stops when the game does', () => {
+  it('adding a die takes it away, and a 7 then shows nothing', () => {
+    startWith(gameDice('Catan'));
+    render(<App />);
+    roll(3, 4);
+    expect(note()).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Add a die' }));
+    expect(note()).toBeNull();
+    roll(1, 1, 5);
+    expect(note()).toBeNull();
+    expect(spoken()).toBe('Rolled 7');
+  });
+
+  it('removing a die takes it away, even once its Undo has gone', () => {
+    startWith(gameDice('Catan'));
+    render(<App />);
+    roll(3, 4);
+    fireEvent.click(document.querySelector('[data-dice-id]')!);
+    fireEvent.click(screen.getAllByRole('button', { name: /^Remove / })[0]);
+    act(() => { vi.advanceTimersByTime(UNDO_WINDOW_MS + 500); });
+    expect(note()).toBeNull();
+  });
+
+  it('loading another game takes it away, and a 7 there shows nothing', () => {
+    startWith(gameDice('Catan'));
+    render(<App />);
+    roll(3, 4);
+    expect(note()).not.toBeNull();
+    loadGame("That's Pretty Clever");
+    expect(note()).toBeNull();
+    roll(2, 1, 1, 1, 1, 1);
+    expect(note()).toBeNull();
+  });
+
+  it('plain dice never show it', () => {
+    const plain = gameDice('Catan').map(d => ({ ...d, color: '#384050', name: '' }));
+    startWith(plain);
+    render(<App />);
+    roll(3, 4);
+    expect(note()).toBeNull();
+    expect(spoken()).toBe('Rolled 7');
+  });
+
+  it('other popular games never show it', () => {
+    startWith(gameDice('Risk'));
+    render(<App />);
+    roll(1, 1, 1, 2, 2);
+    expect(note()).toBeNull();
+  });
+});
+
+describe('Target hit and the note share the spot', () => {
+  it('"🎯 Target hit: 7" shows as before, and the note follows once it goes', () => {
+    localStorage.setItem('targetHighlight', '7');
+    startWith(gameDice('Catan'));
+    render(<App />);
+    roll(3, 4);
+    expect(screen.getByRole('status')).toHaveTextContent('🎯 Target hit: 7');
+    expect(note()).toBeNull();
+    act(() => { vi.advanceTimersByTime(TOAST_DURATION_MS + 50); });
+    expect(screen.queryByText('🎯 Target hit: 7')).toBeNull();
+    expect(note()).toHaveTextContent('Over 7 cards? Discard half, then move it');
+  });
+
+  it('waits under an open dialog and comes back when it closes', () => {
+    startWith(gameDice('Catan'));
+    render(<App />);
+    roll(3, 4);
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    expect(note()).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Help' }));
+    expect(note()).toBeNull();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    act(() => { vi.advanceTimersByTime(500); });
+    expect(note()).not.toBeNull();
+  });
+});
+
+describe('Help', () => {
+  it('has one line about the 7 note, right under Games', () => {
+    render(<HelpModal isOpen onClose={() => {}} />);
+    const items = screen.getAllByRole('listitem').map(li => li.textContent ?? '');
+    const games = items.findIndex(t => t.startsWith('Games:'));
+    expect(items[games + 1]).toBe('A 7 in Catan: In Catan or Cities & Knights, a roll of 7 shows 🎯 and what to do just above Roll, until the next roll.');
+    expect(items.filter(t => /Robber|roll of 7/.test(t))).toHaveLength(1);
+  });
+});

@@ -5,7 +5,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- Catan: a 7 shows a Robber note above the Roll button (Daren 2026-11-10,
+- ~~Done 2026-11-11~~ Catan: a 7 shows a Robber note above the Roll button (Daren 2026-11-10,
   Build, way "With the game, shown above Roll"): "Lives with the built-in
   game, not in Customize. The note follows the game name on the top line:
   while it says Catan (or Cities & Knights), a total of 7 shows the note in
@@ -14,16 +14,16 @@ customdiceroller.com. Public app: every merge to master publishes the site.
   shows "🎯 7 · Robber" and "Over 7 cards? Discard half, then move it" just
   above Roll, a screen reader hears it with the total, and the next roll
   takes it away; any other total shows nothing (src/test/robberNote.test.tsx).
-- Cities & Knights carries its own 7 note. Done when: with Cities &
+- ~~Done 2026-11-11~~ Cities & Knights carries its own 7 note. Done when: with Cities &
   Knights on the top line a 7 shows "🎯 7 · Robber" and "Over 7 cards?
   Discard half"; the note sits with each game in the popular games list, not
   in Customize (src/test/robberNote.test.tsx).
-- The note stops when the game does. Done when: after a die is added,
+- ~~Done 2026-11-11~~ The note stops when the game does. Done when: after a die is added,
   removed or edited, or another game is loaded, a 7 shows no note; other
   games and plain dice never show it; Target hit, Customize and the Undo bar
   work as before, and the note waits behind them in the same spot; it fits at
   320px and 390px and at 200% text (src/test/robberNote.test.tsx).
-- Help names the note. Done when: Help has one line under Games saying a 7
+- ~~Done 2026-11-11~~ Help names the note. Done when: Help has one line under Games saying a 7
   in Catan or Cities & Knights shows what to do above Roll
   (src/test/robberNote.test.tsx).
 

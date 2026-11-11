@@ -15,6 +15,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
           <li><strong>Hold:</strong> Tap a die, then Hold. Held dice stay put when you roll. Tap the gold HELD tag, or Release above Roll, to let them roll again.</li>
           <li><strong>Die settings:</strong> Tap a die, then Settings. Change its name, color and faces, or add words, icons and pictures as faces. Pictures stay on this device; share links show the face's words instead.</li>
           <li><strong>Games:</strong> Open the menu (☰) and tap Games. Load one of the popular games, like <em>Catan</em> or <em>Dungeons &amp; Dragons</em>, or one of your games. Tap Save to keep the dice you have as a game.</li>
+          <li><strong>A 7 in Catan:</strong> In <em>Catan</em> or <em>Cities &amp; Knights</em>, a roll of 7 shows 🎯 and what to do just above Roll, until the next roll.</li>
           <li><strong>Default dice:</strong> Tap Set default in the menu, and Dice Roller opens with these dice every time.</li>
           <li><strong>RPG mode:</strong> Tap RPG mode in the menu for D&amp;D dice, a modifier and advantage or disadvantage. Advantage keeps the highest of matching plain dice; disadvantage keeps the lowest.</li>
           <li><strong>Type a roll:</strong> In RPG mode, type a roll like <code>2d6+3</code> or <code>d20 adv</code> in the box at the top, then tap Roll there or the big Roll button. Tap <em>Save this roll</em> to keep it as a button.</li>

@@ -256,6 +256,26 @@
   to { opacity: 1; transform: none; }
 }
 
+/* Catan's Robber note: two lines, the 🎯 7 · Robber line bold and the
+   what-to-do line plain, wrapping inside the screen at any text size */
+.sevenNote {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  box-sizing: border-box;
+  text-align: center;
+  font-size: 0.875rem; /* 14px, and grows with the browser's text size */
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.sevenNoteTitle {
+  font-weight: 700;
+}
+
 /* The Undo offer can be tapped, unlike a plain message */
 .undoToast {
   display: flex;
