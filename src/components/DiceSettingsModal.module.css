@@ -118,7 +118,12 @@
 /* Custom Faces Grid */
 .facesGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  /* A face card's row (grip, face, number box, picture and ×) needs about
+     190px plus the card's padding: at 130px two cards squeezed side by side
+     spilled their × and picture button out of the panel, on a computer and
+     in the full-width phone sheet (review 2026-11-11). One card per row
+     until two really fit. */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr));
   gap: 8px;
   margin-bottom: 16px;
 }
@@ -501,7 +506,9 @@
 /* Custom faces: Colour, Icons and Text as three buttons that open their tools */
 .panelButtons {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* Three in a row while the words fit; at a large text size two, so
+     "Color" and "Icons" never run past their borders (review 2026-11-11) */
+  grid-template-columns: repeat(auto-fill, minmax(max(calc(2.5rem + 44px), calc(33.33% - 6px)), 1fr));
   gap: 8px;
   margin: 12px 0;
 }
