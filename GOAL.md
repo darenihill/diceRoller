@@ -5,6 +5,22 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- Phone dialogs slide up from the bottom and swipe down to close (Daren
+  2026-11-10, Build, way "sheet"): "On a phone, dialogs slide up from the
+  bottom with a small grab bar on top. Dragging the grab bar down closes
+  them; the × stays." Done when: at the phone width every dialog opens as a
+  full-width sheet from the bottom edge with a grab bar and rounded top
+  corners; dragging its grab bar or header down past a threshold, or a quick
+  flick, closes it, as do tapping above it, Back and its ×/Done; with Reduce
+  motion on it appears without sliding; the focus trap, 48px buttons, the
+  Undo bar under it and a focused text box above the phone keyboard all
+  hold; the computer layout is unchanged (src/test/bottomSheets.test.tsx).
+- The phone menu is the same bottom sheet (the Desk card's answer to
+  Daren's "Does it slide up from the bottom as well?"). Done when: at the
+  phone width the menu rises from the bottom edge with the grab bar and
+  closes on a drag down, a tap above it or Back, and tapping History or
+  Games swaps it for that sheet in the same spot; its own commit, so it can
+  be dropped alone (src/test/bottomSheets.test.tsx).
 - ~~Done 2026-11-11~~ Send Google less (Daren 2026-11-10, Build, way "Cut what isn't used"):
   "Rolls send how many dice and which mode, not the total or modifier; The
   second visit count and an unused second sender go; You keep Google's data
