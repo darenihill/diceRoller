@@ -198,6 +198,34 @@ describe('On a phone the menu is the same bottom sheet', () => {
     await waitFor(() => expect(menuSheet()).toBeNull());
   });
 
+  it('a mouse press on the grab bar holds the pointer, so a drag that leaves the 28px bar still counts; a press on a button does not', () => {
+    setScreen({ phone: true });
+    const capture = vi.fn();
+    const before = HTMLElement.prototype.setPointerCapture;
+    HTMLElement.prototype.setPointerCapture = capture;
+    try {
+      render(<App />);
+      fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+      const grab = menuSheet()!.querySelector('[data-sheet-grab]')!;
+      const press = (el: Element, pointerType: string) => {
+        const ev = createEvent.pointerDown(el);
+        Object.assign(ev, { clientX: 100, clientY: 100, pointerId: 1, pointerType });
+        fireEvent(el, ev);
+      };
+      press(grab, 'mouse');
+      expect(capture).toHaveBeenCalledTimes(1);
+      // A finger is held by the browser itself
+      press(grab, 'touch');
+      expect(capture).toHaveBeenCalledTimes(1);
+      // A press on a button inside the grab area (the dialog's ×) keeps its click
+      render(<Modal isOpen onClose={() => {}} title="History"><button>Done</button></Modal>);
+      press(screen.getByRole('button', { name: 'Close dialog' }), 'mouse');
+      expect(capture).toHaveBeenCalledTimes(1);
+    } finally {
+      HTMLElement.prototype.setPointerCapture = before;
+    }
+  });
+
   it('stays the panel above its button on a computer', () => {
     setScreen({ phone: false });
     render(<App />);

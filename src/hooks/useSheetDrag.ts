@@ -53,6 +53,13 @@ export function useSheetDrag(onClose?: () => void) {
     onPointerDown: (e: React.PointerEvent) => {
       dragged.current = 0;
       drag.current = { y: e.clientY, x: e.clientX, id: e.pointerId, on: false, lastY: e.clientY, lastT: Date.now(), v: 0 };
+      // A finger keeps sending its moves here by itself; a mouse leaves a
+      // short grab bar (the menu's is 28px) before the drag starts, so hold
+      // it from the press. Never on a button or link, so their clicks stay
+      // theirs (second read, 2026-11-11)
+      if (e.pointerType !== 'touch' && !(e.target as Element).closest?.('button, a, input, select, textarea')) {
+        (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+      }
     },
     onPointerMove: (e: React.PointerEvent) => {
       const d = drag.current;
