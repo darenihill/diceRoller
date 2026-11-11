@@ -256,6 +256,12 @@
     max-width: none;
     width: auto;
   }
+  /* A dialog is a bottom sheet here (owner, 2026-11-10), so the bar goes to
+     the clear strip above it, never over its Done or Remove */
+  .toast.toastBelowDialog {
+    top: calc(12px + env(safe-area-inset-top, 0px));
+    bottom: auto;
+  }
 }
 
 @keyframes slideUpRight {

@@ -3,6 +3,7 @@ import { Lock, Unlock, Settings, Trash2, Copy, Dices } from 'lucide-react';
 import type { DiceData } from '../types';
 import { parseFaceContent, faceLabel } from '../utils/diceUtils';
 import styles from './DieActionStrip.module.css';
+import { useSheetDrag } from '../hooks/useSheetDrag';
 
 interface DieActionStripProps {
   die: DiceData;
@@ -19,12 +20,8 @@ interface DieActionStripProps {
   onClose?: () => void;
 }
 
-/** How far a swipe down must go to close the sheet */
-export const SHEET_CLOSE_PX = 60;
-/** A quicker flick down than this, in px per ms, closes it however short */
-export const SHEET_FLICK_PX_PER_MS = 0.5;
-/** How long the sheet takes to slide down before it goes */
-export const SHEET_EXIT_MS = 200;
+// The swipe-down numbers live with the shared sheet drag (useSheetDrag)
+export { SHEET_CLOSE_PX, SHEET_FLICK_PX_PER_MS, SHEET_EXIT_MS } from '../hooks/useSheetDrag';
 
 /** What the die shows, in words, for the strip's heading */
 const showing = (die: DiceData): string => {
@@ -45,64 +42,14 @@ const showing = (die: DiceData): string => {
  */
 export const DieActionStrip: React.FC<DieActionStripProps> = ({ die, rpgMode, onRollOne, onToggleHold, onClone, onOpenSettings, onRemove, onInteract, onClose }) => {
   const name = die.name || `d${die.faces}`;
-  // Swipe down to close, like a phone's bottom sheet: it follows the finger
-  // down, and past SHEET_CLOSE_PX or on a quick flick it slides away; short of
-  // that it springs back. A tap on a button is still a tap.
-  const drag = React.useRef<{ y: number; x: number; id: number; on: boolean; lastY: number; lastT: number; v: number } | null>(null);
-  const [dy, setDy] = React.useState(0);
-  const [live, setLive] = React.useState(false);
-  // When the last drag ended: only the click right after it is swallowed
-  const dragged = React.useRef(0);
-  const exitTimer = React.useRef<number | undefined>(undefined);
-  React.useEffect(() => () => window.clearTimeout(exitTimer.current), []);
-  const endDrag = (e: React.PointerEvent) => {
-    const d = drag.current;
-    drag.current = null;
-    if (!d?.on) return;
-    dragged.current = Date.now();
-    setLive(false);
-    if (Date.now() - d.lastT > 100) d.v = 0;
-    const moved = e.clientY - d.y;
-    // A flick back up at the end means "keep it", as phone sheets do
-    if (onClose && d.v > -0.1 && (moved >= SHEET_CLOSE_PX || d.v > SHEET_FLICK_PX_PER_MS)) {
-      const reduced = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (reduced) { onClose(); return; }
-      setDy(window.innerHeight);
-      exitTimer.current = window.setTimeout(onClose, SHEET_EXIT_MS);
-      return;
-    }
-    setDy(0);
-  };
+  // Swipe down to close, like a phone's bottom sheet (shared with the dialogs)
+  const sheet = useSheetDrag(onClose);
   return (
     <div
       onPointerDownCapture={onInteract}
-      onPointerDown={(e) => { dragged.current = 0; drag.current = { y: e.clientY, x: e.clientX, id: e.pointerId, on: false, lastY: e.clientY, lastT: Date.now(), v: 0 }; }}
-      onPointerMove={(e) => {
-        const d = drag.current;
-        if (!d || d.id !== e.pointerId) return;
-        const my = e.clientY - d.y, mx = e.clientX - d.x;
-        if (!d.on) {
-          // Only a mostly downward move counts
-          if (my < 10 || my < Math.abs(mx)) return;
-          d.on = true;
-          setLive(true);
-          e.currentTarget.setPointerCapture?.(e.pointerId);
-        }
-        const now = Date.now();
-        const step = (e.clientY - d.lastY) / Math.max(8, now - d.lastT);
-        d.v = 0.6 * step + 0.4 * d.v;
-        d.lastY = e.clientY;
-        d.lastT = now;
-        setDy(Math.max(0, my));
-      }}
-      onPointerUp={endDrag}
-      onPointerCancel={() => { drag.current = null; setLive(false); setDy(0); }}
-      onClickCapture={(e) => {
-        // The click that ends a swipe is not a tap on a button
-        if (dragged.current && Date.now() - dragged.current < 1000) { dragged.current = 0; e.stopPropagation(); e.preventDefault(); }
-      }}
-      style={dy ? { translate: `0 ${dy}px` } : undefined}
-      className={`${styles.strip} ${rpgMode ? styles.rpg : ''} ${live ? styles.dragging : ''}`}
+      {...sheet.handlers}
+      style={sheet.style}
+      className={`${styles.strip} ${rpgMode ? styles.rpg : ''} ${sheet.dragging ? styles.dragging : ''}`}
       role="group"
       aria-label={`Actions for ${name}`}
       data-die-actions={die.id}

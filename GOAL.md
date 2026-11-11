@@ -5,7 +5,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- Phone dialogs slide up from the bottom and swipe down to close (Daren
+- ~~Done 2026-11-11~~ Phone dialogs slide up from the bottom and swipe down to close (Daren
   2026-11-10, Build, way "sheet"): "On a phone, dialogs slide up from the
   bottom with a small grab bar on top. Dragging the grab bar down closes
   them; the × stays." Done when: at the phone width every dialog opens as a
