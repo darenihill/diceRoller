@@ -17,6 +17,14 @@
   color: var(--md-sys-color-on-surface);
   box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
   animation: sheetUp 250ms cubic-bezier(0.2, 0, 0, 1);
+  /* Swipe down to close: the sheet takes the vertical drag itself */
+  touch-action: none;
+  transition: translate 200ms ease-out;
+}
+
+/* While a finger drags it, the sheet follows with no lag */
+.strip.dragging {
+  transition: none;
 }
 
 /* The sheet's handle, as Material's bottom sheets have */
@@ -43,7 +51,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .strip { animation: none; }
+  .strip { animation: none; transition: none; }
 }
 
 .heading,

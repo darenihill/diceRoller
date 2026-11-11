@@ -1160,6 +1160,7 @@ function App() {
           onOpenSettings={setEditingDiceId}
           onRemove={handleRemoveDie}
           onInteract={() => setStripTouch(n => n + 1)}
+          onClose={() => setRevealedDiceId(null)}
         />
       )}
 

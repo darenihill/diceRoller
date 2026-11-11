@@ -49,8 +49,9 @@ export const UndoBar: React.FC<UndoBarProps> = ({ offer, windowMs, paused, onUnd
       const box = svg.getBoundingClientRect();
       if (!box.width || !box.height) return;
       const lw = parseFloat(getComputedStyle(svg).getPropertyValue('--line')) || 2;
-      // Just outside the pill, a 2px gap from its edge (owner, 2026-11-10: "Line on the outside edge")
-      const i = -(lw / 2 + 2);
+      // Inside the pill, 3px in from its edge (owner, 2026-11-10: "The undo
+      // button indicator should be inside the button"), as the standard says
+      const i = lw / 2 + 3;
       const w = box.width - 2 * i, h = box.height - 2 * i;
       const r = Math.min(h / 2, w / 2);
       const x0 = i, y0 = i, cx = i + w / 2;

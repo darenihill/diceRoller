@@ -73,10 +73,9 @@
   outline-offset: 2px;
 }
 
-/* The countdown: a line hugging the outside edge of the pill, in the pill's own
-   fill colour, 2px out from its edge (owner, 2026-11-10: "Line on the
-   outside edge"), starting at the top and running clockwise, draining away.
-   No track under it. */
+/* The countdown: a line in the words' colour round the inside of the pill
+   (owner, 2026-11-10: "inside the button"), starting at the top and running
+   clockwise, draining away. No track under it. */
 .ring {
   position: absolute;
   inset: 0;
@@ -88,7 +87,7 @@
 
 .ringLine {
   fill: none;
-  stroke: var(--md-sys-color-primary);
+  stroke: var(--md-sys-color-on-primary);
   stroke-width: var(--line);
   stroke-linecap: round;
   /* The path starts at the top middle; one dash as long as the whole line,
