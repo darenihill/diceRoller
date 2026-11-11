@@ -1,32 +1,65 @@
-/* Sits just above the bottom bar, where the thumb already is */
+/* A sheet that comes up from the bottom edge and covers the Roll, + and menu
+   buttons until you tap away from it (owner, 2026-11-10: "come from the
+   bottom up and cover the roll button at the bottom until clicked out of").
+   Always the same spot, so it never jumps round the screen. */
 .strip {
   position: fixed;
-  left: max(12px, env(safe-area-inset-left, 0px));
-  right: max(12px, env(safe-area-inset-right, 0px));
-  bottom: calc(108px + env(safe-area-inset-bottom, 0px));
-  max-width: 480px;
-  margin: 0 auto;
-  z-index: 101;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 101; /* over the bottom bar (100), under the Undo bar */
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 10px 12px 12px;
-  border-radius: var(--shape-large, 20px);
+  padding: 8px max(16px, env(safe-area-inset-right, 0px)) calc(20px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  border-radius: 28px 28px 0 0;
   background-color: var(--md-sys-color-surface);
   color: var(--md-sys-color-on-surface);
-  box-shadow: var(--elevation-3);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
+  animation: sheetUp 250ms cubic-bezier(0.2, 0, 0, 1);
+  /* Swipe down to close: the sheet takes the vertical drag itself */
+  touch-action: none;
+  transition: translate 200ms ease-out;
+}
+
+/* While a finger drags it, the sheet follows with no lag */
+.strip.dragging {
+  transition: none;
+}
+
+/* The sheet's handle, as Material's bottom sheets have */
+.strip::before {
+  content: '';
+  align-self: center;
+  width: 32px;
+  height: 4px;
+  border-radius: 2px;
+  background-color: var(--md-sys-color-on-surface-variant);
+  opacity: 0.4;
 }
 
 /* A row of chips sits above Roll (RPG Mode's, or Release while dice are
-   held): the strip goes above it, level with the Undo bar */
+   held): the sheet grows tall enough to cover them too, handle at the top */
 .strip.rpg {
-  bottom: calc(162px + env(safe-area-inset-bottom, 0px));
+  min-height: calc(170px + env(safe-area-inset-bottom, 0px));
+  justify-content: space-between;
 }
 
-/* The tapped die sits where the strip would go, so the strip opens at the top instead */
-.strip.top {
-  top: calc(12px + env(safe-area-inset-top, 0px));
-  bottom: auto;
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .strip { animation: none; transition: none; }
+}
+
+.heading,
+.row {
+  /* Full-width sheet so it covers Roll on any screen; its contents stay a phone's width */
+  width: 100%;
+  max-width: 528px;
+  margin: 0 auto;
 }
 
 .heading {

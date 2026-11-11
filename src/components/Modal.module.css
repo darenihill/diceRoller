@@ -45,3 +45,53 @@
   font-size: 1rem;
   color: var(--md-sys-color-on-surface);
 }
+
+/* On a phone every dialog is a bottom sheet (owner, 2026-11-10, Build
+   "sheet"): full width from the bottom edge, top corners round, a grab bar
+   on top, the same look as the die buttons' sheet. The top 72px stay clear,
+   so tapping above it closes it and the Undo bar has room there. */
+@media (max-width: 468px) {
+  .overlay {
+    align-items: flex-end;
+    padding: 0;
+    /* Sits above the phone keyboard while a text box is in use (standard 20) */
+    padding-bottom: var(--keyboard, 0px);
+  }
+
+  .modal.sheet {
+    max-width: none;
+    max-height: calc(100dvh - 72px - var(--keyboard, 0px));
+    border-radius: 28px 28px 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
+    transition: translate 200ms ease-out;
+  }
+
+  /* While a finger drags it, the sheet follows with no lag */
+  .modal.sheet.dragging {
+    transition: none;
+  }
+
+  /* The grab bar and title bar take the drag; the content below still scrolls */
+  .grab {
+    touch-action: none;
+    flex-shrink: 0;
+  }
+
+  .handle {
+    width: 32px;
+    height: 4px;
+    margin: 8px auto 0;
+    border-radius: 2px;
+    background-color: var(--md-sys-color-on-surface-variant);
+    opacity: 0.4;
+  }
+
+  .sheet .header {
+    padding: 4px 16px 8px 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal.sheet { transition: none; }
+}

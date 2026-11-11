@@ -18,7 +18,7 @@ describe('Customize switches say On or Off', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
     fireEvent.click(screen.getByText('Customize'));
-    for (const name of ['Sound effects', 'Shake to roll', 'Sort dice', 'Bright rings', 'Anonymous page metrics']) {
+    for (const name of ['Sound effects', 'Shake to roll', 'Sort dice', 'Bright rings', 'Page metrics']) {
       const pressed = screen.getByRole('button', { name }).getAttribute('aria-pressed') === 'true';
       expect(word(name)).toBe(pressed ? 'On' : 'Off');
     }

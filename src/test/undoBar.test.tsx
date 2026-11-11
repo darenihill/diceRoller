@@ -1,12 +1,18 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, createEvent, act } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
-import { UndoBar } from '../components/UndoBar';
+import { UndoBar, SWIPE_EXIT_MS } from '../components/UndoBar';
 
 const offer = (big = false) => ({ message: 'Removed d20', undo: () => {}, back: 'd20 is back', big, key: 1 });
 const props = { windowMs: 7000, paused: false, onUndo: () => {}, onDismiss: () => {}, onPause: () => {}, onResume: () => {} };
 const css = readFileSync('src/components/UndoBar.module.css', 'utf8');
+// jsdom's pointer events drop clientX and pointerId, so set them by hand
+const ptr = (type: 'pointerDown' | 'pointerMove' | 'pointerUp', el: Element, x: number, y: number, id: number) => {
+  const ev = createEvent[type](el);
+  Object.assign(ev, { clientX: x, clientY: y, pointerId: id });
+  fireEvent(el, ev);
+};
 
 describe('The Undo bar follows the standard', () => {
   it('says what happened, then a filled Undo pill with its arrow, then ×', () => {
@@ -20,9 +26,92 @@ describe('The Undo bar follows the standard', () => {
     expect(onDismiss).toHaveBeenCalled();
   });
 
-  it('a big change has no ×', () => {
+  it('a big change has × too, so it is always there (owner, 2026-11-10)', () => {
     render(<UndoBar offer={offer(true)} {...props} />);
-    expect(screen.queryByRole('button', { name: 'Dismiss' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
+  });
+
+  it('a sideways swipe past the line slides off and dismisses; a short slow one springs back (owner, 2026-11-10, like Sitter)', () => {
+    vi.useFakeTimers();
+    const onDismiss = vi.fn();
+    render(<UndoBar offer={offer()} {...props} onDismiss={onDismiss} />);
+    const bar = screen.getByTestId('undo-bar');
+    ptr('pointerDown', bar, 100, 10, 1);
+    act(() => { vi.advanceTimersByTime(300); });
+    ptr('pointerMove', bar, 140, 12, 1);
+    act(() => { vi.advanceTimersByTime(200); });
+    ptr('pointerUp', bar, 140, 12, 1);
+    expect(onDismiss).not.toHaveBeenCalled();
+    expect(bar.style.translate).toBe('');
+    ptr('pointerDown', bar, 100, 10, 2);
+    act(() => { vi.advanceTimersByTime(300); });
+    ptr('pointerMove', bar, 220, 14, 2);
+    act(() => { vi.advanceTimersByTime(30); });
+    ptr('pointerUp', bar, 220, 14, 2);
+    // It slides the rest of the way off first, then goes
+    expect(onDismiss).not.toHaveBeenCalled();
+    expect(bar.style.translate).not.toBe('');
+    act(() => { vi.advanceTimersByTime(SWIPE_EXIT_MS); });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
+  });
+
+  it('a new Undo that shows while the old one slides off is not dismissed by it', () => {
+    vi.useFakeTimers();
+    const onDismiss = vi.fn();
+    const { rerender } = render(<UndoBar offer={offer()} {...props} onDismiss={onDismiss} />);
+    const bar = screen.getByTestId('undo-bar');
+    ptr('pointerDown', bar, 100, 10, 1);
+    act(() => { vi.advanceTimersByTime(300); });
+    ptr('pointerMove', bar, 220, 10, 1);
+    act(() => { vi.advanceTimersByTime(30); });
+    ptr('pointerUp', bar, 220, 10, 1);
+    rerender(<UndoBar offer={{ ...offer(), message: 'Removed d6', key: 2 }} {...props} onDismiss={onDismiss} />);
+    act(() => { vi.advanceTimersByTime(SWIPE_EXIT_MS * 2); });
+    expect(onDismiss).not.toHaveBeenCalled();
+    expect(screen.getByTestId('undo-bar').style.translate).toBe('');
+    vi.useRealTimers();
+  });
+
+  it('one jittery frame in a slow drag is not a flick', () => {
+    vi.useFakeTimers();
+    const onDismiss = vi.fn();
+    render(<UndoBar offer={offer()} {...props} onDismiss={onDismiss} />);
+    const bar = screen.getByTestId('undo-bar');
+    ptr('pointerDown', bar, 100, 10, 1);
+    act(() => { vi.advanceTimersByTime(200); });
+    ptr('pointerMove', bar, 120, 10, 1);
+    ptr('pointerMove', bar, 124, 10, 1);
+    ptr('pointerUp', bar, 124, 10, 1);
+    act(() => { vi.advanceTimersByTime(SWIPE_EXIT_MS); });
+    expect(onDismiss).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it('a quick flick dismisses even when short, as on Sitter', () => {
+    vi.useFakeTimers();
+    const onDismiss = vi.fn();
+    render(<UndoBar offer={offer()} {...props} onDismiss={onDismiss} />);
+    const bar = screen.getByTestId('undo-bar');
+    ptr('pointerDown', bar, 100, 10, 1);
+    act(() => { vi.advanceTimersByTime(16); });
+    ptr('pointerMove', bar, 115, 10, 1);
+    act(() => { vi.advanceTimersByTime(16); });
+    ptr('pointerMove', bar, 150, 10, 1);
+    ptr('pointerUp', bar, 150, 10, 1);
+    act(() => { vi.advanceTimersByTime(SWIPE_EXIT_MS); });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
+  });
+
+  it('an up-and-down drag is a scroll, not a swipe', () => {
+    const onDismiss = vi.fn();
+    render(<UndoBar offer={offer()} {...props} onDismiss={onDismiss} />);
+    const bar = screen.getByTestId('undo-bar');
+    ptr('pointerDown', bar, 100, 10, 1);
+    ptr('pointerMove', bar, 130, 120, 1);
+    ptr('pointerUp', bar, 200, 140, 1);
+    expect(onDismiss).not.toHaveBeenCalled();
   });
 
   it('the countdown runs for the whole window and stops while touched', () => {
@@ -36,13 +125,19 @@ describe('The Undo bar follows the standard', () => {
     expect((container.querySelector('path') as SVGPathElement).style.animationPlayState).toBe('paused');
   });
 
-  it('the line drains clockwise from the top middle, 2px on a phone and 3px on a computer, with no track', () => {
+  it('the line runs inside the pill and drains clockwise from the top middle, 2px on a phone and 3px on a computer, with no track', () => {
     // A path from the top middle; one whole-line dash whose start slides clockwise to the end
     expect(css).toMatch(/stroke-dasharray:\s*1px 1px/);
-    expect(css).toMatch(/from\s*{\s*stroke-dashoffset:\s*0px;\s*}/);
-    expect(css).toMatch(/to\s*{\s*stroke-dashoffset:\s*-1px;\s*}/);
+    expect(css).toMatch(/from\s*{\s*stroke-dasharray:\s*1px 1px;\s*}/);
+    expect(css).toMatch(/to\s*{\s*stroke-dasharray:\s*0px 1px;\s*}/);
+    expect(css).toMatch(/stroke-linecap:\s*butt/);
     expect(css).toMatch(/--line:\s*2px/);
     expect(css).toMatch(/@media \(min-width: 769px\)\s*{\s*\.undo\s*{\s*--line:\s*3px/);
-    expect(css).toMatch(/stroke:\s*currentColor/);
+    expect(css).toMatch(/stroke:\s*var\(--md-sys-color-on-primary\)/);
+    // Sitter's look: a quiet surface bar, the Undo filled in the main colour
+    expect(css).toMatch(/background-color:\s*var\(--md-sys-color-surface-variant\)/);
+    expect(css).toMatch(/background-color:\s*var\(--md-sys-color-primary\);\s*color:\s*var\(--md-sys-color-on-primary\)/);
+    // Flush with the pill's inside edge, as Sitter's watch draws it (owner, 2026-11-10)
+    expect(readFileSync('src/components/UndoBar.tsx', 'utf8')).toMatch(/const i = lw \/ 2;/);
   });
 });

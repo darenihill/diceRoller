@@ -88,7 +88,7 @@ describe('Type a roll box', () => {
     expect(screen.queryByRole('textbox', { name: /Type a roll/ })).toBeNull();
   });
 
-  it('typing 2d6+3 puts out two d6 with +3 and rolls once; Undo brings the old dice back', () => {
+  it('typing 2d6+3 and tapping + puts out two d6 with +3 without rolling; Undo brings the old dice back (owner, 2026-11-10)', () => {
     vi.useFakeTimers();
     localStorage.setItem('rpgMode', 'true');
     localStorage.setItem('diceConfigs', JSON.stringify({ systemAutosave: { name: 'systemAutosave', config: [
@@ -97,22 +97,36 @@ describe('Type a roll box', () => {
     render(<App />);
     const box = screen.getByRole('textbox', { name: /Type a roll/ });
     fireEvent.change(box, { target: { value: '2d6+3' } });
-    fireEvent.submit(box.closest('form')!);
+    fireEvent.click(screen.getByRole('button', { name: 'Put out these dice' }));
     act(() => { vi.advanceTimersByTime(ROLL_DURATION_MS + 50); });
 
-    const history = JSON.parse(localStorage.getItem('rollHistory') ?? '[]');
-    expect(history).toHaveLength(1);
-    expect(history[0]).toMatchObject({ typed: '2d6+3', modifier: 3 });
+    // Nothing rolled yet
+    expect(JSON.parse(localStorage.getItem('rollHistory') ?? '[]')).toHaveLength(0);
     expect(screen.getAllByLabelText(/^d6 showing/)).toHaveLength(2);
     expect(screen.queryAllByLabelText(/^d4 showing/)).toHaveLength(0);
-    // The modifier set now stays readable on its chip while Roll shows the last total
     expect(screen.getByTestId('modifier-chip')).toHaveTextContent('+3');
-    expect(screen.getByText('Rolled 2d6+3')).toBeInTheDocument();
+    expect(screen.getByText('Put out 2d6+3')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
     expect(screen.getAllByLabelText(/^d4 showing/)).toHaveLength(1);
     expect(screen.queryAllByLabelText(/^d6 showing/)).toHaveLength(0);
     expect(screen.getByTestId('modifier-chip')).toHaveTextContent('±0');
+  });
+
+  it('after +, the big Roll button rolls the dice that were put out, with the modifier', () => {
+    vi.useFakeTimers();
+    localStorage.setItem('rpgMode', 'true');
+    render(<App />);
+    const box = screen.getByRole('textbox', { name: /Type a roll/ });
+    fireEvent.change(box, { target: { value: '2d6+3' } });
+    fireEvent.submit(box.closest('form')!);
+    expect(JSON.parse(localStorage.getItem('rollHistory') ?? '[]')).toHaveLength(0);
+    fireEvent.click(screen.getByRole('button', { name: /^Roll dice/ }));
+    act(() => { vi.advanceTimersByTime(ROLL_DURATION_MS + 50); });
+    const history = JSON.parse(localStorage.getItem('rollHistory') ?? '[]');
+    expect(history).toHaveLength(1);
+    expect(history[0]).toMatchObject({ modifier: 3 });
+    expect(screen.getAllByLabelText(/^d6 showing/)).toHaveLength(2);
   });
 
   it('says what it could not read and does not roll', () => {

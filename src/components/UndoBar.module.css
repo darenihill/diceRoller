@@ -7,7 +7,24 @@
   padding: 6px 6px 6px 20px;
   pointer-events: auto;
   white-space: nowrap;
-  touch-action: manipulation;
+  /* Up and down still scroll the page; sideways is the bar's swipe */
+  touch-action: pan-y;
+  transition: translate 200ms ease-out, opacity 200ms ease-out;
+  /* Sitter's bar: a quiet raised surface, so the filled Undo is what stands
+     out (owner, 2026-11-10: "see how undo works for sitter") */
+  background-color: var(--md-sys-color-surface-variant);
+  color: var(--md-sys-color-on-surface);
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+/* While a finger drags it, the bar follows with no lag */
+.bar.swiping {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar.bar { transition: none; }
 }
 
 /* Single class on purpose: a phone's narrower limit, which keeps the bar clear
@@ -18,6 +35,7 @@
 
 .message {
   min-width: 0;
+  color: var(--md-sys-color-on-surface-variant);
   /* Up to two lines, so a typed roll's "Rolled 1d20+2d6+3" says what happened
      in full (app standard 4, review 2026-11-06); longer still ends in … */
   white-space: normal;
@@ -40,9 +58,9 @@
   padding: 0 16px 0 14px;
   border: none;
   border-radius: 999px;
-  /* Filled, the reverse of the bar: the bar's text colour as the fill */
-  background-color: var(--md-sys-color-on-primary);
-  color: var(--md-sys-color-primary);
+  /* Filled in the app's main colour, as Sitter's Undo is */
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -51,12 +69,14 @@
 }
 
 .undo:focus-visible {
-  outline: 2px solid currentColor;
+  outline: 2px solid var(--md-sys-color-primary);
   outline-offset: 2px;
 }
 
-/* The countdown: a line in the words' colour, inside the pill, starting at the
-   top and running clockwise, draining away. No track under it. */
+/* The countdown, as Sitter's watch draws it: a line in the words' colour
+   flush with the inside edge of the pill (owner, 2026-11-10), from the top
+   middle clockwise round the pill, shrinking back toward the top as time runs
+   out. Flat ends, no track under it. */
 .ring {
   position: absolute;
   inset: 0;
@@ -68,21 +88,20 @@
 
 .ringLine {
   fill: none;
-  stroke: currentColor;
+  stroke: var(--md-sys-color-on-primary);
   stroke-width: var(--line);
-  stroke-linecap: round;
-  /* The path starts at the top middle; one dash as long as the whole line,
-     its start sliding clockwise round to the end */
+  stroke-linecap: butt;
+  /* The path starts at the top middle; what is left is the line from there
+     clockwise, its far end drawing back toward the top (Sitter's getSegment) */
   stroke-dasharray: 1px 1px;
-  stroke-dashoffset: 0px;
   animation-name: undoDrain;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
 }
 
 @keyframes undoDrain {
-  from { stroke-dashoffset: 0px; }
-  to { stroke-dashoffset: -1px; }
+  from { stroke-dasharray: 1px 1px; }
+  to { stroke-dasharray: 0px 1px; }
 }
 
 .close {
@@ -95,7 +114,7 @@
   border: none;
   border-radius: 999px;
   background: transparent;
-  color: inherit;
+  color: var(--md-sys-color-on-surface-variant);
   cursor: pointer;
 }
 

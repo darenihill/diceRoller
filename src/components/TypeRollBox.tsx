@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { parseRollNotation, type TypedRoll } from '../utils/rollNotation';
 import { MAX_ROLL_NAME, type SavedRoll } from '../utils/savedRolls';
 import styles from './TypeRollBox.module.css';
 
 interface TypeRollBoxProps {
+  /** A saved roll's button rolls it at once */
   onRoll: (roll: TypedRoll) => void;
+  /** The box's + (and Enter) puts the typed dice out; the big Roll button rolls them */
+  onPutOut?: (roll: TypedRoll) => void;
   disabled?: boolean;
   /** Rolls kept as buttons under the box */
   savedRolls?: SavedRoll[];
@@ -18,8 +21,17 @@ interface TypeRollBoxProps {
 }
 
 /** RPG mode: type 2d6+3, d20 adv or 1d8+2d6 and roll it in one go. */
-export const TypeRollBox = ({ onRoll, disabled = false, savedRolls = [], onSaveRoll, onRemoveSavedRoll, prefill, onTextChange }: TypeRollBoxProps) => {
+export const TypeRollBox = ({ onRoll, onPutOut, disabled = false, savedRolls = [], onSaveRoll, onRemoveSavedRoll, prefill, onTextChange }: TypeRollBoxProps) => {
   const [text, setText] = useState('');
+  // On a phone the box shares the top line with the name, so the hint is shorter
+  const [narrow, setNarrow] = useState(() => typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 600px)').matches);
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const mq = window.matchMedia('(max-width: 600px)');
+    const on = () => setNarrow(mq.matches);
+    mq.addEventListener?.('change', on);
+    return () => mq.removeEventListener?.('change', on);
+  }, []);
   // A roll tapped in History lands in the box, ready to roll
   const [filledN, setFilledN] = useState<number | undefined>();
   if (prefill && prefill.n !== filledN) {
@@ -39,9 +51,10 @@ export const TypeRollBox = ({ onRoll, disabled = false, savedRolls = [], onSaveR
       return;
     }
     setNote(null);
-    // Put the keyboard away so the dice are in view as they land
+    // Put the keyboard away so the dice are in view
     input?.blur();
-    onRoll(result.roll);
+    // + puts the dice out to roll with the big Roll button (owner, 2026-11-10)
+    (onPutOut ?? onRoll)(result.roll);
   };
 
   const startSave = () => {
@@ -83,13 +96,13 @@ export const TypeRollBox = ({ onRoll, disabled = false, savedRolls = [], onSaveR
             className={`${styles.input} ${note ? styles.inputInvalid : ''}`}
             type="text"
             inputMode="text"
-            enterKeyHint="go"
+            enterKeyHint={onPutOut ? 'done' : 'go'}
             autoComplete="off"
             autoCorrect="off"
             autoCapitalize="off"
             spellCheck={false}
             maxLength={40}
-            placeholder="Type a roll: 2d6+3, d20 adv"
+            placeholder={narrow ? 'Like 2d6+3' : 'Type a roll: 2d6+3, d20 adv'}
             aria-label="Type a roll, like 2d6+3 or d20 adv"
             aria-invalid={note ? true : undefined}
             aria-describedby={note ? 'type-roll-note' : undefined}
@@ -99,8 +112,14 @@ export const TypeRollBox = ({ onRoll, disabled = false, savedRolls = [], onSaveR
               if (note) setNote(null);
             }}
           />
-          <button type="submit" className={`md-button md-button-surface ${styles.go}`} disabled={disabled || !text.trim()}>
-            Roll
+          <button
+            type="submit"
+            className={`md-button md-button-surface ${onPutOut ? styles.add : styles.go}`}
+            disabled={disabled || !text.trim()}
+            aria-label={onPutOut ? 'Put out these dice' : undefined}
+            title={onPutOut ? 'Put out these dice, then tap Roll' : undefined}
+          >
+            {onPutOut ? <Plus size={22} strokeWidth={2.5} aria-hidden="true" /> : 'Roll'}
           </button>
         </div>
         <p id="type-roll-note" className={styles.note} role="status">{note ?? ''}</p>

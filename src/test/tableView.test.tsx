@@ -167,8 +167,9 @@ describe('Table view switch and big total', () => {
     localStorage.setItem('rpgMode', 'true');
     render(<App />);
     fireEvent.change(screen.getByRole('textbox', { name: /type a roll/i }), { target: { value: '2d6+3' } });
-    fireEvent.click(within(screen.getByRole('form', { name: 'Type a roll' })).getByRole('button', { name: 'Roll' }));
-    act(() => { vi.advanceTimersByTime(ROLL_DURATION_MS + 50); });
+    // + puts the typed dice out (owner, 2026-11-10); the big Roll rolls them
+    fireEvent.click(within(screen.getByRole('form', { name: 'Type a roll' })).getByRole('button', { name: 'Put out these dice' }));
+    roll();
     const view = screen.getByTestId('table-view');
     expect(within(view).getAllByRole('listitem')).toHaveLength(2);
     expect(view.querySelector('p')!.textContent).toMatch(/^\d+ \+ \d+ \+ 3$/);

@@ -17,9 +17,11 @@ import { DieActionStrip } from './components/DieActionStrip';
 import { playRollSequence, playLandNow, scheduleLandingBuzz } from './utils/soundEffects';
 import { BUZZ_KEY, BUZZ_SHOWN_KEY, canBuzz, isBuzzLink } from './utils/buzz';
 import { celebrateNatural20 } from './utils/confetti';
-import { recordSessionStart, trackEvent, setTelemetryEnabled } from './utils/analytics';
+import { recordSessionStart, trackEvent, setTelemetryEnabled, setGoogleDisabled } from './utils/analytics';
 import { COMPACT_DIE_SIZE } from './utils/constants';
-import { dicePresets } from './utils/presets';
+import { dicePresets, sevenNoteFor } from './utils/presets';
+import { isFirstVisit, markDieButtonsShown } from './utils/firstVisit';
+import { eraseEverything, reloadAfterErase } from './utils/erase';
 import { currentSetName, diceSignature, rollSignature, readShareLink, nextFreeSaveName, suggestSaveName, type LoadedSet } from './utils/setName';
 import { readLandingStart, readLandingAbout } from './utils/landing';
 import { Info, Plus, Dice6, Table2, Swords, X } from 'lucide-react';
@@ -78,6 +80,8 @@ function App() {
   useEffect(() => onSaveRefused(() => setStorageFull(true)), []);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  /** The dice area's bottom padding, room for the chip row (.diceContainer) */
+  const DICE_AREA_PADDING = 52;
   // A roll shakes the dice past the edge of their area, which flashed a scroll
   // bar on and off (owner, 2026-11-05). When the dice fit without scrolling,
   // the area hides overflow until they land; it shares the count the glide uses.
@@ -136,7 +140,12 @@ function App() {
     return landing?.name ? { name: landing.name, signature: diceSignature(landing.dice) } : null;
   });
   const [editingDiceId, setEditingDiceId] = useState<string | null>(null);
-  const [revealedDiceId, setRevealedDiceId] = useState<string | null>(null);
+  // The very first visit opens the first die's buttons, exactly as a tap
+  // does, once per phone (owner, 2026-11-10: "Show the buttons once"). Read
+  // before anything is saved this visit; a share link or a search page opens
+  // its own dice instead, so not then
+  const [firstDieId] = useState(() => (!window.location.hash && !landing && isFirstVisit() ? generateId() : null));
+  const [revealedDiceId, setRevealedDiceId] = useState<string | null>(firstDieId);
   // Only a known theme reaches the page's class list; a backup file could hold anything
   const [theme, setTheme] = useState(() => {
     const saved = readItem(SAVED.theme);
@@ -279,30 +288,6 @@ function App() {
   // Each tap in the die's button strip restarts the timer below, so it doesn't close mid-use
   const [stripTouch, setStripTouch] = useState(0);
 
-  // Auto-deselect active die on mobile after 5 seconds
-  useEffect(() => {
-    if (!revealedDiceId) return;
-
-    const timer = setTimeout(() => {
-      setRevealedDiceId(null);
-    }, 5000);
-
-    const handleOutsideClick = (e: PointerEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.closest('[data-dice-id], [data-die-actions]')) {
-        return;
-      }
-      setRevealedDiceId(null);
-    };
-
-    document.addEventListener('pointerdown', handleOutsideClick);
-
-    return () => {
-      clearTimeout(timer);
-      document.removeEventListener('pointerdown', handleOutsideClick);
-    };
-  }, [revealedDiceId, stripTouch]);
-
   // Load shared config from URL, default set, or autosave on mount & record session telemetry
   useEffect(() => {
     recordSessionStart();
@@ -386,9 +371,9 @@ function App() {
     }
 
     // Default to 2 basic dice if the app has never been used
-    setDiceList([
+    const starting: DiceData[] = [
       {
-        id: generateId(),
+        id: firstDieId ?? generateId(),
         numberValue: 1,
         faces: 6,
         currentFaceIndex: 0,
@@ -407,7 +392,11 @@ function App() {
         color: '#E9EAEC',
         held: false
       }
-    ]);
+    ];
+    setDiceList(starting);
+    // Its buttons are open (firstDieId above): save the mark so they never
+    // open by themselves again
+    if (firstDieId) markDieButtonsShown();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -476,6 +465,14 @@ function App() {
   const setName = currentSetName(diceList, loadedSet);
   // Each roll records the game it was made in, for History and Frequency by game
   useEffect(() => { gameNameRef.current = setName; }, [setName, gameNameRef]);
+  // Catan's Robber note (owner, 2026-11-10: "With the game, shown above
+  // Roll"): a 7 in a game that carries a 7 note says what to do, until the
+  // next roll. It follows the name on the top line, so changing the dice or
+  // loading another game stops it; a die rolled on its own is a new roll too
+  const lastMainSeven = lastMainRoll && lastMainRoll.total - (lastMainRoll.modifier ?? 0) === 7
+    ? sevenNoteFor(lastMainRoll.game) : null;
+  const sevenNote = lastMainSeven && totalVisible && !totalStale && !isRolling
+    && rollHistory[0] === lastMainRoll && lastMainRoll?.game === setName ? lastMainSeven : null;
   const tableReady = tableView && totalVisible && !isRolling && !!lastMainRoll
     && diceList.length > 0 && diceList.map(d => d.id).join() === tableRolledIds;
   // A roll from the table stays on the table, the numbers dimmed until the
@@ -504,7 +501,52 @@ function App() {
 
   // Below this size the buttons round a tapped die get too small, so they move to one strip (owner, 2026-10-28)
   const compactDieActions = diceList.length > 0 && containerSize.width > 0 && optimalSize < COMPACT_DIE_SIZE;
-  const revealedDie = compactDieActions ? diceList.find(d => d.id === revealedDiceId) : undefined;
+  // The first visit's buttons open round the die only. Where small dice put
+  // them in the sheet over Roll, they wait for a tap instead, so the very
+  // first tap on Roll rolls rather than landing on the sheet (2026-11-11)
+  const [firstOpenWaiting, setFirstOpenWaiting] = useState(firstDieId !== null);
+  const shownRevealedId = firstOpenWaiting && compactDieActions && revealedDiceId === firstDieId ? null : revealedDiceId;
+  const revealedDie = compactDieActions ? diceList.find(d => d.id === shownRevealedId) : undefined;
+
+  // Auto-deselect active die on mobile after 5 seconds. With many small dice
+  // the buttons come up in a sheet that stays until you tap away (owner,
+  // 2026-11-10), so it has no timer.
+  useEffect(() => {
+    if (!revealedDiceId) return;
+
+    const timer = compactDieActions ? undefined : setTimeout(() => {
+      setRevealedDiceId(null);
+    }, 5000);
+
+    const handleOutsideClick = (e: PointerEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('[data-dice-id], [data-die-actions]')) {
+        return;
+      }
+      setRevealedDiceId(null);
+    };
+
+    // Escape, or the keyboard moving on past the die and its buttons, closes
+    // them too, since a keyboard never taps away (second read, 2026-11-10)
+    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setRevealedDiceId(null); };
+    const handleFocus = (e: FocusEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest?.('[data-dice-id], [data-die-actions]')) return;
+      setRevealedDiceId(null);
+    };
+
+    document.addEventListener('pointerdown', handleOutsideClick);
+    document.addEventListener('keydown', handleKey);
+    document.addEventListener('focusin', handleFocus);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('pointerdown', handleOutsideClick);
+      document.removeEventListener('keydown', handleKey);
+      document.removeEventListener('focusin', handleFocus);
+    };
+  }, [revealedDiceId, stripTouch, compactDieActions]);
+
 
   const diceStyles = {
     '--dice-size': `${optimalSize}px`,
@@ -630,6 +672,8 @@ function App() {
     if (index < 0) return;
     const die = diceList[index];
     removeDice(id);
+    // Its buttons go with it, and don't come back if it is undone
+    if (revealedDiceId === id) setRevealedDiceId(null);
     // A second die removed while the bar is up joins the same Undo
     offerUndo(`Removed ${dieLabel(die)}`, () => insertDiceAt(die, index), {
       kind: 'die', many: n => ({ message: `Removed ${n} dice`, back: `${n} dice are back` }),
@@ -750,6 +794,33 @@ function App() {
     }
   };
 
+  // Erase everything (owner, 2026-11-10): asked first in Usage stats. From
+  // here this page saves nothing more, not even the autosave as it unloads,
+  // and an open Undo bar goes, so nothing comes back before the reload. No
+  // Undo: the panel says it can't be undone
+  const handleEraseEverything = () => {
+    freezeSaves();
+    importedBackupRef.current = true;
+    dismissUndo();
+    eraseEverything();
+    reloadAfterErase();
+  };
+
+  // Erase all in another tab empties storage there (a storage event with no
+  // key): this tab stops saving and reopens too, so its autosave as it goes
+  // can't write games back (second read, 2026-11-11)
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== null || (e.storageArea && e.storageArea !== localStorage)) return;
+      freezeSaves();
+      importedBackupRef.current = true;
+      setGoogleDisabled(true);
+      reloadAfterErase();
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
   const handleImportData = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -813,11 +884,40 @@ function App() {
       setHasRolledThisSession(true);
       setRolledSignature(rollSignature(latestDiceRef.current));
       void celebrateNatural20(natural20Ids);
-      trackEvent('roll_dice', { diceCount, sum: total, modifier: roll.modifier, rpgMode, rollAdvantage: roll.advantage, typed: true });
+      trackEvent('roll_dice', { diceCount, rpgMode, rollAdvantage: roll.advantage, typed: true }, { sum: total });
     }, undefined, { text: roll.text, dice, modifier: roll.modifier, advantage: roll.advantage });
     rollFeedback();
     if (before.dice.length > 0) {
       offerUndo(`Rolled ${roll.text}`, () => {
+        restoreDice(before.dice);
+        setModifier(before.modifier);
+        setRollAdvantage(before.advantage);
+      });
+    }
+  };
+
+  // The roll box's +: puts the typed dice, modifier and advantage out without
+  // rolling, so the big Roll button rolls them (owner, 2026-11-10). Undo puts
+  // back the dice and settings that were out before.
+  const handlePutOutTyped = (roll: TypedRoll) => {
+    typedOverDiceRef.current = null;
+    const before = { dice: diceList, modifier, advantage: rollAdvantage };
+    const dice = roll.groups.flatMap(g => Array.from({ length: g.count }, () => ({
+      id: generateId(),
+      numberValue: 1,
+      faces: g.faces,
+      currentFaceIndex: 0,
+      name: `d${g.faces}`,
+      customFaces: [],
+      color: TYPED_DIE_COLOR,
+      held: false
+    })));
+    restoreDice(dice);
+    setModifier(roll.modifier);
+    setRollAdvantage(roll.advantage);
+    trackEvent('dice_added', { typed: true, diceCount: dice.length });
+    if (before.dice.length > 0) {
+      offerUndo(`Put out ${roll.text}`, () => {
         restoreDice(before.dice);
         setModifier(before.modifier);
         setRollAdvantage(before.advantage);
@@ -931,7 +1031,7 @@ function App() {
       setRolledSignature(rollSignature(latestDiceRef.current));
       void celebrateNatural20(natural20Ids);
       if (diceCount > 0) {
-        trackEvent('roll_dice', { diceCount, sum: total, modifier, rpgMode, rollAdvantage });
+        trackEvent('roll_dice', { diceCount, rpgMode, rollAdvantage }, { sum: total });
       }
     });
 
@@ -953,6 +1053,36 @@ function App() {
   // Where the bottom bar sits: under an open dialog, else just above the buttons
   const dialogOpen = modalOpen !== null || savePromptOpen || editingDiceId !== null || shareFallbackUrl !== null;
   const toastPlace = dialogOpen ? styles.toastBelowDialog : chipRow ? styles.toastAboveRpgBar : '';
+  // The Robber note shows only when nothing else wants the spot: the storage
+  // warning, Undo, a message like "🎯 Target hit: 7" and the new-version bar
+  // all come first, and it waits while a menu or dialog is open
+  const sevenNoteShown = !!sevenNote && !dialogOpen && !menuOpen && !addMenuOpen
+    && !storageFull && !undoOffer && !toast && !newVersion.ready;
+  // At a big text size the note can reach down onto the lowest die, so the
+  // dice area gives up just that much room while it shows (second read,
+  // 2026-11-11: it hid a whole die at 320px and 200% text)
+  const sevenNoteRef = useRef<HTMLDivElement>(null);
+  const [noteRoom, setNoteRoom] = useState(0);
+  useLayoutEffect(() => {
+    const note = sevenNoteRef.current;
+    const area = containerRef.current;
+    if (!sevenNoteShown || !note || !area) { setNoteRoom(0); return; }
+    // The note's top from layout (offsetTop), not its box on screen, which
+    // its slide-up animation moves. The room only pads the inside of the
+    // dice area, whose edges stay put, so measuring again can't loop
+    const measure = () => {
+      const overlap = area.getBoundingClientRect().bottom - DICE_AREA_PADDING - (note.offsetTop - 8);
+      setNoteRoom(Math.max(0, Math.ceil(overlap)));
+    };
+    measure();
+    // The note grows with a text size change; the area with the window
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
+    observer?.observe(note);
+    observer?.observe(area);
+    window.addEventListener('resize', measure);
+    return () => { observer?.disconnect(); window.removeEventListener('resize', measure); };
+    // toastPlace: the Release or RPG chip row lifts the note 54px (re-read, 2026-11-11)
+  }, [sevenNoteShown, sevenNote, toastPlace]);
   const handleRollRef = useRef(handleRoll);
   const overlayOpenRef = useRef(overlayOpen);
   useEffect(() => {
@@ -1009,11 +1139,12 @@ function App() {
           </span>
         )}
         {/* RPG mode's Type a roll box sits up here by the name, not as a row of its
-            own over the dice (owner, 2026-11-05). A phone gives it the next line. */}
+            own over the dice (owner, 2026-11-05). On a phone too (owner, 2026-11-10). */}
         {rpgMode && (
           <div className={styles.topRoll}>
             <TypeRollBox
               onRoll={handleTypedRoll}
+              onPutOut={handlePutOutTyped}
               disabled={isRolling}
               savedRolls={savedRolls}
               onSaveRoll={handleSaveRoll}
@@ -1081,14 +1212,14 @@ function App() {
         />
       )}
 
-      <div ref={containerRef} className={`${styles.diceContainer} ${showTable ? styles.diceHidden : ''}`} style={diceStyles}>
+      <div ref={containerRef} className={`${styles.diceContainer} ${showTable ? styles.diceHidden : ''}`} style={noteRoom ? { ...diceStyles, '--note-room': `${noteRoom}px` } as React.CSSProperties : diceStyles}>
         {shownDice.map((dice) => (
           <Dice
             key={dice.id}
             dice={dice}
             isRolling={isRolling && (rollingId === null || rollingId === dice.id)}
-            isRevealed={revealedDiceId === dice.id}
-            onReveal={() => setRevealedDiceId(dice.id)}
+            isRevealed={shownRevealedId === dice.id}
+            onReveal={() => { setFirstOpenWaiting(false); setRevealedDiceId(dice.id); }}
             onToggleHold={toggleHold}
             onRemove={handleRemoveDie}
             onOpenSettings={setEditingDiceId}
@@ -1104,6 +1235,7 @@ function App() {
 
       {revealedDie && (
         <DieActionStrip
+          key={revealedDie.id}
           die={revealedDie}
           rpgMode={chipRow}
           onRollOne={isRolling ? undefined : handleRollOne}
@@ -1112,6 +1244,7 @@ function App() {
           onOpenSettings={setEditingDiceId}
           onRemove={handleRemoveDie}
           onInteract={() => setStripTouch(n => n + 1)}
+          onClose={() => setRevealedDiceId(null)}
         />
       )}
 
@@ -1144,6 +1277,7 @@ function App() {
 
       <SidebarMenu
         isOpen={menuOpen}
+        dialogOpen={dialogOpen}
         onToggle={() => setMenuOpen(!menuOpen)}
         onDonate={() => window.open('https://www.buymeacoffee.com/darenihill', '_blank', 'noopener,noreferrer')}
         onIdeas={() => window.open('https://forms.gle/wqYaKsEZ5FQwizuMA', '_blank', 'noopener,noreferrer')}
@@ -1269,19 +1403,24 @@ function App() {
       <StatsModal
         isOpen={modalOpen === 'stats'}
         onClose={() => setModalOpen(null)}
+        onEraseEverything={handleEraseEverything}
       />
 
       {/* Toast Notification. With a dialog open the bar sits at the screen's
           bottom edge, under the dialog: above the Roll buttons it covered the
           dialog's own Done, so a tap on Done after removing a face pressed
           Undo instead (review 2026-11-10) */}
-      {storageFull ? (
+      {/* With the menu (or the Add menu) open, no message sits on its tiles:
+          "Saved" covered half of Clear all. Each waits and shows when the
+          menu closes, if it is still up, as the Undo bar already did (fix,
+          2026-11-10) */}
+      {menuOpen || addMenuOpen ? null : storageFull ? (
         <div className={`${styles.toast} ${styles.undoToast} ${styles.storageToast} ${toastPlace}`} role="alert">
           <span>Storage is full, so your last change wasn't saved.</span>
           <button className={styles.undoButton} onClick={() => { setStorageFull(false); handleExportData(); }}>Export backup</button>
           <button className={styles.undoButton} onClick={() => setStorageFull(false)} aria-label="Close storage message" style={{ minWidth: 44 }}>✕</button>
         </div>
-      ) : undoOffer && !menuOpen && !addMenuOpen ? (
+      ) : undoOffer ? (
         <UndoBar
           offer={undoOffer}
           windowMs={UNDO_WINDOW_MS}
@@ -1297,18 +1436,28 @@ function App() {
         <div className={`${styles.toast} ${toastPlace}`} role="status">
           {toast}
         </div>
-      ) : newVersion.ready && (
+      ) : newVersion.ready ? (
         // An app left open hears about a new version; Refresh loads it (owner's pick, 2026-11-03)
         <div className={`${styles.toast} ${styles.undoToast} ${toastPlace}`} role="status" data-testid="new-version-bar">
           <span style={{ flexShrink: 0 }}>New version</span>
           <button className={styles.undoButton} onClick={() => window.location.reload()}>Refresh</button>
           <button className={styles.undoButton} onClick={newVersion.later} aria-label="Later" title="Later" style={{ minWidth: 44 }}>✕</button>
         </div>
+      ) : sevenNoteShown && sevenNote && (
+        // The Robber note waits behind everything above and shows once they
+        // go, until the next roll. A screen reader hears it with the total,
+        // below, so this copy has no role of its own
+        <div ref={sevenNoteRef} className={`${styles.toast} ${styles.sevenNote} ${toastPlace}`} data-testid="seven-note">
+          <span className={styles.sevenNoteTitle}>{sevenNote.title}</span>
+          <span>{sevenNote.text}</span>
+        </div>
       )}
 
       {/* Screen-reader announcement of roll results */}
       <div aria-live="polite" className={styles.srOnly}>
-        {totalVisible && !isRolling ? spokenTotal(lastTotal, lastModifier) : ''}
+        {totalVisible && !isRolling
+          ? spokenTotal(lastTotal, lastModifier) + (lastMainSeven ? `. Robber: ${lastMainSeven.text}` : '')
+          : ''}
       </div>
 
       {/* Dice Settings Modal */}

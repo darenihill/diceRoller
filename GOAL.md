@@ -5,6 +5,173 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-11~~ Phone dialogs slide up from the bottom and swipe down to close (Daren
+  2026-11-10, Build, way "sheet"): "On a phone, dialogs slide up from the
+  bottom with a small grab bar on top. Dragging the grab bar down closes
+  them; the × stays." Done when: at the phone width every dialog opens as a
+  full-width sheet from the bottom edge with a grab bar and rounded top
+  corners; dragging its grab bar or header down past a threshold, or a quick
+  flick, closes it, as do tapping above it, Back and its ×/Done; with Reduce
+  motion on it appears without sliding; the focus trap, 48px buttons, the
+  Undo bar under it and a focused text box above the phone keyboard all
+  hold; the computer layout is unchanged (src/test/bottomSheets.test.tsx).
+- ~~Done 2026-11-11~~ The phone menu is the same bottom sheet (the Desk card's answer to
+  Daren's "Does it slide up from the bottom as well?"). Done when: at the
+  phone width the menu rises from the bottom edge with the grab bar and
+  closes on a drag down, a tap above it or Back, and tapping History or
+  Games swaps it for that sheet in the same spot; its own commit, so it can
+  be dropped alone (src/test/bottomSheets.test.tsx).
+- ~~Done 2026-11-11~~ Send Google less (Daren 2026-11-10, Build, way "Cut what isn't used"):
+  "Rolls send how many dice and which mode, not the total or modifier; The
+  second visit count and an unused second sender go; You keep Google's data
+  2 months and turn its ad links off, in Google's settings." Done when: a
+  roll sends Google its dice count, RPG mode, advantage and whether it was
+  typed, and no total or modifier, while Usage stats still counts the total
+  on the phone; the app's own session_start event is gone; the unused second
+  sender (VITE_ANALYTICS_ENDPOINT) and the event names nothing sends are
+  gone (src/test/sendGoogleLess.test.ts). Google's own settings are
+  Daren's step.
+- ~~Done 2026-11-11~~ The Privacy page stays exactly true. Done when: it no longer says a
+  roll's total goes, and still names what Google gathers by itself; the
+  field-list test passes (src/test/privacyPage.test.tsx).
+
+- ~~Done 2026-11-11~~ Say plainly what goes to Google (Daren 2026-11-10, Build, way "Privacy
+  page plus a Help line"): a short Privacy page, a Help line and a switch
+  called "Page metrics". His page text: "Stays on this phone: your dice,
+  games, History and pictures. Nothing you type, name or photograph is ever
+  sent. Goes to Google while Page metrics is on: counts of visits, rolls and
+  taps; your rough city, device and browser; a random ID Google keeps on
+  this phone for about 13 months. Turning it off: Customize, Page metrics,
+  Off. Then nothing goes to Google and its ID is deleted." He has not picked
+  "Send Google less", so the page says what today's app sends, with any
+  claim that isn't true of it corrected. Done when: customdiceroller.com/privacy/
+  is a static page in the site's look with that text, true to
+  src/utils/analytics.ts and every trackEvent call; it carries its own
+  Content-Security-Policy written by npm run landing, is in the sitemap,
+  opens offline, and reads at 320px and 200% text
+  (src/test/privacyPage.test.tsx; Playwright on the built site: no policy
+  errors, no sideways scroll at 320px and 200% text, and with the offline
+  worker installed it opens offline on its first visit, checked on a local
+  copy without the worker's localhost skip; shots in
+  dice-roller/2026-11-11/privacy/).
+- ~~Done 2026-11-11~~ The switch is called "Page metrics". Done when: Customize's metrics switch
+  says "Page metrics" (its label, title and name for screen readers) and its
+  line ends in a "What's sent" link to the Privacy page; DESIGN.md's word
+  list has "Page metrics" in place of "anonymous page metrics", and the
+  classroom page says Page metrics (src/test/privacyPage.test.tsx).
+- ~~Done 2026-11-11~~ Help has one Privacy line linking to the page
+  (src/test/privacyPage.test.tsx).
+
+- ~~Done 2026-11-11~~ Erase everything at the bottom of Usage stats (Daren 2026-11-10, Build,
+  way "Bottom of Usage stats"): "The ask-first panel counts what goes:
+  'Erase 3 games, 120 rolls, 4 pictures and your stats? This can't be
+  undone.' with a red 'Erase all' and 'Not now'. It clears every saved item
+  (games, default dice, History, pictures, saved rolls, stats, settings) and
+  Google's ID cookie, then reloads like a first visit. The metrics switch
+  stays as set, so if it is on, Google starts a fresh ID." Done when: Usage
+  stats ends with "Your games, History, pictures and these stats stay on
+  this phone." and an "Erase everything" button outlined in red; it asks
+  first in a panel that counts what goes (no part that is zero, "1 game"
+  for one) with "Not now" and a red "Erase all", 48px tall; Escape is Not
+  now and focus starts on Not now, with only Not now, Erase all and the
+  dialog's × to Tab to (src/test/eraseEverything.test.tsx; Playwright at
+  390px, dark and Clean Light, shots in dice-roller/2026-11-11/erase/).
+- ~~Done 2026-11-11~~ Erase all really erases. Done when: every saved item and the first-visit
+  mark are gone and Google's _ga cookies deleted after its tag is told to
+  stop, another open tab stops saving and reopens too, the metrics switch is kept
+  as it was, nothing on the page saves again before the reload (an Undo bar
+  or a held picture can't bring anything back), and the app reloads at the
+  home page and opens like a first visit; no Undo is offered
+  (src/test/eraseEverything.test.tsx).
+- ~~Done 2026-11-11~~ Words and Help. Done when: "erase (everything on this phone)" is in
+  DESIGN.md's word list beside clear and delete, and Help has one line about
+  it (src/test/eraseEverything.test.tsx).
+
+- ~~Done 2026-11-11~~ First visit: the first die starts with its buttons
+  open (Daren 2026-11-10, Build, way "Show the buttons once"): "On the very
+  first visit only (nothing saved on the phone yet), the first die's button
+  strip starts open, exactly as a tap opens it. Any tap, Roll included,
+  closes it as it does today, and a mark saved on the phone stops it opening
+  by itself again. No new text, color or box; with Reduce motion on it
+  simply appears." Done when: with nothing saved, the app opens with the
+  buttons round the first die open as a tap opens them; a tap on Roll closes
+  them and rolls, a tap anywhere else closes them, and they close after five
+  seconds as a tap's do; where small dice would put them in the sheet over
+  Roll (a short screen or a phone on its side), they wait for a tap instead
+  (src/test/firstVisit.test.tsx).
+- ~~Done 2026-11-11~~ One saved mark, so it happens once per phone. Done
+  when: the mark is saved as the buttons open; a second visit, anyone with
+  saved dice, a theme, default dice, History, saved rolls or usage stats,
+  and a share link never see them open by themselves; the mark stays out of
+  backups and an import leaves it as it is (src/test/firstVisit.test.tsx).
+- ~~Done 2026-11-11~~ Nothing else changes. Done when: no new words, colors
+  or boxes; with Reduce motion on the buttons round a die appear without
+  fading and the sheet without sliding (src/test/firstVisit.test.tsx);
+  Playwright on the built site at 390px, dark and Clean Light, Reduce
+  motion, a second visit and an existing user (shots in
+  dice-roller/2026-11-11/first-visit/).
+
+- ~~Done 2026-11-11~~ Catan: a 7 shows a Robber note above the Roll button (Daren 2026-11-10,
+  Build, way "With the game, shown above Roll"): "Lives with the built-in
+  game, not in Customize. The note follows the game name on the top line:
+  while it says Catan (or Cities & Knights), a total of 7 shows the note in
+  the message spot above Roll, in words with the 🎯 mark, never color alone,
+  until the next roll." Done when: with Catan on the top line a roll of 7
+  shows "🎯 7 · Robber" and "Over 7 cards? Discard half, then move it" just
+  above Roll, a screen reader hears it with the total, and the next roll
+  takes it away; any other total shows nothing (src/test/robberNote.test.tsx).
+- ~~Done 2026-11-11~~ Cities & Knights carries its own 7 note. Done when: with Cities &
+  Knights on the top line a 7 shows "🎯 7 · Robber" and "Over 7 cards?
+  Discard half"; the note sits with each game in the popular games list, not
+  in Customize (src/test/robberNote.test.tsx).
+- ~~Done 2026-11-11~~ The note stops when the game does. Done when: after a
+  die is added or removed, Catan is loaded again or another game is loaded,
+  or Catan's dice are saved under another name, the note is gone and a 7
+  shows none; other popular games, plain dice and typed rolls never show it;
+  in RPG mode the dice make the 7, not the bonus; "🎯 Target hit: 7", the
+  Undo bar and the new-version bar keep the spot and the note shows once
+  they go (src/test/robberNote.test.tsx). Playwright on the built site, root
+  text 16px and 32px, Catan and Cities & Knights at 320×640 and 390×844: the
+  note stays inside the 16px gutters and covers no die, with or without the
+  Release row (a die held), the dice area giving
+  up room for it when it would (shots in
+  dice-roller/2026-11-11/robber/).
+- ~~Done 2026-11-11~~ Help names the note. Done when: Help has one line under Games saying a 7
+  in Catan or Cities & Knights shows what to do above Roll
+  (src/test/robberNote.test.tsx).
+
+- ~~Done 2026-11-10~~ Material 3 fit (polish lens ui-material). Done when:
+  the Die settings text boxes (name, number of faces, custom face text,
+  "counts as") are the same outlined field as Save and the typed roll box,
+  every text box shows a 2px edge while typing, and
+  reviews/2026-11-10-ui-material.md says what was found
+  (src/test/materialFit.test.ts).
+- ~~Done 2026-11-10~~ Die settings face cards are white on Clean Light (Focus
+  card built as a fix, Daren 2026-11-10: fixes shouldn't be cards). Done
+  when: the face cards, − and + and the icon picker take each theme's own
+  shade, not a fixed black; on Clean Light the cards are white with a gray
+  edge and the "counts as" edge is 3:1 or more on every theme; Dark, Felt and
+  Midnight look the same (src/test/cardFixes.test.tsx).
+- ~~Done 2026-11-10~~ Messages like "Saved" don't cover the open menu (Focus
+  card built as a fix). Done when: with the menu or the Add menu open no
+  message shows on it; a message still fresh when the menu closes shows then
+  (src/test/cardFixes.test.tsx).
+- ~~Done 2026-11-10~~ One offline copy per page, without ad IDs (Focus card
+  built as a fix). Done when: the offline worker saves each page under its
+  address without the query, so ad links (?gclid, ?fbclid) share the plain
+  page's copy and keep no ID; the cache moves to v6 so the old copies go;
+  offline, an ad link still opens the app (src/test/cardFixes.test.tsx; check
+  on the live site after it lands).
+- ~~Done 2026-11-10~~ Dialog buttons are 48px tall (Daren 2026-11-10 on the
+  Desk: "This shouldn't be a card if it's matching a standard"; standards 9
+  and 20). Done when: every button inside a dialog (Save's Cancel and Save,
+  Keep both, Replace it, Clear History, Share's and Install's Done, Die
+  settings' Remove, Copy, Done and Add) is at least 48px tall through one
+  shared rule, with the same words, order and colors and 8px between
+  buttons; the dialogs' boxes, steppers and chips are 48px too; nothing runs
+  off at 320px or at 200% text that didn't before; and
+  reviews/2026-11-10-tap-targets.md lists what is left under 48 and why
+  (src/test/tapTargets.test.ts).
 - ~~Done 2026-11-10~~ Enter in Save no longer opens the menu (stories
   review, standard 20). Done when: pressing Enter (or a phone keyboard's Done)
   in Save's name box saves the game and the menu stays shut; with a taken name

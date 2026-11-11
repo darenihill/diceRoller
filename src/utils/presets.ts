@@ -1,4 +1,23 @@
-export const dicePresets = [
+import type { DiceData } from '../types';
+
+/** What a game says when its dice total 7, shown above Roll until the next
+ *  roll (owner, 2026-11-10: "With the game, shown above Roll") */
+export interface SevenNote {
+  /** The first line, with the 🎯 mark so it reads without color */
+  title: string;
+  /** What to do */
+  text: string;
+}
+
+export interface DicePreset {
+  name: string;
+  dice: Partial<DiceData>[];
+  sevenNote?: SevenNote;
+}
+
+const ROBBER = '🎯 7 · Robber';
+
+export const dicePresets: DicePreset[] = [
   {
     name: "D&D 5e Advantage",
     dice: [
@@ -50,6 +69,7 @@ export const dicePresets = [
       { numberValue: 1, faces: 6, customFaces: [], color: "#E32227", name: "Red" },
       { numberValue: 2, faces: 6, customFaces: [], color: "#FFD700", name: "Yellow" }
     ],
+    sevenNote: { title: ROBBER, text: "Over 7 cards? Discard half, then move it" },
   },
   {
     name: "Cities & Knights",
@@ -58,6 +78,8 @@ export const dicePresets = [
       { numberValue: 2, faces: 6, customFaces: [], color: "#E32227", name: "Event" },
       { numberValue: 3, faces: 6, customFaces: ["Barbarian:bg:#384050", "Barbarian:bg:#384050", "Barbarian:bg:#384050", "Blue:bg:#0056D2", "Yellow:bg:#FFD700", "Green:bg:#2E7D32"], color: "#C0C0C0", name: "Progress" }
     ],
+    // The robber stays put until the barbarians first reach Catan
+    sevenNote: { title: ROBBER, text: "Over 7 cards? Discard half" },
   },
   {
     name: "That's Pretty Clever",
@@ -148,3 +170,9 @@ export const dicePresets = [
     }))
   }
 ];
+
+/** The 7 note of the built-in game with this name, if it has one */
+export function sevenNoteFor(gameName: string | null | undefined): SevenNote | null {
+  if (!gameName) return null;
+  return dicePresets.find(p => p.name === gameName)?.sevenNote ?? null;
+}

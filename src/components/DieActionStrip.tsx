@@ -1,11 +1,13 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React from 'react';
 import { Lock, Unlock, Settings, Trash2, Copy, Dices } from 'lucide-react';
 import type { DiceData } from '../types';
 import { parseFaceContent, faceLabel } from '../utils/diceUtils';
 import styles from './DieActionStrip.module.css';
+import { useSheetDrag } from '../hooks/useSheetDrag';
 
 interface DieActionStripProps {
   die: DiceData;
+  /** A row of chips sits above Roll: the sheet grows to cover it */
   rpgMode: boolean;
   onRollOne?: (id: string) => void;
   onToggleHold: (id: string) => void;
@@ -14,7 +16,12 @@ interface DieActionStripProps {
   onRemove: (id: string) => void;
   /** Any tap in the strip, so it stays open while in use */
   onInteract?: () => void;
+  /** A swipe down closes the sheet (owner, 2026-11-10: "Allow that bar to swipe down") */
+  onClose?: () => void;
 }
+
+// The swipe-down numbers live with the shared sheet drag (useSheetDrag)
+export { SHEET_CLOSE_PX, SHEET_FLICK_PX_PER_MS, SHEET_EXIT_MS } from '../hooks/useSheetDrag';
 
 /** What the die shows, in words, for the strip's heading */
 const showing = (die: DiceData): string => {
@@ -29,27 +36,20 @@ const showing = (die: DiceData): string => {
 /**
  * With many small dice, a tapped die's buttons come out here as one row of
  * thumb-sized buttons above the bottom bar (owner, 2026-10-28), instead of
- * crowding round the die.
+ * crowding round the die. It always opens in that one spot, never jumping to
+ * the top (owner, 2026-11-10: "a more consistent spot. It moves around");
+ * its heading names the die, so covering it doesn't lose which one.
  */
-export const DieActionStrip: React.FC<DieActionStripProps> = ({ die, rpgMode, onRollOne, onToggleHold, onClone, onOpenSettings, onRemove, onInteract }) => {
+export const DieActionStrip: React.FC<DieActionStripProps> = ({ die, rpgMode, onRollOne, onToggleHold, onClone, onOpenSettings, onRemove, onInteract, onClose }) => {
   const name = die.name || `d${die.faces}`;
-  const ref = useRef<HTMLDivElement>(null);
-  // If the strip would cover the tapped die, it moves to the top of the screen
-  const [atTop, setAtTop] = useState(false);
-  useLayoutEffect(() => {
-    const strip = ref.current;
-    const dieEl = document.querySelector(`[data-dice-id="${CSS.escape(die.id)}"]`);
-    if (!strip || !dieEl) return;
-    const below = strip.classList.contains(styles.top) ? null : strip.getBoundingClientRect();
-    const d = dieEl.getBoundingClientRect();
-    const bottomTop = below ? below.top : window.innerHeight - strip.offsetHeight - (rpgMode ? 162 : 108);
-    setAtTop(d.bottom > bottomTop);
-  }, [die.id, rpgMode]);
+  // Swipe down to close, like a phone's bottom sheet (shared with the dialogs)
+  const sheet = useSheetDrag(onClose);
   return (
     <div
-      ref={ref}
       onPointerDownCapture={onInteract}
-      className={`${styles.strip} ${rpgMode ? styles.rpg : ''} ${atTop ? styles.top : ''}`}
+      {...sheet.handlers}
+      style={sheet.style}
+      className={`${styles.strip} ${rpgMode ? styles.rpg : ''} ${sheet.dragging ? styles.dragging : ''}`}
       role="group"
       aria-label={`Actions for ${name}`}
       data-die-actions={die.id}

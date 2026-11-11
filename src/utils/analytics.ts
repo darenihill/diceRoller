@@ -99,6 +99,15 @@ export function saveLocalStats(stats: LocalAnalyticsStats): void {
   }
 }
 
+/**
+ * Google Analytics' official kill switch for this page: while it is set, the
+ * tag sends nothing and writes no cookie. A new page reads the metrics switch
+ * afresh (index.html).
+ */
+export function setGoogleDisabled(disabled: boolean): void {
+  (window as unknown as Record<string, unknown>)[`ga-disable-${GA_MEASUREMENT_ID}`] = disabled;
+}
+
 export function setTelemetryEnabled(enabled: boolean): void {
   const stats = getLocalStats();
   stats.telemetryEnabled = enabled;
@@ -106,7 +115,7 @@ export function setTelemetryEnabled(enabled: boolean): void {
 
   // Google Analytics' official kill switch: when set, gtag drops all hits
   // (including automatic page_views), making the privacy toggle actually binding.
-  (window as unknown as Record<string, unknown>)[`ga-disable-${GA_MEASUREMENT_ID}`] = !enabled;
+  setGoogleDisabled(!enabled);
   if (enabled) loadGoogleTag();
   else clearGoogleCookies();
 }
@@ -128,8 +137,8 @@ export function loadGoogleTag(): void {
 }
 
 /**
- * Google Analytics keeps an ID in its own cookies (_ga, _ga_<id>) for about 13
- * months. With metrics off they are deleted, on this site and its parent
+ * Google Analytics keeps an ID in its own cookies (_ga, _ga_<id>) for up to 2
+ * years after the last visit. With metrics off they are deleted, on this site and its parent
  * domain, so turning metrics off leaves nothing of Google's behind (privacy
  * review, 2026-11-09).
  */
@@ -150,14 +159,6 @@ export function clearGoogleCookies(): void {
   }
 }
 
-/** Detect device classification for metrics */
-export function getDeviceCategory(): 'mobile' | 'tablet' | 'desktop' {
-  const width = window.innerWidth;
-  if (width <= 480) return 'mobile';
-  if (width <= 768) return 'tablet';
-  return 'desktop';
-}
-
 /** Record a new session on app mount */
 export function recordSessionStart(): LocalAnalyticsStats {
   const stats = getLocalStats();
@@ -167,26 +168,18 @@ export function recordSessionStart(): LocalAnalyticsStats {
   // Metrics turned off before this fix, or by a backup, may have left Google's cookies
   if (!stats.telemetryEnabled) clearGoogleCookies();
 
-  if (stats.telemetryEnabled) {
-    dispatchExternalEvent('session_start', {
-      deviceCategory: getDeviceCategory(),
-      referrer: document.referrer || 'direct',
-      screenSize: `${window.innerWidth}x${window.innerHeight}`,
-    });
-  }
+  // Google counts the visit, device and screen itself, so the app sends no
+  // visit event of its own (owner, 2026-11-10: "Send Google less")
 
   return stats;
 }
 
 export type AnalyticsEventName =
-  | 'page_view'
   | 'roll_dice'
   | 'roll_one_die'
   | 'preset_loaded'
   | 'preset_saved'
   | 'dice_added'
-  | 'dice_removed'
-  | 'dice_customized'
   | 'backup_exported'
   | 'backup_imported'
   | 'share_link_copied'
@@ -197,18 +190,21 @@ export type AnalyticsEventName =
   | 'sort_dice_toggled'
   | 'shake_roll'
   | 'table_view_toggled'
-  | 'modifier_toggled'
   | 'install_clicked';
 
-/** Primary event logger */
-export function trackEvent(eventName: AnalyticsEventName, payload: Record<string, unknown> = {}): void {
+/**
+ * Primary event logger. `payload` goes to Google while Page metrics is on;
+ * `onPhone` only feeds Usage stats on this phone, never Google (a roll's
+ * total: owner, 2026-11-10, "Send Google less").
+ */
+export function trackEvent(eventName: AnalyticsEventName, payload: Record<string, unknown> = {}, onPhone: { sum?: number } = {}): void {
   const stats = getLocalStats();
 
   // 1. Update local metrics counters
   switch (eventName) {
     case 'roll_dice': {
       const diceCount = typeof payload.diceCount === 'number' ? payload.diceCount : 0;
-      const sum = typeof payload.sum === 'number' ? payload.sum : 0;
+      const sum = typeof onPhone.sum === 'number' ? onPhone.sum : 0;
       stats.totalRolls += 1;
       stats.totalDiceRolled += diceCount;
       stats.totalSumRolled += sum;
@@ -248,9 +244,9 @@ export function trackEvent(eventName: AnalyticsEventName, payload: Record<string
 
   saveLocalStats(stats);
 
-  // 2. Dispatch to external analytics if telemetry is enabled
+  // 2. To Google, while Page metrics is on
   if (stats.telemetryEnabled) {
-    dispatchExternalEvent(eventName, payload);
+    sendToGoogle(eventName, payload);
   }
 }
 
@@ -258,32 +254,11 @@ interface WindowWithGtag extends Window {
   gtag?: (command: string, action: string, params?: Record<string, unknown>) => void;
 }
 
-/** Dispatches events to standard external providers if configured */
-function dispatchExternalEvent(eventName: string, payload: Record<string, unknown>): void {
+/** Sends one event to Google Analytics (gtag.js), the only place events go */
+function sendToGoogle(eventName: string, payload: Record<string, unknown>): void {
   try {
-    // Support Google Analytics (gtag.js)
-    if (typeof window !== 'undefined') {
-      const win = window as unknown as WindowWithGtag;
-      if (win.gtag) {
-        win.gtag('event', eventName, payload);
-      }
-    }
-
-    // Support custom analytics HTTP endpoint if defined in env
-    const endpoint = import.meta.env?.VITE_ANALYTICS_ENDPOINT;
-    if (endpoint) {
-      const body = JSON.stringify({
-        event: eventName,
-        timestamp: new Date().toISOString(),
-        payload,
-      });
-      if (navigator.sendBeacon) {
-        navigator.sendBeacon(endpoint, body);
-      } else {
-        fetch(endpoint, { method: 'POST', body, headers: { 'Content-Type': 'application/json' } }).catch(() => {});
-      }
-    }
+    (window as unknown as WindowWithGtag).gtag?.('event', eventName, payload);
   } catch {
-    // Silent fail for telemetry so user experience is never impacted
+    // Silent fail for metrics so the app is never affected
   }
 }

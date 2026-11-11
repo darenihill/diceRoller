@@ -45,6 +45,7 @@ bright gold on dark themes and deep gold on light; glows and borders keep
 | Destructive confirm | `.md-button.md-button-danger` | error-colored button |
 | Icon action | `.md-icon-button` | icon button |
 | On/off setting | `.md-icon-button` with `aria-pressed` | icon toggle button |
+| Text field | `Modals.module.css` `.formInput` look: 1px `outline` edge, no fill, 2px `primary` edge while typing (Die settings, Save, Customize, Share and the typed roll box all match; `src/test/materialFit.test.ts`) | outlined text field |
 | Card / tile | `.md-card` | card |
 | Card with icon over label | `.md-card` + `Modals.module.css` `.iconCard` | card |
 | Dialog | `components/Modal.tsx` (title, close, Esc, focus trap) | dialog |
@@ -75,11 +76,12 @@ these words; `src/test/oneName.test.tsx` checks the main ones.
 | clear (empty a list) | delete all, wipe |
 | delete (a saved game) | remove |
 | remove (one die, face or picture) | delete, clear |
+| erase (everything on this phone: Erase everything, Erase all; owner, 2026-11-10) | wipe, reset, delete all |
 | default dice | startup dice, usual dice |
 | faces | sides |
 | Copy link (share) | Copy |
 | tap | click, click/tap, simply |
-| anonymous page metrics | telemetry |
+| Page metrics (the switch that sends visits and taps to Google; owner, 2026-11-10) | anonymous page metrics, telemetry |
 | target hit | HIT!, Target Highlight |
 | like 7, 11 | e.g. |
 | sentence case: "Usage stats", "Set default" | Title Case |
