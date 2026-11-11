@@ -5,7 +5,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- Deep review, 2026-11-11: user stories walked at 390px, what could leak or
+- ~~Done 2026-11-11~~ Deep review, 2026-11-11: user stories walked at 390px, what could leak or
   be abused (STRIDE), and privacy and data, with release 99's Privacy page,
   Erase everything and Send Google less checked against the code at this
   head. Done when: reviews/2026-11-11-stories.md, -security.md, -privacy.md
