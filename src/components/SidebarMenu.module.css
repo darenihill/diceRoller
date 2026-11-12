@@ -151,7 +151,10 @@
     left: 16px;
     right: 16px;
     width: auto;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    /* Four to a row; at a large text size three, wide enough that no word
+       ("Customize", "Feedback") splits across two lines (standard 9;
+       review 2026-11-11). The 25% floor keeps it at four at normal sizes */
+    grid-template-columns: repeat(auto-fill, minmax(max(calc(2.7rem + 14px), calc(25% - 6px)), 1fr));
     gap: 8px;
     z-index: 130;
     /* Up to the top of the screen, less its bottom offset: the group headings

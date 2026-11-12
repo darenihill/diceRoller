@@ -5,6 +5,13 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-11~~ Deep review, 2026-11-11: user stories walked at 390px, what could leak or
+  be abused (STRIDE), and privacy and data, with release 99's Privacy page,
+  Erase everything and Send Google less checked against the code at this
+  head. Done when: reviews/2026-11-11-stories.md, -security.md, -privacy.md
+  and -combined.md are written, each fix and standard gap found is built
+  with tests, and ideas are listed under "Suggested next goals" (Dice Roller
+  is in Maintain, so none go to the Desk).
 - ~~Done 2026-11-11~~ Phone dialogs slide up from the bottom and swipe down to close (Daren
   2026-11-10, Build, way "sheet"): "On a phone, dialogs slide up from the
   bottom with a small grab bar on top. Dragging the grab bar down closes
