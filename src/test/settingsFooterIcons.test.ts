@@ -30,3 +30,18 @@ describe('Release chip appears smoothly', () => {
     expect(bar).toMatch(/prefers-reduced-motion: reduce\)\s*\{\s*\.releaseChip\s*\{\s*animation:\s*none/);
   });
 });
+
+// Owner's screen recording, 2026-11-12: the "yellow line" was the menu, + and Roll
+// buttons joined for a moment by a line of button colour as a die was held. Each
+// gets its own drawing layer so the phone never redraws them as one.
+describe('The bottom buttons are drawn apart', () => {
+  const bar = readFileSync('src/components/ActionBar.module.css', 'utf8');
+  const menu = readFileSync('src/components/SidebarMenu.module.css', 'utf8');
+  it('menu button, + and the Roll group each have their own layer', () => {
+    expect(menu).toMatch(/\.toggleContainer\s*\{[^}]*will-change:\s*transform/);
+    expect(bar).toMatch(/\.addPopoverContainer > \.actionBtn,\s*\.rollGroup\s*\{\s*will-change:\s*transform/);
+  });
+  it('not the bar itself, so the RPG popover backdrop still covers the screen', () => {
+    expect(bar).not.toMatch(/\.actionBar\s*\{[^}]*will-change/);
+  });
+});

@@ -15,6 +15,16 @@
   height: 72px;
 }
 
+/* + and the Roll group each get their own drawing layer, as the menu button
+   does (SidebarMenu.module.css), so Android Chrome is less likely to redraw the
+   three as one: holding a die briefly joined them with a line of button colour across
+   the bottom of the screen (owner's screen recording, 2026-11-12). Not on the
+   bar itself, whose RPG popover backdrop must cover the whole screen. */
+.addPopoverContainer > .actionBtn,
+.rollGroup {
+  will-change: transform;
+}
+
 .rollBtn {
   height: 72px;
   min-width: 156px;
@@ -291,9 +301,9 @@
   font-weight: 600;
 }
 
-/* The chip fades in instead of popping in. On a phone (Android Chrome) the
-   first frame of the gold border could flash as a yellow line along the
-   bottom of the screen when a die was held (owner, 2026-11-10) */
+/* The chip fades in instead of popping in (owner, 2026-11-10). The line seen
+   when holding a die is most likely the phone drawing the bottom buttons as
+   one layer; see the will-change rule above (to confirm on his phone) */
 .releaseChip {
   animation: releaseChipIn 160ms ease-out both;
 }

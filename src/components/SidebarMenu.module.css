@@ -3,6 +3,10 @@
   bottom: 24px;
   left: 24px;
   z-index: 100;
+  /* Its own drawing layer, so Android Chrome never redraws it together with
+     + and Roll: when a die was held, the three were briefly joined by a line
+     of button colour across the bottom (owner's screen recording, 2026-11-12) */
+  will-change: transform;
 }
 
 .toggleBtn {
