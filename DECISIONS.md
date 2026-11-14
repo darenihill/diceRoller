@@ -47,7 +47,6 @@ Daren's picks on suggested ideas for this app, from the Desk, oldest first: the 
 - 2026-10-27 · Build · Phone Back closes the open dialog instead of leaving Dice Roller
 - 2026-10-27 · Build · Press Space or R to roll on a computer
 - 2026-10-27 · Build · Tapping Roll while the dice tumble lands them at once
-- 2026-10-27 · Skip · Undo after Set Default brings back your old startup dice
 - 2026-10-28 · Build · A short buzz when the dice land, even with sound off (Android)
 - 2026-10-28 · Build · Buttons around a tapped die stay thumb-sized with six dice out
 - 2026-10-28 · Watch · Exploding dice: a die that lands its top number rolls again and adds
@@ -62,7 +61,7 @@ Daren's picks on suggested ideas for this app, from the Desk, oldest first: the 
 - 2026-10-28 · Build · When you open a die's settings, its faces show first, not the colour panel
 - 2026-10-29 · Build · A natural 20 sets off a one-second confetti burst
 - 2026-10-30 · Build · Share opens your phone's share sheet (Messages, WhatsApp), with a Copy button as backup
-- 2026-11-02 · Build · 3D dice tumble across a tray and land, instead of flat dice shaking
+- 2026-11-02 · Build · 3D dice tumble across a tray and land, instead of flat dice shaking (his later pick on this idea, below, stands)
 - 2026-11-02 · Build · Dropped die animation: with Advantage, the lower die shrinks back and a DROPPED stamp drops onto it
 - 2026-11-02 · Build · New die animation: a die you add glides out of the + button into its place
 - 2026-11-02 · Build · Phone menu groups its tiles under App, Saves and Tools
@@ -72,6 +71,7 @@ Daren's picks on suggested ideas for this app, from the Desk, oldest first: the 
 - 2026-11-05 · Build · Drag a die's custom faces into a new order
 - 2026-11-05 · Build · The installed app shows a bar when a new version is ready
 - 2026-11-06 · Watch · Hold a die to set it to a face you pick, without rolling
+- 2026-11-07 · Skip · 3D dice tumble across a tray and land, instead of flat dice shaking: "How much extra code does 3d require? I don't really care for it. If it's a tiny add leave it otherwise drop it"
 - 2026-11-07 · Skip · Roll button shows a small "Total" over the number
 - 2026-11-07 · Skip · The "Yatzee" game is renamed "Yatzy"
 - 2026-11-08 · Watch · A Customize switch moves Roll to the left for left-handers
@@ -86,10 +86,6 @@ Daren's picks on suggested ideas for this app, from the Desk, oldest first: the 
 - 2026-11-08 · Build · Show the menu's three groups on phones with a word, shape and color: "Mock up some color coding to the menu options. I want to give more of an indicator (especially on mobile) related topics like we have on desktop. Maybe think of and mock up a couple ideas."
 - 2026-11-08 · Build · Tap a past roll in History to put those dice back out
 - 2026-11-08 · Build · Use one name for each thing in the app, from a short word list
-- 2026-11-10 · Skip · Die settings face cards turn white on Clean Light, not muddy gray
-- 2026-11-10 · Skip · Messages like "Saved" no longer cover the menu's Clear all tile
-- 2026-11-10 · Skip · Save, Cancel and other dialog buttons grow to 48 px tall
-- 2026-11-10 · Skip · The phone keeps one offline copy of the site, without ad IDs
 - 2026-11-11 · Build · Catan: a 7 shows a Robber note above the Roll button
 - 2026-11-11 · Build · First visit: the first die starts with its buttons open, instead of a line of help text
 - 2026-11-11 · Build · New "Erase everything" button at the bottom of Usage stats wipes all your saved things
