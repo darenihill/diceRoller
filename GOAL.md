@@ -5,6 +5,12 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- Polish, 2026-11-14: the main flow (set dice, Roll, read the total, Hold,
+  roll again) at 390px against two or three top-rated apps. Done when:
+  reviews/2026-11-14-ui-top-apps.md has before and after notes with
+  sources, each fix against DESIGN.md or an app standard is built with
+  tests, and ideas are listed under "Suggested next goals" (Maintain: none
+  go to the Desk).
 - ~~Done 2026-11-14~~ Deep review, 2026-11-14: user stories walked at 390px, must-haves and
   delighters (Kano), and the trunk test (dropped onto any screen cold).
   Done when: reviews/2026-11-14-stories.md, -kano.md, -trunk-test.md and
