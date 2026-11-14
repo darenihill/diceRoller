@@ -5,6 +5,12 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- Deep review, 2026-11-14: user stories walked at 390px, must-haves and
+  delighters (Kano), and the trunk test (dropped onto any screen cold).
+  Done when: reviews/2026-11-14-stories.md, -kano.md, -trunk-test.md and
+  -combined.md are written, each fix and standard gap found is built with
+  tests, and ideas are listed under "Suggested next goals" (Dice Roller is
+  in Maintain, so none go to the Desk).
 - ~~Done 2026-11-14~~ DECISIONS.md's Idea choices section matches the hub's
   list (/mnt/project-files/idea-choices/custom-dice-roller.md). Done when: the
   section is that text word for word.
