@@ -932,6 +932,13 @@ function App() {
       return;
     }
     setSavedRolls(list => withSavedRoll(list, roll));
+    // A name already in use takes the new roll: say so, with Undo, rather than
+    // losing the old one silently (standard 2; review 2026-11-14)
+    const replaced = savedRolls.find(r => r.name === roll.name);
+    if (replaced && replaced.text !== roll.text) {
+      offerUndo(`Replaced ${roll.name} (was ${replaced.text})`, () => setSavedRolls(list => withSavedRoll(list, replaced)));
+      return;
+    }
     showToast(`Saved ${roll.name}`);
   };
 
