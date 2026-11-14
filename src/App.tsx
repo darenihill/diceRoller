@@ -932,6 +932,13 @@ function App() {
       return;
     }
     setSavedRolls(list => withSavedRoll(list, roll));
+    // A name already in use takes the new roll: say so, with Undo, rather than
+    // losing the old one silently (standard 2; review 2026-11-14)
+    const replaced = savedRolls.find(r => r.name === roll.name);
+    if (replaced && replaced.text !== roll.text) {
+      offerUndo(`Replaced ${roll.name} (was ${replaced.text})`, () => setSavedRolls(list => withSavedRoll(list, replaced)));
+      return;
+    }
     showToast(`Saved ${roll.name}`);
   };
 
@@ -1304,7 +1311,10 @@ function App() {
         heldCount={heldCount}
         onReleaseAll={releaseAll}
         totalVisible={totalVisible}
-        totalStale={totalStale}
+        // While the dice tumble, the last total isn't theirs: it fades like a
+        // total whose dice changed, as Table view dims its numbers until they
+        // land (polish review 2026-11-14). A die rolled on its own keeps it
+        totalStale={totalStale || (isRolling && rollingId === null)}
         lastTotal={lastTotal}
         totalKey={totalVisible && lastMainRoll ? lastMainRoll.id : undefined}
         rolling={isRolling}
