@@ -5,7 +5,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- Deep review, 2026-11-14: user stories walked at 390px, must-haves and
+- ~~Done 2026-11-14~~ Deep review, 2026-11-14: user stories walked at 390px, must-haves and
   delighters (Kano), and the trunk test (dropped onto any screen cold).
   Done when: reviews/2026-11-14-stories.md, -kano.md, -trunk-test.md and
   -combined.md are written, each fix and standard gap found is built with
