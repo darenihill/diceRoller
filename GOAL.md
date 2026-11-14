@@ -5,7 +5,7 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
-- Polish, 2026-11-14: the main flow (set dice, Roll, read the total, Hold,
+- ~~Done 2026-11-14~~ Polish, 2026-11-14: the main flow (set dice, Roll, read the total, Hold,
   roll again) at 390px against two or three top-rated apps. Done when:
   reviews/2026-11-14-ui-top-apps.md has before and after notes with
   sources, each fix against DESIGN.md or an app standard is built with
