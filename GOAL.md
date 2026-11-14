@@ -5,6 +5,9 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-14~~ DECISIONS.md's Idea choices section matches the hub's
+  list (/mnt/project-files/idea-choices/custom-dice-roller.md). Done when: the
+  section is that text word for word.
 - ~~Done 2026-11-11~~ Deep review, 2026-11-11: user stories walked at 390px, what could leak or
   be abused (STRIDE), and privacy and data, with release 99's Privacy page,
   Erase everything and Send Google less checked against the code at this

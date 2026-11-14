@@ -4,6 +4,11 @@
 
 Daren's picks on suggested ideas for this app, from the Desk, oldest first: the day, his pick and the idea, with his note when he left one. Read his Skip and Ice notes as reasons that guide what to suggest next, not only as ideas not to repeat. Written by the hub's `tools/idea_choices.py`; edits here are overwritten.
 
+- undated · Build · After you type a roll, the big Roll button rolls it
+- undated · Build · Photos on removed dice are really deleted from the phone
+- undated · Build · Safety net: the site refuses code from anywhere except itself and Google
+- undated · Build · Saved games load from a tap anywhere on their row
+- undated · Build · With metrics off, the app no longer contacts Google for its font
 - 2026-10-12 · Build · Make the dice bigger or smaller
 - 2026-10-12 · Build · Name the app and the loaded game on screen
 - 2026-10-12 · Build · Roll just one die
@@ -66,5 +71,28 @@ Daren's picks on suggested ideas for this app, from the Desk, oldest first: the 
 - 2026-11-04 · Watch · A new switch makes the phone say the total out loud
 - 2026-11-05 · Build · Drag a die's custom faces into a new order
 - 2026-11-05 · Build · The installed app shows a bar when a new version is ready
-- 2026-11-07 · Skip · 3D dice tumble across a tray — "How much extra code does 3d require? I don't really care for it. If it's a tiny add leave it otherwise drop it" (PR 75, 585 lines plus a library, closed)
-- 2026-11-08 · Skip · Face pictures in shared links — tapped "No, keep icons" (links stay picture-free; built-in icons already travel; revisit if more players ask, autism center feedback Nov 1)
+- 2026-11-06 · Watch · Hold a die to set it to a face you pick, without rolling
+- 2026-11-07 · Skip · Roll button shows a small "Total" over the number
+- 2026-11-07 · Skip · The "Yatzee" game is renamed "Yatzy"
+- 2026-11-08 · Watch · A Customize switch moves Roll to the left for left-handers
+- 2026-11-08 · Build · A Sort button lines up the dice from low to high after a roll: "I think this is too niche to always be there, is there a good setting to put it in?"
+- 2026-11-08 · Build · Color picker writes the color's name, like "Die color · White"
+- 2026-11-08 · Skip · Face pictures in shared links: "No, keep icons: links stay picture-free, built-in icons already travel. Revisit if more players ask (autism center feedback, Nov 1)."
+- 2026-11-08 · Build · History shows each roll as small dice, not "d6 #1: 2, d6 #2: 4"
+- 2026-11-08 · Watch · Last three totals show small above the Roll button
+- 2026-11-08 · Build · Save fills in a name for you, like "Catan 2" or "2 d6"
+- 2026-11-08 · Build · Share box says "Anyone with this link gets these dice"
+- 2026-11-08 · Build · Share links can't use a built-in game's name for other dice
+- 2026-11-08 · Build · Show the menu's three groups on phones with a word, shape and color: "Mock up some color coding to the menu options. I want to give more of an indicator (especially on mobile) related topics like we have on desktop. Maybe think of and mock up a couple ideas."
+- 2026-11-08 · Build · Tap a past roll in History to put those dice back out
+- 2026-11-08 · Build · Use one name for each thing in the app, from a short word list
+- 2026-11-10 · Skip · Die settings face cards turn white on Clean Light, not muddy gray
+- 2026-11-10 · Skip · Messages like "Saved" no longer cover the menu's Clear all tile
+- 2026-11-10 · Skip · Save, Cancel and other dialog buttons grow to 48 px tall
+- 2026-11-10 · Skip · The phone keeps one offline copy of the site, without ad IDs
+- 2026-11-11 · Build · Catan: a 7 shows a Robber note above the Roll button
+- 2026-11-11 · Build · First visit: the first die starts with its buttons open, instead of a line of help text
+- 2026-11-11 · Build · New "Erase everything" button at the bottom of Usage stats wipes all your saved things
+- 2026-11-11 · Build · Phone dialogs slide up from the bottom and swipe down to close
+- 2026-11-11 · Build · Say plainly what goes to Google: a short Privacy page, a Help line, and a switch called "Page metrics"
+- 2026-11-11 · Build · Send Google less: rolls stop sending their total, and a duplicate visit count goes
