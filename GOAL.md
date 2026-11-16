@@ -5,6 +5,21 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- ~~Done 2026-11-14~~ Polish, 2026-11-14: the main flow (set dice, Roll, read the total, Hold,
+  roll again) at 390px against two or three top-rated apps. Done when:
+  reviews/2026-11-14-ui-top-apps.md has before and after notes with
+  sources, each fix against DESIGN.md or an app standard is built with
+  tests, and ideas are listed under "Suggested next goals" (Maintain: none
+  go to the Desk).
+- ~~Done 2026-11-14~~ Deep review, 2026-11-14: user stories walked at 390px, must-haves and
+  delighters (Kano), and the trunk test (dropped onto any screen cold).
+  Done when: reviews/2026-11-14-stories.md, -kano.md, -trunk-test.md and
+  -combined.md are written, each fix and standard gap found is built with
+  tests, and ideas are listed under "Suggested next goals" (Dice Roller is
+  in Maintain, so none go to the Desk).
+- ~~Done 2026-11-14~~ DECISIONS.md's Idea choices section matches the hub's
+  list (/mnt/project-files/idea-choices/custom-dice-roller.md). Done when: the
+  section is that text word for word.
 - ~~Done 2026-11-11~~ Deep review, 2026-11-11: user stories walked at 390px, what could leak or
   be abused (STRIDE), and privacy and data, with release 99's Privacy page,
   Erase everything and Send Google less checked against the code at this
