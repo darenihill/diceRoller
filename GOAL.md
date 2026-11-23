@@ -5,6 +5,21 @@ customdiceroller.com. Public app: every merge to master publishes the site.
 
 ## Next items
 
+- Code review fix, 2026-11-23 (high): a second open tab no longer wipes
+  games saved in the other tab. Done when a two-tab test passes and
+  reviews/2026-11-23-neon-fixes.md lists it.
+- Code review fix, 2026-11-23 (medium): the four landing pages carry their
+  own description, not the home page's. Done when a test checks each
+  generated page's description.
+- Code review fix, 2026-11-23 (medium): a backup that runs out of room
+  changes nothing, instead of half the settings. Done when a mid-import
+  quota test passes.
+- Code review fix, 2026-11-23 (low): removing or clearing dice mid-roll
+  logs no roll for dice that are gone. Done when a test passes.
+- Code review fix, 2026-11-23 (low): a JSON file that only has a "version"
+  field (package.json) isn't taken for a backup. Done when a test passes.
+- Code review fix, 2026-11-23 (low): a game named __proto__ survives a
+  reload. Done when a test passes.
 - ~~Done 2026-11-14~~ Polish, 2026-11-14: the main flow (set dice, Roll, read the total, Hold,
   roll again) at 390px against two or three top-rated apps. Done when:
   reviews/2026-11-14-ui-top-apps.md has before and after notes with
