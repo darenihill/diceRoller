@@ -122,6 +122,20 @@ describe('Removing or clearing dice mid-roll (low)', () => {
     expect(result.current.diceList.map(d => d.id)).toEqual(['d1']);
   });
 
+  it('a die put back by Undo while another roll tumbles keeps its own value', () => {
+    vi.useFakeTimers();
+    const { result } = renderHook(() => useDiceState());
+    act(() => result.current.setDiceList([die({ faces: 1000 }), die({ id: 'd2' })]));
+    act(() => { result.current.rollDice(); });
+    const copy = result.current.diceList[0];
+    act(() => result.current.removeDice('d1'));
+    act(() => { result.current.rollDice(); });
+    act(() => result.current.insertDiceAt(copy, 0));
+    act(() => { vi.advanceTimersByTime(ROLL_DURATION_MS + 100); });
+    expect(result.current.diceList[0].numberValue).toBe(1);
+    expect(result.current.diceList[0].targetValue).toBeUndefined();
+  });
+
   it('Clear All while the dice tumble logs no roll', () => {
     const result = rollThen('clear');
     expect(result.current.rollHistory).toHaveLength(0);
