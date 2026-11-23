@@ -14,7 +14,7 @@ one deep pass, high in the other) and the half-applied backup (low, then
 medium). That leaves six separate findings. All six are real, and all six
 are fixed here. Each test failed before its fix.
 
-Tests: `src/test/neonFixes20261123.test.tsx` (15 tests).
+Tests: `src/test/neonFixes20261123.test.tsx` (16 tests; the 16th, from the second read, covers Undo during a second roll after a called-off one).
 
 | # | Finding | Grade | Verdict | Fix | Test |
 |---|---|---|---|---|---|
