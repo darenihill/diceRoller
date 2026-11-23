@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { DiceConfig, DiceData } from '../types';
 import { readItem, saveItem } from '../utils/safeStorage';
 import { SAVED } from '../utils/savedValues';
@@ -9,18 +9,31 @@ import { SAVED } from '../utils/savedValues';
  * A name that isn't text would crash that screen every time it opened.
  */
 export function sanitizeSavedConfigs(input: unknown): Record<string, DiceConfig> {
-  const out: Record<string, DiceConfig> = {};
-  if (!input || typeof input !== 'object' || Array.isArray(input)) return out;
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return {};
+  const entries: [string, DiceConfig][] = [];
   for (const [key, raw] of Object.entries(input as Record<string, unknown>)) {
     if (!raw || typeof raw !== 'object') continue;
     const entry = raw as Record<string, unknown>;
-    out[key] = {
+    entries.push([key, {
       ...(entry as object),
       name: typeof entry.name === 'string' ? entry.name : key,
       config: Array.isArray(entry.config) ? entry.config as DiceData[] : [],
-    } as DiceConfig;
+    } as DiceConfig]);
   }
-  return out;
+  // fromEntries, not out[key] = …: a game named __proto__ set the object's
+  // prototype instead and vanished on reload (code review 2026-11-21)
+  return Object.fromEntries(entries);
+}
+
+/** The saved games as storage holds them now, or null when it can't be read */
+function readStoredGames(): Record<string, DiceConfig> | null {
+  try {
+    const stored = readItem(SAVED.games);
+    return stored ? sanitizeSavedConfigs(JSON.parse(stored)) : {};
+  } catch (e) {
+    console.error("Failed to load configs", e);
+    return null;
+  }
 }
 
 // Set once a backup has been put back and the page is about to reload: the
@@ -32,53 +45,73 @@ export function freezeSaves(): void { savesFrozen = true; }
 export function unfreezeSavesForTests(): void { savesFrozen = false; }
 
 export function useStorage() {
-  const [savedConfigs, setSavedConfigs] = useState<Record<string, DiceConfig>>({});
+  // Read when the hook first runs, so a save never starts from an empty list
+  const [savedConfigs, setSavedConfigs] = useState<Record<string, DiceConfig>>(() => readStoredGames() ?? {});
+  const latest = useRef(savedConfigs);
+  // Games whose save storage refused: still shown, and kept by the next save
+  const unsaved = useRef<Record<string, DiceConfig | null>>({});
 
-  // Load from local storage on mount
-  useEffect(() => {
-    const loadFromStorage = () => {
-      try {
-        const stored = readItem(SAVED.games);
-        if (stored) {
-          setSavedConfigs(sanitizeSavedConfigs(JSON.parse(stored)));
-        }
-      } catch (e) {
-        console.error("Failed to load configs", e);
-      }
-    };
-    loadFromStorage();
+  const show = useCallback((games: Record<string, DiceConfig>) => {
+    latest.current = games;
+    setSavedConfigs(games);
   }, []);
+
+  /** What storage holds, with this tab's refused saves laid over it */
+  const current = useCallback((): Record<string, DiceConfig> => {
+    const stored = readStoredGames();
+    if (stored === null) return latest.current;
+    const out = { ...stored };
+    for (const [name, entry] of Object.entries(unsaved.current)) {
+      if (entry) Object.defineProperty(out, name, { value: entry, enumerable: true, writable: true, configurable: true });
+      else delete out[name];
+    }
+    return out;
+  }, []);
+
+  // Another tab saved or deleted a game: show the list as it is now
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== SAVED.games || (e.storageArea && e.storageArea !== localStorage)) return;
+      if (!savesFrozen) show(current());
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [current, show]);
+
+  /**
+   * Each change starts from what storage holds now, not this tab's copy from
+   * when it opened: a second open tab's autosave used to write its old list
+   * over games saved in the other tab (code review 2026-11-21).
+   */
+  const change = useCallback((edit: (games: Record<string, DiceConfig>) => Record<string, DiceConfig>, touched: string, entry: DiceConfig | null) => {
+    if (savesFrozen) return;
+    const updated = edit(current());
+    if (saveItem(SAVED.games, JSON.stringify(updated))) unsaved.current = {};
+    else unsaved.current = { ...unsaved.current, [touched]: entry };
+    show(updated);
+  }, [current, show]);
 
   const saveConfig = useCallback((name: string, config: DiceData[]) => {
-    setSavedConfigs((prev) => {
-      if (savesFrozen) return prev;
-      const updated = { ...prev, [name]: { name, config } };
-      saveItem(SAVED.games, JSON.stringify(updated));
-      return updated;
-    });
-  }, []);
+    const entry = { name, config };
+    change(games => ({ ...games, [name]: entry }), name, entry);
+  }, [change]);
 
   const deleteConfig = useCallback((name: string) => {
-    setSavedConfigs((prev) => {
-      if (savesFrozen) return prev;
-      const updated = { ...prev };
+    change(games => {
+      const updated = { ...games };
       delete updated[name];
-      saveItem(SAVED.games, JSON.stringify(updated));
       return updated;
-    });
-  }, []);
+    }, name, null);
+  }, [change]);
 
   /** Puts a deleted game back in the place it had in the list (used by Undo) */
   const restoreConfig = useCallback((entry: DiceConfig, at: number) => {
-    setSavedConfigs((prev) => {
-      if (savesFrozen) return prev;
-      const entries = Object.entries(prev).filter(([key]) => key !== entry.name);
+    change(games => {
+      const entries = Object.entries(games).filter(([key]) => key !== entry.name);
       entries.splice(Math.min(Math.max(at, 0), entries.length), 0, [entry.name, entry]);
-      const updated = Object.fromEntries(entries);
-      saveItem(SAVED.games, JSON.stringify(updated));
-      return updated;
-    });
-  }, []);
+      return Object.fromEntries(entries);
+    }, entry.name, entry);
+  }, [change]);
 
   const getSystemAutosave = useCallback((): DiceConfig | null => {
     try {

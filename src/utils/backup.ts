@@ -7,7 +7,7 @@
 import { sanitizeDiceList, sanitizeDiceScale } from './diceUtils';
 import { usedFaceImages, importFaceImages } from './faceImages';
 import { MAX_HISTORY_LENGTH } from './constants';
-import { readItem, saveItem } from './safeStorage';
+import { readItem, saveItem, removeItem } from './safeStorage';
 import { SAVED } from './savedValues';
 import { BUZZ_KEY, BUZZ_SHOWN_KEY } from './buzz';
 import { loadSavedRolls, sanitizeSavedRolls, withSavedRoll, SAVED_ROLLS_KEY } from './savedRolls';
@@ -59,19 +59,24 @@ export function restoreBackup(input: unknown): RestoreResult {
   if (!isObject(input)) return 'invalid';
   const data = input;
   // Any other JSON file (notes.json) is not a backup: it used to "import" and
-  // reset the dice size (review 2026-11-06). Every backup carries one of these.
-  if (data.version === undefined && !isObject(data.configs)) return 'invalid';
+  // reset the dice size (review 2026-11-06). Every backup carries its games or
+  // a backup version ("1.0", "1.1"); a package.json's "1.0.0" is not one
+  // (code review 2026-11-21).
+  const isBackupVersion = typeof data.version === 'string' && /^1\.\d+$/.test(data.version);
+  if (!isBackupVersion && !isObject(data.configs)) return 'invalid';
 
-  // A backup that doesn't fit stops here: no reload, no false "Imported"
-  let fits = true;
-  const keep = (key: string, value: string) => { fits = saveItem(key, value) && fits; };
+  // Every write is listed first, then made in order. A backup that doesn't
+  // fit stops at the first refused write and puts back what it had written,
+  // so nothing is half imported: no reload, no false "Imported" (code review 2026-11-21)
+  const writes: [string, string][] = [];
+  const keep = (key: string, value: string) => { writes.push([key, value]); };
 
   if (isObject(data.configs)) {
     // Sanitize every dice list inside the backup before it reaches storage
-    const configs: Record<string, unknown> = {};
-    for (const [name, entry] of Object.entries(data.configs)) {
-      if (isObject(entry)) configs[name] = { ...entry, config: sanitizeDiceList(entry.config) };
-    }
+    // fromEntries, not configs[name] = …, so a game named __proto__ is kept
+    const configs = Object.fromEntries(Object.entries(data.configs)
+      .filter((pair): pair is [string, Record<string, unknown>] => isObject(pair[1]))
+      .map(([name, entry]) => [name, { ...entry, config: sanitizeDiceList(entry.config) }]));
     keep(SAVED.games, JSON.stringify({ ...readJson<Record<string, unknown>>(SAVED.games, {}), ...configs }));
   }
   if (data.defaultSet) keep(SAVED.defaultSet, JSON.stringify(sanitizeDiceList(data.defaultSet)));
@@ -98,7 +103,15 @@ export function restoreBackup(input: unknown): RestoreResult {
   // Typed rolls saved as buttons join this device's own
   if (Array.isArray(data.savedRolls)) keep(SAVED_ROLLS_KEY, JSON.stringify(sanitizeSavedRolls(data.savedRolls).reduce(withSavedRoll, loadSavedRolls())));
 
-  if (!fits) return 'full';
+  const before = writes.map(([key]) => [key, readItem(key)] as const);
+  for (let i = 0; i < writes.length; i++) {
+    if (saveItem(writes[i][0], writes[i][1])) continue;
+    for (const [key, old] of before.slice(0, i).reverse()) {
+      if (old === null) removeItem(key);
+      else saveItem(key, old);
+    }
+    return 'full';
+  }
   // Pictures on faces; older backups have none
   if (isObject(data.faceImages) && Object.keys(data.faceImages).length > 0 && !importFaceImages(data.faceImages)) return 'pictures';
   return 'ok';
