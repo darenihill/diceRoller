@@ -7,6 +7,7 @@ import { gameKeyFor, gameKeyOf, recentGroups, groupLabel, diceSummary } from '..
 import { canReuse } from '../../utils/historyReuse';
 import { historyTiles, historySubtitle } from '../../utils/historyTiles';
 import { getContrastColor } from '../../utils/diceUtils';
+import { StatsPanel, EraseAsk } from './StatsPanel';
 import styles from '../../App.module.css';
 import modalStyles from './Modals.module.css';
 // The same tabs as Dice Settings / Custom faces, so the two dialogs match
@@ -26,6 +27,8 @@ interface HistoryModalProps {
   rollAdvantage?: RollAdvantageMode;
   /** A tapped row: put that roll's dice back out, or a typed roll back in the box */
   onReuse?: (roll: RollHistoryItem) => void;
+  /** Erase all, once asked in the Stats tab: takes everything off this phone and reloads */
+  onEraseEverything?: () => void;
 }
 
 export const HistoryModal: React.FC<HistoryModalProps> = ({
@@ -39,6 +42,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   modifier = 0,
   rollAdvantage = 'normal',
   onReuse,
+  onEraseEverything,
 }) => {
   // History by game (owner, 2026-11-05): Frequency counts the game on the table
   // now, with chips for the last few games before it and All
@@ -72,12 +76,21 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   const times = (n: number) => `${n} ${n === 1 ? 'time' : 'times'}`;
 
   // History and Frequency as tabs by the close button (owner, 2026-11-05)
-  const [tab, setTab] = React.useState<'history' | 'frequency'>('history');
+  // Stats is the third tab (owner's trim pass, 2026-11-24), once Usage stats in the menu
+  const [tab, setTab] = React.useState<'history' | 'frequency' | 'stats'>('history');
+  // Erase everything's question while asking; its panel takes the dialog's place
+  const [asking, setAsking] = React.useState<string | null>(null);
+  const eraseButton = React.useRef<HTMLButtonElement>(null);
+  const backToErase = React.useRef(false);
+  React.useEffect(() => {
+    if (asking === null && backToErase.current) { backToErase.current = false; eraseButton.current?.focus(); }
+  }, [asking]);
   // Each opening starts on History, wherever it was left
   const [wasOpen, setWasOpen] = React.useState(isOpen);
   if (isOpen !== wasOpen) {
     setWasOpen(isOpen);
     if (isOpen) { setTab('history'); setPicked(null); }
+    setAsking(null);
   }
   const currentLabel = currentKey ? groupLabel(rollHistory, currentKey) : '';
   const currentHasRolls = groups.some(g => g.key === currentKey);
@@ -117,7 +130,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
   );
   const tabsHeader = (
     <div className={tabStyles.tabs} role="tablist" aria-label="History">
-      {([['history', 'History'], ['frequency', 'Frequency']] as const).map(([key, label]) => (
+      {([['history', 'History'], ['frequency', 'Frequency'], ['stats', 'Stats']] as const).map(([key, label]) => (
         <button
           key={key}
           type="button"
@@ -134,9 +147,22 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
     </div>
   );
 
+  if (asking !== null) {
+    // Only Not now, Erase all and the dialog's × can be reached while it asks
+    return (
+      <Modal isOpen={isOpen} onClose={onClose} title="History">
+        <EraseAsk
+          question={asking}
+          onErase={() => onEraseEverything?.()}
+          onCancel={() => { backToErase.current = true; setAsking(null); }}
+        />
+      </Modal>
+    );
+  }
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="History" header={tabsHeader}>
-      {rollHistory.length === 0 ? (
+      {tab !== 'stats' && rollHistory.length === 0 ? (
         <p style={{ color: 'var(--md-sys-color-on-surface-variant)', textAlign: 'center', padding: '16px 0' }}>No rolls yet. Each roll shows here.</p>
       ) : (
         <div
@@ -287,6 +313,9 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
             </div>
 
           </>)}
+          {tab === 'stats' && (
+            <StatsPanel onAskErase={onEraseEverything ? setAsking : undefined} eraseRef={eraseButton} />
+          )}
         </div>
       )}
     </Modal>

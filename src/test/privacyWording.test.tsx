@@ -1,7 +1,7 @@
 /**
  * Standard 15 (privacy): the app says plainly what leaves the phone and to
- * whom. The metrics switch names Google Analytics and what it never sends
- * (review 2026-11-07).
+ * whom. The metrics switch names Google Analytics and links what it sends
+ * (review 2026-11-07; one link, not a sentence, since the trim pass 2026-11-24).
  */
 import React from 'react';
 import { describe, it, expect } from 'vitest';
@@ -16,9 +16,9 @@ const base = {
 };
 
 describe('Metrics switch wording', () => {
-  it('names Google Analytics and what is never sent', () => {
+  it('names Google Analytics and links what is sent', () => {
     render(<CustomizeModal {...base} />);
-    expect(screen.getByText(/to Google Analytics/)).toBeInTheDocument();
-    expect(screen.getByText(/Never your own face words, pictures or saved game names/)).toBeInTheDocument();
+    const link = screen.getByRole('link', { name: "What's sent to Google Analytics" });
+    expect(link.getAttribute('href')).toBe('/privacy/');
   });
 });

@@ -7,7 +7,7 @@ import { SidebarMenu } from '../components/SidebarMenu';
 // Owner, 2026-11-07 (way A): on a phone each menu group shows a word and a tint.
 // Owner, 2026-11-10: the circle, square and triangle beside the headings came out.
 const a = vi.fn();
-const menu = () => render(<SidebarMenu isOpen onToggle={a} onDonate={a} onIdeas={a} onHelp={a} onHistory={a} onStats={a} onSets={a} onCustomize={a} onDeleteAll={a} onSave={a} onShare={a} onSetDefault={a} rpgMode={false} onToggleRpgMode={a} />);
+const menu = () => render(<SidebarMenu isOpen onToggle={a} onDonate={a} onIdeas={a} onHelp={a} onHistory={a} onSets={a} onCustomize={a} onDeleteAll={a} onSave={a} onShare={a} onSetDefault={a} rpgMode={false} onToggleRpgMode={a} />);
 
 describe('menu groups on a phone', () => {
   it('each group has its heading word and no shape mark', () => {

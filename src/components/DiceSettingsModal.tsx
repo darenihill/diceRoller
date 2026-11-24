@@ -629,9 +629,9 @@ export const DiceSettingsModal: React.FC<DiceSettingsModalProps> = ({ dice, isOp
               ) : (
                 <div className={styles.editNote}>
                   <span className={styles.modeTitle}>Adding a new face</span>
-                  <span className={styles.sublabel} style={{ margin: 0, flexBasis: '100%' }}>
-                    Tap an icon to add it as a face{dice.customFaces.length > 0 ? '. To change a face, tap it above' : ''}
-                  </span>
+                  {dice.customFaces.length > 0 && (
+                    <span className={styles.sublabel} style={{ margin: 0, flexBasis: '100%' }}>To change a face, tap it above</span>
+                  )}
                 </div>
               )}
               <div className={styles.iconGrid} style={{ maxHeight: showAllIcons ? '150px' : 'auto', overflowY: showAllIcons ? 'auto' : 'visible' }}>

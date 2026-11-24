@@ -4,7 +4,7 @@ import { render, screen, fireEvent, act, within } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import App from '../App';
-import { StatsModal } from '../components/modals/StatsModal';
+import { HistoryModal } from '../components/modals/HistoryModal';
 import { HelpModal } from '../components/modals/HelpModal';
 import { countSaved, eraseEverything, eraseQuestion } from '../utils/erase';
 import { DIE_BUTTONS_SHOWN_KEY, isFirstVisit } from '../utils/firstVisit';
@@ -18,7 +18,12 @@ vi.mock('../utils/erase', async (original) => ({ ...(await original<typeof impor
 globalThis.ResizeObserver ??= class { observe() {} unobserve() {} disconnect() {} } as unknown as typeof ResizeObserver;
 
 // Erase everything at the bottom of Usage stats (owner, 2026-11-10, way
-// "Bottom of Usage stats").
+// "Bottom of Usage stats"), now History's Stats tab (trim pass, 2026-11-24).
+const StatsTab = (props: { onClose?: () => void; onEraseEverything?: () => void }) => {
+  const r = render(<HistoryModal isOpen onClose={props.onClose ?? (() => {})} rollHistory={[]} onClearHistory={() => {}} onEraseEverything={props.onEraseEverything} />);
+  fireEvent.click(screen.getByRole('tab', { name: 'Stats' }));
+  return r;
+};
 
 const PIC = 'data:image/png;base64,iVBORw0KGgo=';
 const fill = () => {
@@ -62,9 +67,9 @@ describe('The question counts what goes', () => {
   });
 });
 
-describe('Usage stats', () => {
+describe('History\'s Stats tab', () => {
   it('ends with the new line and an outlined Erase everything button in words', () => {
-    render(<StatsModal isOpen onClose={() => {}} onEraseEverything={() => {}} />);
+    StatsTab({ onEraseEverything: () => {} });
     expect(screen.getByText('Your games, History, pictures and these stats stay on this phone.')).toBeInTheDocument();
     const button = screen.getByRole('button', { name: 'Erase everything' });
     expect(button.className).toMatch(/eraseEverything/);
@@ -78,7 +83,7 @@ describe('Usage stats', () => {
     fill();
     const onErase = vi.fn();
     const onClose = vi.fn();
-    render(<StatsModal isOpen onClose={onClose} onEraseEverything={onErase} />);
+    StatsTab({ onClose, onEraseEverything: onErase });
     fireEvent.click(screen.getByRole('button', { name: 'Erase everything' }));
     const ask = screen.getByRole('group', { name: "Erase 3 games, 120 rolls, 4 pictures and your stats? This can't be undone." });
     const notNow = within(ask).getByRole('button', { name: 'Not now' });
@@ -102,7 +107,7 @@ describe('Usage stats', () => {
   });
 
   it('Tab stays inside the panel and the dialog\'s ×', () => {
-    render(<StatsModal isOpen onClose={() => {}} onEraseEverything={() => {}} />);
+    StatsTab({ onEraseEverything: () => {} });
     fireEvent.click(screen.getByRole('button', { name: 'Erase everything' }));
     const dialog = screen.getByRole('dialog');
     const reachable = [...dialog.querySelectorAll('button')].map(b => b.getAttribute('aria-label') ?? b.textContent);
@@ -143,7 +148,8 @@ describe('Erase all', () => {
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.getByRole('button', { name: 'Undo' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Usage stats' }));
+    fireEvent.click(screen.getByRole('button', { name: 'History' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Stats' }));
     fireEvent.click(screen.getByRole('button', { name: 'Erase everything' }));
     fireEvent.click(screen.getByRole('button', { name: 'Erase all' }));
     expect(reload).toHaveBeenCalledTimes(1);
@@ -164,7 +170,7 @@ describe('Words and Help', () => {
   it('Help has one line about it', () => {
     render(<HelpModal isOpen onClose={() => {}} />);
     const lines = screen.getAllByRole('listitem').map(li => li.textContent ?? '').filter(t => /Erase everything/.test(t));
-    expect(lines).toEqual(['Erase everything: At the bottom of Usage stats. It asks first, then takes your games, History, pictures, stats and settings off this phone.']);
+    expect(lines).toEqual(['Erase everything: At the bottom of History\'s Stats tab. It asks first, then takes your games, History, pictures, stats and settings off this phone.']);
   });
 });
 

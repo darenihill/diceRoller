@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal } from '../Modal';
 import modalStyles from './Modals.module.css';
+import appStyles from '../../App.module.css';
 
 interface ShareModalProps {
   url: string | null;
@@ -31,7 +32,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({ url, onClose }) => {
   return (
     <Modal isOpen={!!url} onClose={handleClose} title="Share link">
       <div className={modalStyles.formGroup}>
-        <label className={modalStyles.formLabel} htmlFor="share-link-url">Share with this link</label>
+        {/* Heard, not shown: the dialog's title already says it (owner's trim pass, 2026-11-24) */}
+        <label className={appStyles.srOnly} htmlFor="share-link-url">Share with this link</label>
         <input 
           id="share-link-url"
           ref={inputRef}

@@ -8,7 +8,8 @@ import { render, screen } from '@testing-library/react';
 import { cleanStats, getLocalStats } from '../utils/analytics';
 import { restoreBackup } from '../utils/backup';
 import { SAVED } from '../utils/savedValues';
-import { StatsModal } from '../components/modals/StatsModal';
+import { HistoryModal } from '../components/modals/HistoryModal';
+import { fireEvent } from '@testing-library/react';
 
 beforeEach(() => localStorage.clear());
 
@@ -35,7 +36,8 @@ describe('Usage stats from a damaged backup', () => {
     expect(restoreBackup({ version: '1.1', usageStats: { totalRolls: null, presetsLoadedCount: null, highestRoll: {}, totalDiceRolled: 'lots' } })).toBe('ok');
     expect(localStorage.getItem(SAVED.usageStats)).not.toBeNull();
     expect(getLocalStats().totalDiceRolled).toBe(0);
-    render(<StatsModal isOpen onClose={() => {}} />);
+    render(<HistoryModal isOpen onClose={() => {}} rollHistory={[]} onClearHistory={() => {}} />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Stats' }));
     expect(screen.getByText('Total rolls')).toBeInTheDocument();
   });
 });

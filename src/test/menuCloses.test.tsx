@@ -12,7 +12,7 @@ const openMenu = () => fireEvent.click(screen.getByRole('button', { name: 'Open 
 const menuIsOpen = () => screen.queryByRole('button', { name: 'Close menu' }) !== null;
 
 describe('The menu closes when a window opens', () => {
-  it.each(['Help', 'Games', 'History', 'Usage stats', 'Customize'])('%s closes the menu as its window opens', (item) => {
+  it.each(['Help', 'Games', 'History', 'Customize'])('%s closes the menu as its window opens', (item) => {
     render(<App />);
     openMenu();
     expect(menuIsOpen()).toBe(true);

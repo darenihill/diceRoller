@@ -111,7 +111,7 @@ describe("turning page metrics off deletes Google's cookies", () => {
 });
 
 describe('closing a dialog opened from the menu', () => {
-  it.each(['Customize', 'History', 'Games', 'Help', 'Usage stats', 'Save'])('puts focus back on the menu button after %s', (tile) => {
+  it.each(['Customize', 'History', 'Games', 'Help', 'Save'])('puts focus back on the menu button after %s', (tile) => {
     render(<App />);
     fireEvent.click(screen.getByLabelText('Open menu'));
     const button = screen.getByRole('button', { name: tile });

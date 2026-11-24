@@ -23,8 +23,8 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
           <li><strong>Table view:</strong> Tap Table view in the menu to show each total big, with an upside-down copy for the people across the table. Tap × to turn it off.</li>
           <li><strong>History:</strong> Tap History in the menu to see past rolls and how often each total came up.</li>
           <li><strong>Target hit:</strong> In Customize, type the totals you want, like <code>7, 11</code>. A roll that hits one gets a 🎯.</li>
-          <li><strong>Usage stats:</strong> Your total rolls, highest roll and most played games. They stay on this device.</li>
-          <li><strong>Erase everything:</strong> At the bottom of Usage stats. It asks first, then takes your games, History, pictures, stats and settings off this phone.</li>
+          <li><strong>Stats:</strong> In History. Your total rolls, highest roll and most played games. They stay on this device.</li>
+          <li><strong>Erase everything:</strong> At the bottom of History's Stats tab. It asks first, then takes your games, History, pictures, stats and settings off this phone.</li>
           <li><strong>Keyboard:</strong> On a computer, press <kbd>Space</kbd> or <kbd>R</kbd> to roll.</li>
           <li><strong>Privacy:</strong> Your dice and games stay on this phone. <a href="/privacy/" target="_blank" rel="noopener" className={modalStyles.inlineLink}>What goes to Google</a> while Page metrics is on, and how to turn it off.</li>
           <li><strong>Fair dice:</strong> Every roll uses your browser's secure random numbers, so each face is equally likely.</li>

@@ -41,7 +41,6 @@ import { useUndo, dieLabel, UNDO_WINDOW_MS } from './hooks/useUndo';
 import { UndoBar } from './components/UndoBar';
 import { spokenTotal } from './utils/totalMath';
 import { ShareModal } from './components/modals/ShareModal';
-import { StatsModal } from './components/modals/StatsModal';
 import { TableView } from './components/TableView';
 import { tableTiles, tableMath } from './utils/tableView';
 import { gameKeyOf } from './utils/rollGroups';
@@ -229,7 +228,7 @@ function App() {
   }, []);
 
   // Modals state
-  const [modalOpen, setModalOpen] = useState<'help' | 'history' | 'sets' | 'customize' | 'stats' | 'about' | 'install' | null>(null);
+  const [modalOpen, setModalOpen] = useState<'help' | 'history' | 'sets' | 'customize' | 'about' | 'install' | null>(null);
   const { installed, install } = useInstallApp();
 
   // Install app: the browser's own install box, or the how-to where there is none
@@ -631,7 +630,7 @@ function App() {
   };
 
   // A window picked from the menu closes the menu, as Save and Share do, so closing it lands on the dice
-  const openFromMenu = (which: 'help' | 'history' | 'stats' | 'sets' | 'customize') => {
+  const openFromMenu = (which: 'help' | 'history' | 'sets' | 'customize') => {
     setMenuOpen(false);
     setModalOpen(which);
   };
@@ -794,7 +793,7 @@ function App() {
     }
   };
 
-  // Erase everything (owner, 2026-11-10): asked first in Usage stats. From
+  // Erase everything (owner, 2026-11-10): asked first in History's Stats tab. From
   // here this page saves nothing more, not even the autosave as it unloads,
   // and an open Undo bar goes, so nothing comes back before the reload. No
   // Undo: the panel says it can't be undone
@@ -1290,7 +1289,6 @@ function App() {
         onIdeas={() => window.open('https://forms.gle/wqYaKsEZ5FQwizuMA', '_blank', 'noopener,noreferrer')}
         onHelp={() => openFromMenu('help')}
         onHistory={() => openFromMenu('history')}
-        onStats={() => openFromMenu('stats')}
         onSets={() => openFromMenu('sets')}
         onCustomize={() => openFromMenu('customize')}
         onDeleteAll={handleDeleteAll}
@@ -1343,7 +1341,8 @@ function App() {
 
       <HistoryModal 
         isOpen={modalOpen === 'history'} 
-        onClose={() => setModalOpen(null)} 
+        onClose={() => setModalOpen(null)}
+        onEraseEverything={handleEraseEverything}
         rollHistory={rollHistory}
         onClearHistory={handleClearHistory}
         onClearGame={handleClearGame}
@@ -1408,12 +1407,6 @@ function App() {
       <ShareModal
         url={shareFallbackUrl}
         onClose={() => setShareFallbackUrl(null)}
-      />
-
-      <StatsModal
-        isOpen={modalOpen === 'stats'}
-        onClose={() => setModalOpen(null)}
-        onEraseEverything={handleEraseEverything}
       />
 
       {/* Toast Notification. With a dialog open the bar sits at the screen's

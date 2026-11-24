@@ -208,7 +208,6 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
             <div className={modalStyles.toggleRow}>
               <div className={modalStyles.toggleLabelCol}>
                 <span className={modalStyles.toggleTitle}>Bright rings</span>
-                <span className={modalStyles.toggleDesc}>A bright ring around the bottom buttons, easier to find in sunlight</span>
               </div>
               <div className={modalStyles.switchCol}>
                 <button
@@ -252,7 +251,6 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
             <div className={modalStyles.toggleRow}>
               <div className={modalStyles.toggleLabelCol}>
                 <span className={modalStyles.toggleTitle}>Target hit</span>
-                <span className={modalStyles.toggleDesc}>Celebrate when the roll total hits one of these numbers, like 7, 11</span>
               </div>
               <input
                 type="text"
@@ -278,7 +276,7 @@ export const CustomizeModal: React.FC<CustomizeModalProps> = ({
           <div className={modalStyles.toggleRow}>
             <div className={modalStyles.toggleLabelCol}>
               <span className={modalStyles.toggleTitle}>Page metrics</span>
-              <span className={modalStyles.toggleDesc}>Sends page visits, rolls and button taps to Google Analytics. Never your own face words, pictures or saved game names. <a href="/privacy/" target="_blank" rel="noopener" className={modalStyles.inlineLink}>What's sent</a></span>
+              <span className={modalStyles.toggleDesc}><a href="/privacy/" target="_blank" rel="noopener" className={modalStyles.inlineLink}>What's sent to Google Analytics</a></span>
             </div>
             <div className={modalStyles.switchCol}>
               <button 
