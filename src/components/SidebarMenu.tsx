@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import styles from './SidebarMenu.module.css';
 import { useBackToClose } from '../hooks/useBackToClose';
 import { useSheetDrag, usePhoneWidth } from '../hooks/useSheetDrag';
-import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Share2, Palette, Pin, ToggleLeft, ToggleRight, BarChart2, Download } from 'lucide-react';
+import { Coffee, Lightbulb, HelpCircle, History, Dice6, Trash2, Save, Share2, Palette, Pin, ToggleLeft, ToggleRight, Download } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 // Material 3 "emphasized" easing for the menu icon turning into a close icon
@@ -28,7 +28,6 @@ interface SidebarMenuProps {
   onIdeas: () => void;
   onHelp: () => void;
   onHistory: () => void;
-  onStats: () => void;
   onSets: () => void;
   onCustomize: () => void;
   onDeleteAll: () => void;
@@ -47,7 +46,7 @@ interface SidebarMenuProps {
 }
 
 export const SidebarMenu: React.FC<SidebarMenuProps> = ({
-  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onStats, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, rpgMode, onToggleRpgMode, tableView, onToggleTableView, onInstall, dialogOpen = false
+  isOpen, onToggle, onDonate, onIdeas, onHelp, onHistory, onSets, onCustomize, onDeleteAll, onSave, onShare, onSetDefault, rpgMode, onToggleRpgMode, tableView, onToggleTableView, onInstall, dialogOpen = false
 }) => {
   const toggleRef = useRef<HTMLButtonElement>(null);
   // Escape closes the menu, as it does every dialog, and focus goes back to the menu button
@@ -107,7 +106,6 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
 
               <div className={`${styles.menuColumn} ${styles.groupSettings}`}>
                 <div className={styles.menuColumnHeader}>Settings</div>
-                <button className={styles.menuItem} onClick={onStats}><BarChart2 size={18} /> <span>Usage stats</span></button>
                 <button className={styles.menuItem} onClick={onCustomize}><Palette size={18} /> <span>Customize</span></button>
                 <button className={styles.menuItem} onClick={onToggleTableView} aria-pressed={tableView}
                   title="Show each roll's total big for the whole table">

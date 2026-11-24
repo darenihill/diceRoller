@@ -15,22 +15,32 @@ const escapeAttr = (s) => s
   .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
   .replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+// Every copy of a text the page must change: the <meta> tags carry the title
+// and description three times. A swap that matched nothing used to pass
+// silently, so the landing pages shipped the home page's description (code
+// review 2026-11-21); now it stops the build.
+function replaceEvery(html, from, to, count) {
+  const found = html.split(from).length - 1;
+  if (found !== count) throw new Error(`landing-pages: template has ${found} of ${from}, expected ${count}`);
+  return html.replaceAll(from, () => to);
+}
+
 function replaceOnce(html, from, to) {
   if (!html.includes(from)) throw new Error(`landing-pages: template no longer contains ${from}`);
   return html.replace(from, () => to);
 }
 
 const DEFAULT_TITLE = 'Custom Dice Roller — Build and Roll Any Dice Online';
-const DEFAULT_DESCRIPTION = 'Free online dice roller for board games and tabletop RPGs. Build custom dice with any faces, colours and icons, then share your set with a link.';
+const DEFAULT_DESCRIPTION = 'Free online dice roller for board games and tabletop RPGs. Build custom dice with any faces, colors and icons, then share your dice with a link.';
 
 export function renderPage(template, page) {
   const url = `${SITE}/${page.slug}/`;
   const title = escapeAttr(page.title);
   const description = escapeAttr(page.description);
   let html = template;
-  html = html.replaceAll(`<title>${DEFAULT_TITLE}</title>`, `<title>${title}</title>`);
-  html = html.replaceAll(`content="${DEFAULT_TITLE}"`, `content="${title}"`);
-  html = html.replaceAll(`content="${DEFAULT_DESCRIPTION}"`, `content="${description}"`);
+  html = replaceEvery(html, `<title>${DEFAULT_TITLE}</title>`, `<title>${title}</title>`, 1);
+  html = replaceEvery(html, `content="${DEFAULT_TITLE}"`, `content="${title}"`, 2);
+  html = replaceEvery(html, `content="${DEFAULT_DESCRIPTION}"`, `content="${description}"`, 3);
   html = replaceOnce(html, `<meta property="og:url" content="${SITE}/" />`, `<meta property="og:url" content="${url}" />`);
   html = replaceOnce(html, `<link rel="canonical" href="${SITE}/" />`, `<link rel="canonical" href="${url}" />`);
   html = html.replace(/\n\s*<!-- home-about:[\s\S]*?<!-- \/home-about -->/, '');

@@ -175,11 +175,11 @@ describe('The switch is called Page metrics', () => {
     shakeEnabled: false, onToggleShake: () => {},
   };
 
-  it('its label and name say Page metrics, and its line ends in a What\'s sent link', () => {
+  it('its label and name say Page metrics, and its line is a What\'s sent to Google Analytics link', () => {
     render(<CustomizeModal {...base} />);
     expect(screen.getByRole('button', { name: 'Page metrics' })).toHaveAttribute('title', 'Turn off page metrics');
     expect(screen.getByText('Page metrics')).toBeInTheDocument();
-    const link = screen.getByRole('link', { name: "What's sent" });
+    const link = screen.getByRole('link', { name: "What's sent to Google Analytics" });
     expect(link).toHaveAttribute('href', '/privacy/');
     expect(link.parentElement?.lastElementChild).toBe(link);
     expect(document.body.textContent).not.toMatch(/anonymous page metrics/i);

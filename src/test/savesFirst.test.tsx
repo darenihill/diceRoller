@@ -28,7 +28,7 @@ describe('Games dialog lists your saves first', () => {
 describe('Menu keeps one Games entry', () => {
   it('has Games and no separate Load', () => {
     const fns = { a: vi.fn() };
-    render(<SidebarMenu isOpen onToggle={fns.a} onDonate={fns.a} onIdeas={fns.a} onHelp={fns.a} onHistory={fns.a} onStats={fns.a} onSets={fns.a} onCustomize={fns.a} onDeleteAll={fns.a} onSave={fns.a} onShare={fns.a} onSetDefault={fns.a} rpgMode={false} onToggleRpgMode={fns.a} />);
+    render(<SidebarMenu isOpen onToggle={fns.a} onDonate={fns.a} onIdeas={fns.a} onHelp={fns.a} onHistory={fns.a} onSets={fns.a} onCustomize={fns.a} onDeleteAll={fns.a} onSave={fns.a} onShare={fns.a} onSetDefault={fns.a} rpgMode={false} onToggleRpgMode={fns.a} />);
     expect(screen.getByText('Games')).toBeInTheDocument();
     expect(screen.queryByText('Load')).toBeNull();
   });

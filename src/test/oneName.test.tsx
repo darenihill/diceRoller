@@ -37,8 +37,8 @@ describe('one name per thing', () => {
   });
 
   it('menu tiles read in sentence case', () => {
-    render(<SidebarMenu isOpen onToggle={a} onDonate={a} onIdeas={a} onHelp={a} onHistory={a} onStats={a} onSets={a} onCustomize={a} onDeleteAll={a} onSave={a} onShare={a} onSetDefault={a} rpgMode={false} onToggleRpgMode={a} />);
-    for (const label of ['Usage stats', 'Set default', 'RPG mode', 'Clear all']) {
+    render(<SidebarMenu isOpen onToggle={a} onDonate={a} onIdeas={a} onHelp={a} onHistory={a} onSets={a} onCustomize={a} onDeleteAll={a} onSave={a} onShare={a} onSetDefault={a} rpgMode={false} onToggleRpgMode={a} />);
+    for (const label of ['Set default', 'RPG mode', 'Clear all']) {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
   });

@@ -114,6 +114,15 @@ const loadStoredHistory = (): RollHistoryItem[] => {
   return [];
 };
 
+/**
+ * A die with no roll still to land. A die copied for Undo mid-roll carries
+ * that roll's result: put back while another roll tumbled, it jumped to
+ * that result when the other roll landed (second read, 2026-11-23)
+ */
+const settled = (d: DiceData): DiceData => (d.targetValue === undefined && d.targetFaceIndex === undefined
+  ? d
+  : { ...d, targetValue: undefined, targetFaceIndex: undefined });
+
 export const useDiceState = () => {
   const [diceList, setDiceList] = useState<DiceData[]>([]);
   const [rollHistory, setRollHistory] = useState<RollHistoryItem[]>(loadStoredHistory);
@@ -181,9 +190,6 @@ export const useDiceState = () => {
     });
   }, [showToast]);
 
-  const removeDice = useCallback((id: string) => {
-    setDiceList(prev => prev.filter(d => d.id !== id));
-  }, []);
 
   const updateDice = useCallback((id: string, updates: Partial<DiceData>) => {
     setDiceList(prev => prev.map(d => d.id === id ? { ...d, ...updates } : d));
@@ -197,27 +203,49 @@ export const useDiceState = () => {
     setDiceList(prev => prev.map(d => (d.held ? { ...d, held: false } : d)));
   }, []);
 
-  const clearAllDice = useCallback(() => {
-    setDiceList([]);
-  }, []);
 
   /** Puts a removed die back where it was (used by Undo). */
   const insertDiceAt = useCallback((die: DiceData, index: number) => {
     setDiceList(prev => {
       if (prev.some(d => d.id === die.id)) return prev;
       const next = [...prev];
-      next.splice(Math.min(Math.max(index, 0), next.length), 0, die);
+      next.splice(Math.min(Math.max(index, 0), next.length), 0, settled(die));
       return next;
     });
   }, []);
 
-  /** Brings back a whole set of dice (used by Undo after Clear All). */
-  const restoreDice = useCallback((list: DiceData[]) => {
-    setDiceList(list);
-  }, []);
-
   // The roll that is tumbling now: its timer and the step that lands it
   const tumbleRef = useRef<{ timer: ReturnType<typeof setTimeout>; land: () => void } | null>(null);
+
+  /**
+   * Removing or clearing dice mid-roll calls the roll off: it used to land
+   * anyway and log the gone dice in History, with a target toast for them
+   * (code review 2026-11-21). The dice left keep the values they had.
+   */
+  const callOffRoll = useCallback(() => {
+    if (!tumbleRef.current) return;
+    clearTimeout(tumbleRef.current.timer);
+    tumbleRef.current = null;
+    setIsRolling(false);
+    setRollingId(null);
+    setDiceList(prev => prev.map(settled));
+  }, []);
+
+  const removeDice = useCallback((id: string) => {
+    callOffRoll();
+    setDiceList(prev => prev.filter(d => d.id !== id));
+  }, [callOffRoll]);
+
+  const clearAllDice = useCallback(() => {
+    callOffRoll();
+    setDiceList([]);
+  }, [callOffRoll]);
+
+  /** Brings back a whole set of dice (used by Undo after Clear All). */
+  const restoreDice = useCallback((list: DiceData[]) => {
+    callOffRoll();
+    setDiceList(list.map(settled));
+  }, [callOffRoll]);
 
   /** Rolls the dice; returns 'landed' when the tap only landed a tumbling roll. */
   const rollDice = useCallback((onComplete?: (summary: RollSummary) => void, onlyId?: string, typed?: TypedRollSetup): 'rolled' | 'landed' | 'none' => {

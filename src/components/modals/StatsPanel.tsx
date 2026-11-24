@@ -1,22 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Modal } from '../Modal';
+import React, { useEffect, useRef } from 'react';
 import { getLocalStats } from '../../utils/analytics';
 import { countSaved, eraseQuestion } from '../../utils/erase';
 import modalStyles from './Modals.module.css';
 
-interface StatsModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  /** Erase all, once asked: takes everything off this phone and reloads */
-  onEraseEverything?: () => void;
-}
+// Usage stats live in History's Stats tab (owner's trim pass, 2026-11-24:
+// "include them all"), no longer a menu item of their own
 
 /**
  * The ask-first panel for Erase everything. It takes the dialog's place, so
  * Tab stays between Not now and Erase all (and the dialog's ×); Escape is
  * Not now. Focus starts on Not now, the safe one.
  */
-const EraseAsk: React.FC<{ question: string; onErase: () => void; onCancel: () => void }> = ({ question, onErase, onCancel }) => {
+export const EraseAsk: React.FC<{ question: string; onErase: () => void; onCancel: () => void }> = ({ question, onErase, onCancel }) => {
   const notNow = useRef<HTMLButtonElement>(null);
   useEffect(() => { notNow.current?.focus(); }, []);
   return (
@@ -26,7 +21,7 @@ const EraseAsk: React.FC<{ question: string; onErase: () => void; onCancel: () =
       className={modalStyles.eraseAsk}
       data-testid="erase-ask"
       onKeyDown={(e) => {
-        // Escape here is Not now, not "close Usage stats"
+        // Escape here is Not now, not "close History"
         if (e.key === 'Escape') { e.stopPropagation(); e.preventDefault(); onCancel(); }
       }}
     >
@@ -47,31 +42,14 @@ const formatDate = (iso: string): string => {
   }
 };
 
-export const StatsModal: React.FC<StatsModalProps> = ({ isOpen, onClose, onEraseEverything }) => {
-  // The question, counted when Erase everything is tapped; null while not asking
-  const [asking, setAsking] = useState<string | null>(null);
-  const eraseButton = useRef<HTMLButtonElement>(null);
-  const backToErase = useRef(false);
-  useEffect(() => { if (!isOpen) setAsking(null); }, [isOpen]); // eslint-disable-line react-hooks/set-state-in-effect
-  useEffect(() => {
-    if (asking === null && backToErase.current) { backToErase.current = false; eraseButton.current?.focus(); }
-  }, [asking]);
+interface StatsPanelProps {
+  /** Erase everything tapped: the question, counted now, for the ask-first panel */
+  onAskErase?: (question: string) => void;
+  eraseRef?: React.Ref<HTMLButtonElement>;
+}
 
-  // Read on open rather than on mount so the numbers are always current
-  if (!isOpen) return null;
-
-  if (asking !== null) {
-    return (
-      <Modal isOpen={isOpen} onClose={onClose} title="Usage stats">
-        <EraseAsk
-          question={asking}
-          onErase={() => onEraseEverything?.()}
-          onCancel={() => { backToErase.current = true; setAsking(null); }}
-        />
-      </Modal>
-    );
-  }
-
+/** Read each time the tab shows, so the numbers are always current */
+export const StatsPanel: React.FC<StatsPanelProps> = ({ onAskErase, eraseRef }) => {
   const stats = getLocalStats();
   const averageRoll = stats.totalRolls > 0 ? (stats.totalSumRolled / stats.totalRolls).toFixed(1) : '—';
 
@@ -88,9 +66,7 @@ export const StatsModal: React.FC<StatsModalProps> = ({ isOpen, onClose, onErase
     { label: 'Dice added', value: stats.customDiceAddedCount.toLocaleString() },
   ];
 
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Usage stats">
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+  return (<>
         <div>
           <div className={modalStyles.metricsGrid}>
             {metrics.map(m => (
@@ -141,12 +117,10 @@ export const StatsModal: React.FC<StatsModalProps> = ({ isOpen, onClose, onErase
         <p className={modalStyles.toggleDesc} style={{ margin: 0 }}>
           Your games, History, pictures and these stats stay on this phone.
         </p>
-        {onEraseEverything && (
-          <button ref={eraseButton} className={`md-button ${modalStyles.eraseEverything}`} onClick={() => setAsking(eraseQuestion(countSaved()))}>
+        {onAskErase && (
+          <button ref={eraseRef} className={`md-button ${modalStyles.eraseEverything}`} onClick={() => onAskErase(eraseQuestion(countSaved()))}>
             Erase everything
           </button>
         )}
-      </div>
-    </Modal>
-  );
+  </>);
 };
